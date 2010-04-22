@@ -56,9 +56,9 @@ import de.walware.ecommons.ui.components.StatusInfo;
 import de.walware.ecommons.ui.dialogs.ExtStatusDialog;
 import de.walware.ecommons.ui.util.DialogUtil;
 import de.walware.ecommons.ui.util.LayoutUtil;
+import de.walware.ecommons.ui.util.ViewerUtil;
 
 import de.walware.ecommons.ltk.internal.ui.EditingMessages;
-import de.walware.ecommons.ltk.internal.ui.LTKUIPlugin;
 import de.walware.ecommons.ltk.ui.sourceediting.SnippetEditor;
 import de.walware.ecommons.ltk.ui.sourceediting.SourceEditorViewerConfigurator;
 
@@ -67,6 +67,7 @@ import de.walware.ecommons.ltk.ui.sourceediting.SourceEditorViewerConfigurator;
  * Dialog to edit a template.
  */
 public class EditTemplateDialog extends ExtStatusDialog {
+	
 	
 	private final Template fOriginalTemplate;
 	private Template fNewTemplate;
@@ -202,6 +203,7 @@ public class EditTemplateDialog extends ExtStatusDialog {
 					doContextChanged(((TemplateContextType) selection.getFirstElement()));
 				}
 			});
+			ViewerUtil.setDefaultVisibleItemCount(fContextCombo);
 			
 			fAutoInsertCheckbox= createCheckbox(composite, EditingMessages.EditTemplateDialog_AutoInsert_label);
 			fAutoInsertCheckbox.setSelection(fOriginalTemplate.isAutoInsertable());
@@ -357,14 +359,14 @@ public class EditTemplateDialog extends ExtStatusDialog {
 	protected void okPressed() {
 		final String name= fNameText == null ? fOriginalTemplate.getName() : fNameText.getText();
 		final boolean isAutoInsertable= fAutoInsertCheckbox != null && fAutoInsertCheckbox.getSelection();
-		fNewTemplate= new Template(name, fDescriptionText.getText(), getContextType().getId(), fPatternEditor.getDocument().get(), isAutoInsertable);
+		fNewTemplate = new Template(name, fDescriptionText.getText(), getContextType().getId(), fPatternEditor.getDocument().get(), isAutoInsertable);
 		super.okPressed();
 	}
 	
 	private void updateButtons() {
 		StatusInfo status;
 		
-		final boolean valid= fNameText == null || fNameText.getText().trim().length() != 0;
+		final boolean valid = (fNameText == null || fNameText.getText().trim().length() != 0);
 		if (!valid) {
 			status = new StatusInfo();
 			if (!fSuppressError) {
@@ -389,9 +391,14 @@ public class EditTemplateDialog extends ExtStatusDialog {
 		}
 	}
 	
+	
+	protected IDialogSettings getDialogSettings() {
+		return DialogUtil.getSection(getDialogBoundsSettings(), "TemplateEditDialog"); //$NON-NLS-1$
+	}
+	
 	@Override
 	protected IDialogSettings getDialogBoundsSettings() {
-		return DialogUtil.getDialogSettings(LTKUIPlugin.getDefault(), "TemplateEditDialog"); //$NON-NLS-1$
+		return getDialogSettings();
 	}
 	
 }

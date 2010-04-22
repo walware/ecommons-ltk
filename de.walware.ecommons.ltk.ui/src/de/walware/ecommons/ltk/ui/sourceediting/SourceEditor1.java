@@ -1164,7 +1164,7 @@ public abstract class SourceEditor1 extends TextEditor
 	}
 	
 	public String[] getShowInTargetIds() {
-		return new String[] { IPageLayout.ID_PROJECT_EXPLORER, IPageLayout.ID_OUTLINE };
+		return new String[] { IPageLayout.ID_PROJECT_EXPLORER };
 	}
 	
 }

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
@@ -82,7 +83,9 @@ public class LTKUIPlugin extends AbstractUIPlugin {
 				fStarted = false;
 				
 				if (fWorkbenchLabelProvider != null) {
-					fWorkbenchLabelProvider.dispose();
+					if (Platform.isRunning()) {
+						fWorkbenchLabelProvider.dispose();
+					}
 					fWorkbenchLabelProvider = null;
 				}
 			}
