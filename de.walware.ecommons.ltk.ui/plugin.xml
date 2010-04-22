@@ -100,12 +100,28 @@
                optional="false"
                values="de.walware.ecommons.ltk.internal.ui.SpecificContentAssistParameterValues"/>
       </command>
+      
       <!-- navigate -->
       <command
             id="de.walware.ecommons.text.commands.GotoMatchingBracket"
             categoryId="org.eclipse.ui.category.navigate"
             name="%commands_GotoMatchingBracket_name"
             description="%commands_GotoMatchingBracket_description" />
+      
+      <!-- search -->
+      <command
+            id="de.walware.ecommons.ide.commands.OpenSearchDialog"
+            categoryId="org.eclipse.search.ui.category.search"
+            name="Open Search Dialog"
+            description="Opens the Search Dialog"
+            defaultHandler="de.walware.epatches.ui.OpenSearchDialogHandler">
+         <commandParameter
+               id="pageId"
+               name="Page"
+               optional="true">
+         </commandParameter>
+      </command>
+      
       <!-- source -->
       <category
             id="de.walware.statet.base.commandCategorys.StatetSource"
@@ -179,6 +195,10 @@
       <image
             commandId="de.walware.ecommons.base.commands.CopyElementName"
             icon="icons/tool_16/copy-name.png">
+      </image>
+      <image
+            commandId="de.walware.ecommons.ide.commands.OpenSearchDialog"
+            icon="icons/tool_16/search.gif">
       </image>
    </extension>
    <extension

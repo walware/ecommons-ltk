@@ -23,7 +23,8 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.5.0",
  de.walware.ecommons.uimisc;bundle-version="0.9.0",
  de.walware.ecommons.ltk.core;bundle-version="0.9.0";visibility:=reexport,
  org.eclipse.ecf.docshare;bundle-version="2.1.0";resolution:=optional,
- org.eclipse.compare;resolution:=optional
+ org.eclipse.compare;resolution:=optional,
+ org.eclipse.search;resolution:=optional
 Import-Package: com.ibm.icu.text;version="4.0.1",
  de.walware.ecommons,
  de.walware.ecommons.io,
