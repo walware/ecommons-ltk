@@ -16,14 +16,23 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.MultiEditorInput;
+
+import de.walware.ecommons.ltk.ISourceUnit;
+import de.walware.ecommons.ltk.ISourceUnitManager;
+import de.walware.ecommons.ltk.LTK;
 
 
 /**
@@ -74,6 +83,35 @@ public class EditorUtility {
 		} 
 		else if (input.getAdapter(IResource.class) != null) {
 			return true;
+		}
+		return false;
+	}
+	
+	public static boolean isModelTypeEditorInput(final IEditorInput input, final String modelTypeId) {
+		final Object ifile = input.getAdapter(IFile.class);
+		final ISourceUnitManager suManager = LTK.getSourceUnitManager();
+		if (ifile != null) {
+			final ISourceUnit su = suManager.getSourceUnit(modelTypeId, LTK.PERSISTENCE_CONTEXT, ifile, false, null);
+			if (su != null) {
+				su.disconnect(null);
+				return true;
+			}
+			return false;
+		}
+		else if (input instanceof IURIEditorInput) {
+			final IFileStore store;
+			try {
+				store = EFS.getStore(((IURIEditorInput) input).getURI());
+			}
+			catch (final CoreException e) {
+				return false;
+			}
+			final ISourceUnit su = suManager.getSourceUnit(modelTypeId, LTK.EDITOR_CONTEXT, store, false, null);
+			if (su != null) {
+				su.disconnect(null);
+				return true;
+			}
+			return false;
 		}
 		return false;
 	}

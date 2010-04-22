@@ -65,7 +65,7 @@ public class TextStyleManager {
 		return token;
 	}
 	
-	private String resolveUsedKey(final String key) {
+	protected String resolveUsedKey(final String key) {
 		String use = key;
 		while (true) {
 			final String test = fPreferenceStore.getString(use+ITextPresentationConstants.TEXTSTYLE_USE_SUFFIX);
@@ -83,7 +83,7 @@ public class TextStyleManager {
 	 * @return the created text attribute
 	 * @since 3.0
 	 */
-	private TextAttribute createTextAttribute(String key) {
+	protected Object createTextAttribute(String key) {
 		key = resolveUsedKey(key);
 		
 		final RGB rgb = PreferenceConverter.getColor(fPreferenceStore, key + ITextPresentationConstants.TEXTSTYLE_COLOR_SUFFIX);
