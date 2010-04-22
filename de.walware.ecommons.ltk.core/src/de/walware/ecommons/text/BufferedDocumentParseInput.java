@@ -42,7 +42,8 @@ public class BufferedDocumentParseInput extends SourceParseInput {
 	}
 	
 	@Override
-	protected void updateBuffer(final int index, final int min) {
+	protected void updateBuffer(final int min) {
+		final int index = getIndex();
 		int stop = getStopIndex();
 		if (stop < 0) {
 			stop = fDocument.getLength();

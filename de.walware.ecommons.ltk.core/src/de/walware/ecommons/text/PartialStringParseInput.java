@@ -29,7 +29,8 @@ public class PartialStringParseInput extends SourceParseInput implements CharSeq
 	
 	
 	@Override
-	protected void updateBuffer(final int index, final int min) {
+	protected void updateBuffer(final int min) {
+		final int index = getIndex();
 		if (index < fOffset) {
 			throw new IllegalStateException();
 		}

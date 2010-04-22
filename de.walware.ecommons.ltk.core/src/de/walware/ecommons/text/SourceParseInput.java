@@ -55,7 +55,7 @@ public abstract class SourceParseInput {
 		fStop = stop;
 		fIndexInBuffer = 0;
 		fBufferLength = 0;
-		updateBuffer(fIndex, 0);
+		updateBuffer(0);
 	}
 	
 	public final int getIndex() {
@@ -71,13 +71,29 @@ public abstract class SourceParseInput {
 		if (idx < fBufferLength) {
 			return fBuffer[idx];
 		}
-		updateBuffer(fIndex, num);
+		updateBuffer(num);
 		idx = fIndexInBuffer+num-1;
 		if (idx < fBufferLength) {
 			return fBuffer[idx];
 		}
 		return EOF;
 	}
+	
+//	public int read(final char[] buffer) {
+//		int idx = fIndexInBuffer;
+//		if (idx >= fBufferLength) {
+//			updateBuffer(buffer.length);
+//			idx = fIndexInBuffer;
+//			if (idx >= fBufferLength) {
+//				return -1;
+//			}
+//		}
+//		final int n = 0;
+//		while (idx < fBufferLength) {
+//			buffer[n] = fBuffer[idx++];
+//		}
+//		return n;
+//	}
 	
 //	public final boolean subequals(final int num, final char c1) {
 //		int idx = fIndexInBuffer+num-1; // -1
@@ -95,7 +111,7 @@ public abstract class SourceParseInput {
 		if (idx < fBufferLength) {
 			return (fBuffer[idx] == c2 && fBuffer[--idx] == c1);
 		}
-		updateBuffer(fIndex, num);
+		updateBuffer(num);
 		idx = fIndexInBuffer+num;
 		return (idx < fBufferLength
 				&& fBuffer[idx] == c2 && fBuffer[++idx] == c1);
@@ -106,7 +122,7 @@ public abstract class SourceParseInput {
 		if (idx < fBufferLength) {
 			return (fBuffer[idx] == c3 && fBuffer[--idx] == c2 && fBuffer[--idx] == c1);
 		}
-		updateBuffer(fIndex, num);
+		updateBuffer(num);
 		idx = fIndexInBuffer+num+1;
 		return (idx < fBufferLength
 				&& fBuffer[idx] == c3 && fBuffer[--idx] == c2 && fBuffer[--idx] == c1);
@@ -116,7 +132,7 @@ public abstract class SourceParseInput {
 		int idx = fIndexInBuffer+num-1;
 		final int length = sequence.length;
 		if (idx+length > fBufferLength) {
-			updateBuffer(fIndex, num);
+			updateBuffer(num);
 			idx = fIndexInBuffer+num-1;
 			if (idx+length > fBufferLength) {
 				return false;
@@ -139,17 +155,22 @@ public abstract class SourceParseInput {
 		return num;
 	}
 	
-	public final void consume(final int num) {
+	public void consume(final int num) {
 		fIndex += getLength(num);
 		fIndexInBuffer += num;
 	}
 	
-	public final void consume(final int num, final int length) {
+	public void consume(final int num, final int length) {
 		fIndex += length;
 		fIndexInBuffer += num;
 	}
 	
-	protected abstract void updateBuffer(int index, int min);
+	protected void setConsume(final int num, final int index) {
+		fIndex = index;
+		fIndexInBuffer += num;
+	}
+	
+	protected abstract void updateBuffer(int min);
 	
 	protected final void setBuffer(final char[] buffer, final int length, final int indexInBuffer) {
 		fIndexInBuffer = indexInBuffer;

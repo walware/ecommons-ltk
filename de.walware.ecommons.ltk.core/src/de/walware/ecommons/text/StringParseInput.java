@@ -27,8 +27,8 @@ public class StringParseInput extends SourceParseInput implements CharSequence {
 	
 	
 	@Override
-	protected void updateBuffer(final int index, final int min) {
-		setBuffer(fContent, fContent.length, index);
+	protected void updateBuffer(final int min) {
+		setBuffer(fContent, fContent.length, getIndex());
 	}
 	
 	

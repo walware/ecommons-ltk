@@ -60,7 +60,8 @@ public class StringRegionParseInput extends SourceParseInput implements CharSequ
 	
 	
 	@Override
-	protected void updateBuffer(final int index, final int min) {
+	protected void updateBuffer(final int min) {
+		final int index = getIndex();
 		if (index < fOffset) {
 			throw new IllegalStateException();
 		}
@@ -133,7 +134,7 @@ public class StringRegionParseInput extends SourceParseInput implements CharSequ
 	}
 	
 	public CharSequence subSequence(final int start, final int end) {
-		return new String(fContent, start-fOffset, end-(start-fOffset));
+		return new String(fContent, start-fOffset, end-start);
 	}
 	
 }
