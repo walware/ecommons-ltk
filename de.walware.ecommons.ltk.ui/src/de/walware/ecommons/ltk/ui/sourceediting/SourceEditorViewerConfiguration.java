@@ -33,6 +33,9 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.ITextViewerExtension2;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
+import org.eclipse.jface.text.information.IInformationPresenter;
+import org.eclipse.jface.text.information.IInformationProvider;
+import org.eclipse.jface.text.information.InformationPresenter;
 import org.eclipse.jface.text.quickassist.IQuickAssistAssistant;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.templates.TemplateContextType;
@@ -49,6 +52,8 @@ import de.walware.ecommons.text.ui.settings.AssistPreferences;
 import de.walware.ecommons.text.ui.settings.DecorationPreferences;
 import de.walware.ecommons.ui.ColorManager;
 import de.walware.ecommons.ui.ISettingsChangedHandler;
+
+import de.walware.ecommons.ltk.ui.sourceediting.InfoHoverRegistry.EffectiveHovers;
 
 
 /**
@@ -93,6 +98,15 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 		
 	};
 	
+	private static final IInformationControlCreator DEFAULT_INFORMATION_CONTROL_CREATOR =
+			new IInformationControlCreator() {
+				
+				public IInformationControl createInformationControl(final Shell parent) {
+					return new DefaultInformationControl(parent, true);
+				}
+				
+			};
+	
 	
 	private final ISourceEditor fSourceEditor;
 	
@@ -103,6 +117,8 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	
 	private DecorationPreferences fDecorationPreferences;
 	private AssistPreferences fAssistPreferences;
+	
+	private EffectiveHovers fEffectiveHovers;
 	
 	
 	public SourceEditorViewerConfiguration(final ISourceEditor sourceEditor) {
@@ -216,12 +232,60 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	}
 	
 	@Override
+	public int[] getConfiguredTextHoverStateMasks(final ISourceViewer sourceViewer, final String contentType) {
+		if (fSourceEditor != null) {
+			final String[] partitioning = getConfiguredContentTypes(sourceViewer);
+			if (partitioning != null && partitioning.length > 0 && partitioning[0].equals(contentType)) {
+				final InfoHoverRegistry registry = getInfoHoverRegistry();
+				if (registry != null) {
+					fEffectiveHovers = registry.getEffectiveHoverDescriptors();
+					if (fEffectiveHovers != null) {
+						return fEffectiveHovers.getStateMasks();
+					}
+					return null;
+				}
+			}
+		}
+		return super.getConfiguredTextHoverStateMasks(sourceViewer, contentType);
+	}
+	
+	public EffectiveHovers getEffectiveHovers() {
+		return fEffectiveHovers;
+	}
+	
+	@Override
 	public ITextHover getTextHover(final ISourceViewer sourceViewer, final String contentType) {
 		return getTextHover(sourceViewer, contentType, ITextViewerExtension2.DEFAULT_HOVER_STATE_MASK);
 	}
 	
 	@Override
 	public ITextHover getTextHover(final ISourceViewer sourceViewer, final String contentType, final int stateMask) {
+		return null;
+	}
+	
+	protected InfoHoverRegistry getInfoHoverRegistry() {
+		return null;
+	}
+	
+	
+	@Override
+	public IInformationPresenter getInformationPresenter(final ISourceViewer sourceViewer) {
+		final InformationPresenter presenter = new InformationPresenter(
+				DEFAULT_INFORMATION_CONTROL_CREATOR);
+		presenter.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
+		
+		// Register information provider
+		final IInformationProvider provider = getInformationProvider();
+		final String[] contentTypes = getConfiguredContentTypes(sourceViewer);
+		for (int i= 0; i < contentTypes.length; i++) {
+			presenter.setInformationProvider(provider, contentTypes[i]);
+		}
+		// sizes: see org.eclipse.jface.text.TextViewer.TEXT_HOVER_*_CHARS
+		presenter.setSizeConstraints(100, 12, true, true);
+		return presenter;
+	}
+	
+	protected IInformationProvider getInformationProvider() {
 		return null;
 	}
 	

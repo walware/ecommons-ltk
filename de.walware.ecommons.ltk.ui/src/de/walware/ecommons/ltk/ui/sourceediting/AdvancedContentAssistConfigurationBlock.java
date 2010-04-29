@@ -92,8 +92,7 @@ public class AdvancedContentAssistConfigurationBlock extends ManagedConfiguratio
 	private IParameter fSpecificParam;
 	
 	
-	public AdvancedContentAssistConfigurationBlock(
-			final ContentAssistComputerRegistry registry,
+	public AdvancedContentAssistConfigurationBlock(final ContentAssistComputerRegistry registry,
 			final IStatusChangeListener statusListener) {
 		super(null, statusListener);
 		fRegistry = registry;

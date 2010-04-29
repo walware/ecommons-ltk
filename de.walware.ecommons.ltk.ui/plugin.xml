@@ -19,6 +19,10 @@
          schema="schema/advancedContentAssist.exsd"
          name="Point to register categories and computers for advanced content assist in editors"/>
    
+   <extension-point id="de.walware.ecommons.ltk.advancedInfoHover"
+         schema="schema/advancedInfoHover.exsd"
+         name="Point to register information hovers"/>
+   
    <extension
          point="org.eclipse.ui.contexts">
       <context

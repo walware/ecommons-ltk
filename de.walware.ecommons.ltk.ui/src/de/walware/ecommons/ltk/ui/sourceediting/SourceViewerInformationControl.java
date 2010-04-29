@@ -52,7 +52,7 @@ public class SourceViewerInformationControl extends AbstractInformationControl {
 	/** The control's source viewer */
 	private SourceViewer fViewer;
 	
-	private SourceEditorViewerConfigurator fConfigurator;
+	private final SourceEditorViewerConfigurator fConfigurator;
 	
 	private IInformationControlCreator fInformationCreator;
 	

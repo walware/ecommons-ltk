@@ -42,12 +42,12 @@ public class SpecificContentAssistParameterValues implements IParameterValues {
 			map = new HashMap<String, String>();
 			
 			final IExtensionRegistry extensionRegistry = Platform.getExtensionRegistry();
-			final IConfigurationElement[] contributions = extensionRegistry.getConfigurationElementsFor(AdvancedContentAssistInternal.EXTENSIONPOINT_ID);
+			final IConfigurationElement[] contributions = extensionRegistry.getConfigurationElementsFor(AdvancedExtensionsInternal.CONTENTASSIST_EXTENSIONPOINT_ID);
 			for (final IConfigurationElement config : contributions) {
-				if (config.getName().equals(AdvancedContentAssistInternal.CONFIG_CATEGORY_ELEMENT_NAME)) {
+				if (config.getName().equals(AdvancedExtensionsInternal.CONFIG_CATEGORY_ELEMENT_NAME)) {
 					try {
-						final String id = AdvancedContentAssistInternal.getCheckedString(config, AdvancedContentAssistInternal.CONFIG_ID_ATTRIBUTE_NAME);
-						final String name = AdvancedContentAssistInternal.getCheckedString(config, AdvancedContentAssistInternal.CONFIG_NAME_ATTRIBUTE_NAME);
+						final String id = AdvancedExtensionsInternal.getCheckedString(config, AdvancedExtensionsInternal.CONFIG_ID_ATTRIBUTE_NAME);
+						final String name = AdvancedExtensionsInternal.getCheckedString(config, AdvancedExtensionsInternal.CONFIG_NAME_ATTRIBUTE_NAME);
 						map.put(MessageUtil.removeMnemonics(name), id);
 					}
 					catch (final CoreException e) {

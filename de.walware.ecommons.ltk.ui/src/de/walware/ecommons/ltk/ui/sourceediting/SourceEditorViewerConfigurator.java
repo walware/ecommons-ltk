@@ -17,6 +17,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.filebuffers.IDocumentSetupParticipant;
+import org.eclipse.jface.text.ITextHover;
+import org.eclipse.jface.text.ITextViewerExtension2;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.swt.events.DisposeEvent;
@@ -167,6 +169,30 @@ public abstract class SourceEditorViewerConfigurator implements ISettingsChanged
 		
 		if (options.containsKey(ITextPresentationConstants.SETTINGSCHANGE_AFFECTSPRESENTATION_KEY)) {
 			viewer.invalidateTextPresentation();
+		}
+	}
+	
+	protected void updateConfiguredInfoHovers() {
+		final SourceViewer viewer = fSourceEditor.getViewer();
+		final String[] contentTypes = fConfiguration.getConfiguredContentTypes(viewer);
+		for (final String contentType : contentTypes) {
+			((ITextViewerExtension2)viewer).removeTextHovers(contentType);
+			final int[] stateMasks = fConfiguration.getConfiguredTextHoverStateMasks(viewer, contentType);
+			if (stateMasks != null) {
+				for (int j = 0; j < stateMasks.length; j++)	{
+					final int stateMask = stateMasks[j];
+					final ITextHover textHover = fConfiguration.getTextHover(viewer, contentType, stateMask);
+					if (textHover != null) {
+						viewer.setTextHover(textHover, contentType, stateMask);
+					}
+				}
+			}
+			else {
+				final ITextHover textHover = fConfiguration.getTextHover(viewer, contentType);
+				if (textHover != null) {
+					viewer.setTextHover(textHover, contentType, ITextViewerExtension2.DEFAULT_HOVER_STATE_MASK);
+				}
+			}
 		}
 	}
 	

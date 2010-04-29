@@ -12,6 +12,7 @@
 package de.walware.ecommons.ltk.ui.sourceediting;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.quickassist.IQuickAssistInvocationContext;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.swt.graphics.Point;
@@ -22,7 +23,7 @@ import de.walware.ecommons.ltk.ISourceUnitModelInfo;
 import de.walware.ecommons.ltk.ast.AstSelection;
 
 
-public class AssistInvocationContext implements IQuickAssistInvocationContext {
+public class AssistInvocationContext implements IQuickAssistInvocationContext, IRegion {
 	
 	
 	private final ISourceEditor fEditor;
@@ -51,6 +52,23 @@ public class AssistInvocationContext implements IQuickAssistInvocationContext {
 		fSelectionOffset = selectedRange.x;
 		fSelectionLength = selectedRange.y;
 		
+		init(synch);
+	}
+	
+	public AssistInvocationContext(final ISourceEditor editor, final IRegion region, final int synch) {
+		fEditor = editor;
+		
+		fSourceViewer = editor.getViewer();
+		fSourceUnit = editor.getSourceUnit();
+		
+		fInvocationOffset = region.getOffset();
+		fSelectionOffset = region.getOffset();
+		fSelectionLength = region.getLength();
+		
+		init(synch);
+	}
+	
+	private void init(final int synch) {
 		if (fSourceUnit != null) {
 			final NullProgressMonitor monitor = new NullProgressMonitor();
 			final String type = null;
