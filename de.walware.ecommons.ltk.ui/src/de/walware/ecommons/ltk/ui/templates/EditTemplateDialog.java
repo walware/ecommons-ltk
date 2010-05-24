@@ -59,6 +59,7 @@ import de.walware.ecommons.ui.util.LayoutUtil;
 import de.walware.ecommons.ui.util.ViewerUtil;
 
 import de.walware.ecommons.ltk.internal.ui.EditingMessages;
+import de.walware.ecommons.ltk.internal.ui.LTKUIPlugin;
 import de.walware.ecommons.ltk.ui.sourceediting.SnippetEditor;
 import de.walware.ecommons.ltk.ui.sourceediting.SourceEditorViewerConfigurator;
 
@@ -372,12 +373,34 @@ public class EditTemplateDialog extends ExtStatusDialog {
 			if (!fSuppressError) {
 				status.setError(EditingMessages.EditTemplateDialog_error_NoName);
 			}
+		} else if (!isValidPattern(fPatternEditor.getDocument().get())) {
+			status = new StatusInfo();
+			if (!fSuppressError)
+				status.setError(EditingMessages.EditTemplateDialog_error_invalidPattern);
 		} else {
 			status= fValidationStatus;
 		}
 		updateStatus(status);
 	}
 	
+	/**
+	 * Validates the pattern.
+	 * <p>
+	 * The default implementation rejects invalid XML characters.
+	 * </p>
+	 * 
+	 * @param pattern the pattern to verify
+	 * @return <code>true</code> if the pattern is valid
+	 * @since 3.6
+	 */
+	protected boolean isValidPattern(final String pattern) {
+		for (int i= 0; i < pattern.length(); i++) {
+			final char ch= pattern.charAt(i);
+			if (!(ch == 9 || ch == 10 || ch == 13 || ch >= 32))
+				return false;
+		}
+		return true;
+	}
 	
 /* ******/
 	
@@ -393,7 +416,7 @@ public class EditTemplateDialog extends ExtStatusDialog {
 	
 	
 	protected IDialogSettings getDialogSettings() {
-		return DialogUtil.getSection(getDialogBoundsSettings(), "TemplateEditDialog"); //$NON-NLS-1$
+		return DialogUtil.getDialogSettings(LTKUIPlugin.getDefault(), "TemplateEditDialog"); //$NON-NLS-1$
 	}
 	
 	@Override

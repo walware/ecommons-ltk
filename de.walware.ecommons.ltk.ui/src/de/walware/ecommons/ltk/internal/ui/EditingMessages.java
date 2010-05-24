@@ -64,6 +64,7 @@ public class EditingMessages extends NLS {
 	public static String EditTemplateDialog_title_Edit;
 	public static String EditTemplateDialog_title_New;
 	public static String EditTemplateDialog_error_NoName;
+	public static String EditTemplateDialog_error_invalidPattern;
 	public static String EditTemplateDialog_Name_label;
 	public static String EditTemplateDialog_Description_label;
 	public static String EditTemplateDialog_Context_label;
