@@ -15,11 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.ui.statushandlers.StatusManager;
 import org.osgi.framework.BundleContext;
 
 import de.walware.ecommons.ICommonStatusConstants;
@@ -83,8 +84,15 @@ public class LTKUIPlugin extends AbstractUIPlugin {
 				fStarted = false;
 				
 				if (fWorkbenchLabelProvider != null) {
-					if (Platform.isRunning()) {
-						fWorkbenchLabelProvider.dispose();
+					try {
+						if (PlatformUI.isWorkbenchRunning() &&
+								!PlatformUI.getWorkbench().isClosing()) {
+							fWorkbenchLabelProvider.dispose();
+						}
+					}
+					catch (Exception e) {
+						StatusManager.getManager().handle(new Status(IStatus.ERROR, PLUGIN_ID, -1,
+								"An error occurred when disposing the shared WorkbenchLabelProvider.", e));
 					}
 					fWorkbenchLabelProvider = null;
 				}
