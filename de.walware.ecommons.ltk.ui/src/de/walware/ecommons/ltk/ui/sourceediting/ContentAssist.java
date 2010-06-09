@@ -20,6 +20,10 @@ import org.eclipse.jface.text.contentassist.ContentAssistant;
 public class ContentAssist extends ContentAssistant {
 	
 	
+	private boolean fIsAutoInsertEnabled;
+	private boolean fIsAutoInsertOverwritten;
+	
+	
 	public ContentAssist() {
 	}
 	
@@ -34,6 +38,39 @@ public class ContentAssist extends ContentAssistant {
 	
 	void hidePopups() {
 		super.hide();
+	}
+	
+	
+	@Override
+	public void enableAutoInsert(boolean enabled) {
+		fIsAutoInsertEnabled = enabled;
+		if (!fIsAutoInsertOverwritten) {
+			super.enableAutoInsert(enabled);
+		}
+	}
+	
+	/**
+	 * Overwrites the current (user) setting temporarily and enables auto insert until it is reset
+	 * by calling {@link #enableAutoInsertSetting()}.
+	 * 
+	 * @see #enableAutoInsert(boolean)
+	 */
+	void enableAutoInsertTemporarily() {
+		fIsAutoInsertOverwritten = true;
+		super.enableAutoInsert(true);
+	}
+	
+	/**
+	 * Disables the overwriting of auto insert enabled by {@link #enableAutoInsertTemporarily()}
+	 * and resets it to the (user) setting.
+	 * 
+	 * @see #enableAutoInsert(boolean)
+	 */
+	void enableAutoInsertSetting() {
+		if (fIsAutoInsertOverwritten) {
+			fIsAutoInsertOverwritten = false;
+			super.enableAutoInsert(fIsAutoInsertEnabled);
+		}
 	}
 	
 }

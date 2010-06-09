@@ -105,19 +105,20 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 			
 			fRepetition = 0;
 			
+			if (fAssistant instanceof IContentAssistantExtension3) {
+				final IContentAssistantExtension3 ext3= fAssistant;
+				((ContentAssistant) ext3).setRepeatedInvocationTrigger(binding);
+			}
 			if (fCategoryIteration.size() == 1) {
 				fAssistant.setRepeatedInvocationMode(false);
 				fAssistant.setShowEmptyList(false);
 			}
 			else {
 				fAssistant.setRepeatedInvocationMode(true);
+				fAssistant.setShowEmptyList(true);
+				
 				fAssistant.setStatusLineVisible(true);
 				fAssistant.setStatusMessage(createIterationMessage(0));
-				fAssistant.setShowEmptyList(true);
-				if (fAssistant instanceof IContentAssistantExtension3) {
-					final IContentAssistantExtension3 ext3= fAssistant;
-					((ContentAssistant) ext3).setRepeatedInvocationTrigger(binding);
-				}
 			}
 		}
 		
@@ -139,8 +140,10 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 			fRepetition = -1;
 			fIterationGesture = null;
 			
-			fAssistant.setShowEmptyList(false);
 			fAssistant.setRepeatedInvocationMode(false);
+			fAssistant.setShowEmptyList(false);
+			fAssistant.enableAutoInsertSetting();
+			
 			fAssistant.setStatusLineVisible(false);
 			if (fAssistant instanceof IContentAssistantExtension3) {
 				final IContentAssistantExtension3 ext3 = fAssistant;
@@ -236,16 +239,24 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 					|| modificationStamp != fInformationModeModificationStamp)
 				&& forceContextInformation(context)) {
 			mode = IContentAssistComputer.INFORMATION_MODE;
-			fAssistant.setShowEmptyList(false);
+			
+			fAssistant.setRepeatedInvocationMode(true);
+			fAssistant.setShowEmptyList(true);
+			fAssistant.enableAutoInsertTemporarily();
+			
 			fAssistant.setStatusLineVisible(true);
 //			fAssistant.setStatusMessage(createIterationMessage(-1));
 			fAssistant.setStatusMessage(EditingMessages.ContentAssistProcessor_ContextSelection_label);
 		}
 		else if (fRepetition > 0) {
-				mode = IContentAssistComputer.SPECIFIC_MODE;
+			mode = IContentAssistComputer.SPECIFIC_MODE;
+			
+			fAssistant.enableAutoInsertSetting();
 		}
 		else {
 			mode = IContentAssistComputer.COMBINED_MODE;
+			
+			fAssistant.enableAutoInsertSetting();
 		}
 		
 		final List<ContentAssistCategory> categories = (mode == IContentAssistComputer.INFORMATION_MODE) ?
@@ -524,6 +535,9 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	}
 	
 	protected String createIterationMessage(final int repetition) {
+		if (repetition >= 0 && repetition == repetition % fCategoryIteration.size()) {
+			return getCategoryName(repetition);
+		}
 		return NLS.bind(EditingMessages.ContentAssistProcessor_ToggleAffordance_message, new String[] { 
 				getCategoryName(repetition), fIterationGesture, getCategoryName(repetition + 1) });
 	}
