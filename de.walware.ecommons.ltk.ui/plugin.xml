@@ -214,27 +214,71 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M2+M3+ARROW_UP"/>
       <key
+            contextId="de.walware.ecommons.text.contexts.TextEditor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            platform="carbon"
+            sequence="M2+M3+ARROW_UP"/>
+      <key
+            commandId="de.walware.ecommons.base.commands.SelectExpandEnclosing"
+            contextId="de.walware.ecommons.text.contexts.TextEditor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            platform="carbon"
+            sequence="CTRL+SHIFT+ARROW_UP"/>
+      <key
             commandId="de.walware.ecommons.base.commands.SelectExpandNext"
             contextId="de.walware.ecommons.text.contexts.TextEditor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M2+M3+ARROW_RIGHT"/>
+      <key
+            contextId="de.walware.ecommons.text.contexts.TextEditor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            platform="carbon"
+            sequence="M2+M3+ARROW_RIGHT"/>
+      <key
+            commandId="de.walware.ecommons.base.commands.SelectExpandNext"
+            contextId="de.walware.ecommons.text.contexts.TextEditor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            platform="carbon"
+            sequence="CTRL+SHIFT+ARROW_RIGHT"/>
       <key
             commandId="de.walware.ecommons.base.commands.SelectExpandPrevious"
             contextId="de.walware.ecommons.text.contexts.TextEditor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M2+M3+ARROW_LEFT"/>
       <key
+            contextId="de.walware.ecommons.text.contexts.TextEditor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            platform="carbon"
+            sequence="M2+M3+ARROW_LEFT"/>
+      <key
+            commandId="de.walware.ecommons.base.commands.SelectExpandPrevious"
+            contextId="de.walware.ecommons.text.contexts.TextEditor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            platform="carbon"
+            sequence="CTRL+SHIFT+ARROW_LEFT"/>
+      <key
             commandId="de.walware.ecommons.base.commands.SelectLast"
             contextId="de.walware.ecommons.text.contexts.TextEditor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M2+M3+ARROW_DOWN"/>
+      <key
+            contextId="de.walware.ecommons.text.contexts.TextEditor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            platform="carbon"
+            sequence="M2+M3+ARROW_DOWN"/>
+      <key
+            commandId="de.walware.ecommons.base.commands.SelectLast"
+            contextId="de.walware.ecommons.text.contexts.TextEditor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            platform="carbon"
+            sequence="CTRL+SHIFT+ARROW_DOWN"/>
       
       <key
             commandId="de.walware.ecommons.text.commands.GotoMatchingBracket"
             contextId="de.walware.ecommons.text.contexts.TextEditor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M2+P"/>
-            
+      
       <key
             commandId="de.walware.ecommons.ltk.commands.ToggleComment"
             contextId="de.walware.ecommons.text.contexts.TextEditor"
@@ -259,6 +303,11 @@
             commandId="de.walware.ecommons.ltk.commands.AddDocComment"
             contextId="de.walware.ecommons.text.contexts.TextEditor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+/"/>
+      <key
+            contextId="de.walware.ecommons.text.contexts.TextEditor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            platform="carbon"
             sequence="M1+M2+/"/>
       <key
             commandId="de.walware.ecommons.ltk.commands.CorrectIndent"
@@ -299,6 +348,19 @@
             contextId="de.walware.ecommons.text.contexts.TextEditor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M2+M3+R">
+      </key>
+      <key
+            contextId="de.walware.ecommons.text.contexts.TextEditor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            platform="carbon"
+            sequence="M2+M3+R">
+      </key>
+      <key
+            commandId="de.walware.ecommons.ltk.commands.RefactorRenameInWorkspace"
+            contextId="de.walware.ecommons.text.contexts.TextEditor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            platform="carbon"
+            sequence="COMMAND+ALT+R">
       </key>
    </extension>
    
