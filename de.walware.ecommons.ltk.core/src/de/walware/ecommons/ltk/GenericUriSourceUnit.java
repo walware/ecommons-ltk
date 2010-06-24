@@ -34,10 +34,9 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	private IWorkingBuffer fBuffer;
 	
 	private int fCounter = 0;
-	private final ISourceUnitStateListener fListener;
 	
 	
-	public GenericUriSourceUnit(final String id, final IFileStore store, final ISourceUnitStateListener listener) {
+	public GenericUriSourceUnit(final String id, final IFileStore store) {
 		fId = id;
 		fName = new IElementName() {
 			public int getType() {
@@ -57,7 +56,6 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 			}
 		};
 		fStore = store;
-		fListener = listener;
 	}
 	
 	
@@ -225,18 +223,19 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 		}
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
+	public synchronized boolean isConnected() {
+		return (fCounter > 0);
+	}
+	
 	protected abstract IWorkingBuffer createWorkingBuffer(SubMonitor progress);
 	
 	protected void register() {
-		if (fListener != null) {
-			fListener.connectedChanged(this, true);
-		}
 	}
 	
 	protected void unregister() {
-		if (fListener != null) {
-			fListener.connectedChanged(this, false);
-		}
 	}
 	
 }

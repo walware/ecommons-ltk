@@ -12,7 +12,7 @@
 package de.walware.ecommons.ltk.internal.core;
 
 import java.lang.ref.ReferenceQueue;
-import java.lang.ref.WeakReference;
+import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -35,7 +35,6 @@ import de.walware.ecommons.ltk.IModelElement;
 import de.walware.ecommons.ltk.ISourceUnit;
 import de.walware.ecommons.ltk.ISourceUnitFactory;
 import de.walware.ecommons.ltk.ISourceUnitManager;
-import de.walware.ecommons.ltk.ISourceUnitStateListener;
 import de.walware.ecommons.ltk.LTK;
 import de.walware.ecommons.ltk.WorkingContext;
 
@@ -47,62 +46,30 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 	private static final String CONFIG_CONTEXT_KEY_ATTRIBUTE_NAME = "contextKey"; //$NON-NLS-1$
 	
 	
-	private static final class SuItem extends WeakReference<ISourceUnit> {
+	private static final class SuItem extends SoftReference<ISourceUnit> {
 		
 		private final String fKey;
-		private ISourceUnit fStrongReference;
 		
 		public SuItem(final String key, final ISourceUnit su, final ReferenceQueue<ISourceUnit> queue) {
 			super(su);
 			fKey = key;
-			fStrongReference = su;
 		}
 		
 		public String getKey() {
 			return fKey;
 		}
 		
-		public void loosen() {
-			fStrongReference = null;
-		}
-		
-		public void tighten() {
-			if (fStrongReference == null) {
-				fStrongReference = get();
-			}
-		}
-		
-		public ISourceUnit get(final boolean includeDeleted) {
-			final ISourceUnit su = fStrongReference;
-			if (su != null) {
-				return su;
-			}
-			if (includeDeleted) {
-				return super.get();
-			}
-			return null;
-		}
-		
 		public void dispose() {
-			fStrongReference = null;
+			final ISourceUnit su = get();
+			if (su != null && su.isConnected()) {
+				LTKCorePlugin.getDefault().getLog().log(
+						new Status(IStatus.WARNING, LTKCorePlugin.PLUGIN_ID, -1,
+								NLS.bind("Source Unit ''{0}'' disposed but connected.", su.getId()), null));
+			}
 			clear();
 		}
 		
 	}
-	
-	private static class SourceUnitStateListener implements ISourceUnitStateListener {
-		
-		private SuItem fSuItem;
-		
-		public void connectedChanged(final ISourceUnit source, final boolean connected) {
-			if (connected) {
-				fSuItem.tighten();
-			}
-			else {
-				fSuItem.loosen();
-			}
-		}
-	};
 	
 	private static class ContextItem {
 		
@@ -253,7 +220,6 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 	
 	
 	public SourceUnitManager() {
-		
 		fCleanupJob.initialSchedule();
 	}
 	
@@ -307,19 +273,20 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 			synchronized (contextItem) {
 				SuItem suItem = contextItem.fSus.get(id);
 				if (suItem != null) {
-					su = suItem.get(true);
+					su = suItem.get();
+					if (suItem.isEnqueued()) {
+						su = null;
+					}
 				}
 				else {
 					if (create) {
-						final SourceUnitStateListener listener = new SourceUnitStateListener();
-						su = contextItem.fFactory.createSourceUnit(id, fromUnit, listener);
+						su = contextItem.fFactory.createSourceUnit(id, (fromUnit != null) ? fromUnit : from);
 						if (su == null || !su.getModelTypeId().equals(modelItem.fModelTypeId)
 								|| (su.getElementType() & IModelElement.MASK_C1) != IModelElement.C1_SOURCE) {
 							// TODO log
 							return null; 
 						}
 						suItem = new SuItem(id, su, contextItem.fSusToClean);
-						listener.fSuItem = suItem;
 					}
 					else {
 						return null;
@@ -384,8 +351,8 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 					final Collection<SuItem> suItems = contextItem.fSus.values();
 					list.ensureCapacity(list.size()+suItems.size());
 					for (final SuItem suItem : suItems) {
-						final ISourceUnit su = suItem.get(false);
-						if (su != null) {
+						final ISourceUnit su = suItem.get();
+						if (su != null && su.isConnected() && !suItem.isEnqueued()) {
 							list.add(su);
 						}
 					}

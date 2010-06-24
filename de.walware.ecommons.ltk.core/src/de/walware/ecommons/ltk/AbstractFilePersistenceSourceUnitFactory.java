@@ -70,7 +70,7 @@ public abstract class AbstractFilePersistenceSourceUnitFactory implements ISourc
 		return null;
 	}
 	
-	public ISourceUnit createSourceUnit(final String id, final Object from, final ISourceUnitStateListener callback) {
+	public ISourceUnit createSourceUnit(final String id, final Object from) {
 		IFile ifile;
 		if (from instanceof IFile) {
 			ifile = (IFile) from;
@@ -79,10 +79,10 @@ public abstract class AbstractFilePersistenceSourceUnitFactory implements ISourc
 			final IPath path = new Path(id.substring(IFILE_PREFIX.length()));
 			ifile = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
 		}
-		return createSourceUnit(id, ifile, callback);
+		return createSourceUnit(id, ifile);
 	}
 	
 	
-	protected abstract ISourceUnit createSourceUnit(String id, IFile file, ISourceUnitStateListener callback);
+	protected abstract ISourceUnit createSourceUnit(final String id, final IFile file);
 	
 }

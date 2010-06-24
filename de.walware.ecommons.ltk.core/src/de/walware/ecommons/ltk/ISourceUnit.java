@@ -96,5 +96,6 @@ public interface ISourceUnit extends IModelElement, IAdaptable {
 	
 	public void connect(IProgressMonitor monitor);
 	public void disconnect(IProgressMonitor monitor);
+	public boolean isConnected();
 	
 }

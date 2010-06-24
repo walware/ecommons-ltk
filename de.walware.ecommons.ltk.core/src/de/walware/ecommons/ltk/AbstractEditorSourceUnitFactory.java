@@ -27,19 +27,19 @@ public abstract class AbstractEditorSourceUnitFactory implements ISourceUnitFact
 		return null;
 	}
 	
-	public ISourceUnit createSourceUnit(final String id, final Object from, final ISourceUnitStateListener callback) {
+	public ISourceUnit createSourceUnit(final String id, final Object from) {
 		if (from instanceof ISourceUnit) {
-			return createSourceUnit(id, (ISourceUnit) from, callback);
+			return createSourceUnit(id, (ISourceUnit) from);
 		}
 		if (from instanceof IFileStore) {
-			return createSourceUnit(id, (IFileStore) from, callback);
+			return createSourceUnit(id, (IFileStore) from);
 		}
 		return null;
 	}
 	
 	
-	protected abstract ISourceUnit createSourceUnit(String id, ISourceUnit su, ISourceUnitStateListener callback);
+	protected abstract ISourceUnit createSourceUnit(final String id, final ISourceUnit su);
 	
-	protected abstract ISourceUnit createSourceUnit(String id, IFileStore file, ISourceUnitStateListener callback);
+	protected abstract ISourceUnit createSourceUnit(final String id, final IFileStore file);
 	
 }

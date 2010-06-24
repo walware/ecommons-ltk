@@ -40,13 +40,11 @@ public abstract class GenericResourceSourceUnit implements ISourceUnit {
 	private IWorkingBuffer fBuffer;
 	
 	private int fCounter = 0;
-	private final ISourceUnitStateListener fListener;
 	
 	
-	public GenericResourceSourceUnit(final String id, final IFile file, final ISourceUnitStateListener listener) {
+	public GenericResourceSourceUnit(final String id, final IFile file) {
 		fId = id;
 		fFile = file;
-		fListener = listener;
 		fName = createElementName();
 	}
 	
@@ -258,16 +256,17 @@ public abstract class GenericResourceSourceUnit implements ISourceUnit {
 		}
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
+	public synchronized boolean isConnected() {
+		return (fCounter > 0);
+	}
+	
 	protected void register() {
-		if (fListener != null) {
-			fListener.connectedChanged(this, true);
-		}
 	}
 	
 	protected void unregister() {
-		if (fListener != null) {
-			fListener.connectedChanged(this, false);
-		}
 	}
 	
 	

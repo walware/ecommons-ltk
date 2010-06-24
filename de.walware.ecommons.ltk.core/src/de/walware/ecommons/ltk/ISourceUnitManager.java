@@ -21,7 +21,22 @@ import org.eclipse.core.runtime.IProgressMonitor;
  */
 public interface ISourceUnitManager {
 	
-	
+	/**
+	 * Returns the source unit for the given object in the given LTK model and working context.
+	 * 
+	 * The supported object types depends on the model and working context. Typically for
+	 * the workspace context it is IFile, for the editor context an existing source unit
+	 * (a working copy is created) or IFileStore (URI).
+	 * The returned source unit is already connected. If it is a working copy of an existing source
+	 * unit (if <code>from</code> was instance of ISourceUnit), the parent is disconnected.
+	 * 
+	 * @param modelTypeId the model type id
+	 * @param context the working context
+	 * @param from the object to get the source unit for
+	 * @param create whether a new source unit object should be created, if it does not yet exists
+	 * @param monitor
+	 * @return the source unit or <code>null</code>
+	 */
 	ISourceUnit getSourceUnit(String modelTypeId, WorkingContext context, Object from,
 			boolean create, IProgressMonitor monitor);
 	

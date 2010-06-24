@@ -31,17 +31,14 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	
 	private int fCounter = 0;
 	
-	private final ISourceUnitStateListener fListener;
-	
 	
 	/**
 	 * Creates new working copy of the source unit
 	 * 
 	 * @param from the underlying unit to create a working copy from
 	 */
-	public GenericSourceUnitWorkingCopy(final ISourceUnit from, final ISourceUnitStateListener listener) {
+	public GenericSourceUnitWorkingCopy(final ISourceUnit from) {
 		fFrom = from;
-		fListener = listener;
 	}
 	
 	
@@ -200,19 +197,19 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 		}
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
+	public synchronized boolean isConnected() {
+		return (fCounter > 0);
+	}
 	
 	protected abstract IWorkingBuffer createWorkingBuffer(SubMonitor progress);
 	
 	protected void register() {
-		if (fListener != null) {
-			fListener.connectedChanged(this, true);
-		}
 	}
 	
 	protected void unregister() {
-		if (fListener != null) {
-			fListener.connectedChanged(this, false);
-		}
 	}
 	
 	/**

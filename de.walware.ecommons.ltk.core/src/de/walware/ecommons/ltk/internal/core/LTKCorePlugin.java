@@ -19,8 +19,8 @@ import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
 
 import de.walware.ecommons.ECommons;
-import de.walware.ecommons.IDisposable;
 import de.walware.ecommons.ECommons.IAppEnvironment;
+import de.walware.ecommons.IDisposable;
 
 import de.walware.ecommons.ltk.IExtContentTypeManager;
 import de.walware.ecommons.ltk.ISourceUnitManager;

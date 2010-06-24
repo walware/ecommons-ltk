@@ -21,6 +21,6 @@ public interface ISourceUnitFactory {
 	
 	String createId(Object from);
 	
-	ISourceUnit createSourceUnit(String id, Object from, ISourceUnitStateListener callback);
+	ISourceUnit createSourceUnit(String id, Object from);
 	
 }
