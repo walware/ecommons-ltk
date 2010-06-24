@@ -143,7 +143,10 @@ public abstract class StructureSelectHandler extends AbstractHandler {
 		return (ITextSelection) fSourceEditor.getViewer().getSelectionProvider().getSelection();
 	}
 	
-	protected final IRegion createRegion(final int start, final int stop) {
+	protected final IRegion createRegion(int start, final int stop) {
+		if (start < 0) {
+			start = 0;
+		}
 		return new Region(start, stop-start);
 	}
 	
