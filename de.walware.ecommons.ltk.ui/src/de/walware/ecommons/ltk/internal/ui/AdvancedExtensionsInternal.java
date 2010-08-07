@@ -115,13 +115,13 @@ public class AdvancedExtensionsInternal {
 				stateMask |= SWT.MOD1;
 			}
 			else if (key.equals("M2")) { //$NON-NLS-1$
-				stateMask |= SWT.MOD1;
+				stateMask |= SWT.MOD2;
 			}
 			else if (key.equals("M3")) { //$NON-NLS-1$
-				stateMask |= SWT.MOD1;
+				stateMask |= SWT.MOD3;
 			}
 			else if (key.equals("M4")) { //$NON-NLS-1$
-				stateMask |= SWT.MOD1;
+				stateMask |= SWT.MOD4;
 			}
 			else {
 				return -1;
