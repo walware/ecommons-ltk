@@ -22,10 +22,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
 import de.walware.ecommons.preferences.ui.SettingsUpdater;
+import de.walware.ecommons.text.ui.TextViewerJFaceUpdater;
 
 import de.walware.ecommons.ltk.ui.sourceediting.SnippetEditor;
 import de.walware.ecommons.ltk.ui.sourceediting.SourceEditorViewerConfigurator;
-import de.walware.ecommons.ltk.ui.sourceediting.SourceViewerJFaceUpdater;
 import de.walware.ecommons.ltk.ui.sourceediting.ViewerSourceEditorAdapter;
 
 
@@ -57,7 +57,8 @@ public class CompareTextViewer extends Viewer {
 				return (fInput instanceof IEditableContent && ((IEditableContent) fInput).isEditable());
 			}
 		});
-		new SourceViewerJFaceUpdater(fSourceViewer, fConfigurator.getSourceViewerConfiguration());
+		new TextViewerJFaceUpdater(fSourceViewer,
+				fConfigurator.getSourceViewerConfiguration().getPreferences() );
 		new SettingsUpdater(fConfigurator, fSourceViewer.getControl());
 		
 		fSourceViewer.activatePlugins();

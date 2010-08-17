@@ -44,7 +44,6 @@ import org.eclipse.jface.databinding.viewers.ViewersObservables;
 import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.SourceViewer;
@@ -58,7 +57,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
@@ -79,6 +77,7 @@ import de.walware.ecommons.preferences.ui.OverlayStorePreference;
 import de.walware.ecommons.preferences.ui.PreferenceStoreBeanWrapper;
 import de.walware.ecommons.preferences.ui.RGBPref;
 import de.walware.ecommons.text.internal.ui.Messages;
+import de.walware.ecommons.text.ui.TextViewerJFaceUpdater;
 import de.walware.ecommons.text.ui.presentation.AbstractTextStylesConfigurationBlock.SyntaxNode.UseStyle;
 import de.walware.ecommons.ui.ColorManager;
 import de.walware.ecommons.ui.util.LayoutUtil;
@@ -90,7 +89,6 @@ import de.walware.ecommons.ui.util.ViewerUtil.Node;
 
 import de.walware.ecommons.ltk.internal.ui.LTKUIPlugin;
 import de.walware.ecommons.ltk.ui.sourceediting.SourceEditorViewerConfiguration;
-import de.walware.ecommons.ltk.ui.sourceediting.SourceViewerJFaceUpdater;
 
 
 /**
@@ -639,12 +637,10 @@ public abstract class AbstractTextStylesConfigurationBlock extends OverlayStoreC
 		final IPreferenceStore store = new ChainedPreferenceStore(new IPreferenceStore[] {
 				fOverlayStore, EditorsUI.getPreferenceStore() });
 		fPreviewViewer = new SourceViewer(parent, null, null, false, SWT.V_SCROLL | SWT.H_SCROLL | SWT.BORDER);
-		final Font font = JFaceResources.getFont(JFaceResources.TEXT_FONT);
-		fPreviewViewer.getTextWidget().setFont(font);
 		fPreviewViewer.setEditable(false);
 		fConfiguration = getSourceViewerConfiguration(fColorManager, store);
 		fPreviewViewer.configure(fConfiguration);
-		new SourceViewerJFaceUpdater(fPreviewViewer, fConfiguration, store);
+		new TextViewerJFaceUpdater(fPreviewViewer, store);
 		
 		final String content = loadPreviewContentFromFile(getPreviewFileName());
 		final IDocument document = new Document(content);

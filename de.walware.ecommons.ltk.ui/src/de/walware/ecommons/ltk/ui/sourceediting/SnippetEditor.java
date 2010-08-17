@@ -21,7 +21,6 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.commands.ActionHandler;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocumentListener;
@@ -41,6 +40,7 @@ import org.eclipse.ui.texteditor.IUpdate;
 
 import de.walware.ecommons.preferences.ui.SettingsUpdater;
 import de.walware.ecommons.text.ui.TextViewerAction;
+import de.walware.ecommons.text.ui.TextViewerJFaceUpdater;
 import de.walware.ecommons.ui.actions.ControlServicesUtil;
 import de.walware.ecommons.ui.components.WidgetToolsButton;
 import de.walware.ecommons.ui.util.LayoutUtil;
@@ -167,12 +167,12 @@ public class SnippetEditor extends Object {
 		fSourceViewer = new SourceViewer(composite, null, style);
 		fSourceViewer.setEditable(true);
 		
-		fSourceViewer.getTextWidget().setFont(JFaceResources.getFont(JFaceResources.TEXT_FONT));
 		fSourceViewer.setDocument(fDocument);
 		
 		final ViewerSourceEditorAdapter adapter = new ViewerSourceEditorAdapter(fSourceViewer, fConfigurator);
 		fConfigurator.setTarget(adapter);
-		new SourceViewerJFaceUpdater(fSourceViewer, fConfigurator.getSourceViewerConfiguration());
+		new TextViewerJFaceUpdater(fSourceViewer,
+				fConfigurator.getSourceViewerConfiguration().getPreferences() );
 		new SettingsUpdater(fConfigurator, fSourceViewer.getControl());
 		
 		initActions();
