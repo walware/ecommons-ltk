@@ -28,7 +28,7 @@ import de.walware.ecommons.ltk.internal.core.refactoring.Messages;
 public class DynamicValidationChange extends CompositeChange implements IResourceChangeListener {
 	
 	// 30 minutes
-	private static final long LIFE_TIME = 30 * 60 * 1000;
+	private static final long LIFE_TIME = 30L * 60L * 1000000000L;
 	
 	
 	private RefactoringStatus fValidationState = null;
@@ -59,7 +59,7 @@ public class DynamicValidationChange extends CompositeChange implements IResourc
 	public void initializeValidationData(final IProgressMonitor pm) {
 		super.initializeValidationData(pm);
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
-		fTimeStamp= System.currentTimeMillis();
+		fTimeStamp = System.nanoTime();
 	}
 	
 	/**
@@ -95,7 +95,7 @@ public class DynamicValidationChange extends CompositeChange implements IResourc
 	}
 	
 	public void resourceChanged(final IResourceChangeEvent event) {
-		if (System.currentTimeMillis() - fTimeStamp < LIFE_TIME) {
+		if (System.nanoTime() - fTimeStamp < LIFE_TIME) {
 			return;
 		}
 		fValidationState = RefactoringStatus.createFatalErrorStatus(

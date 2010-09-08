@@ -80,6 +80,8 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 		
 	};
 	
+	private static final long INFO_ITER_SPAN = 3L * 1000000000L;
+	
 	
 	/**
 	 * The completion listener class for this processor.
@@ -220,12 +222,12 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	 * {@inheritDoc}
 	 */
 	public final ICompletionProposal[] computeCompletionProposals(final ITextViewer viewer, final int offset) {
-		final long start = System.currentTimeMillis();
+		final long start = System.nanoTime();
 		
 		clearState();
 		
 		final AssistInvocationContext context = createCompletionProposalContext(offset);
-		final long setup = DEBUG ? System.currentTimeMillis() : 0L;
+		final long setup = DEBUG ? System.nanoTime() : 0L;
 		
 		final long modificationStamp = ((AbstractDocument) context.getSourceViewer().getDocument()).getModificationStamp();
 		final int mode;
@@ -233,7 +235,7 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 			mode = IContentAssistComputer.SPECIFIC_MODE;
 		}
 		else if (!fAssistant.isProposalPopupActive1()
-				&& (   start-fInformationModeTimestamp > 3000 
+				&& (   start-fInformationModeTimestamp > INFO_ITER_SPAN
 					|| offset != fInformationModeOffset
 					|| !fAssistant.isContextInfoPopupActive1()
 					|| modificationStamp != fInformationModeModificationStamp)
@@ -268,13 +270,13 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 				EditingMessages.ContentAssistProcessor_ComputingProposals_Collecting_task :
 				EditingMessages.ContentAssistProcessor_ComputingContexts_Collecting_task);
 		final List<IAssistCompletionProposal> proposals = collectProposals(context, mode, categories, progress);
-		final long collect = DEBUG ? System.currentTimeMillis() : 0L;
+		final long collect = DEBUG ? System.nanoTime() : 0L;
 		
 		progress.subTask((mode != IContentAssistComputer.INFORMATION_MODE) ?
 				EditingMessages.ContentAssistProcessor_ComputingProposals_Sorting_task :
 				EditingMessages.ContentAssistProcessor_ComputingContexts_Sorting_task);
 		final List<IAssistCompletionProposal> filtered = filterAndSortProposals(proposals, context, progress);
-		final long filter = DEBUG ? System.currentTimeMillis() : 0L;
+		final long filter = DEBUG ? System.nanoTime() : 0L;
 		
 		fNumberOfComputedResults = filtered.size();
 		final ICompletionProposal[] result = filtered.toArray(new ICompletionProposal[fNumberOfComputedResults]);
@@ -286,7 +288,7 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 				fAssistant.hidePopups();
 			}
 			fInformationModeOffset = offset;
-			fInformationModeTimestamp = System.currentTimeMillis();
+			fInformationModeTimestamp = System.nanoTime();
 			fInformationModeModificationStamp = modificationStamp;
 		}
 		
