@@ -3,11 +3,11 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: WalWare.de
 Bundle-Name: LTK Core
 Bundle-SymbolicName: de.walware.ecommons.ltk.core;singleton:=true
-Bundle-Version: 0.9.0.qualifier
+Bundle-Version: 0.9.1.qualifier
 Bundle-Activator: de.walware.ecommons.ltk.internal.core.LTKCorePlugin
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Require-Bundle: org.eclipse.core.runtime;bundle-version="3.5.0",
+Require-Bundle: org.eclipse.core.runtime;bundle-version="3.6.0",
  org.eclipse.core.contenttype,
  org.eclipse.core.filesystem,
  org.eclipse.core.resources;visibility:=reexport,
