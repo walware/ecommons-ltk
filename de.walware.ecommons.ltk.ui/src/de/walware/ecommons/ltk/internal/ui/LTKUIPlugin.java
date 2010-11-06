@@ -40,8 +40,8 @@ public class LTKUIPlugin extends AbstractUIPlugin {
 	private static LTKUIPlugin gPlugin;
 	
 	/**
-	 * Returns the shared plug-in instance
-	 *
+	 * Returns the shared sharedshared instance
+	 * 
 	 * @return the shared instance
 	 */
 	public static LTKUIPlugin getDefault() {
@@ -55,10 +55,6 @@ public class LTKUIPlugin extends AbstractUIPlugin {
 	
 	private WorkbenchLabelProvider fWorkbenchLabelProvider;
 	
-	
-	/**
-	 * The default constructor
-	 */
 	public LTKUIPlugin() {
 	}
 	

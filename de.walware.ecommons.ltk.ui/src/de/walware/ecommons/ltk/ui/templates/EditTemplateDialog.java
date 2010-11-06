@@ -391,7 +391,6 @@ public class EditTemplateDialog extends ExtStatusDialog {
 	 * 
 	 * @param pattern the pattern to verify
 	 * @return <code>true</code> if the pattern is valid
-	 * @since 3.6
 	 */
 	protected boolean isValidPattern(final String pattern) {
 		for (int i= 0; i < pattern.length(); i++) {
