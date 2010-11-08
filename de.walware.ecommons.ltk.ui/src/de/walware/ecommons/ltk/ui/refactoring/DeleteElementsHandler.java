@@ -89,7 +89,6 @@ public class DeleteElementsHandler extends AbstractElementsHandler {
 						StatusManager.LOG | StatusManager.SHOW);
 			}
 			catch (final InterruptedException e) {
-				Thread.interrupted();
 			}
 		}
 		return null;
