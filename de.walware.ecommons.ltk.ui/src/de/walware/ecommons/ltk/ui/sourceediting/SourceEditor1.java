@@ -33,6 +33,8 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChange
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IInformationControl;
@@ -59,6 +61,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -494,6 +497,8 @@ public abstract class SourceEditor1 extends TextEditor
 	private boolean fInputChange;
 	private int fInputUpdate = Integer.MAX_VALUE;
 	
+	private ImageDescriptor fImageDescriptor;
+	
 	
 /*- Contructors ------------------------------------------------------------*/
 	
@@ -532,6 +537,37 @@ public abstract class SourceEditor1 extends TextEditor
 		fModelProvider = provider;
 		fFoldingEnablement = codeFoldingEnablement;
 		fMarkOccurrencesEnablement = markOccurrencesEnablement;
+	}
+	
+	/**
+	 * Overwrites the default title image (editor icon) during the initialization of the editor
+	 * input.
+	 * 
+	 * The image is created and disposed automatically.
+	 * 
+	 * For example, it can be used to overwrite the default image using the image descriptor of 
+	 * the editor input in {@link #setDocumentProvider(IEditorInput)}
+	 * 
+	 * @param descriptor the image description of the icon or <code>null</code>
+	 */
+	protected void overwriteTitleImage(final ImageDescriptor descriptor) {
+		if (fImageDescriptor == descriptor || (fImageDescriptor == null && descriptor == null) ) {
+			return;
+		}
+		if (fImageDescriptor != null) {
+			JFaceResources.getResources().destroyImage(fImageDescriptor);
+		}
+		fImageDescriptor = descriptor;
+		if (fImageDescriptor != null) {
+			super.setTitleImage(JFaceResources.getResources().createImage(descriptor));
+		}
+	}
+	
+	@Override
+	protected void setTitleImage(final Image titleImage) {
+		if (fImageDescriptor == null) {
+			super.setTitleImage(titleImage);
+		}
 	}
 	
 	@Override
@@ -1188,6 +1224,11 @@ public abstract class SourceEditor1 extends TextEditor
 		}
 		
 		super.dispose();
+		
+		if (fImageDescriptor != null) {
+			JFaceResources.getResources().destroyImage(fImageDescriptor);
+			fImageDescriptor = null;
+		}
 		
 		fModelProvider = null;
 		fModelPostSelection = null;
