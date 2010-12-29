@@ -35,11 +35,19 @@ public class CodeGenerationTemplateContext extends TemplateContext implements IW
 	
 	private final String fLineDelimiter;
 	
+	private ISourceUnit fSourceUnit;
+	
 	
 	public CodeGenerationTemplateContext(final TemplateContextType contextType,
 			final String lineDelim) {
 		super(contextType);
 		fLineDelimiter = lineDelim;
+	}
+	
+	public CodeGenerationTemplateContext(final TemplateContextType contextType,
+			final ISourceUnit su, final String lineDelim) {
+		this(contextType, lineDelim);
+		fSourceUnit = su;
 	}
 	
 	
@@ -48,7 +56,7 @@ public class CodeGenerationTemplateContext extends TemplateContext implements IW
 	}
 	
 	public ISourceUnit getSourceUnit() {
-		return null;
+		return fSourceUnit;
 	}
 	
 	public String evaluateInfo(final Template template) throws BadLocationException, TemplateException {

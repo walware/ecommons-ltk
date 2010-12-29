@@ -32,6 +32,7 @@ import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
+import de.walware.ecommons.ltk.IElementName;
 import de.walware.ecommons.ltk.ISourceUnit;
 import de.walware.ecommons.ltk.internal.ui.TemplatesMessages;
 
@@ -84,7 +85,31 @@ public class SourceEditorContextType extends TemplateContextType {
 	
 	
 	/**
-	 * Resolver for Project-name.
+	 * Resolver for file name.
+	 */
+	protected static class File extends SimpleTemplateVariableResolver {
+		
+		public File() {
+			super("file_name", TemplatesMessages.Templates_Variable_File_description);  //$NON-NLS-1$
+		}
+		
+		@Override
+		protected String resolve(final TemplateContext context) {
+			if (context instanceof IWorkbenchTemplateContext) {
+				final ISourceUnit su = ((IWorkbenchTemplateContext) context).getSourceUnit();
+				if (su != null) {
+					final IElementName elementName = su.getElementName();
+					if (elementName != null) {
+						return elementName.getSegmentName();
+					}
+				}
+			}
+			return ""; //$NON-NLS-1$
+		}
+	}
+	
+	/**
+	 * Resolver for project name.
 	 */
 	protected static class Project extends SimpleTemplateVariableResolver {
 		
@@ -168,8 +193,7 @@ public class SourceEditorContextType extends TemplateContextType {
 	}
 	
 	protected void addSourceUnitGenerationVariables() {
-		addResolver(new CodeTemplatesVariableResolver(FILENAME_VARIABLE,
-				TemplatesMessages.Templates_Variable_File_description));
+		addResolver(new File());
 		addResolver(new InitialSelectionStart());
 		addResolver(new InitialSelectionEnd());
 	}
