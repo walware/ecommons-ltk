@@ -246,56 +246,7 @@ public abstract class SourceEditor1 extends TextEditor
 		
 		public ToggleCommentHandler() {
 			configure();
-		}
-		
-		public Object execute(final ExecutionEvent event) throws ExecutionException {
-			final ISourceViewer sourceViewer = SourceEditor1.this.getSourceViewer();
-			
-			if (!SourceEditor1.this.validateEditorInputState()) {
-				return null;
-			}
-			
-			final int operationCode = (isSelectionCommented(SourceEditor1.this.getSelectionProvider().getSelection())) ?
-				ITextOperationTarget.STRIP_PREFIX : ITextOperationTarget.PREFIX;
-			
-			final Shell shell = SourceEditor1.this.getSite().getShell();
-			if (!fOperationTarget.canDoOperation(operationCode)) {
-				SourceEditor1.this.setStatusLineErrorMessage(EditingMessages.ToggleCommentAction_error);
-				sourceViewer.getTextWidget().getDisplay().beep();
-				return null;
-			}
-			
-			Display display = null;
-			if (shell != null && !shell.isDisposed()) {
-				display = shell.getDisplay();
-			}
-			
-			BusyIndicator.showWhile(display, new Runnable() {
-				public void run() {
-					fOperationTarget.doOperation(operationCode);
-				}
-			});
-			return null;
-		}
-		
-		/**
-		 * Implementation of the <code>IUpdate</code> prototype method discovers
-		 * the operation through the current editor's
-		 * <code>ITextOperationTarget</code> adapter, and sets the enabled state
-		 * accordingly.
-		 */
-		public void update() {
-			if (!SourceEditor1.this.isEditorInputModifiable()) {
-				setEnabled(false);
-				return;
-			}
-			
-			if (fOperationTarget == null) {
-				fOperationTarget = (ITextOperationTarget) SourceEditor1.this.getAdapter(ITextOperationTarget.class);
-			}
-			setEnabled(fOperationTarget != null
-					&& fOperationTarget.canDoOperation(ITextOperationTarget.PREFIX)
-					&& fOperationTarget.canDoOperation(ITextOperationTarget.STRIP_PREFIX) );
+			setBaseEnabled(false);
 		}
 		
 		private void configure() {
@@ -330,6 +281,56 @@ public abstract class SourceEditor1 extends TextEditor
 				}
 			}
 			fDocumentPartitioning = configuration.getConfiguredDocumentPartitioning(sourceViewer);
+		}
+		
+		/**
+		 * Implementation of the <code>IUpdate</code> prototype method discovers
+		 * the operation through the current editor's
+		 * <code>ITextOperationTarget</code> adapter, and sets the enabled state
+		 * accordingly.
+		 */
+		public void update() {
+			if (!SourceEditor1.this.isEditorInputModifiable()) {
+				setBaseEnabled(false);
+				return;
+			}
+			
+			if (fOperationTarget == null) {
+				fOperationTarget = (ITextOperationTarget) SourceEditor1.this.getAdapter(ITextOperationTarget.class);
+			}
+			setBaseEnabled(fOperationTarget != null
+					&& fOperationTarget.canDoOperation(ITextOperationTarget.PREFIX)
+					&& fOperationTarget.canDoOperation(ITextOperationTarget.STRIP_PREFIX) );
+		}
+		
+		public Object execute(final ExecutionEvent event) throws ExecutionException {
+			final ISourceViewer sourceViewer = SourceEditor1.this.getSourceViewer();
+			
+			if (!SourceEditor1.this.validateEditorInputState() || !isEnabled()) {
+				return null;
+			}
+			
+			final int operationCode = (isSelectionCommented(SourceEditor1.this.getSelectionProvider().getSelection())) ?
+				ITextOperationTarget.STRIP_PREFIX : ITextOperationTarget.PREFIX;
+			
+			final Shell shell = SourceEditor1.this.getSite().getShell();
+			if (!fOperationTarget.canDoOperation(operationCode)) {
+				SourceEditor1.this.setStatusLineErrorMessage(EditingMessages.ToggleCommentAction_error);
+				sourceViewer.getTextWidget().getDisplay().beep();
+				return null;
+			}
+			
+			Display display = null;
+			if (shell != null && !shell.isDisposed()) {
+				display = shell.getDisplay();
+			}
+			
+			BusyIndicator.showWhile(display, new Runnable() {
+				public void run() {
+					fOperationTarget.doOperation(operationCode);
+				}
+			});
+			return null;
 		}
 		
 		/**
@@ -618,6 +619,7 @@ public abstract class SourceEditor1 extends TextEditor
 	 * Subclasses should setup the SourceViewerConfiguration.
 	 */
 	protected void setupConfiguration(final IEditorInput newInput, final ISourceViewer sourceViewer) {
+		updateStateDependentActions();
 	}
 	
 	public ISourceUnit getSourceUnit() {
