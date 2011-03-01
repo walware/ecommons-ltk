@@ -11,10 +11,6 @@
 
 package de.walware.ecommons.ltk.ui.sourceediting;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.text.BadLocationException;
@@ -70,7 +66,7 @@ public abstract class TemplatesCompletionComputer implements IContentAssistCompu
 	 * {@inheritDoc}
 	 */
 	public IStatus computeCompletionProposals(final AssistInvocationContext context,
-			final int mode, final List<IAssistCompletionProposal> tenders, final IProgressMonitor monitor) {
+			final int mode, final AssistProposalCollector<IAssistCompletionProposal> tenders, final IProgressMonitor monitor) {
 		final ISourceViewer viewer = context.getSourceViewer();
 		
 		String prefix = extractPrefix(context);
@@ -108,11 +104,11 @@ public abstract class TemplatesCompletionComputer implements IContentAssistCompu
 		return null;
 	}
 	
-	private int doComputeProposals(final List<IAssistCompletionProposal> tenders, final DocumentTemplateContext context, final String prefix, final IRegion replacementRegion) {
+	private int doComputeProposals(final AssistProposalCollector<IAssistCompletionProposal> proposals,
+			final DocumentTemplateContext context, final String prefix, final IRegion replacementRegion) {
 		// Add Templates
-		int count = 0;
+		final int count = 0;
 		final Template[] templates = getTemplates(context.getContextType().getId());
-		final List<TemplateProposal> templateMatches = new ArrayList<TemplateProposal>();
 		for (int i = 0; i < templates.length; i++) {
 			final Template template = templates[i];
 			try {
@@ -122,13 +118,9 @@ public abstract class TemplatesCompletionComputer implements IContentAssistCompu
 				continue;
 			}
 			if (include(template, prefix)) { // Change <-> super
-				templateMatches.add(createProposal(template, context, replacementRegion, getRelevance(template, prefix)));
+				proposals.add(createProposal(template, context, replacementRegion,
+						getRelevance(template, prefix) ));
 			}
-		}
-		if (templateMatches.size() > 0) {
-			Collections.sort(templateMatches, fgTemplateComparator);
-			tenders.addAll(templateMatches);
-			count += templateMatches.size();
 		}
 		
 		return count;
@@ -139,7 +131,7 @@ public abstract class TemplatesCompletionComputer implements IContentAssistCompu
 	}
 	
 	public IStatus computeContextInformation(final AssistInvocationContext context,
-			final List<IAssistInformationProposal> tenders, final IProgressMonitor monitor) {
+			final AssistProposalCollector<IAssistInformationProposal> tenders, final IProgressMonitor monitor) {
 		return null;
 	}
 	

@@ -12,7 +12,6 @@
 package de.walware.ecommons.ltk.ui.sourceediting;
 
 import java.util.Arrays;
-import java.util.List;
 
 import com.ibm.icu.text.Collator;
 
@@ -321,7 +320,8 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 	/**
 	 * {@inheritDoc}
 	 */
-	public IStatus computeCompletionProposals(final AssistInvocationContext context, final int mode, final List<IAssistCompletionProposal> tenders, final IProgressMonitor monitor) {
+	public IStatus computeCompletionProposals(final AssistInvocationContext context, final int mode,
+			final AssistProposalCollector<IAssistCompletionProposal> proposals, final IProgressMonitor monitor) {
 		try {
 			final IDocument document = context.getSourceViewer().getDocument();
 			final int offset = context.getInvocationOffset();
@@ -401,12 +401,12 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 			
 			if (baseStore == null || !baseStore.fetchInfo().exists()) {
 				if (path != null) {
-					return tryAlternative(context, tenders, path, offset-start.length(), start, prefix, completionPrefix);
+					return tryAlternative(context, proposals, path, offset-start.length(), start, prefix, completionPrefix);
 				}
 				return null;
 			}
 			
-			doAddChildren(context, tenders, baseStore, offset-start.length(), start, completionPrefix);
+			doAddChildren(context, proposals, baseStore, offset-start.length(), start, completionPrefix);
 			if (start != null && start.length() > 0 && !start.equals(".")) { //$NON-NLS-1$
 				baseStore = baseStore.getChild(start);
 				if (baseStore.fetchInfo().exists()) {
@@ -417,7 +417,7 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 					prefixBuilder.append(baseStore.getName());
 					prefixBuilder.append(fPathSeparator);
 					completionPrefix = prefixBuilder.toString();
-					doAddChildren(context, tenders, baseStore, offset-start.length(), null, completionPrefix);
+					doAddChildren(context, proposals, baseStore, offset-start.length(), null, completionPrefix);
 				}
 			}
 			return Status.OK_STATUS;
@@ -469,7 +469,8 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 		}
 	}
 	
-	protected void doAddChildren(final AssistInvocationContext context, final List<IAssistCompletionProposal> matches, final IFileStore baseStore, 
+	protected void doAddChildren(final AssistInvocationContext context, final AssistProposalCollector<IAssistCompletionProposal> proposals,
+			final IFileStore baseStore,
 			final int startOffset, final String startsWith, final String prefix) throws CoreException {
 		final IContainer[] workspaceRefs = ResourcesPlugin.getWorkspace().getRoot().findContainersForLocationURI(baseStore.toURI());
 		final IContainer workspaceRef = (workspaceRefs.length > 0) ? workspaceRefs[0] : null;
@@ -477,7 +478,7 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 		Arrays.sort(names, Collator.getInstance());
 		for (final String name : names) {
 			if (startsWith == null || name.regionMatches(true, 0, startsWith, 0, startsWith.length())) {
-				matches.add(new ResourceProposal(context, startOffset, baseStore.getChild(name), null, prefix, workspaceRef));
+				proposals.add(new ResourceProposal(context, startOffset, baseStore.getChild(name), null, prefix, workspaceRef));
 			}
 		}
 	}
@@ -485,7 +486,8 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 	/**
 	 * {@inheritDoc}
 	 */
-	public IStatus computeContextInformation(final AssistInvocationContext context, final List<IAssistInformationProposal> tenders, final IProgressMonitor monitor) {
+	public IStatus computeContextInformation(final AssistInvocationContext context,
+			final AssistProposalCollector<IAssistInformationProposal> proposals, final IProgressMonitor monitor) {
 		return null;
 	}
 	
@@ -513,8 +515,8 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 		}
 	}
 	
-	protected IStatus tryAlternative(final AssistInvocationContext context, final List<IAssistCompletionProposal> matches, final IPath path,
-			final int startOffset, final String startsWith, final String prefix, final String completionPrefix) throws CoreException {
+	protected IStatus tryAlternative(final AssistInvocationContext context, final AssistProposalCollector<IAssistCompletionProposal> proposals,
+			final IPath path, final int startOffset, final String startsWith, final String prefix, final String completionPrefix) throws CoreException {
 		return null;
 	}
 	

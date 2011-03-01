@@ -13,6 +13,7 @@
 package de.walware.ecommons.ltk.ui.sourceediting;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -261,25 +262,26 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 			fAssistant.enableAutoInsertSetting();
 		}
 		
-		final List<ContentAssistCategory> categories = (mode == IContentAssistComputer.INFORMATION_MODE) ?
-				fAvailableCategories : getCurrentCategories();
+		final List<ContentAssistCategory> categories = (mode != IContentAssistComputer.INFORMATION_MODE) ?
+				getCurrentCategories() : getInformationCategories();
 		
 		final SubMonitor progress = SubMonitor.convert(createProgressMonitor());
 		progress.beginTask(EditingMessages.ContentAssistProcessor_ComputingProposals_task, categories.size() + 1);
 		progress.subTask((mode != IContentAssistComputer.INFORMATION_MODE) ?
 				EditingMessages.ContentAssistProcessor_ComputingProposals_Collecting_task :
 				EditingMessages.ContentAssistProcessor_ComputingContexts_Collecting_task);
-		final List<IAssistCompletionProposal> proposals = collectProposals(context, mode, categories, progress);
+		final AssistProposalCollector<IAssistCompletionProposal> proposals =
+				createCompletionProposalCollector();
+		collectCompletionProposals(context, mode, categories, proposals, progress);
 		final long collect = DEBUG ? System.nanoTime() : 0L;
 		
 		progress.subTask((mode != IContentAssistComputer.INFORMATION_MODE) ?
 				EditingMessages.ContentAssistProcessor_ComputingProposals_Sorting_task :
 				EditingMessages.ContentAssistProcessor_ComputingContexts_Sorting_task);
-		final List<IAssistCompletionProposal> filtered = filterAndSortProposals(proposals, context, progress);
+		final IAssistCompletionProposal[] result = filterAndSortCompletionProposals(proposals, context, progress);
 		final long filter = DEBUG ? System.nanoTime() : 0L;
 		
-		fNumberOfComputedResults = filtered.size();
-		final ICompletionProposal[] result = filtered.toArray(new ICompletionProposal[fNumberOfComputedResults]);
+		fNumberOfComputedResults = result.length;
 		progress.done();
 		
 		if (mode == IContentAssistComputer.INFORMATION_MODE) {
@@ -310,15 +312,17 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	/**
 	 * Collects the proposals.
 	 * 
-	 * @param viewer the text viewer
-	 * @param offset the offset
-	 * @param monitor the progress monitor
 	 * @param context the code assist invocation context
+	 * @param mode
+	 * @param categories list of categories to use
+	 * @param proposals collector for the proposals
+	 * @param monitor the progress monitor
 	 * @return the list of proposals
 	 */
-	private List<IAssistCompletionProposal> collectProposals(final AssistInvocationContext context, final int mode,
-			final List<ContentAssistCategory> categories, final SubMonitor progress) {
-		final List<IAssistCompletionProposal> proposals = new ArrayList<IAssistCompletionProposal>();
+	private boolean collectCompletionProposals(
+			final AssistInvocationContext context, final int mode,
+			final List<ContentAssistCategory> categories,
+			final AssistProposalCollector<IAssistCompletionProposal> proposals, final SubMonitor progress) {
 		for (final ContentAssistCategory category : categories) {
 			final List<IContentAssistComputer> computers = category.getComputers(fPartition);
 			final SubMonitor computorsProgress = progress.newChild(1);
@@ -326,7 +330,19 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 				computer.computeCompletionProposals(context, mode, proposals, computorsProgress);
 			}
 		}
-		return proposals;
+		return true;
+	}
+	
+	protected AssistProposalCollector<IAssistCompletionProposal> createCompletionProposalCollector() {
+		return new AssistProposalCollector<IAssistCompletionProposal>(IAssistCompletionProposal.class) {
+			@Override
+			public void add(final IAssistCompletionProposal proposal) {
+				final IAssistCompletionProposal existing = fProposals.put(proposal, proposal);
+				if (existing != null && existing.getRelevance() > proposal.getRelevance()) {
+					fProposals.put(existing, existing);
+				}
+			}
+		};
 	}
 	
 	/**
@@ -338,9 +354,14 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	 * @param context 
 	 * @return the list of filtered and sorted proposals, ready for display
 	 */
-	protected List<IAssistCompletionProposal> filterAndSortProposals(final List<IAssistCompletionProposal> proposals, final AssistInvocationContext context, final IProgressMonitor monitor) {
-		Collections.sort(proposals, PROPOSAL_COMPARATOR);
-		return proposals;
+	protected IAssistCompletionProposal[] filterAndSortCompletionProposals(
+			final AssistProposalCollector<IAssistCompletionProposal> proposals,
+			final AssistInvocationContext context, final IProgressMonitor monitor) {
+		final IAssistCompletionProposal[] array = proposals.toArray();
+		if (array.length > 1) {
+			Arrays.sort(array, PROPOSAL_COMPARATOR);
+		}
+		return array;
 	}
 	
 	
@@ -348,49 +369,75 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	 * {@inheritDoc}
 	 */
 	public IContextInformation[] computeContextInformation(final ITextViewer viewer, final int offset) {
+		fNumberOfComputedResults = 0;
+		IContextInformation[] result = null;
 		
 		clearState();
 		
 		final AssistInvocationContext context = createContextInformationContext(offset);
 		
-		final List<ContentAssistCategory> categories = fComputerRegistry.getCategories();
+		final List<ContentAssistCategory> available = fComputerRegistry.getCategories();
+		final List<ContentAssistCategory> defaultGroup = new ArrayList<ContentAssistCategory>();
+		final List<ContentAssistCategory> otherGroup = new ArrayList<ContentAssistCategory>();
+		for (final ContentAssistCategory category : otherGroup) {
+			if (category.isEnabledInDefault()) {
+				defaultGroup.add(category);
+			}
+			else if (category.isEnabledInCircling()) {
+				otherGroup.add(category);
+			}
+		}
 		
 		final SubMonitor progress = SubMonitor.convert(createProgressMonitor());
-		progress.beginTask(EditingMessages.ContentAssistProcessor_ComputingContexts_task, categories.size() + 1);
+		progress.beginTask(EditingMessages.ContentAssistProcessor_ComputingContexts_task, available.size() + 1);
 		progress.subTask(EditingMessages.ContentAssistProcessor_ComputingContexts_Collecting_task);
-		final IContextInformation info = collectContextInformation(context, categories, progress);
+		final AssistProposalCollector<IAssistInformationProposal> proposals =
+				createInformationProposalCollector();
+		if (collectSingleInformationProposals(context, defaultGroup, proposals, progress)) {
+			if (proposals.getCount() <= 0) {
+				if (collectSingleInformationProposals(context, otherGroup, proposals, progress)) {
+					if (proposals.getCount() == 1) {
+						fNumberOfComputedResults = 1;
+						result = proposals.toArray();
+					}
+				}
+			}
+		}
 		
-		final IContextInformation[] result;
-		if (info != null) {
-			fNumberOfComputedResults = 1;
-			return new IContextInformation[] { info };
-		}
-		else {
-			fNumberOfComputedResults = 0;
-			result = null;
-		}
 		progress.done();
 		
 		return result;
 	}
 	
-	private IContextInformation collectContextInformation(final AssistInvocationContext context, final List<ContentAssistCategory> categories, final SubMonitor progress) {
-		final List<IAssistInformationProposal> infos = new ArrayList<IAssistInformationProposal>();
+	/**
+	 * @return <code>false</code> if cancelled
+	 */
+	private boolean collectSingleInformationProposals(final AssistInvocationContext context,
+			final List<ContentAssistCategory> categories,
+			final AssistProposalCollector<IAssistInformationProposal> proposals, final SubMonitor progress) {
 		for (final ContentAssistCategory category : categories) {
 			final List<IContentAssistComputer> computers = category.getComputers(fPartition);
 			final SubMonitor computersProgress = progress.newChild(1);
 			for (final IContentAssistComputer computer : computers) {
-				final IStatus status = computer.computeContextInformation(context, infos, computersProgress);
-				if ((status != null && status.getSeverity() > IStatus.WARNING)
-						|| infos.size() > 1) {
-					return null;
+				computer.sessionStarted(context.getEditor());
+				final IStatus status;
+				try {
+					status = computer.computeContextInformation(context, proposals, computersProgress);
 				}
-				if (infos.size() == 1) {
-					return infos.get(0);
+				finally {
+					computer.sessionEnded();
+				}
+				if ((status != null && status.getSeverity() > IStatus.WARNING)
+						|| proposals.getCount() > 1) {
+					return false;
 				}
 			}
 		}
-		return null;
+		return true;
+	}
+	
+	protected AssistProposalCollector<IAssistInformationProposal> createInformationProposalCollector() {
+		return new AssistProposalCollector<IAssistInformationProposal>(IAssistInformationProposal.class);
 	}
 	
 	/**
@@ -493,6 +540,16 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 		}
 		
 		return fCategoryIteration.get(iteration);
+	}
+	
+	private List<ContentAssistCategory> getInformationCategories() {
+		final List<ContentAssistCategory> categories = new ArrayList<ContentAssistCategory>(fAvailableCategories.size());
+		for (final ContentAssistCategory category : fAvailableCategories) {
+			if (category.isEnabledInDefault() || category.isEnabledInCircling()) {
+				categories.add(category);
+			}
+		}
+		return categories;
 	}
 	
 	private List<List<ContentAssistCategory>> createCategoryIteration() {

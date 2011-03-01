@@ -18,9 +18,20 @@ import org.eclipse.jface.text.contentassist.ICompletionProposalExtension4;
 
 public interface IAssistCompletionProposal extends ICompletionProposal, ICompletionProposalExtension2, ICompletionProposalExtension4 {
 	
-	
+	/**
+	 * Returns relevance of the proposal
+	 * <p>
+	 * Higher values indicates that it is probably more relevant.</p>
+	 * 
+	 * @return the relevance
+	 */
 	int getRelevance();
 	
+	/**
+	 * Returns the string to use when sorting proposals
+	 * 
+	 * @return the sorting string
+	 */
 	String getSortingString();
 	
 }

@@ -17,8 +17,4 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 public interface IAssistInformationProposal extends IContextInformation {
 	
 	
-	int getRelevance();
-	
-	String getSortingString();
-	
 }

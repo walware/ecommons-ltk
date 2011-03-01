@@ -42,7 +42,7 @@ public class ContentAssist extends ContentAssistant {
 	
 	
 	@Override
-	public void enableAutoInsert(boolean enabled) {
+	public void enableAutoInsert(final boolean enabled) {
 		fIsAutoInsertEnabled = enabled;
 		if (!fIsAutoInsertOverwritten) {
 			super.enableAutoInsert(enabled);

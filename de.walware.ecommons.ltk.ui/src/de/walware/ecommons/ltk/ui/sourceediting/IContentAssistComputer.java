@@ -12,7 +12,6 @@
 
 package de.walware.ecommons.ltk.ui.sourceediting;
 
-import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -45,21 +44,21 @@ public interface IContentAssistComputer {
 	 * 
 	 * @param context the context of the content assist invocation
 	 * @param mode one of the mode constant defined in {@link IContentAssistComputer}
-	 * @param tenders a list collecting the completion proposals
+	 * @param proposals a set collecting the completion proposals
 	 * @param monitor a progress monitor to report progress. The monitor is private to this
 	 *     invocation, i.e. there is no need for the receiver to spawn a sub monitor.
 	 */
-	public IStatus computeCompletionProposals(AssistInvocationContext context, int mode, List<IAssistCompletionProposal> tenders, IProgressMonitor monitor);
+	public IStatus computeCompletionProposals(AssistInvocationContext context, int mode, AssistProposalCollector<IAssistCompletionProposal> proposals, IProgressMonitor monitor);
 	
 	/**
 	 * Returns context information objects valid at the given invocation context.
 	 * 
 	 * @param context the context of the content assist invocation
-	 * @param tenders a list collecting the context information objects
+	 * @param proposals a set collecting the context information objects
 	 * @param monitor a progress monitor to report progress. The monitor is private to this
 	 *     invocation, i.e. there is no need for the receiver to spawn a sub monitor.
 	 */
-	public IStatus computeContextInformation(AssistInvocationContext context, List<IAssistInformationProposal> tenders, IProgressMonitor monitor);
+	public IStatus computeContextInformation(AssistInvocationContext context, AssistProposalCollector<IAssistInformationProposal> proposals, IProgressMonitor monitor);
 	
 	/**
 	 * Informs the computer that a content assist session has ended. This call will always be after

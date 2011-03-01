@@ -18,14 +18,12 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jface.text.AbstractDocument;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IDocumentExtension3;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.ui.IURIEditorInput;
-import org.eclipse.ui.editors.text.ForwardingDocumentProvider;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 import org.eclipse.ui.part.FileEditorInput;
-import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import de.walware.ecommons.text.PartitionerDocumentSetupParticipant;
 
@@ -53,28 +51,15 @@ public class SourceDocumentProvider<T extends ISourceUnit> extends TextFileDocum
 	public SourceDocumentProvider(final String modelTypeId, final PartitionerDocumentSetupParticipant documentSetupParticipant) {
 		fModelTypeId = modelTypeId;
 		fDocumentSetupParticipant = documentSetupParticipant;
-		final IDocumentProvider provider = new ForwardingDocumentProvider(documentSetupParticipant.getPartitioningId(),
-				fDocumentSetupParticipant, new TextFileDocumentProvider());
-		setParentDocumentProvider(provider);
+//		final IDocumentProvider provider = new ForwardingDocumentProvider(documentSetupParticipant.getPartitioningId(),
+//				fDocumentSetupParticipant, new TextFileDocumentProvider());
+//		setParentDocumentProvider(provider);
 	}
 	
 	
 	@Override
 	protected FileInfo createEmptyFileInfo() {
 		return new SourceFileInfo();
-	}
-	
-	@Override
-	public void connect(final Object element) throws CoreException {
-		super.connect(element);
-		
-		final IDocument document = getDocument(element);
-		if (document instanceof IDocumentExtension3) {
-			final IDocumentExtension3 extension = (IDocumentExtension3) document;
-			if (extension.getDocumentPartitioner(fDocumentSetupParticipant.getPartitioningId()) == null) {
-				fDocumentSetupParticipant.setup(document);
-			}
-		}
 	}
 	
 	@Override
@@ -102,8 +87,15 @@ public class SourceDocumentProvider<T extends ISourceUnit> extends TextFileDocum
 	@Override
 	protected FileInfo createFileInfo(final Object element) throws CoreException {
 		final FileInfo info = super.createFileInfo(element);
+		
 		if (!(info instanceof SourceFileInfo)) {
 			return null;
+		}
+		
+		{	final IDocument document = getDocument(element);
+			if (document instanceof AbstractDocument) {
+				setupDocument((AbstractDocument) document);
+			}
 		}
 		
 		final IAdaptable adaptable = (IAdaptable) element;
@@ -136,6 +128,12 @@ public class SourceDocumentProvider<T extends ISourceUnit> extends TextFileDocum
 		}
 		
 		return sourceInfo;
+	}
+	
+	protected void setupDocument(final AbstractDocument document) {
+		if (document.getDocumentPartitioner(fDocumentSetupParticipant.getPartitioningId()) == null) {
+			fDocumentSetupParticipant.setup(document);
+		}
 	}
 	
 	public T getWorkingCopy(final Object element) {

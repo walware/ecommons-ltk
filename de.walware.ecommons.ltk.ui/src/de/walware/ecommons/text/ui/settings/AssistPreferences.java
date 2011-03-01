@@ -16,9 +16,9 @@ import org.eclipse.jface.text.quickassist.IQuickAssistAssistant;
 import org.eclipse.swt.graphics.Color;
 
 import de.walware.ecommons.preferences.IPreferenceAccess;
-import de.walware.ecommons.preferences.PreferencesUtil;
 import de.walware.ecommons.preferences.Preference.BooleanPref;
 import de.walware.ecommons.preferences.Preference.IntPref;
+import de.walware.ecommons.preferences.PreferencesUtil;
 import de.walware.ecommons.preferences.ui.RGBPref;
 import de.walware.ecommons.ui.ColorManager;
 import de.walware.ecommons.ui.SharedUIResources;

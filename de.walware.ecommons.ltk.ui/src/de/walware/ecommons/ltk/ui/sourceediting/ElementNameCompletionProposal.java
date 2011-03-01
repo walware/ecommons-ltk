@@ -160,4 +160,22 @@ public abstract class ElementNameCompletionProposal extends CompletionProposalWi
 	}
 	
 	
+	@Override
+	public int hashCode() {
+		return getClass().hashCode() * ((fReplacementName != null) ? fReplacementName.hashCode() : 564);
+	}
+	
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final ElementNameCompletionProposal other = (ElementNameCompletionProposal) obj;
+		return (   ((fReplacementName != null) ? fReplacementName.equals(other.fReplacementName) : null == other.fReplacementName)
+				&& ((fElement != null) ? fElement.equals(other.fElement) : null == other.fElement) );
+	}
+	
 }

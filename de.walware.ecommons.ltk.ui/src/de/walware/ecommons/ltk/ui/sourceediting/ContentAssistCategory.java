@@ -42,7 +42,7 @@ public final class ContentAssistCategory {
 	
 	boolean fIsIncludedInDefault = false;
 	
-	private int fSortOrder = 0x10000;
+	private final int fSortOrder = 0x10000;
 	
 	private final List<ContentAssistComputerRegistry.ComputerDescriptor> fComputerDescriptors;
 	private final Map<String, List<IContentAssistComputer>> fComputersByPartition;

@@ -86,7 +86,7 @@ public class LTKUIPlugin extends AbstractUIPlugin {
 							fWorkbenchLabelProvider.dispose();
 						}
 					}
-					catch (Exception e) {
+					catch (final Exception e) {
 						StatusManager.getManager().handle(new Status(IStatus.ERROR, PLUGIN_ID, -1,
 								"An error occurred when disposing the shared WorkbenchLabelProvider.", e));
 					}
