@@ -27,7 +27,16 @@ import de.walware.ecommons.ltk.ISourceUnit;
 public interface ISourceEditor extends IAdaptable {
 	
 	/**
-	 * Returns the source unit of editor input, if exists
+	 * Returns the model type of source units of the editor.
+	 * The value must not change for an editor instance and all source units
+	 * in the editor must be of the same type.
+	 * 
+	 * @return id of the model type
+	 */
+	public String getModelTypeId();
+	
+	/**
+	 * Returns the source unit of editor input, if exists.
 	 * 
 	 * @return model element or <code>null</code>
 	 */

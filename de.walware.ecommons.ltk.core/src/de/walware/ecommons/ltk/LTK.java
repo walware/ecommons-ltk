@@ -33,4 +33,8 @@ public class LTK {
 		return LTKCorePlugin.getDefault().getContentTypeServices();
 	}
 	
+	public static Object getModelAdapter(final String type, final Class<?> required) {
+		return LTKCorePlugin.getDefault().getModelAdapterFactory().get(type, required);
+	}
+	
 }

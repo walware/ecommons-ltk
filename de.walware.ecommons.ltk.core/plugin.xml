@@ -20,7 +20,10 @@
          schema="schema/de.walware.ecommons.ltk.contentTypeActivation.exsd"/>
    
    <extension-point id="de.walware.ecommons.ltk.workingContexts"
-         name="StatET Working Contexts"
+         name="LTK Working Contexts"
          schema="schema/de.walware.ecommons.ltk.workingContexts.exsd"/>
+   <extension-point id="de.walware.ecommons.ltk.modelAdapters"
+         name="LKT Model Adapters"
+         schema="schema/de.walware.ecommons.ltk.modelAdapters.exsd"/>
    
 </plugin>

@@ -43,6 +43,10 @@ public class ViewerSourceEditorAdapter implements ISourceEditor {
 	}
 	
 	
+	public String getModelTypeId() {
+		return null;
+	}
+	
 	public ISourceUnit getSourceUnit() {
 		return null;
 	}

@@ -55,6 +55,8 @@ public final class LTKCorePlugin extends Plugin implements IAppEnvironment {
 	private ExtContentTypeServices fContentTypeServices;
 	private SourceUnitManager fSourceUnitManager;
 	
+	private AdapterFactory fModelAdapterFactory;
+	
 	
 	/**
 	 * The default constructor
@@ -137,6 +139,17 @@ public final class LTKCorePlugin extends Plugin implements IAppEnvironment {
 	public ISourceUnitManager getSourceUnitManager() {
 		return fSourceUnitManager;
 	}
+	
+	public synchronized AdapterFactory getModelAdapterFactory() {
+		if (fModelAdapterFactory == null) {
+			if (!fStarted) {
+				throw new IllegalStateException("Plug-in is not started.");
+			}
+			fModelAdapterFactory = new AdapterFactory("de.walware.ecommons.ltk.modelAdapters"); //$NON-NLS-1$
+		}
+		return fModelAdapterFactory;
+	}
+	
 	
 //	public synchronized SshSessionManager getSshSessionManager() {
 //		if (fSshSessions == null) {
