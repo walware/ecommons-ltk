@@ -19,7 +19,6 @@ import org.eclipse.core.filebuffers.FileBuffers;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -92,16 +91,13 @@ public class WorkingBuffer implements IWorkingBuffer {
 	 */
 	protected final boolean detectMode() {
 		if (fMode == 0) {
-			if (fUnit.getResource() != null) {
-				if (fUnit.getResource() instanceof IFile) {
-					fMode = IFILE;
-				}
+			final Object resource = fUnit.getResource();
+			if (resource instanceof IFile) {
+				fMode = IFILE;
 			}
-			else {
-				final IFileStore store = (IFileStore) fUnit.getAdapter(IFileStore.class);
-				if (store != null && !store.fetchInfo().isDirectory()) {
-					fMode = FILESTORE;
-				}
+			else if (resource instanceof IFileStore 
+					&& !((IFileStore) resource).fetchInfo().isDirectory() ) {
+				fMode = FILESTORE;
 			}
 			if (fMode == 0) {
 				fMode = -1;
@@ -193,7 +189,7 @@ public class WorkingBuffer implements IWorkingBuffer {
 //			}
 		}
 		else {
-			final IResource resource = fUnit.getResource();
+			final Object resource = fUnit.getResource();
 			if (resource instanceof IFile) {
 				loadDocumentFromFile((IFile) resource, document, progress);
 			}
@@ -233,7 +229,7 @@ public class WorkingBuffer implements IWorkingBuffer {
 			return underlyingUnit.getContent(progress);
 		}
 		else {
-			final IResource resource = fUnit.getResource();
+			final Object resource = fUnit.getResource();
 			final AtomicReference<SourceContent> content = new AtomicReference<SourceContent>();
 			if (resource instanceof IFile) {
 				loadContentFromFile((IFile) resource, content, progress);

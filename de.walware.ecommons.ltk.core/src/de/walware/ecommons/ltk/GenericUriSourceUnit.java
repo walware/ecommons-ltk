@@ -14,8 +14,6 @@ package de.walware.ecommons.ltk;
 import java.util.List;
 
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.text.AbstractDocument;
@@ -114,17 +112,8 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	 * 
 	 * A source unit of this type is usually doesn't have a resource/path.
 	 */
-	public IPath getPath() {
-		return null;
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * A source unit of this type is usually doesn't have a resource/path.
-	 */
-	public IResource getResource() {
-		return null;
+	public Object getResource() {
+		return fStore;
 	}
 	
 	

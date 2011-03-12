@@ -13,8 +13,6 @@ package de.walware.ecommons.ltk;
 
 import java.util.List;
 
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.text.AbstractDocument;
@@ -98,14 +96,7 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
-	public IPath getPath() {
-		return fFrom.getPath();
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	public IResource getResource() {
+	public Object getResource() {
 		return fFrom.getResource();
 	}
 	

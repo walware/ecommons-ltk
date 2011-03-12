@@ -45,15 +45,15 @@ public class AdapterFactory {
 		
 		private IConfigurationElement fConfigurationElement;
 		
-		public ClassContribution(IConfigurationElement contributionElement) {
+		public ClassContribution(final IConfigurationElement contributionElement) {
 			fConfigurationElement = contributionElement;
 		}
 		
-		public Object getAdapter(String modelTypeId, Class<?> required) {
+		public Object getAdapter(final String modelTypeId, final Class<?> required) {
 			try {
 				return fConfigurationElement.createExecutableExtension(CLASS_ATTRIBUTE_NAME);
 			}
-			catch (CoreException e) {
+			catch (final CoreException e) {
 				LTKCorePlugin.getDefault().log(new Status(IStatus.ERROR, LTKCorePlugin.PLUGIN_ID, 0,
 						NLS.bind("An error occurred when loading adapter class for model ''{0}''.", modelTypeId),
 						e ));
@@ -69,18 +69,18 @@ public class AdapterFactory {
 		private IConfigurationElement fConfigurationElement;
 		private IAdapterFactory fFactory;
 		
-		public FactoryContribution(IConfigurationElement configurationElement) {
+		public FactoryContribution(final IConfigurationElement configurationElement) {
 			fConfigurationElement = configurationElement;
 		}
 		
-		public Object getAdapter(String modelTypeId, Class<?> required) {
+		public Object getAdapter(final String modelTypeId, final Class<?> required) {
 			synchronized (this) {
 				if (fConfigurationElement != null) {
 					try {
 						fFactory = (IAdapterFactory) fConfigurationElement.createExecutableExtension(CLASS_ATTRIBUTE_NAME);
 						fConfigurationElement = null;
 					}
-					catch (CoreException e) {
+					catch (final CoreException e) {
 						LTKCorePlugin.getDefault().log(new Status(IStatus.ERROR, LTKCorePlugin.PLUGIN_ID, 0,
 								NLS.bind("An error occurred when loading adapter factory for model ''{0}''.", modelTypeId),
 								e ));
@@ -103,7 +103,7 @@ public class AdapterFactory {
 			Map<String, AdapterContribution>>();
 	
 	
-	public AdapterFactory(String extensionPointId) {
+	public AdapterFactory(final String extensionPointId) {
 		fExtensionPointId = extensionPointId;
 		load();
 	}

@@ -69,6 +69,7 @@ import de.walware.ecommons.ltk.IModelElement;
 import de.walware.ecommons.ltk.ISourceElement;
 import de.walware.ecommons.ltk.ISourceStructElement;
 import de.walware.ecommons.ltk.ISourceUnit;
+import de.walware.ecommons.ltk.IWorkspaceSourceUnit;
 import de.walware.ecommons.ltk.LTK;
 import de.walware.ecommons.ltk.LTKUtil;
 import de.walware.ecommons.ltk.internal.core.refactoring.Messages;
@@ -405,12 +406,9 @@ public abstract class RefactoringAdapter {
 		resources.addAll(elements.getResources());
 		for(final IModelElement element : elements.getModelElements()) {
 			final ISourceUnit su = LTKUtil.getSourceUnit(element);
-			if (su != null) {
-				final IResource resource = su.getResource();
-				if (resource != null) {
-					resources.add(resource);
-					continue;
-				}
+			if (su instanceof IWorkspaceSourceUnit) {
+				resources.add(((IWorkspaceSourceUnit) su).getResource());
+				continue;
 			}
 			result.addFatalError(Messages.Check_ElementNotInWS_message);
 			return;
@@ -425,12 +423,9 @@ public abstract class RefactoringAdapter {
 		resources.addAll(elements.getResources());
 		for(final IModelElement element : elements.getModelElements()) {
 			final ISourceUnit su = LTKUtil.getSourceUnit(element);
-			if (su != null) {
-				final IResource resource = su.getResource();
-				if (resource != null) {
-					resources.add(resource);
-					continue;
-				}
+			if (su instanceof IWorkspaceSourceUnit) {
+				resources.add(((IWorkspaceSourceUnit) su).getResource());
+				continue;
 			}
 			result.addFatalError(Messages.Check_ElementNotInWS_message);
 			return;
@@ -468,9 +463,8 @@ public abstract class RefactoringAdapter {
 	
 	public void checkFinalToDeletion(final RefactoringStatus result, final IModelElement element) throws CoreException {
 		if ((element.getElementType() & IModelElement.MASK_C2) == IModelElement.C2_SOURCE_FILE) {
-			final IResource resource = ((ISourceUnit) element).getResource();
-			if (resource != null) {
-				checkFinalToDelete(result, resource);
+			if (element instanceof IWorkspaceSourceUnit) {
+				checkFinalToDelete(result, ((IWorkspaceSourceUnit) element).getResource());
 			}
 		}
 		else if ((element.getElementType() & IModelElement.MASK_C1) == IModelElement.C1_BUNDLE
@@ -535,10 +529,10 @@ public abstract class RefactoringAdapter {
 	}
 	
 	public boolean hasReadOnlyElements(final IModelElement element) throws CoreException {
-		final ISourceUnit sourceUnit = LTKUtil.getSourceUnit(element);
+		final ISourceUnit su = LTKUtil.getSourceUnit(element);
 		IResource resource = null;
-		if (sourceUnit != null) {
-			resource = sourceUnit.getResource();
+		if (su instanceof IWorkspaceSourceUnit) {
+			resource = ((IWorkspaceSourceUnit) su).getResource();
 		}
 		if (resource == null) {
 			resource = (IResource) element.getAdapter(IResource.class);
@@ -647,7 +641,8 @@ public abstract class RefactoringAdapter {
 	private Change createChangeToDelete(final RefactoringElementSet elements,
 			final ISourceUnit su, final List<IModelElement> elementsInUnit,
 			final TextChangeManager manager, final SubMonitor progress) throws CoreException {
-		if (su == null || su.getResource() == null || su.getResource().getType() != IResource.FILE) {
+		if (!(su instanceof IWorkspaceSourceUnit)
+				|| ((IWorkspaceSourceUnit) su).getResource().getType() != IResource.FILE ) {
 			throw new IllegalArgumentException();
 		}
 		su.connect(progress.newChild(1));
@@ -696,9 +691,8 @@ public abstract class RefactoringAdapter {
 	}
 	
 	protected Change createChangeToDelete(final RefactoringElementSet elements, final ISourceUnit su) throws CoreException {
-		final IResource resource = su.getResource();
-		if (resource != null) {
-			return createChangeToDelete(elements, resource);
+		if (su instanceof IWorkspaceSourceUnit) {
+			return createChangeToDelete(elements, ((IWorkspaceSourceUnit) su).getResource());
 		}
 		throw new IllegalStateException();
 	}

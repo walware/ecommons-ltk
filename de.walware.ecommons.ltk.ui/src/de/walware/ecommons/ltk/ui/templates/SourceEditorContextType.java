@@ -14,7 +14,6 @@ package de.walware.ecommons.ltk.ui.templates;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -34,6 +33,7 @@ import org.eclipse.text.edits.TextEdit;
 
 import de.walware.ecommons.ltk.IElementName;
 import de.walware.ecommons.ltk.ISourceUnit;
+import de.walware.ecommons.ltk.IWorkspaceSourceUnit;
 import de.walware.ecommons.ltk.internal.ui.TemplatesMessages;
 
 
@@ -121,11 +121,8 @@ public class SourceEditorContextType extends TemplateContextType {
 		protected String resolve(final TemplateContext context) {
 			if (context instanceof IWorkbenchTemplateContext) {
 				final ISourceUnit su = ((IWorkbenchTemplateContext) context).getSourceUnit();
-				if (su != null) {
-					final IResource resource = su.getResource();
-					if (resource != null) {
-						return resource.getProject().getName();
-					}
+				if (su instanceof IWorkspaceSourceUnit) {
+					return ((IWorkspaceSourceUnit) su).getResource().getProject().getName();
 				}
 			}
 			return ""; //$NON-NLS-1$

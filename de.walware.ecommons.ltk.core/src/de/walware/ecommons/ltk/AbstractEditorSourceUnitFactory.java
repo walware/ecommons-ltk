@@ -28,8 +28,8 @@ public abstract class AbstractEditorSourceUnitFactory implements ISourceUnitFact
 	}
 	
 	public ISourceUnit createSourceUnit(final String id, final Object from) {
-		if (from instanceof ISourceUnit) {
-			return createSourceUnit(id, (ISourceUnit) from);
+		if (from instanceof IWorkspaceSourceUnit) {
+			return createSourceUnit(id, (IWorkspaceSourceUnit) from);
 		}
 		if (from instanceof IFileStore) {
 			return createSourceUnit(id, (IFileStore) from);
@@ -38,7 +38,7 @@ public abstract class AbstractEditorSourceUnitFactory implements ISourceUnitFact
 	}
 	
 	
-	protected abstract ISourceUnit createSourceUnit(final String id, final ISourceUnit su);
+	protected abstract ISourceUnit createSourceUnit(final String id, final IWorkspaceSourceUnit su);
 	
 	protected abstract ISourceUnit createSourceUnit(final String id, final IFileStore file);
 	

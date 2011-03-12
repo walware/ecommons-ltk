@@ -16,16 +16,17 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.text.AbstractDocument;
+
+import de.walware.ecommons.text.IMarkerPositionResolver;
 
 
 /**
  * Generic source unit for files in the Eclipse workspace (IFile).
  */
-public abstract class GenericResourceSourceUnit implements ISourceUnit {
+public abstract class GenericResourceSourceUnit implements IWorkspaceSourceUnit {
 	
 	
 	public static String createResourceId(final IResource file) {
@@ -43,6 +44,9 @@ public abstract class GenericResourceSourceUnit implements ISourceUnit {
 	
 	
 	public GenericResourceSourceUnit(final String id, final IFile file) {
+		if (file == null) {
+			throw new NullPointerException();
+		}
 		fId = id;
 		fFile = file;
 		fName = createElementName();
@@ -133,19 +137,12 @@ public abstract class GenericResourceSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
-	public final IPath getPath() {
-		return fFile.getFullPath();
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
 	public final IResource getResource() {
 		return fFile;
 	}
 	
-	protected final IFile getFile() {
-		return fFile;
+	public IMarkerPositionResolver getMarkerPositionResolver() {
+		return null;
 	}
 	
 	

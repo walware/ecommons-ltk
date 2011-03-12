@@ -13,9 +13,7 @@ package de.walware.ecommons.ltk;
 
 import java.lang.reflect.InvocationTargetException;
 
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.AbstractDocument;
 import org.eclipse.jface.text.IDocumentExtension4;
@@ -41,8 +39,12 @@ public interface ISourceUnit extends IModelElement, IAdaptable {
 	public WorkingContext getWorkingContext();
 	public ISourceUnit getUnderlyingUnit();
 	
-	public IPath getPath();
-	public IResource getResource();
+	/**
+	 * The file resource of the source unit. The type depends on the source unit.
+	 * 
+	 * @return the resource or <code>null</code> if without resource
+	 */
+	public Object getResource();
 	
 	/**
 	 * Checks if the source is modifiable.

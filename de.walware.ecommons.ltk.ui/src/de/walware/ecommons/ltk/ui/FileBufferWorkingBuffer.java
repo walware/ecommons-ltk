@@ -18,6 +18,7 @@ import org.eclipse.core.filebuffers.FileBuffers;
 import org.eclipse.core.filebuffers.ITextFileBuffer;
 import org.eclipse.core.filebuffers.LocationKind;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -105,7 +106,7 @@ public class FileBufferWorkingBuffer extends WorkingBuffer {
 	protected AbstractDocument createDocument(final SubMonitor progress) {
 		if (detectMode()) {
 			if (getMode() == IFILE) {
-				final IPath path = fUnit.getPath();
+				final IPath path = ((IFile) fUnit.getResource()).getFullPath();
 				try {
 					FileBuffers.getTextFileBufferManager().connect(path, LocationKind.IFILE, progress);
 					fBuffer = FileBuffers.getTextFileBufferManager().getTextFileBuffer(path, LocationKind.IFILE);
@@ -116,7 +117,7 @@ public class FileBufferWorkingBuffer extends WorkingBuffer {
 				}
 			}
 			else if (getMode() == FILESTORE) {
-				final IFileStore store = (IFileStore) fUnit.getAdapter(IFileStore.class);
+				final IFileStore store = (IFileStore) fUnit.getResource();
 				try {
 					FileBuffers.getTextFileBufferManager().connectFileStore(store, progress);
 					fBuffer = FileBuffers.getTextFileBufferManager().getFileStoreTextFileBuffer(store);
@@ -144,11 +145,11 @@ public class FileBufferWorkingBuffer extends WorkingBuffer {
 			ITextFileBuffer buffer = fBuffer;
 			if (buffer == null) {
 				if (getMode() == IFILE) {
-					final IPath path = fUnit.getPath();
+					final IPath path = ((IFile) fUnit.getResource()).getFullPath();
 					buffer = FileBuffers.getTextFileBufferManager().getTextFileBuffer(path, LocationKind.IFILE);
 				}
 				else if (getMode() == FILESTORE) {
-					final IFileStore store = (IFileStore) fUnit.getAdapter(IFileStore.class);
+					final IFileStore store = (IFileStore) fUnit.getResource();
 					buffer = FileBuffers.getTextFileBufferManager().getFileStoreTextFileBuffer(store);
 				}
 			}
@@ -165,11 +166,11 @@ public class FileBufferWorkingBuffer extends WorkingBuffer {
 			try {
 				final SubMonitor progress = SubMonitor.convert(monitor);
 				if (getMode() == IFILE) {
-					final IPath path = fUnit.getPath();
+					final IPath path = ((IFile) fUnit.getResource()).getFullPath();
 					FileBuffers.getTextFileBufferManager().disconnect(path, LocationKind.IFILE, progress);
 				}
 				else if (getMode() == FILESTORE) {
-					final IFileStore store = (IFileStore) fUnit.getAdapter(IFileStore.class);
+					final IFileStore store = (IFileStore) fUnit.getResource();
 					FileBuffers.getTextFileBufferManager().disconnectFileStore(store, progress);
 				}
 			}
