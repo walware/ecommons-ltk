@@ -77,6 +77,7 @@ import de.walware.ecommons.preferences.ui.OverlayStorePreference;
 import de.walware.ecommons.preferences.ui.PreferenceStoreBeanWrapper;
 import de.walware.ecommons.preferences.ui.RGBPref;
 import de.walware.ecommons.text.internal.ui.Messages;
+import de.walware.ecommons.text.ui.TextViewerEditorColorUpdater;
 import de.walware.ecommons.text.ui.TextViewerJFaceUpdater;
 import de.walware.ecommons.text.ui.presentation.AbstractTextStylesConfigurationBlock.SyntaxNode.UseStyle;
 import de.walware.ecommons.ui.ColorManager;
@@ -641,6 +642,7 @@ public abstract class AbstractTextStylesConfigurationBlock extends OverlayStoreC
 		fConfiguration = getSourceViewerConfiguration(fColorManager, store);
 		fPreviewViewer.configure(fConfiguration);
 		new TextViewerJFaceUpdater(fPreviewViewer, store);
+		new TextViewerEditorColorUpdater(fPreviewViewer, store);
 		
 		final String content = loadPreviewContentFromFile(getPreviewFileName());
 		final IDocument document = new Document(content);

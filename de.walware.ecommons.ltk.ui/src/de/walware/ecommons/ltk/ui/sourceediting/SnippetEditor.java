@@ -40,6 +40,7 @@ import org.eclipse.ui.texteditor.IUpdate;
 
 import de.walware.ecommons.preferences.ui.SettingsUpdater;
 import de.walware.ecommons.text.ui.TextViewerAction;
+import de.walware.ecommons.text.ui.TextViewerEditorColorUpdater;
 import de.walware.ecommons.text.ui.TextViewerJFaceUpdater;
 import de.walware.ecommons.ui.actions.ControlServicesUtil;
 import de.walware.ecommons.ui.components.WidgetToolsButton;
@@ -172,6 +173,8 @@ public class SnippetEditor extends Object {
 		final ViewerSourceEditorAdapter adapter = new ViewerSourceEditorAdapter(fSourceViewer, fConfigurator);
 		fConfigurator.setTarget(adapter);
 		new TextViewerJFaceUpdater(fSourceViewer,
+				fConfigurator.getSourceViewerConfiguration().getPreferences() );
+		new TextViewerEditorColorUpdater(fSourceViewer,
 				fConfigurator.getSourceViewerConfiguration().getPreferences() );
 		new SettingsUpdater(fConfigurator, fSourceViewer.getControl());
 		
