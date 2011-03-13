@@ -485,11 +485,11 @@ public abstract class RefactoringAdapter {
 			if (buffer.isStateValidated() && buffer.isSynchronized()) {
 				result.addWarning(NLS.bind(
 					Messages.Check_FileUnsavedChanges_message,
-					FileUtil.getFileUtil(file).getFileLabel()) );
+					FileUtil.getFileUtil(file).getLabel()) );
 			} else {
 				result.addFatalError(NLS.bind(
 					Messages.Check_FileUnsavedChanges_message, 
-					FileUtil.getFileUtil(file).getFileLabel()) );
+					FileUtil.getFileUtil(file).getLabel()) );
 			}
 		}
 	}
