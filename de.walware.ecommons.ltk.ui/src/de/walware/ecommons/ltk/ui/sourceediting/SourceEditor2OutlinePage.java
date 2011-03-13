@@ -23,8 +23,10 @@ import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.part.IPageSite;
+import org.eclipse.ui.services.IServiceLocator;
 
 import de.walware.ecommons.ui.SharedUIResources;
+import de.walware.ecommons.ui.actions.HandlerCollection;
 
 import de.walware.ecommons.ltk.ISourceStructElement;
 import de.walware.ecommons.ltk.core.refactoring.CommonRefactoringFactory;
@@ -83,24 +85,33 @@ public abstract class SourceEditor2OutlinePage extends SourceEditor1OutlinePage 
 	
 	
 	@Override
-	protected void initActions() {
-		super.initActions();
-		final IPageSite site = getSite();
+	protected void initActions(final IServiceLocator serviceLocator, final HandlerCollection handlers) {
+		super.initActions(serviceLocator, handlers);
 		
-		final IHandlerService handlerSvc = (IHandlerService) site.getService(IHandlerService.class);
-		final AbstractElementsHandler cutHandler = new CutElementsHandler(fLTK, fRefactoring);
-		registerHandlerToUpdate(cutHandler);
-		handlerSvc.activateHandler(IWorkbenchCommandConstants.EDIT_CUT, cutHandler);
-		final AbstractElementsHandler copyHandler = new CopyElementsHandler(fLTK);
-		registerHandlerToUpdate(copyHandler);
-		handlerSvc.activateHandler(IWorkbenchCommandConstants.EDIT_COPY, copyHandler);
-		final AbstractElementsHandler copyNamesHandler = new CopyNamesHandler(fLTK);
-		registerHandlerToUpdate(copyNamesHandler);
-		handlerSvc.activateHandler(ISourceEditorCommandIds.COPY_ELEMENT_NAME, copyNamesHandler);
-		final AbstractElementsHandler pasteHandler = new PasteElementsHandler(getSourceEditor(), fLTK);
-		handlerSvc.activateHandler(IWorkbenchCommandConstants.EDIT_PASTE, pasteHandler);
-		final AbstractElementsHandler deleteHandler = new DeleteElementsHandler(fLTK, fRefactoring);
-		handlerSvc.activateHandler(IWorkbenchCommandConstants.EDIT_DELETE, deleteHandler);
+		final IHandlerService handlerService = (IHandlerService) serviceLocator.getService(IHandlerService.class);
+		{	final AbstractElementsHandler handler = new CutElementsHandler(fLTK, fRefactoring);
+			handlers.add(IWorkbenchCommandConstants.EDIT_CUT, handler);
+			registerHandlerToUpdate(handler);
+			handlerService.activateHandler(IWorkbenchCommandConstants.EDIT_CUT, handler);
+		}
+		{	final AbstractElementsHandler handler = new CopyElementsHandler(fLTK);
+			handlers.add(IWorkbenchCommandConstants.EDIT_COPY, handler);
+			registerHandlerToUpdate(handler);
+			handlerService.activateHandler(IWorkbenchCommandConstants.EDIT_COPY, handler);
+		}
+		{	final AbstractElementsHandler handler = new CopyNamesHandler(fLTK);
+			handlers.add(ISourceEditorCommandIds.COPY_ELEMENT_NAME, handler);
+			registerHandlerToUpdate(handler);
+			handlerService.activateHandler(ISourceEditorCommandIds.COPY_ELEMENT_NAME, handler);
+		}
+		{	final AbstractElementsHandler handler = new PasteElementsHandler(getSourceEditor(), fLTK);
+			handlers.add(IWorkbenchCommandConstants.EDIT_PASTE, handler);
+			handlerService.activateHandler(IWorkbenchCommandConstants.EDIT_PASTE, handler);
+		}
+		{	final AbstractElementsHandler handler = new DeleteElementsHandler(fLTK, fRefactoring);
+			handlers.add(IWorkbenchCommandConstants.EDIT_DELETE, handler);
+			handlerService.activateHandler(IWorkbenchCommandConstants.EDIT_DELETE, handler);
+		}
 	}
 	
 	@Override
