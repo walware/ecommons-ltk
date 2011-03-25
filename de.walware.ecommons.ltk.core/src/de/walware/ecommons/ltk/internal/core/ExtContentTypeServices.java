@@ -78,6 +78,7 @@ public class ExtContentTypeServices implements IExtContentTypeManager, IDisposab
 	private Map<String, String[]> fPrimaryToSecondary;
 	private Map<String, String[]> fSecondaryToPrimary;
 	private Map<String, String> fModelToPrimary;
+	private Map<String, String> fPrimaryToModel;
 	private final String[] NO_TYPES = new String[0];
 	
 	
@@ -93,6 +94,7 @@ public class ExtContentTypeServices implements IExtContentTypeManager, IDisposab
 		final Map<String, Set<String>> primaryToSecondary = new HashMap<String, Set<String>>();
 		final Map<String, Set<String>> secondaryToPrimary = new HashMap<String, Set<String>>();
 		final Map<String, String> modelToPrimary = new HashMap<String, String>();
+		final Map<String, String> primaryToModel = new HashMap<String, String>();
 		
 		for (final IConfigurationElement element : elements) {
 			if (element.getName().equals(CONFIG_CONTENTTYPE_ELEMENT_NAME)) { 
@@ -114,12 +116,14 @@ public class ExtContentTypeServices implements IExtContentTypeManager, IDisposab
 					modelTypeId = modelTypeId.intern();
 					contentTypeId = contentTypeId.intern();
 					modelToPrimary.put(modelTypeId, contentTypeId);
+					primaryToModel.put(contentTypeId, modelTypeId);
 				}
 			}
 		}
 		fPrimaryToSecondary = copy(primaryToSecondary, new HashMap<String, String[]>());
 		fSecondaryToPrimary = copy(secondaryToPrimary, new HashMap<String, String[]>());
 		fModelToPrimary = modelToPrimary;
+		fPrimaryToModel = primaryToModel;
 	}
 	
 	
@@ -154,6 +158,10 @@ public class ExtContentTypeServices implements IExtContentTypeManager, IDisposab
 	
 	public String getContentTypeForModelType(final String modelTypeId) {
 		return fModelToPrimary.get(modelTypeId);
+	}
+	
+	public String getModelTypeForContentType(final String contentTypeId) {
+		return fPrimaryToModel.get(contentTypeId);
 	}
 	
 	
