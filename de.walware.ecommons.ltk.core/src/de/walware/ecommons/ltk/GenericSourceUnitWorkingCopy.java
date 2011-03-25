@@ -47,6 +47,10 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 		return fFrom;
 	}
 	
+	public boolean isSynchronized() {
+		return fBuffer.isSynchronized();
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */

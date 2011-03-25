@@ -24,10 +24,11 @@ import org.eclipse.jface.text.AbstractDocument;
 public interface IWorkingBuffer {
 	
 	
-	public AbstractDocument getDocument(IProgressMonitor monitor);
-	public SourceContent getContent(IProgressMonitor monitor);
-	public boolean checkState(boolean validate, IProgressMonitor monitor);
-	public void saveDocument(IProgressMonitor monitor);
-	public void releaseDocument(IProgressMonitor monitor);
+	AbstractDocument getDocument(IProgressMonitor monitor);
+	SourceContent getContent(IProgressMonitor monitor);
+	boolean checkState(boolean validate, IProgressMonitor monitor);
+	boolean isSynchronized();
+	void saveDocument(IProgressMonitor monitor);
+	void releaseDocument(IProgressMonitor monitor);
 	
 }

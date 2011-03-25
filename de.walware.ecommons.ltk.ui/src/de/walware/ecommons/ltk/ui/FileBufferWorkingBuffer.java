@@ -209,4 +209,8 @@ public class FileBufferWorkingBuffer extends WorkingBuffer {
 		return super.checkState(validate, monitor);
 	}
 	
+	public boolean isSynchronized() {
+		return fBuffer.isSynchronized();
+	}
+	
 }

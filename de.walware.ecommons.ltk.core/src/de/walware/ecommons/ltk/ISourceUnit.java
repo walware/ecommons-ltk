@@ -40,6 +40,13 @@ public interface ISourceUnit extends IModelElement, IAdaptable {
 	public ISourceUnit getUnderlyingUnit();
 	
 	/**
+	 * If the content is synchronized with the underlying unit.
+	 * 
+	 * @return <code>true</code> if synchronized, otherwise <code>false</code>
+	 */
+	public boolean isSynchronized();
+	
+	/**
 	 * The file resource of the source unit. The type depends on the source unit.
 	 * 
 	 * @return the resource or <code>null</code> if without resource

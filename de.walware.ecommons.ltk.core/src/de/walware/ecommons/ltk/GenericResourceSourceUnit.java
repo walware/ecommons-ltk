@@ -82,6 +82,10 @@ public abstract class GenericResourceSourceUnit implements IWorkspaceSourceUnit 
 		return null;
 	}
 	
+	public boolean isSynchronized() {
+		return true;
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */

@@ -259,4 +259,8 @@ public class WorkingBuffer implements IWorkingBuffer {
 		}
 	}
 	
+	public boolean isSynchronized() {
+		return false;
+	}
+	
 }

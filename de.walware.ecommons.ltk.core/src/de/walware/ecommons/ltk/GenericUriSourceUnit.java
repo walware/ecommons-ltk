@@ -64,6 +64,10 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 		return null;
 	}
 	
+	public boolean isSynchronized() {
+		return fBuffer.isSynchronized();
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
