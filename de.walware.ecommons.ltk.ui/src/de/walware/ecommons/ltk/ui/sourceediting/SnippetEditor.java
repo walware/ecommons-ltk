@@ -29,6 +29,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -55,6 +56,39 @@ public class SnippetEditor extends Object {
 	
 	public static final int DEFAULT_SINGLE_LINE_STYLE = SWT.BORDER | SWT.SINGLE | SWT.LEFT_TO_RIGHT;
 	public static final int DEFAULT_MULTI_LINE_STYLE = SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.MULTI | SWT.LEFT_TO_RIGHT;
+	
+	
+	private static class ExtStyledText extends StyledText {
+		
+		
+		private Color fSavedColor;
+		
+		
+		public ExtStyledText(final Composite parent, final int style) {
+			super(parent, style);
+		}
+		
+		
+		@Override
+		public void setBackground(final Color color) {
+			fSavedColor = color;
+			if (isEnabled()) {
+				super.setBackground(color);
+			}
+		}
+		
+		@Override
+		public void setEnabled(final boolean enabled) {
+			super.setEnabled(enabled);
+			if (enabled) {
+				super.setBackground(fSavedColor);
+			}
+			else {
+				super.setBackground(getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+			}
+		}
+		
+	}
 	
 	
 	private class Updater implements ISelectionChangedListener, IDocumentListener, Runnable {
@@ -165,7 +199,16 @@ public class SnippetEditor extends Object {
 	}
 	
 	private void createSourceViewer(final Composite composite, final int style) {
-		fSourceViewer = new SourceViewer(composite, null, style);
+		fSourceViewer = new SourceViewer(composite, null, style) {
+			
+			@Override
+			protected StyledText createTextWidget(final Composite parent, final int styles) {
+				final StyledText styledText = new ExtStyledText(parent, styles);
+				styledText.setLeftMargin(Math.max(styledText.getLeftMargin(), 2));
+				return styledText;
+			}
+			
+		};
 		fSourceViewer.setEditable(true);
 		
 		fSourceViewer.setDocument(fDocument);
