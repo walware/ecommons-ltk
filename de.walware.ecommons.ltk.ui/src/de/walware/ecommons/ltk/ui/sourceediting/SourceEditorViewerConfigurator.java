@@ -137,10 +137,12 @@ public abstract class SourceEditorViewerConfigurator implements ISettingsChanged
 		for (final ISourceEditorAddon addon : fAddons) {
 			addon.uninstall();
 		}
-		for (final ISourceEditorAddon addon : fConfigurationAddons) {
-			addon.uninstall();
+		if (fConfigurationAddons != null) {
+			for (final ISourceEditorAddon addon : fConfigurationAddons) {
+				addon.uninstall();
+			}
+			fConfigurationAddons = null;
 		}
-		fConfigurationAddons = null;
 	}
 	
 	public final void installAddon(final ISourceEditorAddon installable) {
