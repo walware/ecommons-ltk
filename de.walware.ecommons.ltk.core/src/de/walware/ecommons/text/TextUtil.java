@@ -205,4 +205,60 @@ public class TextUtil {
 						- offset);
 	}
 	
+	public final static int getColumn(final IDocument document, final int offset, int line, int tabWidth)
+			throws BadLocationException {
+		if (offset > document.getLength()) {
+			return -1;
+		}
+		if (line < 0) {
+			line = document.getLineOfOffset(offset);
+		}
+		if (tabWidth <= 0) {
+			tabWidth = 8;
+		}
+		int currentColumn = 0;
+		int currentOffset = document.getLineOffset(line);
+		while (currentOffset < offset) {
+			final char c = document.getChar(currentOffset++);
+			switch (c) {
+			case '\n':
+			case '\r':
+				return -1;
+			case '\t':
+				currentColumn += tabWidth - (currentColumn % tabWidth);
+				continue;
+			default:
+				currentColumn++;
+				continue;
+			}
+		}
+		return currentColumn;
+	}
+	
+	public final static int getColumn(final String text, final int offset, int tabWidth) {
+		if (offset > text.length()) {
+			return -1;
+		}
+		if (tabWidth <= 0) {
+			tabWidth = 8;
+		}
+		int currentColumn = 0;
+		int currentOffset = 0;
+		while (currentOffset < offset) {
+			final char c = text.charAt(currentOffset++);
+			switch (c) {
+			case '\n':
+			case '\r':
+				return -1;
+			case '\t':
+				currentColumn += tabWidth - (currentColumn % tabWidth);
+				continue;
+			default:
+				currentColumn++;
+				continue;
+			}
+		}
+		return currentColumn;
+	}
+	
 }

@@ -22,6 +22,7 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
+import org.eclipse.core.commands.IHandler2;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
@@ -57,6 +58,7 @@ import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -74,6 +76,7 @@ import org.eclipse.ui.services.IServiceLocator;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
+import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
 import org.eclipse.ui.texteditor.IUpdate;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 import org.eclipse.ui.texteditor.templates.ITemplatesPage;
@@ -88,6 +91,7 @@ import de.walware.ecommons.preferences.SettingsChangeNotifier;
 import de.walware.ecommons.text.PairMatcher;
 import de.walware.ecommons.text.PartitioningConfiguration;
 import de.walware.ecommons.text.TextUtil;
+import de.walware.ecommons.text.ui.TextHandlerUtil;
 import de.walware.ecommons.ui.ISettingsChangedHandler;
 import de.walware.ecommons.ui.SharedUIResources;
 import de.walware.ecommons.ui.util.UIAccess;
@@ -105,6 +109,13 @@ import de.walware.ecommons.ltk.ui.LTKInputData;
 import de.walware.ecommons.ltk.ui.PostSelectionCancelExtension;
 import de.walware.ecommons.ltk.ui.PostSelectionWithElementInfoController;
 import de.walware.ecommons.ltk.ui.PostSelectionWithElementInfoController.IgnoreActivation;
+import de.walware.ecommons.ltk.ui.sourceediting.actions.DeleteNextWordHandler;
+import de.walware.ecommons.ltk.ui.sourceediting.actions.DeletePreviousWordHandler;
+import de.walware.ecommons.ltk.ui.sourceediting.actions.GotoMatchingBracketHandler;
+import de.walware.ecommons.ltk.ui.sourceediting.actions.GotoNextWordHandler;
+import de.walware.ecommons.ltk.ui.sourceediting.actions.GotoPreviousWordHandler;
+import de.walware.ecommons.ltk.ui.sourceediting.actions.SelectNextWordHandler;
+import de.walware.ecommons.ltk.ui.sourceediting.actions.SelectPreviousWordHandler;
 
 
 /**
@@ -235,7 +246,7 @@ public abstract class SourceEditor1 extends TextEditor
 		}
 	}
 	
-	protected class ToggleCommentHandler extends AbstractHandler implements IUpdate {
+	protected class ToggleCommentHandler extends AbstractHandler {
 		
 		/** The text operation target */
 		private ITextOperationTarget fOperationTarget;
@@ -283,13 +294,8 @@ public abstract class SourceEditor1 extends TextEditor
 			fDocumentPartitioning = configuration.getConfiguredDocumentPartitioning(sourceViewer);
 		}
 		
-		/**
-		 * Implementation of the <code>IUpdate</code> prototype method discovers
-		 * the operation through the current editor's
-		 * <code>ITextOperationTarget</code> adapter, and sets the enabled state
-		 * accordingly.
-		 */
-		public void update() {
+		@Override
+		public void setEnabled(final Object evaluationContext) {
 			if (!SourceEditor1.this.isEditorInputModifiable()) {
 				setBaseEnabled(false);
 				return;
@@ -483,7 +489,7 @@ public abstract class SourceEditor1 extends TextEditor
 	private int fEffectSynchonizerCounter;
 	
 	private final FastList<IUpdate> fContentUpdateables = new FastList<IUpdate>(IUpdate.class);
-	private final FastList<IUpdate> fStateUpdateables = new FastList<IUpdate>(IUpdate.class);
+	private final FastList<IHandler2> fStateUpdateables = new FastList<IHandler2>(IHandler2.class);
 	
 	private boolean fInputChange;
 	private int fInputUpdate = Integer.MAX_VALUE;
@@ -871,7 +877,40 @@ public abstract class SourceEditor1 extends TextEditor
 	protected void createActions() {
 		super.createActions();
 		final IHandlerService handlerService = (IHandlerService) getServiceLocator().getService(IHandlerService.class);
-		IAction action;
+		final StyledText textWidget = getViewer().getTextWidget();
+		
+		{	final IHandler2 handler = new GotoNextWordHandler(this);
+			setAction(ITextEditorActionDefinitionIds.WORD_NEXT, null);
+			TextHandlerUtil.disable(textWidget, ITextEditorActionDefinitionIds.WORD_NEXT);
+			handlerService.activateHandler(ITextEditorActionDefinitionIds.WORD_NEXT, handler);
+		}
+		{	final IHandler2 handler = new GotoPreviousWordHandler(this);
+			setAction(ITextEditorActionDefinitionIds.WORD_PREVIOUS, null);
+			TextHandlerUtil.disable(textWidget, ITextEditorActionDefinitionIds.WORD_NEXT);
+			handlerService.activateHandler(ITextEditorActionDefinitionIds.WORD_PREVIOUS, handler);
+		}
+		{	final IHandler2 handler = new SelectNextWordHandler(this);
+			setAction(ITextEditorActionDefinitionIds.SELECT_WORD_NEXT, null);
+			TextHandlerUtil.disable(textWidget, ITextEditorActionDefinitionIds.SELECT_WORD_NEXT);
+			handlerService.activateHandler(ITextEditorActionDefinitionIds.SELECT_WORD_NEXT, handler);
+		}
+		{	final IHandler2 handler = new SelectPreviousWordHandler(this);
+			setAction(ITextEditorActionDefinitionIds.SELECT_WORD_PREVIOUS, null);
+			TextHandlerUtil.disable(textWidget, ITextEditorActionDefinitionIds.SELECT_WORD_PREVIOUS);
+			handlerService.activateHandler(ITextEditorActionDefinitionIds.SELECT_WORD_PREVIOUS, handler);
+		}
+		{	final IHandler2 handler = new DeleteNextWordHandler(this);
+			setAction(ITextEditorActionDefinitionIds.DELETE_NEXT_WORD, null);
+			TextHandlerUtil.disable(textWidget, ITextEditorActionDefinitionIds.DELETE_NEXT_WORD);
+			handlerService.activateHandler(ITextEditorActionDefinitionIds.DELETE_NEXT_WORD, handler);
+			markAsStateDependentHandler(handler, true);
+		}
+		{	final IHandler2 handler = new DeletePreviousWordHandler(this);
+			setAction(ITextEditorActionDefinitionIds.DELETE_PREVIOUS_WORD, null);
+			TextHandlerUtil.disable(textWidget, ITextEditorActionDefinitionIds.DELETE_PREVIOUS_WORD);
+			handlerService.activateHandler(ITextEditorActionDefinitionIds.DELETE_PREVIOUS_WORD, handler);
+			markAsStateDependentHandler(handler, true);
+		}
 		
 		final PairMatcher matcher = fConfigurator.getSourceViewerConfiguration().getPairMatcher();
 		if (matcher != null) {
@@ -884,17 +923,16 @@ public abstract class SourceEditor1 extends TextEditor
 				handlerService.activateHandler(ISourceEditorCommandIds.TOGGLE_COMMENT, handler);
 			}
 		}
-		
-		action = createCorrectIndentAction();
-		if (action != null) {
-			setAction(action.getId(), action);
-			markAsContentDependentAction(action.getId(), true);
+		{	final IAction action = createCorrectIndentAction();
+			if (action != null) {
+				setAction(action.getId(), action);
+				markAsContentDependentAction(action.getId(), true);
+			}
 		}
 		
 		if (fFoldingEnablement != null) {
 			fFoldingActionGroup = createFoldingActionGroup();
 		}
-		
 		if (fModelProvider != null) {
 			fSelectionHistory = new StructureSelectionHistory(this);
 			handlerService.activateHandler(ISourceEditorCommandIds.SELECT_ENCLOSING,
@@ -907,6 +945,7 @@ public abstract class SourceEditor1 extends TextEditor
 			handlerService.activateHandler(ISourceEditorCommandIds.SELECT_LAST, backHandler);
 			fSelectionHistory.addUpdateListener(backHandler);
 		}
+		
 		//WorkbenchHelp.setHelp(action, IJavaHelpContextIds.TOGGLE_COMMENT_ACTION);
 	}
 	
@@ -933,7 +972,7 @@ public abstract class SourceEditor1 extends TextEditor
 		}
 	}
 	
-	protected void markAsStateDependentHandler(final IUpdate handler, final boolean mark) {
+	protected void markAsStateDependentHandler(final IHandler2 handler, final boolean mark) {
 		if (mark) {
 			fStateUpdateables.add(handler);
 		}
@@ -954,9 +993,9 @@ public abstract class SourceEditor1 extends TextEditor
 	@Override
 	protected void updateStateDependentActions() {
 		super.updateStateDependentActions();
-		final IUpdate[] listeners = fStateUpdateables.toArray();
+		final IHandler2[] listeners = fStateUpdateables.toArray();
 		for (int i = 0; i < listeners.length; i++) {
-			listeners[i].update();
+			listeners[i].setEnabled(this);
 		}
 	}
 	
