@@ -13,6 +13,8 @@ package de.walware.ecommons.ltk;
 
 import org.eclipse.core.filesystem.IFileStore;
 
+import de.walware.ecommons.text.ISourceFragment;
+
 
 /**
  * Abstract factory for {@link LTK#EDITOR_CONTEXT}.
@@ -24,6 +26,9 @@ public abstract class AbstractEditorSourceUnitFactory implements ISourceUnitFact
 		if (from instanceof IFileStore) {
 			return AbstractFilePersistenceSourceUnitFactory.createResourceId(((IFileStore) from).toURI());
 		}
+		if (from instanceof ISourceFragment) {
+			return ((ISourceFragment) from).getId();
+		}
 		return null;
 	}
 	
@@ -34,6 +39,9 @@ public abstract class AbstractEditorSourceUnitFactory implements ISourceUnitFact
 		if (from instanceof IFileStore) {
 			return createSourceUnit(id, (IFileStore) from);
 		}
+		if (from instanceof ISourceFragment) {
+			return createSourceUnit(id, (ISourceFragment) from);
+		}
 		return null;
 	}
 	
@@ -41,5 +49,9 @@ public abstract class AbstractEditorSourceUnitFactory implements ISourceUnitFact
 	protected abstract ISourceUnit createSourceUnit(final String id, final IWorkspaceSourceUnit su);
 	
 	protected abstract ISourceUnit createSourceUnit(final String id, final IFileStore file);
+	
+	protected ISourceUnit createSourceUnit(final String id, final ISourceFragment fragment) {
+		return null;
+	}
 	
 }

@@ -267,29 +267,31 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 		
 		final ModelItem modelItem = getModelItem(modelTypeId);
 		final ContextItem contextItem = modelItem.getContextItem(context, create);
-		ISourceUnit su;
+		ISourceUnit su = null;
 		if (contextItem != null) {
 			final String id = (fromUnit != null) ? fromUnit.getId() : contextItem.fFactory.createId(from);
-			synchronized (contextItem) {
-				SuItem suItem = contextItem.fSus.get(id);
-				if (suItem != null) {
-					su = suItem.get();
-					if (suItem.isEnqueued()) {
-						su = null;
-					}
-				}
-				else {
-					if (create) {
-						su = contextItem.fFactory.createSourceUnit(id, (fromUnit != null) ? fromUnit : from);
-						if (su == null || !su.getModelTypeId().equals(modelItem.fModelTypeId)
-								|| (su.getElementType() & IModelElement.MASK_C1) != IModelElement.C1_SOURCE) {
-							// TODO log
-							return null; 
+			if (id != null) {
+				synchronized (contextItem) {
+					SuItem suItem = contextItem.fSus.get(id);
+					if (suItem != null) {
+						su = suItem.get();
+						if (suItem.isEnqueued()) {
+							su = null;
 						}
-						suItem = new SuItem(id, su, contextItem.fSusToClean);
 					}
 					else {
-						return null;
+						if (create) {
+							su = contextItem.fFactory.createSourceUnit(id, (fromUnit != null) ? fromUnit : from);
+							if (su == null || !su.getModelTypeId().equals(modelItem.fModelTypeId)
+									|| (su.getElementType() & IModelElement.MASK_C1) != IModelElement.C1_SOURCE) {
+								// TODO log
+								return null; 
+							}
+							suItem = new SuItem(id, su, contextItem.fSusToClean);
+						}
+						else {
+							return null;
+						}
 					}
 				}
 			}

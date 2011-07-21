@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPageLayout;
+import org.eclipse.ui.editors.text.IEncodingSupport;
 import org.eclipse.ui.part.IPageSite;
 import org.eclipse.ui.part.IShowInSource;
 import org.eclipse.ui.part.IShowInTarget;
@@ -445,6 +446,9 @@ public abstract class SourceEditor1OutlinePage extends AbstractEditorOutlinePage
 	public Object getAdapter(final Class required) {
 		if (ISourceEditorAssociated.class.equals(required)) {
 			return this;
+		}
+		if (IEncodingSupport.class.equals(required)) {
+			return fEditor.getAdapter(IEncodingSupport.class);
 		}
 		return null;
 	}
