@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Vendor: WalWare.de
-Bundle-Name: LTK UI
+Bundle-Name: ECommons LTK UI
 Bundle-SymbolicName: de.walware.ecommons.ltk.ui;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: de.walware.ecommons.ltk.internal.ui.LTKUIPlugin

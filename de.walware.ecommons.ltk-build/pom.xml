@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<groupId>de.walware.ecommons</groupId>
+	<artifactId>ecommons-ltk</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>ECommons LTK</name>
+	
+	<modules>
+		<module>targetplatform</module>
+		
+		<module>../de.walware.ecommons.ltk.core</module>
+		<module>../de.walware.ecommons.ltk.ui</module>
+	</modules>
+	
+	<properties>
+		<tycho.version>0.12.0</tycho.version>
+	</properties>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-maven-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<extensions>true</extensions>
+			</plugin>
+			<!-- configure the p2 repo/target -->
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>target-platform-configuration</artifactId>
+				<version>${tycho.version}</version>
+				<configuration>
+					<resolver>p2</resolver>
+					<pomDependencies>consider</pomDependencies>
+					<target>
+						<artifact>
+							<groupId>de.walware.ecommons</groupId>
+							<artifactId>de.walware.ecommons.ltk-targetplatform</artifactId>
+							<version>1.0.0-SNAPSHOT</version>
+							<classifier>all</classifier>
+						</artifact>
+					</target>
+				</configuration>
+			</plugin>
+			<!-- enable source bundle generation -->
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-source-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<executions>
+					<execution>
+						<id>plugin-source</id>
+						<goals>
+							<goal>plugin-source</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	
+	<profiles>
+		<profile>
+			<id>walware-releng</id>
+			<modules>
+				<module>de.walware.ecommons.ltk</module>
+				<module>de.walware.ecommons.ltk-feature</module>
+				<module>de.walware.ecommons.ltk.source-feature</module>
+			</modules>
+		</profile>
+	</profiles>
+	
+</project>
