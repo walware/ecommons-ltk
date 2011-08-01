@@ -117,6 +117,7 @@ public class WorkingBuffer implements IWorkingBuffer {
 		if (fDocument == null) {
 			final SubMonitor progress = SubMonitor.convert(monitor);
 			final AbstractDocument doc = createDocument(progress);
+			checkDocument(doc);
 			fDocument = doc;
 		}
 		return fDocument;
@@ -195,6 +196,15 @@ public class WorkingBuffer implements IWorkingBuffer {
 			}
 		}
 		return document;
+	}
+	
+	protected void checkDocument(final AbstractDocument document) {
+		if (document instanceof ISynchronizable) {
+			final ISynchronizable synchronizable = (ISynchronizable) document;
+			if (synchronizable.getLockObject() == null) {
+				synchronizable.setLockObject(new Object());
+			}
+		}
 	}
 	
 	protected final void loadDocumentFromFile(final IFile file, final AbstractDocument document, final SubMonitor progress) {

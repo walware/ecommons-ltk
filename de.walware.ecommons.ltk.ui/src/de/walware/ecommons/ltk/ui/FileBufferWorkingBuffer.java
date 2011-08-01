@@ -129,10 +129,9 @@ public class FileBufferWorkingBuffer extends WorkingBuffer {
 			}
 			if (fBuffer != null) {
 				final IDocument fileDoc = fBuffer.getDocument();
-				if (!(fileDoc instanceof AbstractDocument)) {
-					return null;
+				if (fileDoc instanceof AbstractDocument) {
+					return (AbstractDocument) fileDoc;
 				}
-				return (AbstractDocument) fileDoc;
 			}
 			return null;
 		}
