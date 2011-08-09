@@ -45,8 +45,9 @@ public class WorkbenchUIUtil {
 	public static ISelection getCurrentSelection(final Object context) {
 		if (context instanceof IEvaluationContext) {
 			final IEvaluationContext evaluationContext = (IEvaluationContext) context;
-			final IWorkbenchSite site = (IWorkbenchSite) evaluationContext.getVariable(ISources.ACTIVE_SITE_NAME);
-			if (site != null) {
+			Object object = evaluationContext.getVariable(ISources.ACTIVE_SITE_NAME);
+			if (object instanceof IWorkbenchSite) {
+				final IWorkbenchSite site = (IWorkbenchSite) object;
 				final ISelectionProvider selectionProvider = site.getSelectionProvider();
 				if (selectionProvider != null) {
 					return selectionProvider.getSelection();
@@ -54,7 +55,10 @@ public class WorkbenchUIUtil {
 				return null;
 			}
 			else {
-				return (ISelection) evaluationContext.getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
+				object = evaluationContext.getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
+				if (object instanceof ISelection) {
+					return (ISelection) object;
+				}
 			}
 		}
 		return null;
@@ -62,7 +66,10 @@ public class WorkbenchUIUtil {
 	
 	public static IWorkbenchPart getActivePart(final Object context) {
 		if (context instanceof IEvaluationContext) {
-			return (IWorkbenchPart) ((IEvaluationContext) context).getVariable(ISources.ACTIVE_PART_NAME);
+			Object object = ((IEvaluationContext) context).getVariable(ISources.ACTIVE_PART_NAME);
+			if (object instanceof IWorkbenchPart) {
+				return (IWorkbenchPart) object;
+			}
 		}
 		return null;
 	}
