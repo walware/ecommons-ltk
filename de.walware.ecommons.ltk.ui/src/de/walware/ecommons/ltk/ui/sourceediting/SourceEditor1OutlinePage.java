@@ -267,7 +267,7 @@ public abstract class SourceEditor1OutlinePage extends AbstractEditorOutlinePage
 		pageSite.setSelectionProvider(this);
 	}
 	
-	protected IModelElement.Filter<ISourceStructElement> getContentFilter() {
+	protected IModelElement.Filter getContentFilter() {
 		return null;
 	}
 	

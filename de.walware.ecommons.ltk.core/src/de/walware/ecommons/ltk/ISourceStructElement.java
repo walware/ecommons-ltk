@@ -21,7 +21,7 @@ public interface ISourceStructElement extends ISourceElement {
 	
 	
 	ISourceStructElement getSourceParent();
-	boolean hasSourceChildren(Filter<? extends IModelElement> filter);
-	List<? extends ISourceStructElement> getSourceChildren(Filter<? extends IModelElement> filter);
+	boolean hasSourceChildren(IModelElement.Filter filter);
+	List<? extends ISourceStructElement> getSourceChildren(IModelElement.Filter filter);
 	
 }
