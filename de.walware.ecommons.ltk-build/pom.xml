@@ -5,7 +5,7 @@
 	
 	<groupId>de.walware.ecommons</groupId>
 	<artifactId>ecommons-ltk</artifactId>
-	<version>1.1-SNAPSHOT</version>
+	<version>1.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>ECommons LTK</name>
 	
@@ -40,7 +40,7 @@
 						<artifact>
 							<groupId>de.walware.ecommons</groupId>
 							<artifactId>de.walware.ecommons.ltk-targetplatform</artifactId>
-							<version>1.1.0</version>
+							<version>1.2.0</version>
 							<classifier>all</classifier>
 						</artifact>
 					</target>

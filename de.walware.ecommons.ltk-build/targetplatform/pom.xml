@@ -6,11 +6,11 @@
 	<parent>
 		<groupId>de.walware.ecommons</groupId>
 		<artifactId>ecommons-ltk</artifactId>
-		<version>1.1-SNAPSHOT</version>
+		<version>1.2-SNAPSHOT</version>
 	</parent>
 	
 	<artifactId>de.walware.ecommons.ltk-targetplatform</artifactId>
-	<version>1.1.0</version>
+	<version>1.2.0</version>
 	<packaging>pom</packaging>
 	
 	<build>
