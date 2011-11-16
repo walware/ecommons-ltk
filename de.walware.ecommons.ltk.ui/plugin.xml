@@ -175,17 +175,17 @@
             name="%commands_RefactorRenameInWorkspace_name"
             description="%commands_RefactorRenameInWorkspace_description"/>
       <command
-            id="de.walware.statet.base.commands.RefactorRenameInSelectedRegion"
+            id="de.walware.ecommons.ltk.commands.RefactorRenameInSelectedRegion"
             categoryId="de.walware.statet.base.commandCategorys.StatetSource"
             name="%commands_RefactorRenameInSelectedRegion_name"
             description="%commands_RefactorRenameInSelectedRegion_description"/>
       <command
-            id="de.walware.statet.base.commands.RefactorInlineLocalVariable"
+            id="de.walware.ecommons.ltk.commands.RefactorInlineLocalVariable"
             categoryId="de.walware.statet.base.commandCategorys.StatetSource"
             name="%commands_RefactorInlineLocalVariable_name"
             description="%commands_RefactorInlineLocalVariable_description"/>
       <command
-            id="de.walware.statet.base.commands.RefactorExtractLocalVariable"
+            id="de.walware.ecommons.ltk.commands.RefactorExtractLocalVariable"
             categoryId="de.walware.statet.base.commandCategorys.StatetSource"
             name="%commands_RefactorExtractLocalVariable_name"
             description="%commands_RefactorExtractLocalVariable_description"/>
