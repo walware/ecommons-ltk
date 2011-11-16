@@ -32,6 +32,8 @@ public class AssistInvocationContext implements IQuickAssistInvocationContext, I
 	private final ISourceUnit fSourceUnit;
 	private AstInfo fAstInfo;
 	private ISourceUnitModelInfo fModelInfo;
+	
+	private AstSelection fInvocationAstSelection;
 	private AstSelection fAstSelection;
 	
 	private final int fInvocationOffset;
@@ -75,10 +77,6 @@ public class AssistInvocationContext implements IQuickAssistInvocationContext, I
 			// TODO check if/how we can reduce model requirement in content assistant
 			fModelInfo = fSourceUnit.getModelInfo(type, synch, monitor);
 			fAstInfo = fModelInfo != null ? fModelInfo.getAst() : fSourceUnit.getAstInfo(type, true, monitor);
-			if (fAstInfo != null && fAstInfo.getRootNode() != null) {
-				fAstSelection = AstSelection.search(fAstInfo.getRootNode(),
-						getOffset(), getOffset(), AstSelection.MODE_COVERING_SAME_LAST );
-			}
 		}
 	}
 	
@@ -134,7 +132,19 @@ public class AssistInvocationContext implements IQuickAssistInvocationContext, I
 		return fModelInfo;
 	}
 	
+	public AstSelection getInvocationAstSelection() {
+		if (fInvocationAstSelection == null && fAstInfo != null && fAstInfo.getRootNode() != null) {
+			fInvocationAstSelection = AstSelection.search(fAstInfo.getRootNode(),
+					getInvocationOffset(), getInvocationOffset(), AstSelection.MODE_COVERING_SAME_LAST );
+		}
+		return fInvocationAstSelection;
+	}
+	
 	public AstSelection getAstSelection() {
+		if (fAstSelection == null && fAstInfo != null && fAstInfo.getRootNode() != null) {
+			fAstSelection = AstSelection.search(fAstInfo.getRootNode(),
+					getOffset(), getOffset() + getLength(), AstSelection.MODE_COVERING_SAME_LAST );
+		}
 		return fAstSelection;
 	}
 	
