@@ -25,7 +25,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.text.AbstractDocument;
 import org.eclipse.jface.text.ITextViewer;
@@ -39,13 +38,12 @@ import org.eclipse.jface.text.contentassist.IContentAssistantExtension3;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
 
 import de.walware.ecommons.FastList;
 
 import de.walware.ecommons.ltk.internal.ui.EditingMessages;
+import de.walware.ecommons.ltk.ui.util.WorkbenchUIUtil;
 
 
 /**
@@ -96,7 +94,8 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 				return;
 			}
 			
-			final KeySequence binding = getIterationBinding();
+			final KeySequence binding = WorkbenchUIUtil.getBestKeyBinding(
+					ITextEditorActionDefinitionIds.CONTENT_ASSIST_PROPOSALS );
 			fAvailableCategories = fComputerRegistry.getCategories();
 			fIterationGesture = createIterationGesture(binding);
 			fCategoryIteration = createCategoryIteration();
@@ -624,19 +623,10 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	}
 	
 	private String createIterationGesture(final KeySequence binding) {
-		return (binding != null) ? 
-				NLS.bind(EditingMessages.ContentAssistProcessor_ToggleAffordance_PressGesture_message, new String[] { 
-						binding.format() }) :
+		return (binding != null) ?
+				NLS.bind(EditingMessages.ContentAssistProcessor_ToggleAffordance_PressGesture_message,
+						new String[] { binding.format() }) :
 				EditingMessages.ContentAssistProcessor_ToggleAffordance_ClickGesture_message;
-	}
-	
-	private KeySequence getIterationBinding() {
-		final IBindingService bindingSvc = (IBindingService) PlatformUI.getWorkbench().getService(IBindingService.class);
-		final TriggerSequence binding = bindingSvc.getBestActiveBindingFor(ITextEditorActionDefinitionIds.CONTENT_ASSIST_PROPOSALS);
-		if (binding instanceof KeySequence) {
-			return (KeySequence) binding;
-		}
-		return null;
 	}
 	
 }
