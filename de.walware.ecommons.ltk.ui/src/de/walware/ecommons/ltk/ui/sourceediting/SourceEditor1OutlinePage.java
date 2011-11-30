@@ -73,11 +73,9 @@ public abstract class SourceEditor1OutlinePage extends AbstractEditorOutlinePage
 		}
 		
 		public long getStamp(final Object inputElement) {
-			if (inputElement instanceof ISourceUnit) {
-				final ISourceUnitModelInfo info = ((ISourceUnit) inputElement).getModelInfo(fMainType, 0, null); 
-				if (info != null) {
-					return info.getStamp();
-				}
+			final ISourceUnitModelInfo modelInfo = getModelInfo(inputElement);
+			if (modelInfo != null) {
+				return modelInfo.getStamp();
 			}
 			return ISourceUnit.UNKNOWN_MODIFICATION_STAMP;
 		}
@@ -88,15 +86,13 @@ public abstract class SourceEditor1OutlinePage extends AbstractEditorOutlinePage
 		
 		@Override
 		public Object[] getElements(final Object inputElement) {
-			if (inputElement instanceof ISourceUnit) {
-				final ISourceUnitModelInfo info = ((ISourceUnit) inputElement).getModelInfo(fMainType, 0, null); 
-				if (info != null) {
-					fCurrentModelStamp = info.getStamp();
-					final List<? extends ISourceStructElement> children = info.getSourceElement().getSourceChildren(getContentFilter());
-					return children.toArray(new ISourceStructElement[children.size()]);
-				}
+			final ISourceUnitModelInfo modelInfo = getModelInfo(inputElement);
+			if (modelInfo != null) {
+				fCurrentModelStamp = modelInfo.getStamp();
+				final List<? extends ISourceStructElement> children = modelInfo.getSourceElement().getSourceChildren(getContentFilter());
+				return children.toArray(new ISourceStructElement[children.size()]);
 			}
-			return new Object[0];
+			return new ISourceStructElement[0];
 		}
 		
 		@Override
@@ -371,6 +367,14 @@ public abstract class SourceEditor1OutlinePage extends AbstractEditorOutlinePage
 			}
 		});
 	}
+	
+	protected ISourceUnitModelInfo getModelInfo(final Object input) {
+		if (input instanceof ISourceUnit) {
+			return ((ISourceUnit) input).getModelInfo(fMainType, 0, null);
+		}
+		return null;
+	}
+	
 	
 	@Override
 	public void dispose() {
