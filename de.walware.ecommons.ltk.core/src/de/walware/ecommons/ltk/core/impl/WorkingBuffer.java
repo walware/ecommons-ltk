@@ -9,7 +9,7 @@
  *     Stephan Wahlbrink - initial API and implementation
  *******************************************************************************/
 
-package de.walware.ecommons.ltk;
+package de.walware.ecommons.ltk.core.impl;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -34,6 +34,8 @@ import org.eclipse.jface.text.ISynchronizable;
 import de.walware.ecommons.ICommonStatusConstants;
 import de.walware.ecommons.io.FileUtil;
 
+import de.walware.ecommons.ltk.ISourceUnit;
+import de.walware.ecommons.ltk.SourceContent;
 import de.walware.ecommons.ltk.internal.core.LTKCorePlugin;
 
 

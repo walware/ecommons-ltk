@@ -13,6 +13,8 @@ package de.walware.ecommons.ltk;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
+import de.walware.ecommons.ltk.core.impl.SourceUnitModelContainer;
+
 
 /**
  * 

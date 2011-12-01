@@ -1,4 +1,15 @@
-package de.walware.ecommons.ltk;
+/*******************************************************************************
+ * Copyright (c) 2011 WalWare/StatET-Project (www.walware.de/goto/statet)
+ * and others. All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     Stephan Wahlbrink - initial API and implementation
+ *******************************************************************************/
+
+package de.walware.ecommons.ltk.core.impl;
 
 import java.util.List;
 
@@ -8,6 +19,15 @@ import org.eclipse.jface.text.AbstractDocument;
 
 import de.walware.ecommons.text.ISourceFragment;
 import de.walware.ecommons.text.ReadOnlyDocument;
+
+import de.walware.ecommons.ltk.AstInfo;
+import de.walware.ecommons.ltk.IElementName;
+import de.walware.ecommons.ltk.IModelElement;
+import de.walware.ecommons.ltk.IProblemRequestor;
+import de.walware.ecommons.ltk.ISourceUnit;
+import de.walware.ecommons.ltk.ISourceUnitModelInfo;
+import de.walware.ecommons.ltk.SourceContent;
+
 
 public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	

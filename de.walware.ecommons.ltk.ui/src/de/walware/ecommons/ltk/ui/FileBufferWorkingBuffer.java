@@ -37,7 +37,7 @@ import de.walware.ecommons.ui.util.UIAccess;
 import de.walware.ecommons.ltk.ISourceUnit;
 import de.walware.ecommons.ltk.SourceContent;
 import de.walware.ecommons.ltk.SourceDocumentRunnable;
-import de.walware.ecommons.ltk.WorkingBuffer;
+import de.walware.ecommons.ltk.core.impl.WorkingBuffer;
 import de.walware.ecommons.ltk.internal.ui.LTKUIPlugin;
 
 

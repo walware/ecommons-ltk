@@ -9,7 +9,7 @@
  *     Stephan Wahlbrink - initial API and implementation
  *******************************************************************************/
 
-package de.walware.ecommons.ltk;
+package de.walware.ecommons.ltk.core.impl;
 
 import java.net.URI;
 
@@ -18,6 +18,10 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+
+import de.walware.ecommons.ltk.ISourceUnit;
+import de.walware.ecommons.ltk.ISourceUnitFactory;
+import de.walware.ecommons.ltk.LTK;
 
 
 /**

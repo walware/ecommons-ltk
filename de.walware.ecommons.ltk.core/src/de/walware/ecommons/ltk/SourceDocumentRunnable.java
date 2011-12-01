@@ -27,7 +27,7 @@ public abstract class SourceDocumentRunnable {
 	
 	private AbstractDocument fDocument;
 	private long fStamp;
-	private DocumentRewriteSessionType fRewriteSessionType;
+	private final DocumentRewriteSessionType fRewriteSessionType;
 	
 	
 	public SourceDocumentRunnable(final AbstractDocument document, final long assertedStamp, final DocumentRewriteSessionType rewriteSessionType) {

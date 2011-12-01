@@ -20,5 +20,6 @@ Import-Package: com.ibm.icu.text;version="4.0.1",
  org.apache.commons.collections.primitives;version="1.0.0"
 Export-Package: de.walware.ecommons.ltk,
  de.walware.ecommons.ltk.ast,
+ de.walware.ecommons.ltk.core.impl,
  de.walware.ecommons.ltk.core.refactoring,
  de.walware.ecommons.text

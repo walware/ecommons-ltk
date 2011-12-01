@@ -9,9 +9,18 @@
  *     Stephan Wahlbrink - initial API and implementation
  *******************************************************************************/
 
-package de.walware.ecommons.ltk;
+package de.walware.ecommons.ltk.core.impl;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+
+import de.walware.ecommons.ltk.AstInfo;
+import de.walware.ecommons.ltk.IModelManager;
+import de.walware.ecommons.ltk.IProblemRequestor;
+import de.walware.ecommons.ltk.ISourceUnit;
+import de.walware.ecommons.ltk.ISourceUnitModelInfo;
+import de.walware.ecommons.ltk.IWorkspaceSourceUnit;
+import de.walware.ecommons.ltk.LTK;
+import de.walware.ecommons.ltk.SourceContent;
 
 
 public abstract class SourceUnitModelContainer<SuType extends ISourceUnit, ModelType extends ISourceUnitModelInfo> {
