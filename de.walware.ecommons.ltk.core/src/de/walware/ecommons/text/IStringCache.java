@@ -18,7 +18,9 @@ package de.walware.ecommons.text;
 public interface IStringCache {
 	
 	
-	public String get(String s);
+	String get(String s, boolean isCompact);
+	
+	String get(CharArrayString s);
 	
 	
 }

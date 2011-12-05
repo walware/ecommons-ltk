@@ -29,6 +29,8 @@ public abstract class SourceParseInput {
 	protected final static char[] NO_INPUT = new char[0];
 	
 	
+	protected final CharArrayString fTmpCharString = new CharArrayString();
+	
 	protected char[] fBuffer = NO_INPUT;
 	private int fBufferLength = 0;
 	private int fIndexInBuffer = 0;
@@ -151,6 +153,15 @@ public abstract class SourceParseInput {
 		return new String(fBuffer, fIndexInBuffer+num-1, length);
 	}
 	
+	public final String substring(final int num, final int length, final IStringCache factory) {
+		fTmpCharString.set(fBuffer, fIndexInBuffer+num-1, length);
+		return factory.get(fTmpCharString);
+	}
+	
+	public final void substring(final int num, final int length, final CharArrayString s) {
+		s.set(fBuffer, fIndexInBuffer+num-1, length);
+	}
+	
 	public int getLength(final int num) {
 		return num;
 	}
@@ -178,6 +189,7 @@ public abstract class SourceParseInput {
 		final int stopInBuffer = fIndexInBuffer+fStop-fIndex;
 		fBufferLength = (fStop > 0 && stopInBuffer < length) ?
 			stopInBuffer : length;
+		fTmpCharString.clear();
 	}
 	
 	protected int getIndexInBuffer() {

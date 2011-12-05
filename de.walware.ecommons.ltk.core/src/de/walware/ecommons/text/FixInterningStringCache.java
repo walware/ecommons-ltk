@@ -32,14 +32,17 @@ public class FixInterningStringCache implements IStringCache {
 	
 	private final String[] fValues;
 	
+	private final int fMaxCachedLength;
 	
-	public FixInterningStringCache() {
+	
+	public FixInterningStringCache(final int maxCachedLength) {
 		fValues = new String[HASHSET_MAX+1];
+		fMaxCachedLength = maxCachedLength;
 	}
 	
 	
 	@Override
-	public String get(final String s) {
+	public String get(final String s, final boolean isCompact) {
 		switch (s.length()) {
 		case 0:
 			return ""; //$NON-NLS-1$
@@ -53,7 +56,47 @@ public class FixInterningStringCache implements IStringCache {
 				return getChar(s);
 			}
 		default:
+			if (s.length() > fMaxCachedLength) {
+				return (isCompact) ? s : new String(s);
+			}
 			return getDefault(s);
+		}
+	}
+	
+	@Override
+	public String get(final CharArrayString s) {
+		switch (s.length()) {
+		case 0:
+			return ""; //$NON-NLS-1$
+		case 1: {
+			final char c = s.charAt(0);
+			if (c >= 0 && c < CHARTABLE_SIZE) {
+//				fStatCharmap++;
+				return CHARTABLE[c];
+			}
+			else {
+				final int i1 = ((c - CHARTABLE_SIZE) & HASHSET_MAX); // hashCode = c
+				final String s1 = fValues[i1];
+				if (s1 != null && s1.length() == 1 && s1.charAt(0) == c) {
+//					fStatFound++;
+					return s1;
+				}
+//				fStatSet++;
+				return (fValues[i1] = String.valueOf(c).intern());
+			}}
+		default: {
+			if (s.length() > fMaxCachedLength) {
+				return s.toString();
+			}
+			final int hashCode = s.hashCode();
+			final int i1 = (hashCode & HASHSET_MAX);
+			final String s1 = fValues[i1];
+			if (s1 != null && s.contentEquals(s1)) {
+//				fStatFound++;
+				return s1;
+			}
+//			fStatSet++;
+			return (fValues[i1] = s.toString().intern()); }
 		}
 	}
 	
