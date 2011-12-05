@@ -133,16 +133,16 @@ public class AssistInvocationContext implements IQuickAssistInvocationContext, I
 	}
 	
 	public AstSelection getInvocationAstSelection() {
-		if (fInvocationAstSelection == null && fAstInfo != null && fAstInfo.getRootNode() != null) {
-			fInvocationAstSelection = AstSelection.search(fAstInfo.getRootNode(),
+		if (fInvocationAstSelection == null && fAstInfo != null && fAstInfo.root != null) {
+			fInvocationAstSelection = AstSelection.search(fAstInfo.root,
 					getInvocationOffset(), getInvocationOffset(), AstSelection.MODE_COVERING_SAME_LAST );
 		}
 		return fInvocationAstSelection;
 	}
 	
 	public AstSelection getAstSelection() {
-		if (fAstSelection == null && fAstInfo != null && fAstInfo.getRootNode() != null) {
-			fAstSelection = AstSelection.search(fAstInfo.getRootNode(),
+		if (fAstSelection == null && fAstInfo != null && fAstInfo.root != null) {
+			fAstSelection = AstSelection.search(fAstInfo.root,
 					getOffset(), getOffset() + getLength(), AstSelection.MODE_COVERING_SAME_LAST );
 		}
 		return fAstSelection;

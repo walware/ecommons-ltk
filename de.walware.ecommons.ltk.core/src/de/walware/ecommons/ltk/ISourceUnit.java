@@ -74,6 +74,17 @@ public interface ISourceUnit extends IModelElement, IAdaptable {
 	public AbstractDocument getDocument(IProgressMonitor monitor);
 	
 	/**
+	 * Returns the current stamp of the content of this source unit.
+	 * 
+	 * The stamp is identical with the stamp of the SourceContent returned by
+	 * {@link #getContent(IProgressMonitor)}, or <code>0</code> if unkown.
+	 * 
+	 * @param monitor
+	 * @return the current stamp
+	 */
+	public long getContentStamp(IProgressMonitor monitor);
+	
+	/**
 	 * Access to the current content of this source unit.
 	 * 
 	 * The content represents a snapshot usually recreated by each access.

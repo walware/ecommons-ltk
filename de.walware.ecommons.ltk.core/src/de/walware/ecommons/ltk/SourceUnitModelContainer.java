@@ -14,51 +14,116 @@ package de.walware.ecommons.ltk;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 
-public abstract class SourceUnitModelContainer {
+public abstract class SourceUnitModelContainer<SuType extends ISourceUnit, ModelType extends ISourceUnitModelInfo> {
 	
 	
-	private final ISourceUnit fSourceUnit;
+	private final int fMode;
+	
+	private final SuType fSourceUnit;
 	
 	private AstInfo fAstInfo;
 	
-	private ISourceUnitModelInfo fModelInfo;
+	private ModelType fModelInfo;
 	
 	
-	public SourceUnitModelContainer(final ISourceUnit su) {
+	public SourceUnitModelContainer(final SuType su) {
 		fSourceUnit = su;
+		fMode = getMode(su);
 	}
 	
 	
-	public ISourceUnit getSourceUnit() {
+	protected int getMode(final SuType su) {
+		if (su instanceof IWorkspaceSourceUnit) {
+			if (su.getWorkingContext() == LTK.PERSISTENCE_CONTEXT) {
+				return 1;
+			}
+			else if (su.getWorkingContext() == LTK.EDITOR_CONTEXT) {
+				return 2;
+			}
+		}
+		return 0;
+	}
+	
+	
+	public SuType getSourceUnit() {
 		return fSourceUnit;
+	}
+	
+	public SourceContent getParseContent(final IProgressMonitor monitor) {
+		return fSourceUnit.getContent(monitor);
 	}
 	
 	public AstInfo getAstInfo(final boolean ensureSync, final IProgressMonitor monitor) {
 		if (ensureSync) {
-			getModelManager().reconcile(fSourceUnit, IModelManager.AST, false, monitor);
+			getModelManager().reconcile(this, IModelManager.AST, monitor);
 		}
 		return fAstInfo;
 	}
 	
-	public ISourceUnitModelInfo getModelInfo(final int syncLevel, final IProgressMonitor monitor) {
+	public ModelType getModelInfo(final int syncLevel, final IProgressMonitor monitor) {
+		if ((syncLevel & 0xf) >= IModelManager.MODEL_FILE) {
+			final ModelType currentModel = fModelInfo;
+			if (currentModel == null
+					|| currentModel.getStamp() == 0
+					|| currentModel.getStamp() != fSourceUnit.getContentStamp(monitor)) {
+				getModelManager().reconcile(this, syncLevel, monitor);
+			}
+		}
 		return fModelInfo;
 	}
 	
 	protected abstract IModelManager getModelManager();
 	
+	
+	public void clear() {
+		fAstInfo = null;
+		fModelInfo = null;
+	}
+	
 	public AstInfo getCurrentAst() {
+		if (fMode == 1) {
+			final ModelType model = getCurrentModel();
+			if (model != null) {
+				return model.getAst();
+			}
+			return null;
+		}
 		return fAstInfo;
 	}
 	
+	public AstInfo getCurrentAst(final long stamp) {
+		final AstInfo ast = getCurrentAst();
+		if (ast != null && ast.stamp == stamp) {
+			return ast;
+		}
+		return null;
+	}
+	
 	public void setAst(final AstInfo ast) {
+		if (fMode == 1) {
+			return;
+		}
 		fAstInfo = ast;
 	}
 	
-	public ISourceUnitModelInfo getCurrentModel() {
+	public ModelType getCurrentModel() {
 		return fModelInfo;
 	}
 	
-	public void setModel(final ISourceUnitModelInfo modelInfo) {
+	public ModelType getCurrentModel(final long stamp) {
+		final ModelType model = getCurrentModel();
+		if (model != null && model.getStamp() == stamp) {
+			return model;
+		}
+		return null;
+	}
+	
+	public void setModel(final ModelType modelInfo) {
+		if (modelInfo != null
+				&& (fAstInfo == null || fAstInfo.stamp == modelInfo.getStamp()) ) {
+									// otherwise, the ast is probably newer
+			setAst(modelInfo.getAst());
+		}
 		fModelInfo = modelInfo;
 	}
 	

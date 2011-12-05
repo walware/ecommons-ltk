@@ -19,23 +19,27 @@ import org.eclipse.core.runtime.IProgressMonitor;
  */
 public interface IModelManager {
 	
-	public static int NONE = 0;
-	public static int AST = 1;
-	public static int MODEL_FILE = 2;
-	public static int MODEL_DEPENDENCIES = 3;
+	int NONE =                                              0x00000000;
+	
+	int AST =                                               0x00000001;
+	int MODEL_FILE =                                        0x00000002;
+	int MODEL_DEPENDENCIES =                                0x00000003;
+	
+	int RECONCILER =                                        0x10000000; 
 	
 	
 	/**
 	 * Refreshes the model info of all loaded source units in given context.
 	 */
-	public void refresh(WorkingContext context);
+	void refresh(WorkingContext context);
 	
-	public void addElementChangedListener(IElementChangedListener listener, WorkingContext context);
-	public void removeElementChangedListener(IElementChangedListener listener, WorkingContext context);
+	void addElementChangedListener(IElementChangedListener listener, WorkingContext context);
+	void removeElementChangedListener(IElementChangedListener listener, WorkingContext context);
 	
-	public void registerDependentUnit(ISourceUnit su);
-	public void deregisterDependentUnit(ISourceUnit su);
+	void registerDependentUnit(ISourceUnit su);
+	void deregisterDependentUnit(ISourceUnit su);
 	
-	public void reconcile(final ISourceUnit u, final int level, final boolean reconciler, final IProgressMonitor monitor);
+	void reconcile(SourceUnitModelContainer<?, ?> adapter, int level,
+			IProgressMonitor monitor);
 	
 }

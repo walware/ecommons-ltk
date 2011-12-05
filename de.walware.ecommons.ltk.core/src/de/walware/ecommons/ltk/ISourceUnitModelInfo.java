@@ -26,7 +26,7 @@ public interface ISourceUnitModelInfo {
 	 * 
 	 * @return the stamp
 	 */
-	public long getStamp();
+	long getStamp();
 	
 	/**
 	 * The AST used to create this info.
@@ -34,13 +34,13 @@ public interface ISourceUnitModelInfo {
 	 * 
 	 * @return the AST information
 	 */
-	public AstInfo getAst();
+	AstInfo getAst();
 	
 	/**
 	 * The source unit as source structure model element.
 	 * 
 	 * @return the element
 	 */
-	public ISourceStructElement getSourceElement();
+	ISourceStructElement getSourceElement();
 	
 }

@@ -24,6 +24,7 @@ import org.eclipse.jface.text.AbstractDocument;
 public interface IWorkingBuffer {
 	
 	
+	long getContentStamp(IProgressMonitor monitor);
 	AbstractDocument getDocument(IProgressMonitor monitor);
 	SourceContent getContent(IProgressMonitor monitor);
 	boolean checkState(boolean validate, IProgressMonitor monitor);

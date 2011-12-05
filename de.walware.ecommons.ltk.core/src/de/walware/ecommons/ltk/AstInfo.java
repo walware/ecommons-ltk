@@ -17,22 +17,38 @@ import de.walware.ecommons.ltk.ast.IAstNode;
 /**
  * 
  */
-public abstract class AstInfo {
+public class AstInfo {
 	
 	
-	public static final int DEFAULT_LEVEL_MASK = 0xf;
+	public static final int DEFAULT_LEVEL_MASK =            0xf;
+	
+	/**
+	 * AST without any text informations.
+	 */
+	public static final int LEVEL_MINIMAL =                 0x1;
+	
+	/**
+	 * AST ready for model processing.
+	 */
+	public static final int LEVEL_MODEL_DEFAULT =           0x4;
 	
 	
 	public final int level;
 	public final long stamp;
+	public final IAstNode root;
 	
 	
-	public AstInfo(final int level, final long stamp) {
+	public AstInfo(final int level, final long stamp, final IAstNode root) {
 		this.level = level;
 		this.stamp = stamp;
+		this.root = root;
 	}
 	
+	public AstInfo(final int level, final AstInfo ast) {
+		this.level = level;
+		this.stamp = ast.stamp;
+		this.root = ast.root;
+	}
 	
-	public abstract IAstNode getRootNode();
 	
 }

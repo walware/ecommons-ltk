@@ -135,6 +135,14 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public long getContentStamp(final IProgressMonitor monitor) {
+		return fTimestamp;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public SourceContent getContent(final IProgressMonitor monitor) {
 		return new SourceContent(fTimestamp, fFragment.getSource());
 	}

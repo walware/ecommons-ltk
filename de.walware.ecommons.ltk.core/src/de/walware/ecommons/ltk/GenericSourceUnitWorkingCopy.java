@@ -127,6 +127,14 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public long getContentStamp(final IProgressMonitor monitor) {
+		return fBuffer.getContentStamp(monitor);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public SourceContent getContent(final IProgressMonitor monitor) {
 		return fBuffer.getContent(monitor);
 	}

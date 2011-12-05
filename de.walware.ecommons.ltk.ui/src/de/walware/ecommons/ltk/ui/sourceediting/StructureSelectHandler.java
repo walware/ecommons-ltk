@@ -128,7 +128,7 @@ public abstract class StructureSelectHandler extends AbstractHandler {
 	}
 	
 	public final IRegion getNewSelectionRange(final int oldStart, final int oldStop, final AstInfo ast) {
-		final AstSelection selection = AstSelection.search(ast.getRootNode(),
+		final AstSelection selection = AstSelection.search(ast.root,
 				oldStart, oldStop, AstSelection.MODE_COVERING_GREATER );
 		if (selection.getCovering() == null) {
 			return null;

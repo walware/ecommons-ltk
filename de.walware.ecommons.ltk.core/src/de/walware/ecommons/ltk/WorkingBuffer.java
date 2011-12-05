@@ -110,6 +110,29 @@ public class WorkingBuffer implements IWorkingBuffer {
 		return fMode;
 	}
 	
+	@Override
+	public long getContentStamp(final IProgressMonitor monitor) {
+		{	final AbstractDocument doc = fDocument;
+			if (doc != null) {
+				return doc.getModificationStamp();
+			}
+		}
+		{	final ISourceUnit underlyingUnit = fUnit.getUnderlyingUnit();
+			if (underlyingUnit != null) {
+				return underlyingUnit.getContentStamp(monitor);
+			}
+		}
+		if (detectMode()) {
+			if (getMode() == IFILE) {
+				final IFile resource = (IFile) fUnit.getResource();
+				if (resource != null) {
+					return resource.getModificationStamp();
+				}
+			}
+		}
+		return 0;
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -162,7 +185,7 @@ public class WorkingBuffer implements IWorkingBuffer {
 					return resource.getWorkspace().validateEdit(new IFile[] { resource }, IWorkspace.VALIDATE_PROMPT).isOK();
 				}
 			}
-			if (getMode() == FILESTORE) {
+			else if (getMode() == FILESTORE) {
 				final IFileStore store = (IFileStore) fUnit.getAdapter(IFileStore.class);
 				try {
 					return !store.fetchInfo(EFS.NONE, monitor).getAttribute(EFS.ATTRIBUTE_READ_ONLY);

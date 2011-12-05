@@ -74,10 +74,10 @@ public class LTKSelectionUtil {
 				return null;
 			}
 			final AstInfo info = modelInfo.getAst();
-			if (info == null || info.getRootNode() == null) {
+			if (info == null || info.root == null) {
 				return null;
 			}
-			final AstSelection astSelection = AstSelection.search(info.getRootNode(),
+			final AstSelection astSelection = AstSelection.search(info.root,
 					textSelection.getOffset(), textSelection.getOffset()+textSelection.getLength(),
 					AstSelection.MODE_COVERING_SAME_LAST );
 			return astSelection.getCovering();
