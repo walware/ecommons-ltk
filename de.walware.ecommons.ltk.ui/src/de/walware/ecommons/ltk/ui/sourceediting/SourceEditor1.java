@@ -154,7 +154,7 @@ public abstract class SourceEditor1 extends TextEditor
 	 * @param annotationModel the annotation model
 	 * @return the annotation model's lock object
 	 */
-	protected static Object getLockObject(final IAnnotationModel annotationModel) {
+	protected static final Object getLockObject(final IAnnotationModel annotationModel) {
 		if (annotationModel instanceof ISynchronizable) {
 			final Object lock = ((ISynchronizable) annotationModel).getLockObject();
 			if (lock != null) {
