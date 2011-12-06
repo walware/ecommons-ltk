@@ -16,6 +16,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.quickassist.IQuickAssistInvocationContext;
@@ -75,18 +77,39 @@ public class QuickAssistProcessor implements IQuickAssistProcessor {
 	 * Creates the context that is passed to the completion proposal
 	 * computers.
 	 * 
+	 * @param invocationContext the original invocation context
+	 * 
 	 * @return the context to be passed to the computers
 	 */
-	protected AssistInvocationContext createContext() {
-		return new AssistInvocationContext(getEditor(), -1, IModelManager.MODEL_FILE);
+	protected AssistInvocationContext createContext(final IQuickAssistInvocationContext invocationContext,
+			final IProgressMonitor monitor) {
+		return new AssistInvocationContext(getEditor(), invocationContext.getOffset(), IModelManager.MODEL_FILE);
 	}
+	
+	/**
+	 * Creates the context that is passed to the completion proposal
+	 * computers.
+	 * 
+	 * @return the context to be passed to the computers
+	 * @deprecated implement {@link #createContext(IQuickAssistInvocationContext, IProgressMonitor)}
+	 */
+	@Deprecated
+	protected AssistInvocationContext createContext() {
+		return null;
+	}
+	
 	
 	public ICompletionProposal[] computeQuickAssistProposals(final IQuickAssistInvocationContext invocationContext) {
 		fErrorMessage = null;
 		
-		final AssistInvocationContext context = createContext();
+		AssistInvocationContext context = createContext();
+		if (context == null) {
+			context = createContext(invocationContext, new NullProgressMonitor());
+		}
+		if (context == null) {
+			return null;
+		}
 		final ISourceViewer viewer = context.getSourceViewer();
-		final int offset = context.getOffset();
 		if (viewer == null) {
 			return null;
 		}
