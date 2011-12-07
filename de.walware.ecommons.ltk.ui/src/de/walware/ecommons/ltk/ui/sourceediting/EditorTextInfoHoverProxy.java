@@ -11,7 +11,9 @@
 
 package de.walware.ecommons.ltk.ui.sourceediting;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.IRegion;
@@ -80,7 +82,7 @@ public abstract class EditorTextInfoHoverProxy implements ITextHover, ITextHover
 	public Object getHoverInfo2(final ITextViewer textViewer, final IRegion hoverRegion) {
 		if (ensureHover()) {
 			try {
-				final AssistInvocationContext context = createContext(hoverRegion);
+				final AssistInvocationContext context = createContext(hoverRegion, new NullProgressMonitor());
 				if (context != null) {
 					return fHover.getHoverInfo(context);
 				}
@@ -94,7 +96,7 @@ public abstract class EditorTextInfoHoverProxy implements ITextHover, ITextHover
 		return null;
 	}
 	
-	protected abstract AssistInvocationContext createContext(final IRegion region);
+	protected abstract AssistInvocationContext createContext(IRegion region, IProgressMonitor monitor);
 	
 	@Override
 	public IInformationControlCreator getHoverControlCreator() {

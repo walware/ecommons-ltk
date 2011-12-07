@@ -11,7 +11,7 @@
 
 package de.walware.ecommons.ltk.ui.sourceediting;
 
-import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.quickassist.IQuickAssistInvocationContext;
 import org.eclipse.jface.text.source.SourceViewer;
@@ -43,7 +43,8 @@ public class AssistInvocationContext implements IQuickAssistInvocationContext, I
 	private String fPrefix;
 	
 	
-	public AssistInvocationContext(final ISourceEditor editor, final int offset, final int synch) {
+	public AssistInvocationContext(final ISourceEditor editor, final int offset,
+			final int synch, final IProgressMonitor monitor) {
 		fEditor = editor;
 		
 		fSourceViewer = editor.getViewer();
@@ -54,10 +55,14 @@ public class AssistInvocationContext implements IQuickAssistInvocationContext, I
 		fSelectionOffset = selectedRange.x;
 		fSelectionLength = selectedRange.y;
 		
-		init(synch);
+		init(synch, monitor);
 	}
 	
-	public AssistInvocationContext(final ISourceEditor editor, final IRegion region, final int synch) {
+	public AssistInvocationContext(final ISourceEditor editor, final IRegion region,
+			final int synch, final IProgressMonitor monitor) {
+		if (region.getOffset() < 0 || region.getLength() < 0) {
+			throw new IllegalArgumentException("region");
+		}
 		fEditor = editor;
 		
 		fSourceViewer = editor.getViewer();
@@ -67,17 +72,20 @@ public class AssistInvocationContext implements IQuickAssistInvocationContext, I
 		fSelectionOffset = region.getOffset();
 		fSelectionLength = region.getLength();
 		
-		init(synch);
+		init(synch, monitor);
 	}
 	
-	private void init(final int synch) {
+	private void init(final int synch, final IProgressMonitor monitor) {
 		if (fSourceUnit != null) {
-			final NullProgressMonitor monitor = new NullProgressMonitor();
-			final String type = null;
+			final String type = getModelTypeId();
 			// TODO check if/how we can reduce model requirement in content assistant
 			fModelInfo = fSourceUnit.getModelInfo(type, synch, monitor);
 			fAstInfo = fModelInfo != null ? fModelInfo.getAst() : fSourceUnit.getAstInfo(type, true, monitor);
 		}
+	}
+	
+	protected String getModelTypeId() {
+		return null;
 	}
 	
 	

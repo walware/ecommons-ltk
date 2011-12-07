@@ -30,6 +30,7 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension3;
+import org.eclipse.jface.text.contentassist.ICompletionProposalExtension4;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension5;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension6;
 import org.eclipse.jface.text.contentassist.IContextInformation;
@@ -67,8 +68,8 @@ import de.walware.ecommons.ltk.ui.templates.IWorkbenchTemplateContext;
  * </ul>
  */
 public class TemplateProposal implements IAssistCompletionProposal,
-		ICompletionProposalExtension, ICompletionProposalExtension3, ICompletionProposalExtension5,
-		ICompletionProposalExtension6 {
+		ICompletionProposalExtension, ICompletionProposalExtension3, ICompletionProposalExtension4,
+		ICompletionProposalExtension5, ICompletionProposalExtension6 {
 	
 	public static class TemplateComparator implements Comparator<TemplateProposal> {
 		

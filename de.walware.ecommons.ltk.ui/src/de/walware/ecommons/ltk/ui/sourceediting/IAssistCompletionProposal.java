@@ -13,15 +13,14 @@ package de.walware.ecommons.ltk.ui.sourceediting;
 
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
-import org.eclipse.jface.text.contentassist.ICompletionProposalExtension4;
 
 
-public interface IAssistCompletionProposal extends ICompletionProposal, ICompletionProposalExtension2, ICompletionProposalExtension4 {
+public interface IAssistCompletionProposal extends ICompletionProposal, ICompletionProposalExtension2 {
 	
 	/**
 	 * Returns relevance of the proposal
 	 * <p>
-	 * Higher values indicates that it is probably more relevant.</p>
+	 * Higher values indicates that it is likely more relevant.</p>
 	 * 
 	 * @return the relevance
 	 */

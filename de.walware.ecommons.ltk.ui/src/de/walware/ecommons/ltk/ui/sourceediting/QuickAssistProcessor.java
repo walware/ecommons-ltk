@@ -11,20 +11,26 @@
 
 package de.walware.ecommons.ltk.ui.sourceediting;
 
-import java.util.ArrayList;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jface.text.DocumentEvent;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
+import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.quickassist.IQuickAssistInvocationContext;
 import org.eclipse.jface.text.quickassist.IQuickAssistProcessor;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.texteditor.spelling.SpellingAnnotation;
 import org.eclipse.ui.texteditor.spelling.SpellingProblem;
 
@@ -35,6 +41,101 @@ import de.walware.ecommons.ltk.IModelManager;
  * LTK quick assistant processor.
  */
 public class QuickAssistProcessor implements IQuickAssistProcessor {
+	
+	
+	private static class SpellingProposal implements IAssistCompletionProposal {
+		
+		
+		private final ICompletionProposal fProposal;
+		
+		
+		public SpellingProposal(final ICompletionProposal proposal) {
+			fProposal = proposal;
+		}
+		
+		
+		@Override
+		public int getRelevance() {
+			try {
+				final Method method = fProposal.getClass().getMethod("getRelevance");
+				final Object value = method.invoke(fProposal);
+				if (value instanceof Integer) {
+					return ((Integer) value).intValue();
+				}
+			}
+			catch (final Exception e) {
+			}
+			return 0;
+		}
+		
+		@Override
+		public String getSortingString() {
+			return "";
+		}
+		
+		@Override
+		public Image getImage() {
+			return fProposal.getImage();
+		}
+		
+		@Override
+		public String getDisplayString() {
+			return fProposal.getDisplayString();
+		}
+		
+		@Override
+		public void selected(final ITextViewer viewer, final boolean smartToggle) {
+			if (fProposal instanceof ICompletionProposalExtension2) {
+				((ICompletionProposalExtension2) fProposal).selected(viewer, smartToggle);
+			}
+		}
+		
+		@Override
+		public void unselected(final ITextViewer viewer) {
+			if (fProposal instanceof ICompletionProposalExtension2) {
+				((ICompletionProposalExtension2) fProposal).unselected(viewer);
+			}
+		}
+		
+		@Override
+		public boolean validate(final IDocument document, final int offset, final DocumentEvent event) {
+			if (fProposal instanceof ICompletionProposalExtension2) {
+				return ((ICompletionProposalExtension2) fProposal).validate(document, offset, event);
+			}
+			return false;
+		}
+		
+		@Override
+		public String getAdditionalProposalInfo() {
+			return fProposal.getAdditionalProposalInfo();
+		}
+		
+		@Override
+		public void apply(final IDocument document) {
+			fProposal.apply(document);
+		}
+		
+		@Override
+		public void apply(final ITextViewer viewer, final char trigger, final int stateMask, final int offset) {
+			if (fProposal instanceof ICompletionProposalExtension2) {
+				((ICompletionProposalExtension2) fProposal).apply(viewer, trigger, stateMask, offset);
+			}
+			else {
+				fProposal.apply(viewer.getDocument());
+			}
+		}
+		
+		@Override
+		public Point getSelection(final IDocument document) {
+			return fProposal.getSelection(document);
+		}
+		
+		@Override
+		public IContextInformation getContextInformation() {
+			return fProposal.getContextInformation();
+		}
+		
+	}
 	
 	
 	private final ISourceEditor fEditor;
@@ -85,30 +186,18 @@ public class QuickAssistProcessor implements IQuickAssistProcessor {
 	 */
 	protected AssistInvocationContext createContext(final IQuickAssistInvocationContext invocationContext,
 			final IProgressMonitor monitor) {
-		return new AssistInvocationContext(getEditor(), invocationContext.getOffset(), IModelManager.MODEL_FILE);
-	}
-	
-	/**
-	 * Creates the context that is passed to the completion proposal
-	 * computers.
-	 * 
-	 * @return the context to be passed to the computers
-	 * @deprecated implement {@link #createContext(IQuickAssistInvocationContext, IProgressMonitor)}
-	 */
-	@Deprecated
-	protected AssistInvocationContext createContext() {
-		return null;
+		return new AssistInvocationContext(getEditor(), invocationContext.getOffset(),
+				IModelManager.MODEL_FILE, monitor );
 	}
 	
 	
 	@Override
 	public ICompletionProposal[] computeQuickAssistProposals(final IQuickAssistInvocationContext invocationContext) {
 		fErrorMessage = null;
+		final SubMonitor progress = SubMonitor.convert(null);
+		progress.beginTask("", 10);
 		
-		AssistInvocationContext context = createContext();
-		if (context == null) {
-			context = createContext(invocationContext, new NullProgressMonitor());
-		}
+		final AssistInvocationContext context = createContext(invocationContext, progress.newChild(3));
 		if (context == null) {
 			return null;
 		}
@@ -116,21 +205,41 @@ public class QuickAssistProcessor implements IQuickAssistProcessor {
 		if (viewer == null) {
 			return null;
 		}
-		final List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
+		final AssistProposalCollector<IAssistCompletionProposal> proposals = new AssistProposalCollector<IAssistCompletionProposal>(IAssistCompletionProposal.class);
 		
 		final IAnnotationModel model = viewer.getAnnotationModel();
 		if (model != null) {
-			addAnnotationProposals(proposals, context, model);
+			addAnnotationProposals(context, proposals, model);
 		}
 		if (context.getModelInfo() != null) {
-			addModelAssistProposals(proposals, context);
+			addModelAssistProposals(context, proposals, progress);
 		}
 		
-		if (proposals.isEmpty()) {
+		if (proposals.getCount() == 0) {
 			return null;
 		}
-		return proposals.toArray(new ICompletionProposal[proposals.size()]);
+		return filterAndSortCompletionProposals(proposals, context, progress);
 	}
+	
+	/**
+	 * Filters and sorts the proposals. The passed list may be modified
+	 * and returned, or a new list may be created and returned.
+	 * 
+	 * @param proposals the list of collected proposals
+	 * @param monitor a progress monitor
+	 * @param context 
+	 * @return the list of filtered and sorted proposals, ready for display
+	 */
+	protected IAssistCompletionProposal[] filterAndSortCompletionProposals(
+			final AssistProposalCollector<IAssistCompletionProposal> proposals,
+			final AssistInvocationContext context, final IProgressMonitor monitor) {
+		final IAssistCompletionProposal[] array = proposals.toArray();
+		if (array.length > 1) {
+			Arrays.sort(array, ContentAssistProcessor.PROPOSAL_COMPARATOR);
+		}
+		return array;
+	}
+	
 	
 	protected boolean isMatchingPosition(final Position pos, final int offset) {
 		return (pos != null)
@@ -138,8 +247,8 @@ public class QuickAssistProcessor implements IQuickAssistProcessor {
 				&& (offset <= pos.getOffset()+pos.getLength());
 	}
 	
-	private void addAnnotationProposals(final List<ICompletionProposal> proposals,
-			final IQuickAssistInvocationContext invocationContext,
+	private void addAnnotationProposals(final IQuickAssistInvocationContext invocationContext,
+			final AssistProposalCollector<IAssistCompletionProposal> proposals,
 			final IAnnotationModel model) {
 		final int offset = invocationContext.getOffset();
 		final Iterator<Annotation> iter = model.getAnnotationIterator();
@@ -157,14 +266,18 @@ public class QuickAssistProcessor implements IQuickAssistProcessor {
 					final SpellingProblem problem = ((SpellingAnnotation) annotation).getSpellingProblem();
 					final ICompletionProposal[] annotationProposals = problem.getProposals(invocationContext);
 					if (annotationProposals != null && annotationProposals.length > 0) {
-						proposals.addAll(Arrays.asList(annotationProposals));
+						for (int i = 0; i < annotationProposals.length; i++) {
+							proposals.add(new SpellingProposal(annotationProposals[i]));
+						}
 					}
 				}
 			}
 		}
 	}
 	
-	protected void addModelAssistProposals(final List<ICompletionProposal> proposals, final AssistInvocationContext context) {
+	protected void addModelAssistProposals(final AssistInvocationContext context,
+			final AssistProposalCollector<IAssistCompletionProposal> proposals,
+			final IProgressMonitor monitor) {
 	}
 	
 	@Override

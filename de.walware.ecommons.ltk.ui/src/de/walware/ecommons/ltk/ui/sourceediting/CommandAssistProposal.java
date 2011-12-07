@@ -16,8 +16,6 @@ import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
-import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension5;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension6;
 import org.eclipse.jface.text.contentassist.IContextInformation;
@@ -30,8 +28,8 @@ import de.walware.ecommons.text.ui.DefaultBrowserInformationInput;
 import de.walware.ecommons.ltk.ui.util.WorkbenchUIUtil;
 
 
-public abstract class CommandAssistProposal implements ICompletionProposal, ICommandAccess,
-		ICompletionProposalExtension2, ICompletionProposalExtension5, ICompletionProposalExtension6 {
+public abstract class CommandAssistProposal implements IAssistCompletionProposal, ICommandAccess,
+		ICompletionProposalExtension5, ICompletionProposalExtension6 {
 	
 	
 	public static StyledString addAcceleratorStyled(final String message, final KeySequence binding) {
@@ -93,8 +91,14 @@ public abstract class CommandAssistProposal implements ICompletionProposal, ICom
 	}
 	
 	
+	@Override
 	public int getRelevance() {
 		return fRelevance;
+	}
+	
+	@Override
+	public String getSortingString() {
+		return fLabel;
 	}
 	
 	@Override

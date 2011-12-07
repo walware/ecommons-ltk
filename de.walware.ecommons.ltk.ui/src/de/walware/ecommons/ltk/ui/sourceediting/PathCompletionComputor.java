@@ -34,16 +34,13 @@ import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.IRegion;
-import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension3;
 import org.eclipse.jface.text.contentassist.IContextInformation;
-import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.statushandlers.StatusManager;
@@ -247,16 +244,8 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 			finally {
 				document.removePosition(newSelectionOffset);
 			}
-			if (fIsDirectory && viewer instanceof ITextOperationTarget) {
-				final ITextOperationTarget target = viewer;
-				Display.getCurrent().asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						if (target.canDoOperation(ISourceViewer.CONTENTASSIST_PROPOSALS)) {
-							target.doOperation(ISourceViewer.CONTENTASSIST_PROPOSALS);
-						}
-					}
-				});
+			if (fIsDirectory) {
+				reinvokeAssist(viewer);
 			}
 		}
 		
@@ -294,17 +283,25 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 	private String fPathSeparator;
 	private String fPathSeparatorBackup;
 	
+	private ISourceEditor fEditor;
+	
 	
 	public PathCompletionComputor() {
 	}
 	
 	
 	public abstract String getPluginId();
+	
+	protected ISourceEditor getEditor() {
+		return fEditor;
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void sessionStarted(final ISourceEditor editor) {
+		fEditor = editor;
 		fPathSeparator = getDefaultFileSeparator();
 	}
 	
@@ -313,6 +310,7 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 	 */
 	@Override
 	public void sessionEnded() {
+		fEditor = null;
 	}
 	
 	protected String getDefaultFileSeparator() {
@@ -339,15 +337,14 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 	public IStatus computeCompletionProposals(final AssistInvocationContext context, final int mode,
 			final AssistProposalCollector<IAssistCompletionProposal> proposals, final IProgressMonitor monitor) {
 		try {
-			final IDocument document = context.getSourceViewer().getDocument();
 			final int offset = context.getInvocationOffset();
-			final IRegion partition = getContentRange(document, offset);
+			final IRegion partition = getContentRange(context, mode);
 			if (partition == null) {
 				return null;
 			}
 			
-			String prefix = checkPrefix(
-					document.get(partition.getOffset(), offset-partition.getOffset()) );
+			String prefix = checkPrefix(context.getSourceViewer().getDocument().get(
+					partition.getOffset(), offset-partition.getOffset() ));
 			
 			if (prefix == null) {
 				return null;
@@ -509,7 +506,8 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 	}
 	
 	
-	protected abstract IRegion getContentRange(IDocument document, int offset) throws BadLocationException;
+	protected abstract IRegion getContentRange(AssistInvocationContext context, int mode)
+			throws BadLocationException;
 	
 	protected IPath getRelativeBasePath() {
 		return null;

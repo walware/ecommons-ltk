@@ -11,8 +11,10 @@
 
 package de.walware.ecommons.ltk.ui.sourceediting;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
@@ -53,8 +55,9 @@ public abstract class EditorInformationProvider
 	@Override
 	public Object getInformation2(final ITextViewer textViewer, final IRegion region) {
 		fBestHover = null;
+		final SubMonitor progress = SubMonitor.convert(null);
 		try {
-			final AssistInvocationContext context = createContext(region);
+			final AssistInvocationContext context = createContext(region, progress);
 			if (context != null) {
 				for (int i = 0; i < fHovers.length; i++) {
 					final Object info = fHovers[i].getHoverInfo(context);
@@ -80,6 +83,6 @@ public abstract class EditorInformationProvider
 		return null;
 	}
 	
-	protected abstract AssistInvocationContext createContext(final IRegion region);
+	protected abstract AssistInvocationContext createContext(IRegion region, IProgressMonitor monitor);
 	
 }

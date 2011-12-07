@@ -33,7 +33,8 @@ public class LTKUtil {
 		return getCoveringSourceElement(root, region.getOffset(), region.getOffset()+region.getLength());
 	}
 	
-	public static ISourceStructElement getCoveringSourceElement(final ISourceStructElement root, final int startOffset, final int endOffset) {
+	public static ISourceStructElement getCoveringSourceElement(final ISourceStructElement root,
+			final int startOffset, final int endOffset) {
 		ISourceStructElement ok = root;
 		CHECK: while (ok != null) {
 			final List<? extends ISourceStructElement> children = ok.getSourceChildren(null);
@@ -60,6 +61,37 @@ public class LTKUtil {
 			break CHECK;
 		}
 		return ok;
+	}
+	
+	public static int searchCoveringSourceElement(final List<? extends ISourceStructElement> elements,
+			final int offset) {
+		// binary search
+		int low = 0;
+		int high = elements.size() - 1;
+		while (low <= high) {
+			final int mid = (low + high) >> 1;
+			final IRegion region = elements.get(mid).getSourceRange();
+			
+			if (region.getOffset()+region.getLength() < offset) {
+				low = mid + 1;
+			}
+			else if (region.getOffset() > offset) {
+				high = mid - 1;
+			}
+			else {
+				return mid;
+			}
+		}
+		return -(low + 1);
+	}
+	
+	public static <T extends ISourceStructElement> T getCoveringSourceElement(final List<T> elements,
+			final int offset) {
+		final int idx = searchCoveringSourceElement(elements, offset);
+		if (idx >= 0) {
+			return elements.get(idx);
+		}
+		return null;
 	}
 	
 }

@@ -15,9 +15,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.contentassist.ICompletionProposalExtension4;
 import org.eclipse.jface.text.source.Annotation;
+import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
@@ -26,7 +29,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.statushandlers.StatusManager;
 
 
-public abstract class CompletionProposalWithOverwrite implements IAssistCompletionProposal {
+public abstract class CompletionProposalWithOverwrite implements IAssistCompletionProposal,
+		ICompletionProposalExtension4 {
 	
 	
 	protected final AssistInvocationContext fContext;
@@ -99,13 +103,28 @@ public abstract class CompletionProposalWithOverwrite implements IAssistCompleti
 			}
 		}
 		catch (final BadLocationException e) {
-			StatusManager.getManager().handle(new Status(IStatus.ERROR, getPluginId(), "Failed to apply completion proposal."));
+			StatusManager.getManager().handle(new Status(IStatus.ERROR, getPluginId(), "Failed to apply completion proposal.", e));
 		}
 		Display.getCurrent().beep();
 	}
 	
 	protected abstract void doApply(final char trigger, final int stateMask,
 			final int caretOffset, final int replacementOffset, final int replacementLength) throws BadLocationException;
+	
+	
+	protected void reinvokeAssist(final ITextViewer viewer) {
+		if (viewer instanceof ITextOperationTarget) {
+			final ITextOperationTarget target = (ITextOperationTarget) viewer;
+			Display.getCurrent().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					if (target.canDoOperation(ISourceViewer.CONTENTASSIST_PROPOSALS)) {
+						target.doOperation(ISourceViewer.CONTENTASSIST_PROPOSALS);
+					}
+				}
+			});
+		}
+	}
 	
 	
 	private void addOverwriteStyle() {

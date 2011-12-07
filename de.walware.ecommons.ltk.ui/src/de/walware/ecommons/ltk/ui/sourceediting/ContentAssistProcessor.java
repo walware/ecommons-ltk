@@ -67,7 +67,7 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	
 	private static final Collator NAME_COLLATOR = Collator.getInstance();
 	
-	private static final Comparator<IAssistCompletionProposal> PROPOSAL_COMPARATOR = new Comparator<IAssistCompletionProposal>() {
+	static final Comparator<IAssistCompletionProposal> PROPOSAL_COMPARATOR = new Comparator<IAssistCompletionProposal>() {
 		
 		@Override
 		public int compare(final IAssistCompletionProposal proposal1, final IAssistCompletionProposal proposal2) {
@@ -232,7 +232,11 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 		
 		clearState();
 		
-		final AssistInvocationContext context = createCompletionProposalContext(offset);
+		final SubMonitor progress = SubMonitor.convert(createProgressMonitor());
+		progress.beginTask(EditingMessages.ContentAssistProcessor_ComputingProposals_task, 10);
+		
+		final AssistInvocationContext context = createCompletionProposalContext(offset, progress.newChild(3));
+		
 		final long setup = DEBUG ? System.nanoTime() : 0L;
 		
 		final long modificationStamp = ((AbstractDocument) context.getSourceViewer().getDocument()).getModificationStamp();
@@ -270,8 +274,7 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 		final List<ContentAssistCategory> categories = (mode != IContentAssistComputer.INFORMATION_MODE) ?
 				getCurrentCategories() : getInformationCategories();
 		
-		final SubMonitor progress = SubMonitor.convert(createProgressMonitor());
-		progress.beginTask(EditingMessages.ContentAssistProcessor_ComputingProposals_task, categories.size() + 1);
+		progress.setWorkRemaining(categories.size() + 1);
 		progress.subTask((mode != IContentAssistComputer.INFORMATION_MODE) ?
 				EditingMessages.ContentAssistProcessor_ComputingProposals_Collecting_task :
 				EditingMessages.ContentAssistProcessor_ComputingContexts_Collecting_task);
@@ -380,7 +383,10 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 		
 		clearState();
 		
-		final AssistInvocationContext context = createContextInformationContext(offset);
+		final SubMonitor progress = SubMonitor.convert(createProgressMonitor());
+		progress.beginTask(EditingMessages.ContentAssistProcessor_ComputingContexts_task, 10);
+		
+		final AssistInvocationContext context = createContextInformationContext(offset, progress.newChild(3));
 		
 		final List<ContentAssistCategory> available = fComputerRegistry.getCategories();
 		final List<ContentAssistCategory> defaultGroup = new ArrayList<ContentAssistCategory>();
@@ -394,8 +400,7 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 			}
 		}
 		
-		final SubMonitor progress = SubMonitor.convert(createProgressMonitor());
-		progress.beginTask(EditingMessages.ContentAssistProcessor_ComputingContexts_task, available.size() + 1);
+		progress.setWorkRemaining(available.size());
 		progress.subTask(EditingMessages.ContentAssistProcessor_ComputingContexts_Collecting_task);
 		final AssistProposalCollector<IAssistInformationProposal> proposals =
 				createInformationProposalCollector();
@@ -518,8 +523,9 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	 * @param offset the content assist offset
 	 * @return the context to be passed to the computers
 	 */
-	protected AssistInvocationContext createCompletionProposalContext(final int offset) {
-		return new AssistInvocationContext(getEditor(), offset, 0);
+	protected AssistInvocationContext createCompletionProposalContext(final int offset,
+			final IProgressMonitor monitor) {
+		return new AssistInvocationContext(getEditor(), offset, 0, monitor);
 	}
 	
 	/**
@@ -529,8 +535,9 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	 * @param offset the content assist offset
 	 * @return the context to be passed to the computers
 	 */
-	protected AssistInvocationContext createContextInformationContext(final int offset) {
-		return new AssistInvocationContext(getEditor(), offset, 0);
+	protected AssistInvocationContext createContextInformationContext(final int offset,
+			final IProgressMonitor monitor) {
+		return new AssistInvocationContext(getEditor(), offset, 0, monitor);
 	}
 	
 	protected boolean forceContextInformation(final AssistInvocationContext context) {
