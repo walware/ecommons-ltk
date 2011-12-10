@@ -16,6 +16,7 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.6.0",
  org.eclipse.ltk.core.refactoring
 Import-Package: com.ibm.icu.text;version="4.0.1",
  de.walware.ecommons,
+ de.walware.ecommons.collections,
  de.walware.ecommons.io,
  org.apache.commons.collections.primitives;version="1.0.0"
 Export-Package: de.walware.ecommons.ltk,

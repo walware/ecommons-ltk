@@ -11,6 +11,8 @@
 
 package de.walware.ecommons.ltk;
 
+import java.util.List;
+
 import org.eclipse.jface.text.IDocumentExtension4;
 
 
@@ -42,5 +44,8 @@ public interface ISourceUnitModelInfo {
 	 * @return the element
 	 */
 	ISourceStructElement getSourceElement();
+	
+	void addAttachment(Object data);
+	List<Object> getAttachments();
 	
 }
