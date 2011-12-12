@@ -555,4 +555,29 @@
       </specification>
    </extension>
    
+   <extension
+         point="org.eclipse.ui.keywords">
+      <keyword
+            id="de.walware.ecommons.ltk.keywords.SourceAppearance"
+            label="%keywords_Appearance"/>
+      <keyword
+            id="de.walware.ecommons.ltk.keywords.SourceTemplates"
+            label="%keywords_Template"/>
+      <keyword
+            id="de.walware.ecommons.ltk.keywords.SourceEditor"
+            label="%keywords_Editor"/>
+      <keyword
+            id="de.walware.ecommons.ltk.keywords.TaskTags"
+            label="%keywords_TaskTag"/>
+      <keyword
+            id="de.walware.ecommons.ltk.keywords.SourceFormatting"
+            label="%keywords_Formatting"/>
+      <keyword
+            id="de.walware.ecommons.ltk.keywords.SpellChecking"
+            label="%keywords_SpellChecking"/>
+      <keyword
+            id="de.walware.ecommons.ltk.keywords.SourceContentAssist"
+            label="%keywords_ContentAssist"/>
+   </extension>
+   
 </plugin>
