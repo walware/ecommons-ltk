@@ -13,7 +13,9 @@
 package de.walware.ecommons.ltk.ui.sourceediting;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.text.BadLocationException;
@@ -28,15 +30,50 @@ import de.walware.ecommons.ltk.IProblemRequestor;
  * Abstract annotation model dealing with marker annotations and temporary problems.
  * Also acts as problem requester for its source unit.
  */
-public abstract class SourceAnnotationModel extends ResourceMarkerAnnotationModel
-		implements IProblemRequestor {
+public abstract class SourceAnnotationModel extends ResourceMarkerAnnotationModel {
 	
-	private static class ProblemRequestorState {
-		List<IProblem> reportedProblems = new ArrayList<IProblem>();
-		int sequenceCount = 0;
+	
+	protected class ProblemRequestor implements IProblemRequestor {
+		
+		
+		protected final List<IProblem> fReportedProblems = new ArrayList<IProblem>();
+		
+		protected final boolean fHandleTemporaryProblems;
+		
+		private int fState = 1;
+		
+		
+		public ProblemRequestor() {
+			fHandleTemporaryProblems = isHandlingTemporaryProblems();
+		}
+		
+		
+		@Override
+		public void acceptProblems(final IProblem problem) {
+			if (fHandleTemporaryProblems) {
+				fReportedProblems.add(problem);
+			}
+		}
+		
+		@Override
+		public void acceptProblems(final String modelTypeId, final List<IProblem> problems) {
+			if (fHandleTemporaryProblems) {
+				fReportedProblems.addAll(problems);
+			}
+		}
+		
+		@Override
+		public void finish() {
+			if (fState < 0) {
+				throw new IllegalStateException("Already finished");
+			}
+			fState = -1;
+			reportProblems(fReportedProblems);
+		}
+		
 	}
 	
-	private final ThreadLocal<ProblemRequestorState> fProblemRequestorState = new ThreadLocal<ProblemRequestorState>();
+	private final AtomicInteger fReportingCounter = new AtomicInteger();
 	
 	private final List<SourceProblemAnnotation> fProblemAnnotations = new ArrayList<SourceProblemAnnotation>();
 	
@@ -63,44 +100,39 @@ public abstract class SourceAnnotationModel extends ResourceMarkerAnnotationMode
 //		return new CompilationUnitAnnotationModelEvent(this, getResource());
 //	}
 	
-	@Override
-	public void beginReportingSequence() {
-		ProblemRequestorState state = fProblemRequestorState.get();
-		if (state == null) {
-			state = new ProblemRequestorState();
-			fProblemRequestorState.set(state);
-		}
-		state.sequenceCount++;
+	public final IProblemRequestor createProblemRequestor(final long stamp) {
+		fReportingCounter.incrementAndGet();
+		return doCreateProblemRequestor(stamp);
 	}
 	
-	@Override
-	public void endReportingSequence() {
-		final ProblemRequestorState state = fProblemRequestorState.get();
-		if (state == null) {
-			return;
-		}
-		state.sequenceCount--;
-		if (state.sequenceCount == 0) {
-			reportProblems(state.reportedProblems);
-			fProblemRequestorState.remove();
-		}
+	protected IProblemRequestor doCreateProblemRequestor(final long stamp) {
+		return new ProblemRequestor();
 	}
 	
-	@Override
-	public void acceptProblems(final String type, final List<IProblem> problems) {
-		if (isHandlingTemporaryProblems()) {
-			final ProblemRequestorState state = fProblemRequestorState.get();
-			if (state != null) {
-				state.reportedProblems.addAll(problems);
-			}
-		}
-	}
-	
-	public void clearProblems(final String type) {
+	public void clearProblems(final String category) {
 		synchronized (getLockObject()) {
 			if (fProblemAnnotations.size() > 0) {
-				removeAnnotations(fProblemAnnotations, true, true);
-				fProblemAnnotations.clear();
+				if (category == null) {
+					removeAnnotations(fProblemAnnotations, true, true);
+					fProblemAnnotations.clear();
+				}
+				else {
+					final Iterator<SourceProblemAnnotation> iter = fProblemAnnotations.iterator();
+					List<SourceProblemAnnotation> toRemove = null;
+					while (iter.hasNext()) {
+						final SourceProblemAnnotation annotation = iter.next();
+						if (annotation.getProblem().getCategoryId() == category) {
+							iter.remove();
+							if (toRemove == null) {
+								toRemove = new ArrayList<SourceProblemAnnotation>();
+							}
+							toRemove.add(annotation);
+						}
+					}
+					if (toRemove != null) {
+						removeAnnotations(toRemove, true, true);
+					}
+				}
 			}
 		}
 	}
@@ -109,6 +141,9 @@ public abstract class SourceAnnotationModel extends ResourceMarkerAnnotationMode
 		boolean reportedProblemsChanged = false;
 		
 		synchronized (getLockObject()) {
+			if (fReportingCounter.decrementAndGet() != 0) {
+				return;
+			}
 //			fPreviouslyOverlaid = fCurrentlyOverlaid;
 //			fCurrentlyOverlaid = new ArrayList();
 			

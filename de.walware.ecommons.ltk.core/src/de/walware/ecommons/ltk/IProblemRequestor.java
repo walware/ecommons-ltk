@@ -21,25 +21,22 @@ import java.util.List;
  */
 public interface IProblemRequestor {
 	
+	
 	/**
-	 * Notification of a problem.
+	 * Notification of a discovered problem.
 	 * 
-	 * @param type the category of discovered problems.
-	 * @param problem The discovered problems.
+	 * @param problem the problem.
 	 */
-	public void acceptProblems(String type, List<IProblem> problems);
+	void acceptProblems(IProblem problem);
 	
 	/**
-	 * Notification sent before starting the problem detection process.
-	 * Typically, this would tell a problem collector to clear previously recorded problems.
+	 * Notification of a list of problems.
+	 * 
+	 * @param type the category of the problems.
+	 * @param problems the problems.
 	 */
-	public void beginReportingSequence();
+	void acceptProblems(String categoryId, List<IProblem> problems);
 	
-	/**
-	 * Notification sent after having completed problem detection process.
-	 * Typically, this would tell a problem collector that no more problems should be expected in this
-	 * iteration.
-	 */
-	public void endReportingSequence();
+	void finish();
 	
 }

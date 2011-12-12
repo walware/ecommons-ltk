@@ -108,8 +108,6 @@ public interface ISourceUnit extends IModelElement, IAdaptable {
 	
 	public AstInfo getAstInfo(String type, boolean ensureSync, IProgressMonitor monitor);
 	
-	public IProblemRequestor getProblemRequestor();
-	
 	public ISourceUnitModelInfo getModelInfo(String type, int syncLevel, IProgressMonitor monitor);
 	
 	public void connect(IProgressMonitor monitor);

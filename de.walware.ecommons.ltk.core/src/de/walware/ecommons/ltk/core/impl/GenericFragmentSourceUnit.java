@@ -23,7 +23,6 @@ import de.walware.ecommons.text.ReadOnlyDocument;
 import de.walware.ecommons.ltk.AstInfo;
 import de.walware.ecommons.ltk.IElementName;
 import de.walware.ecommons.ltk.IModelElement;
-import de.walware.ecommons.ltk.IProblemRequestor;
 import de.walware.ecommons.ltk.ISourceUnit;
 import de.walware.ecommons.ltk.ISourceUnitModelInfo;
 import de.walware.ecommons.ltk.SourceContent;
@@ -217,14 +216,6 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	@Override
 	public List<? extends IModelElement> getModelChildren(final Filter filter) {
 		return NO_CHILDREN;
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public IProblemRequestor getProblemRequestor() {
-		return null;
 	}
 	
 	

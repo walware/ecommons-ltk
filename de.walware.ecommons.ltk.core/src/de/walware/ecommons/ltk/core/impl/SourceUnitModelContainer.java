@@ -136,4 +136,16 @@ public abstract class SourceUnitModelContainer<SuType extends ISourceUnit, Model
 		fModelInfo = modelInfo;
 	}
 	
+	
+	public IProblemRequestor createProblemRequestor(final long stamp) {
+		if (fMode == 2) {
+			return createEditorContextProblemRequestor(stamp);
+		}
+		return null;
+	}
+	
+	protected IProblemRequestor createEditorContextProblemRequestor(final long stamp) {
+		return null;
+	}
+	
 }

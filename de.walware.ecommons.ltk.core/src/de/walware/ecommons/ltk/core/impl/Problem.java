@@ -26,13 +26,16 @@ public class Problem implements IProblem {
 	private final int fStart;
 	private final int fStop;
 	
+	private final String fModelTypeId;
 	private final int fSeverity;
 	private final int fCode;
 	private final String fMessage;
 	
 	
-	public Problem(final int severity, final int code, final String message,
+	public Problem(final String modelTypeId,
+			final int severity, final int code, final String message,
 			final ISourceUnit unit, final int line, final int startOffset, final int stopOffset) {
+		fModelTypeId = modelTypeId;
 		fSeverity = severity;
 		fCode = code;
 		fMessage = message;
@@ -43,8 +46,10 @@ public class Problem implements IProblem {
 		fStop = (stopOffset - startOffset > 0) ? stopOffset : startOffset + 1;
 	}
 	
-	public Problem(final int severity, final int code, final String message,
+	public Problem(final String modelTypeId,
+			final int severity, final int code, final String message,
 			final ISourceUnit unit, final int startOffset, final int stopOffset) {
+		fModelTypeId = modelTypeId;
 		fSeverity = severity;
 		fCode = code;
 		fMessage = message;
@@ -55,6 +60,11 @@ public class Problem implements IProblem {
 		fStop = (stopOffset - startOffset > 0) ? stopOffset : startOffset + 1;
 	}
 	
+	
+	@Override
+	public String getCategoryId() {
+		return fModelTypeId;
+	}
 	
 	@Override
 	public ISourceUnit getSourceUnit() {

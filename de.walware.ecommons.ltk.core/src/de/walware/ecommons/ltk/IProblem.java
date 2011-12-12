@@ -25,31 +25,32 @@ public interface IProblem {
 	 * 
 	 * {@link IMarker#SEVERITY_ERROR}
 	 */
-	public static final int SEVERITY_ERROR = 2;
+	int SEVERITY_ERROR = 2;
 	
 	/** 
 	 * Error severity constant indicating a warning.
 	 * 
 	 * {@link IMarker#SEVERITY_WARNING}
 	 */
-	public static final int SEVERITY_WARNING = 1;
+	int SEVERITY_WARNING = 1;
 	
 	/** 
 	 * Error severity constant indicating an information only.
 	 * 
 	 * {@link IMarker#SEVERITY_INFO}
 	 */
-	public static final int SEVERITY_INFO = 0;
+	int SEVERITY_INFO = 0;
 	
 	
-	public ISourceUnit getSourceUnit();
+	String getCategoryId();
+	ISourceUnit getSourceUnit();
 	
-	public int getSourceLine();
-	public int getSourceStartOffset();
-	public int getSourceStopOffset();
+	int getSourceLine();
+	int getSourceStartOffset();
+	int getSourceStopOffset();
 	
-	public int getSeverity();
-	public int getCode();
-	public String getMessage();
+	int getSeverity();
+	int getCode();
+	String getMessage();
 	
 }

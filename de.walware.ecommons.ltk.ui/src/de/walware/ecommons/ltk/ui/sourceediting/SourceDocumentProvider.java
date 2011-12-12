@@ -28,6 +28,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import de.walware.ecommons.text.PartitionerDocumentSetupParticipant;
 
 import de.walware.ecommons.ltk.IDocumentModelProvider;
+import de.walware.ecommons.ltk.IProblemRequestor;
 import de.walware.ecommons.ltk.ISourceUnit;
 import de.walware.ecommons.ltk.ISourceUnitManager;
 import de.walware.ecommons.ltk.LTK;
@@ -151,6 +152,14 @@ public class SourceDocumentProvider<T extends ISourceUnit> extends TextFileDocum
 			element = new FileEditorInput((IFile) ((ISourceUnit) element).getResource());
 		}
 		return super.getAnnotationModel(element);
+	}
+	
+	public IProblemRequestor createProblemRequestor(final ISourceUnit element, final long stamp) {
+		final IAnnotationModel annotationModel = getAnnotationModel(element);
+		if (annotationModel instanceof SourceAnnotationModel) {
+			return ((SourceAnnotationModel) annotationModel).createProblemRequestor(stamp);
+		}
+		return null;
 	}
 	
 }
