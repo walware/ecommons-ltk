@@ -1211,7 +1211,7 @@ public abstract class SourceEditor1 extends TextEditor
 				if (first instanceof ISourceStructElement) {
 					region = ((ISourceStructElement) first).getNameSourceRange();
 					if (region == null) {
-						region = ((ISourceStructElement) first).getSourceRange();
+						region = new Region(((ISourceStructElement) first).getSourceRange().getOffset(), 0);
 					}
 				}
 				if (region == null && first instanceof IRegion) {
