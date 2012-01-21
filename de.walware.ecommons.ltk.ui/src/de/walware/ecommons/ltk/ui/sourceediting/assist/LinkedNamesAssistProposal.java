@@ -9,7 +9,7 @@
  *     Stephan Wahlbrink - initial API and implementation
  *******************************************************************************/
 
-package de.walware.ecommons.ltk.ui.sourceediting;
+package de.walware.ecommons.ltk.ui.sourceediting.assist;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -38,6 +38,7 @@ import de.walware.ecommons.text.ui.DefaultBrowserInformationInput;
 
 import de.walware.ecommons.ltk.internal.ui.LTKUIPlugin;
 import de.walware.ecommons.ltk.ui.LTKUI;
+import de.walware.ecommons.ltk.ui.sourceediting.SourceEditor1;
 
 
 public abstract class LinkedNamesAssistProposal implements IAssistCompletionProposal,

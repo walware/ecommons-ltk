@@ -9,7 +9,7 @@
  *     Stephan Wahlbrink - initial API and implementation
  *******************************************************************************/
 
-package de.walware.ecommons.ltk.ui.sourceediting;
+package de.walware.ecommons.ltk.ui.sourceediting.assist;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -30,7 +30,8 @@ import org.eclipse.swt.graphics.Image;
 
 import de.walware.ecommons.ltk.internal.ui.LTKUIPlugin;
 import de.walware.ecommons.ltk.ui.LTKUI;
-import de.walware.ecommons.ltk.ui.sourceediting.TemplateProposal.TemplateComparator;
+import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditor;
+import de.walware.ecommons.ltk.ui.sourceediting.assist.TemplateProposal.TemplateComparator;
 import de.walware.ecommons.ltk.ui.templates.SourceEditorTemplateContext;
 
 

@@ -10,7 +10,7 @@
  *     Stephan Wahlbrink - adapted API and improvements
  *******************************************************************************/
 
-package de.walware.ecommons.ltk.ui.sourceediting;
+package de.walware.ecommons.ltk.ui.sourceediting.assist;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,6 +43,7 @@ import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
 import de.walware.ecommons.FastList;
 
 import de.walware.ecommons.ltk.internal.ui.EditingMessages;
+import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditor;
 import de.walware.ecommons.ltk.ui.util.WorkbenchUIUtil;
 
 

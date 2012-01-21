@@ -9,7 +9,7 @@
  *     Stephan Wahlbrink - initial API and implementation
  *******************************************************************************/
 
-package de.walware.ecommons.ltk.ui.sourceediting;
+package de.walware.ecommons.ltk.ui.sourceediting.assist;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.IRegion;
@@ -21,6 +21,7 @@ import de.walware.ecommons.ltk.AstInfo;
 import de.walware.ecommons.ltk.ISourceUnit;
 import de.walware.ecommons.ltk.ISourceUnitModelInfo;
 import de.walware.ecommons.ltk.ast.AstSelection;
+import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditor;
 
 
 public class AssistInvocationContext implements IQuickAssistInvocationContext, IRegion {

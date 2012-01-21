@@ -9,7 +9,7 @@
  *     Stephan Wahlbrink - initial API and implementation
  *******************************************************************************/
 
-package de.walware.ecommons.ltk.ui.sourceediting;
+package de.walware.ecommons.ltk.ui.sourceediting.assist;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -35,6 +35,7 @@ import org.eclipse.ui.texteditor.spelling.SpellingAnnotation;
 import org.eclipse.ui.texteditor.spelling.SpellingProblem;
 
 import de.walware.ecommons.ltk.IModelManager;
+import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditor;
 
 
 /**

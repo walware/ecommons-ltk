@@ -9,7 +9,7 @@
  *     Stephan Wahlbrink - initial API and implementation
  *******************************************************************************/
 
-package de.walware.ecommons.ltk.ui.sourceediting;
+package de.walware.ecommons.ltk.ui.sourceediting.assist;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.bindings.keys.KeySequence;
@@ -25,6 +25,7 @@ import org.eclipse.swt.graphics.Point;
 
 import de.walware.ecommons.text.ui.DefaultBrowserInformationInput;
 
+import de.walware.ecommons.ltk.ui.sourceediting.ICommandAccess;
 import de.walware.ecommons.ltk.ui.util.WorkbenchUIUtil;
 
 

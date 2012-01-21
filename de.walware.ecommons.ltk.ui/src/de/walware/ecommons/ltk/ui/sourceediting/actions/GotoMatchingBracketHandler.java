@@ -14,7 +14,6 @@ package de.walware.ecommons.ltk.ui.sourceediting.actions;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextSelection;
@@ -24,8 +23,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.texteditor.IEditorStatusLine;
 
-import de.walware.ecommons.text.ITokenScanner;
-import de.walware.ecommons.text.PairMatcher;
+import de.walware.ecommons.text.ICharPairMatcher;
 
 import de.walware.ecommons.ltk.internal.ui.EditingMessages;
 import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditor;
@@ -36,10 +34,10 @@ public class GotoMatchingBracketHandler extends AbstractHandler {
 	
 	private final ISourceEditor fSourceEditor;
 	
-	private final PairMatcher fPairMatcher;
+	private final ICharPairMatcher fPairMatcher;
 	
 	
-	public GotoMatchingBracketHandler(final PairMatcher pairMatcher, final ISourceEditor editor) {
+	public GotoMatchingBracketHandler(final ICharPairMatcher pairMatcher, final ISourceEditor editor) {
 		assert (pairMatcher != null);
 		assert (editor != null);
 		fSourceEditor = editor;
@@ -69,74 +67,53 @@ public class GotoMatchingBracketHandler extends AbstractHandler {
 		final ITextSelection selection = (ITextSelection) sourceViewer.getSelectionProvider().getSelection();
 		int offset = selection.getOffset();
 		int selectionLength = selection.getLength();
-		final char[][] brackets = fPairMatcher.getPairs();
 		
-		if (selectionLength == 1) {
-			try {
-				final char c = document.getChar(offset);
-				for (int i = 0; i < brackets.length; i++) {
-					if (c == brackets[i][ITokenScanner.OPENING_PEER]) {
-						offset++;
-						selectionLength = 0;
-						break;
-					}
-					if (c == brackets[i][ITokenScanner.CLOSING_PEER]) {
-						selectionLength = 0;
-						break;
-					}
+		final IRegion region = (selectionLength <= 1) ?
+				fPairMatcher.match(document, offset, (selection.getLength() == 0)): null;
+		{	String message = null;
+			if (region == null) {
+				message = EditingMessages.GotoMatchingBracketAction_error_InvalidSelection;
+			}
+			else if (region.getLength() < 2) {
+				if (region.getLength() >= 0) {
+					return; // invalid
 				}
-			} catch (final BadLocationException e) {
+				message = EditingMessages.GotoMatchingBracketAction_error_NoMatchingBracket;
+			}
+			if (message != null) {
+				final IEditorStatusLine statusLine = (IEditorStatusLine) fSourceEditor.getAdapter(IEditorStatusLine.class);
+				if (statusLine != null) {
+					statusLine.setMessage(true, message, null);
+				}
+				Display.getCurrent().beep();
+				return;
 			}
 		}
 		
-		if (selectionLength > 0) {
-			final IEditorStatusLine statusLine = (IEditorStatusLine) fSourceEditor.getAdapter(IEditorStatusLine.class);
-			if (statusLine != null) {
-				statusLine.setMessage(true, EditingMessages.GotoMatchingBracketAction_error_InvalidSelection, null);
+		{	final int targetOffset = (fPairMatcher.getAnchor() == ICharacterPairMatcher.RIGHT) ?
+					region.getOffset() + 1 : region.getOffset() + region.getLength() - 1;
+			
+			boolean visible = false;
+			if (sourceViewer instanceof ITextViewerExtension5) {
+				final ITextViewerExtension5 extension = (ITextViewerExtension5) sourceViewer;
+				visible = (extension.modelOffset2WidgetOffset(targetOffset) > -1);
+			} else {
+				final IRegion visibleRegion = sourceViewer.getVisibleRegion();
+				visible = (targetOffset >= visibleRegion.getOffset() && targetOffset <= visibleRegion.getOffset() + visibleRegion.getLength());
 			}
-			sourceViewer.getTextWidget().getDisplay().beep();
-			return;
-		}
-		
-		final IRegion region = fPairMatcher.match(document, offset);
-		if (region == null) {
-			final IEditorStatusLine statusLine = (IEditorStatusLine) fSourceEditor.getAdapter(IEditorStatusLine.class);
-			if (statusLine != null) {
-				statusLine.setMessage(true, EditingMessages.GotoMatchingBracketAction_error_NoMatchingBracket, null);
+			
+			if (!visible) {
+				final IEditorStatusLine statusLine = (IEditorStatusLine) fSourceEditor.getAdapter(IEditorStatusLine.class);
+				if (statusLine != null) {
+					statusLine.setMessage(true, EditingMessages.GotoMatchingBracketAction_error_BracketOutsideSelectedElement, null);
+				}
+				Display.getCurrent().beep();
+				return;
 			}
-			Display.getCurrent().beep();
-			return;
+			
+			sourceViewer.setSelectedRange(targetOffset, 0);
+			sourceViewer.revealRange(targetOffset, 0);
 		}
-		
-		final int matchingOffset = region.getOffset();
-		final int matchingLength = region.getLength();
-		
-		if (matchingLength < 1) {
-			return;
-		}
-		
-		final int targetOffset = (fPairMatcher.getAnchor() == ICharacterPairMatcher.RIGHT) ? matchingOffset+1 : matchingOffset+matchingLength-1;
-		
-		boolean visible = false;
-		if (sourceViewer instanceof ITextViewerExtension5) {
-			final ITextViewerExtension5 extension = (ITextViewerExtension5) sourceViewer;
-			visible = (extension.modelOffset2WidgetOffset(targetOffset) > -1);
-		} else {
-			final IRegion visibleRegion = sourceViewer.getVisibleRegion();
-			visible = (targetOffset >= visibleRegion.getOffset() && targetOffset <= visibleRegion.getOffset() + visibleRegion.getLength());
-		}
-		
-		if (!visible) {
-			final IEditorStatusLine statusLine = (IEditorStatusLine) fSourceEditor.getAdapter(IEditorStatusLine.class);
-			if (statusLine != null) {
-				statusLine.setMessage(true, EditingMessages.GotoMatchingBracketAction_error_BracketOutsideSelectedElement, null);
-			}
-			Display.getCurrent().beep();
-			return;
-		}
-		
-		sourceViewer.setSelectedRange(targetOffset, 0);
-		sourceViewer.revealRange(targetOffset, 0);
 	}
 	
 }

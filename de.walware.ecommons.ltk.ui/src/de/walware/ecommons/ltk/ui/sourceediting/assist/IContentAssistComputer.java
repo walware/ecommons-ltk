@@ -10,11 +10,12 @@
  *     Stephan Wahlbrink - adapted API and improvements
  *******************************************************************************/
 
-package de.walware.ecommons.ltk.ui.sourceediting;
-
+package de.walware.ecommons.ltk.ui.sourceediting.assist;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+
+import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditor;
 
 
 /**

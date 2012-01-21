@@ -53,7 +53,8 @@ import de.walware.ecommons.text.ui.settings.DecorationPreferences;
 import de.walware.ecommons.ui.ColorManager;
 import de.walware.ecommons.ui.ISettingsChangedHandler;
 
-import de.walware.ecommons.ltk.ui.sourceediting.InfoHoverRegistry.EffectiveHovers;
+import de.walware.ecommons.ltk.ui.sourceediting.assist.InfoHoverRegistry;
+import de.walware.ecommons.ltk.ui.sourceediting.assist.InfoHoverRegistry.EffectiveHovers;
 
 
 /**

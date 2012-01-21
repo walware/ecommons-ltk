@@ -17,9 +17,9 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.source.ISourceViewer;
 
-import de.walware.ecommons.ltk.ui.sourceediting.ContentAssistComputerRegistry;
 import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditor;
 import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditorCommandIds;
+import de.walware.ecommons.ltk.ui.sourceediting.assist.ContentAssistComputerRegistry;
 
 
 /**

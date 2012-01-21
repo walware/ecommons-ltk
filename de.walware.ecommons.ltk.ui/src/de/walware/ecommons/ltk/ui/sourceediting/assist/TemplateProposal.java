@@ -9,7 +9,7 @@
  *     Stephan Wahlbrink - initial API and implementation
  *******************************************************************************/
 
-package de.walware.ecommons.ltk.ui.sourceediting;
+package de.walware.ecommons.ltk.ui.sourceediting.assist;
 
 import java.util.Comparator;
 
@@ -58,6 +58,8 @@ import de.walware.ecommons.text.ui.DefaultBrowserInformationInput;
 import de.walware.ecommons.text.ui.PositionBasedCompletionProposal;
 import de.walware.ecommons.ui.SharedUIResources;
 
+import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditor;
+import de.walware.ecommons.ltk.ui.sourceediting.ITextEditToolSynchronizer;
 import de.walware.ecommons.ltk.ui.templates.IWorkbenchTemplateContext;
 
 

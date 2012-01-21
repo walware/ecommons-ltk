@@ -25,7 +25,11 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.statushandlers.StatusManager;
 
 import de.walware.ecommons.ltk.internal.ui.LTKUIPlugin;
-import de.walware.ecommons.ltk.ui.sourceediting.InfoHoverRegistry.EffectiveHovers;
+import de.walware.ecommons.ltk.ui.sourceediting.assist.AssistInvocationContext;
+import de.walware.ecommons.ltk.ui.sourceediting.assist.CombinedHover;
+import de.walware.ecommons.ltk.ui.sourceediting.assist.IInfoHover;
+import de.walware.ecommons.ltk.ui.sourceediting.assist.InfoHoverDescriptor;
+import de.walware.ecommons.ltk.ui.sourceediting.assist.InfoHoverRegistry.EffectiveHovers;
 
 
 /**

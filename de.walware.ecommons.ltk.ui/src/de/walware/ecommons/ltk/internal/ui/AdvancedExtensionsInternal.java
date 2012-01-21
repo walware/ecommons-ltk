@@ -27,7 +27,7 @@ import org.osgi.framework.Bundle;
 
 import de.walware.ecommons.ui.SharedUIResources;
 
-import de.walware.ecommons.ltk.ui.sourceediting.ContentAssistComputerRegistry;
+import de.walware.ecommons.ltk.ui.sourceediting.assist.ContentAssistComputerRegistry;
 
 
 public class AdvancedExtensionsInternal {

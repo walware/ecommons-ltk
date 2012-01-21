@@ -9,7 +9,7 @@
  *     Stephan Wahlbrink - initial API and implementation
  *******************************************************************************/
 
-package de.walware.ecommons.ltk.ui.sourceediting;
+package de.walware.ecommons.ltk.ui.sourceediting.assist;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,6 +61,7 @@ import de.walware.ecommons.ui.util.ViewerUtil;
 import de.walware.ecommons.ui.util.ViewerUtil.CheckboxTableComposite;
 
 import de.walware.ecommons.ltk.internal.ui.EditingMessages;
+import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditorCommandIds;
 
 
 public class AdvancedContentAssistConfigurationBlock extends ManagedConfigurationBlock {

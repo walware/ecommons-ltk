@@ -24,6 +24,8 @@ import org.eclipse.jface.text.information.IInformationProviderExtension2;
 import org.eclipse.ui.statushandlers.StatusManager;
 
 import de.walware.ecommons.ltk.internal.ui.LTKUIPlugin;
+import de.walware.ecommons.ltk.ui.sourceediting.assist.AssistInvocationContext;
+import de.walware.ecommons.ltk.ui.sourceediting.assist.IInfoHover;
 
 
 public abstract class EditorInformationProvider

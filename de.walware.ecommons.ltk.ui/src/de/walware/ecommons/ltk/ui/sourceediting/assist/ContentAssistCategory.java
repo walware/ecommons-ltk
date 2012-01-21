@@ -10,7 +10,7 @@
  *     Stephan Wahlbrink - adapted API and improvements
  *******************************************************************************/
 
-package de.walware.ecommons.ltk.ui.sourceediting;
+package de.walware.ecommons.ltk.ui.sourceediting.assist;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,6 +21,7 @@ import java.util.Map;
 import org.eclipse.jface.resource.ImageDescriptor;
 
 import de.walware.ecommons.ui.util.MessageUtil;
+
 
 
 /**
