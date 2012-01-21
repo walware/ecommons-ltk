@@ -20,46 +20,43 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.TextUtilities;
-import org.eclipse.jface.text.source.ICharacterPairMatcher;
 
 
 /**
  * Helper class for match pairs of characters.
  */
-public class PairMatcher implements ICharacterPairMatcher {
+public class PairMatcher implements ICharPairMatcher {
 	
 	
-	private static char IGNORE = '\n';
+	private static final char IGNORE = '\n';
 	
-	protected char[][] fPairs;
-	protected IDocument fDocument;
+	private static final byte NOTHING_FOUND = 0;
+	private static final byte OPENING_NOT_FOUND = 1;
+	private static final byte CLOSING_NOT_FOUND = 2;
+	private static final byte PAIR_FOUND = 3;
+	
+	
+	protected final char[][] fPairs;
+	protected final String fPartitioning;
+	protected final String[] fApplicablePartitions;
+	protected final char fEscapeChar;
+	protected final ITokenScanner fScanner;
+	
 	protected int fOffset;
 	
-	protected int fStartPos;
+	protected int fBeginPos;
 	protected int fEndPos;
 	protected int fAnchor;
 	protected String fPartition;
 	
-	protected String fPartitioning;
-	protected String[] fApplicablePartitions;
-	protected char fEscapeChar;
 	
-	protected ITokenScanner fScanner;
-	
-	
-	public PairMatcher(final char[][] pairs, final String partitioning, final String[] partitions, final ITokenScanner scanner, final char escapeChar) {
+	public PairMatcher(final char[][] pairs, final String partitioning, final String[] partitions,
+			final ITokenScanner scanner, final char escapeChar) {
 		fPairs = pairs;
 		fScanner = scanner;
 		fPartitioning = partitioning;
 		fApplicablePartitions = partitions;
 		fEscapeChar = escapeChar;
-	}
-	
-	/**
-	 * constructor using <code>BasicHeuristicTokenScanner</code>, without escapeChar.
-	 */
-	public PairMatcher(final char[][] pairs, final PartitioningConfiguration partitioning, final String[] partitions) {
-		this(pairs, partitioning.getPartitioning(), partitions, new BasicHeuristicTokenScanner(partitioning), (char) 0);
 	}
 	
 	/**
@@ -70,21 +67,43 @@ public class PairMatcher implements ICharacterPairMatcher {
 	}
 	
 	
+	/**
+	 * @return Returns the fPairs.
+	 */
+	public char[][] getPairs(final IDocument document, final int offset) {
+		return fPairs;
+	}
+	
 	@Override
 	public IRegion match(final IDocument document, final int offset) {
-		fOffset = offset;
-		if (fOffset < 0) {
+		if (document == null || offset < 0) {
 			return null;
 		}
-		
-		fDocument = document;
-		if (document != null && matchPairsAt() && fStartPos != fEndPos) {
-			fDocument = null;
-			return new Region(fStartPos, fEndPos - fStartPos + 1);
+		fOffset = offset;
+		if (matchPairsAt(document, true) == PAIR_FOUND) {
+			return new Region(fBeginPos, fEndPos - fBeginPos + 1);
 		}
-		
-		fDocument = null;
-		return null;
+		else {
+			return null;
+		}
+	}
+	
+	@Override
+	public IRegion match(final IDocument document, final int offset, final boolean auto) {
+		if (document == null || offset < 0) {
+			return null;
+		}
+		fOffset = offset;
+		switch (matchPairsAt(document, auto)) {
+		case OPENING_NOT_FOUND:
+			return new Region(fEndPos, -1);
+		case CLOSING_NOT_FOUND:
+			return new Region(fBeginPos, -1);
+		case PAIR_FOUND:
+			return new Region(fBeginPos, fEndPos - fBeginPos + 1);
+		default:
+			return null;
+		}
 	}
 	
 	@Override
@@ -103,34 +122,36 @@ public class PairMatcher implements ICharacterPairMatcher {
 	
 	/**
 	 * Search Pairs
+	 * @param document 
+	 * @param auto 
 	 */
-	protected boolean matchPairsAt() {
-		fStartPos = -1;
+	protected byte matchPairsAt(final IDocument document, final boolean auto) {
+		fBeginPos = -1;
 		fEndPos = -1;
 		
 		// get the chars preceding and following the start position
 		try {
-			final ITypedRegion thisPartition = TextUtilities.getPartition(fDocument, fPartitioning, fOffset, false);
-			final ITypedRegion prevPartition = (fOffset > 0) ? TextUtilities.getPartition(fDocument, fPartitioning, fOffset-1, false) : null;
+			final ITypedRegion thisPartition = TextUtilities.getPartition(document, fPartitioning, fOffset, false);
+			final ITypedRegion prevPartition = (fOffset > 0) ? TextUtilities.getPartition(document, fPartitioning, fOffset-1, false) : null;
 			
 			char thisChar = IGNORE;
 			char prevChar = IGNORE;
 			final int thisPart = checkPartition(thisPartition.getType());
-			if (thisPart >= 0 && fOffset < fDocument.getLength()) {
-				thisChar = fDocument.getChar(fOffset);
+			if (thisPart >= 0 && fOffset < document.getLength()) {
+				thisChar = document.getChar(fOffset);
 			}
 			
 			// check, if escaped
 			int prevPart = -1;
 			if (prevPartition != null) {
 				prevPart = checkPartition(prevPartition.getType());
-				if (prevPart >= 0) {
-					prevChar = fDocument.getChar(fOffset-1);
+				if (auto && prevPart >= 0) {
+					prevChar = document.getChar(fOffset-1);
 					final int partitionOffset = prevPartition.getOffset();
 					int checkOffset = fOffset-2;
 					final char escapeChar = getEscapeChar(prevPartition.getType());
 					while (checkOffset >= partitionOffset) {
-						if (fDocument.getChar(checkOffset) == escapeChar) {
+						if (document.getChar(checkOffset) == escapeChar) {
 							checkOffset--;
 						}
 						else {
@@ -150,29 +171,23 @@ public class PairMatcher implements ICharacterPairMatcher {
 			
 			final int pairIdx = findChar(prevChar, prevPart, thisChar, thisPart);
 			
-			if (fStartPos > -1) {  		// closing peer
+			if (fBeginPos > -1) {		// closing peer
 				fAnchor = LEFT;
-				fEndPos = searchForClosingPeer(fPairs[pairIdx]);
-				if (fEndPos > -1) {
-					return true;
-				} else {
-					fStartPos = -1;
-				}
+				fScanner.configure(document, fPartition);
+				fEndPos = fScanner.findClosingPeer(fBeginPos + 1, fPairs[pairIdx], getEscapeChar(fPartition));
+				return (fEndPos > -1 && fBeginPos != fEndPos) ? PAIR_FOUND : CLOSING_NOT_FOUND;
 			}
-			else if (fEndPos > -1) {  	// opening peer
+			else if (fEndPos > -1) {	// opening peer
 				fAnchor = RIGHT;
-				fStartPos = searchForOpeningPeer(fPairs[pairIdx]);
-				if (fStartPos > -1) {
-					return true;
-				} else {
-					fEndPos = -1;
-				}
+				fScanner.configure(document, fPartition);
+				fBeginPos = fScanner.findOpeningPeer(fEndPos - 1, fPairs[pairIdx], getEscapeChar(fPartition));
+				return (fBeginPos > -1 && fBeginPos != fEndPos) ? PAIR_FOUND : OPENING_NOT_FOUND;
 			}
 			
 		} catch (final BadLocationException x) {
 		} // ignore
 		
-		return false;
+		return NOTHING_FOUND;
 	}
 	
 	private int checkPartition(final String id) {
@@ -200,14 +215,14 @@ public class PairMatcher implements ICharacterPairMatcher {
 		}
 		for (int i = 0; i < fPairs.length; i++) {
 			if (prevChar == fPairs[i][OPENING_PEER]) {
-				fStartPos = fOffset-1;
+				fBeginPos = fOffset-1;
 				fPartition = fApplicablePartitions[prevPart];
 				return i;
 			}
 		}
 		for (int i = 0; i < fPairs.length; i++) {
 			if (thisChar == fPairs[i][OPENING_PEER]) {
-				fStartPos = fOffset;
+				fBeginPos = fOffset;
 				fPartition = fApplicablePartitions[thisPart];
 				return i;
 			}
@@ -223,25 +238,8 @@ public class PairMatcher implements ICharacterPairMatcher {
 		return -1;
 	}
 	
-	protected int searchForClosingPeer(final char[] pair) throws BadLocationException {
-		fScanner.configure(fDocument, fPartition);
-		return fScanner.findClosingPeer(fStartPos + 1, pair, getEscapeChar(fPartition));
-	}
-	
-	protected int searchForOpeningPeer(final char[] pair) throws BadLocationException {
-		fScanner.configure(fDocument, fPartition);
-		return fScanner.findOpeningPeer(fEndPos - 1, pair, getEscapeChar(fPartition));
-	}
-	
 	protected char getEscapeChar(final String contentType) {
 		return fEscapeChar;
-	}
-	
-	/**
-	 * @return Returns the fPairs.
-	 */
-	public char[][] getPairs() {
-		return fPairs;
 	}
 	
 }

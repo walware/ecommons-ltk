@@ -91,7 +91,7 @@ import de.walware.ecommons.IDisposable;
 import de.walware.ecommons.preferences.Preference;
 import de.walware.ecommons.preferences.PreferencesUtil;
 import de.walware.ecommons.preferences.SettingsChangeNotifier;
-import de.walware.ecommons.text.PairMatcher;
+import de.walware.ecommons.text.ICharPairMatcher;
 import de.walware.ecommons.text.PartitioningConfiguration;
 import de.walware.ecommons.text.TextUtil;
 import de.walware.ecommons.text.ui.TextHandlerUtil;
@@ -982,7 +982,7 @@ public abstract class SourceEditor1 extends TextEditor
 			markAsStateDependentHandler(handler, true);
 		}
 		
-		final PairMatcher matcher = fConfigurator.getSourceViewerConfiguration().getPairMatcher();
+		final ICharPairMatcher matcher = fConfigurator.getSourceViewerConfiguration().getPairMatcher();
 		if (matcher != null) {
 			handlerService.activateHandler(ISourceEditorCommandIds.GOTO_MATCHING_BRACKET,
 					new GotoMatchingBracketHandler(matcher, this));

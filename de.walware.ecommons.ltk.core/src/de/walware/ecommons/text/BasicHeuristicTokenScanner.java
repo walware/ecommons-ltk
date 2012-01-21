@@ -11,8 +11,6 @@
 
 package de.walware.ecommons.text;
 
-import java.util.Arrays;
-
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.apache.commons.collections.primitives.IntList;
 import org.eclipse.core.runtime.Assert;
@@ -134,17 +132,28 @@ public class BasicHeuristicTokenScanner implements ITokenScanner {
 	}
 	
 	
-	protected class CharacterMatchCondition extends PartitionBasedCondition {
+	protected class SingleCharacterMatchCondition extends PartitionBasedCondition {
 		
-		protected final char[] fChars;
+		protected final int fSingleChar;
 		
 		/**
 		 * Creates a new instance.
 		 * @param ch the single character to match
 		 */
-		public CharacterMatchCondition(final char ch) {
-			this(new char[] { ch });
+		public SingleCharacterMatchCondition(final char ch) {
+			fSingleChar = ch;
 		}
+		
+		@Override
+		protected boolean matchesChar() {
+			return (fSingleChar == fChar);
+		}
+		
+	}
+	
+	protected class CharacterMatchCondition extends PartitionBasedCondition {
+		
+		protected final char[] fChars;
 		
 		/**
 		 * Creates a new instance.
@@ -167,7 +176,6 @@ public class BasicHeuristicTokenScanner implements ITokenScanner {
 		
 	}
 	
-	
 	protected class ExtCharacterMatchCondition extends CharacterMatchCondition {
 		
 		private final char fEscapeChar;
@@ -176,11 +184,10 @@ public class BasicHeuristicTokenScanner implements ITokenScanner {
 		ExtCharacterMatchCondition(final char[] chars, final char escapeChar) {
 			super(chars);
 			fEscapeChar = escapeChar;
-			Arrays.sort(chars);
 		}
 		
 		@Override
-		public boolean stop() {
+		protected boolean matchesChar() {
 			if (fPos == fLastEscapeOffset+1) {
 				return false;
 			}
@@ -188,7 +195,44 @@ public class BasicHeuristicTokenScanner implements ITokenScanner {
 				fLastEscapeOffset = fPos;
 				return false;
 			}
-			return (Arrays.binarySearch(fChars, fChar) >= 0 && (fPartitionConstraint.matches(getContentType())) );
+			return super.matchesChar();
+		}
+		
+	}
+	
+	protected class StringMatchCondition extends PartitionBasedCondition {
+		
+		protected final String fString;
+		private final char fEscapeChar;
+		private int fLastEscapeOffset = -100;
+		
+		/**
+		 * Creates a new instance.
+		 * @param ch the string to match
+		 */
+		public StringMatchCondition(final String s, final char escapeChar) {
+			fString = s;
+			fEscapeChar = escapeChar;
+		}
+		
+		@Override
+		protected boolean matchesChar() {
+			if (fPos == fLastEscapeOffset+1) {
+				return false;
+			}
+			if (fString.charAt(0) == fChar) {
+				try {
+					if (fString.regionMatches(1, fDocument.get(fPos+1, fString.length()-1),
+							0, fString.length()-1 )) {
+						return true;
+					}
+				} catch (final BadLocationException e) {}
+			}
+			if (fEscapeChar == fChar) {
+				fLastEscapeOffset = fPos;
+				return false;
+			}
+			return false;
 		}
 		
 	}
@@ -373,7 +417,7 @@ public class BasicHeuristicTokenScanner implements ITokenScanner {
 	
 	
 	protected StopCondition createFindPeerStopCondition(final int start, final char[] pair, final char escapeChar) {
-		return (escapeChar == (char)0) ?
+		return (escapeChar == (char) 0) ?
 				new CharacterMatchCondition(pair) : new ExtCharacterMatchCondition(pair, escapeChar);
 	}
 	
@@ -407,7 +451,7 @@ public class BasicHeuristicTokenScanner implements ITokenScanner {
 					return NOT_FOUND;
 				}
 				
-				if (fDocument.getChar(start) == pair[OPENING_PEER]) {
+				if (fChar == pair[OPENING_PEER]) {
 					depth++;
 				} else {
 					depth--;
@@ -441,7 +485,7 @@ public class BasicHeuristicTokenScanner implements ITokenScanner {
 					return NOT_FOUND;
 				}
 				
-				if (fDocument.getChar(start) == pair[CLOSING_PEER]) {
+				if (fChar == pair[CLOSING_PEER]) {
 					depth++;
 				} else {
 					depth--;
@@ -636,7 +680,7 @@ public class BasicHeuristicTokenScanner implements ITokenScanner {
 	 * @return the lowest position of <code>ch</code> in (<code>bound</code>, <code>position</code>] that resides in a Java partition, or <code>NOT_FOUND</code> if none can be found
 	 */
 	public final int scanForward(final int position, final int bound, final char ch) {
-		return scanForward(position, bound, new CharacterMatchCondition(ch));
+		return scanForward(position, bound, new SingleCharacterMatchCondition(ch));
 	}
 	
 	/**
@@ -651,6 +695,15 @@ public class BasicHeuristicTokenScanner implements ITokenScanner {
 	 */
 	public final int scanForward(final int position, final int bound, final char[] chars) {
 		return scanForward(position, bound, new CharacterMatchCondition(chars));
+	}
+	
+	/** Provisional / Not Tested */
+	public final int scanForward(final int position, int bound, final String s, final char escapeChar) {
+		if (bound == UNBOUND) {
+			bound = fDocument.getLength();
+		}
+		bound -= s.length();
+		return scanForward(position, bound, new StringMatchCondition(s, escapeChar));
 	}
 	
 	/**
@@ -699,7 +752,7 @@ public class BasicHeuristicTokenScanner implements ITokenScanner {
 	 * @return the highest position of one element in <code>chars</code> in (<code>bound</code>, <code>position</code>] that resides in a Java partition, or <code>NOT_FOUND</code> if none can be found
 	 */
 	public final int scanBackward(final int position, final int bound, final char ch) {
-		return scanBackward(position, bound, new CharacterMatchCondition(ch));
+		return scanBackward(position, bound, new SingleCharacterMatchCondition(ch));
 	}
 	
 	/**
@@ -719,7 +772,7 @@ public class BasicHeuristicTokenScanner implements ITokenScanner {
 	
 	public final int count(int start, final int stop, final char c) {
 		int count = 0;
-		final CharacterMatchCondition condition = new CharacterMatchCondition(c);
+		final SingleCharacterMatchCondition condition = new SingleCharacterMatchCondition(c);
 		while (start < stop && (start = scanForward(start, stop, condition)) != NOT_FOUND) {
 			count++;
 			start++;

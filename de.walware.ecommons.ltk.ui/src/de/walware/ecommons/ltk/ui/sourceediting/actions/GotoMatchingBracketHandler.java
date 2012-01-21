@@ -65,8 +65,8 @@ public class GotoMatchingBracketHandler extends AbstractHandler {
 		final IDocument document = sourceViewer.getDocument();
 		
 		final ITextSelection selection = (ITextSelection) sourceViewer.getSelectionProvider().getSelection();
-		int offset = selection.getOffset();
-		int selectionLength = selection.getLength();
+		final int offset = selection.getOffset();
+		final int selectionLength = selection.getLength();
 		
 		final IRegion region = (selectionLength <= 1) ?
 				fPairMatcher.match(document, offset, (selection.getLength() == 0)): null;

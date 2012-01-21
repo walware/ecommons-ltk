@@ -46,7 +46,7 @@ import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 import de.walware.ecommons.FastList;
 import de.walware.ecommons.templates.TemplateVariableProcessor;
 import de.walware.ecommons.templates.WordFinder;
-import de.walware.ecommons.text.PairMatcher;
+import de.walware.ecommons.text.ICharPairMatcher;
 import de.walware.ecommons.text.ui.DefaultBrowserInformationInput;
 import de.walware.ecommons.text.ui.settings.AssistPreferences;
 import de.walware.ecommons.text.ui.settings.DecorationPreferences;
@@ -114,6 +114,8 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	
 	private ColorManager fColorManager;
 	private final FastList<ISettingsChangedHandler> fSettingsHandler = new FastList<ISettingsChangedHandler>(ISettingsChangedHandler.class);
+	
+	private ICharPairMatcher fPairMatcher;
 	private ContentAssistant fContentAssistant;
 	private IQuickAssistAssistant fQuickAssistant;
 	
@@ -188,6 +190,17 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 		return new ArrayList<ISourceEditorAddon>();
 	}
 	
+	
+	public ICharPairMatcher getPairMatcher() {
+		if (fPairMatcher == null) {
+			fPairMatcher = createPairMatcher();
+		}
+		return fPairMatcher;
+	}
+	
+	protected ICharPairMatcher createPairMatcher() {
+		return null;
+	}
 	
 	@Override
 	public IContentAssistant getContentAssistant(final ISourceViewer sourceViewer) {
@@ -355,10 +368,6 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	
 	public boolean isSmartInsertByDefault() {
 		return true;
-	}
-	
-	public PairMatcher getPairMatcher() {
-		return null;
 	}
 	
 }

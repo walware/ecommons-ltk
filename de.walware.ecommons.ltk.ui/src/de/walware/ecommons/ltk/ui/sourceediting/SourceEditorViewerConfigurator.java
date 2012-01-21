@@ -19,6 +19,7 @@ import java.util.Set;
 import org.eclipse.core.filebuffers.IDocumentSetupParticipant;
 import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.ITextViewerExtension2;
+import org.eclipse.jface.text.source.ICharacterPairMatcher;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.swt.events.DisposeEvent;
@@ -26,7 +27,6 @@ import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 
-import de.walware.ecommons.text.PairMatcher;
 import de.walware.ecommons.text.PartitioningConfiguration;
 import de.walware.ecommons.text.ui.presentation.ITextPresentationConstants;
 import de.walware.ecommons.text.ui.settings.DecorationPreferences;
@@ -73,7 +73,7 @@ public abstract class SourceEditorViewerConfigurator implements ISettingsChanged
 	}
 	
 	public void configureSourceViewerDecorationSupport(final SourceViewerDecorationSupport support) {
-		final PairMatcher pairMatcher = fConfiguration.getPairMatcher();
+		final ICharacterPairMatcher pairMatcher = fConfiguration.getPairMatcher();
 		final DecorationPreferences preferences = fConfiguration.getDecorationPreferences();
 		if (pairMatcher != null && preferences != null) {
 			support.setCharacterPairMatcher(pairMatcher);
