@@ -47,6 +47,8 @@ import de.walware.ecommons.FastList;
 import de.walware.ecommons.templates.TemplateVariableProcessor;
 import de.walware.ecommons.templates.WordFinder;
 import de.walware.ecommons.text.ICharPairMatcher;
+import de.walware.ecommons.text.IIndentSettings;
+import de.walware.ecommons.text.IndentUtil;
 import de.walware.ecommons.text.ui.DefaultBrowserInformationInput;
 import de.walware.ecommons.text.ui.settings.AssistPreferences;
 import de.walware.ecommons.text.ui.settings.DecorationPreferences;
@@ -201,6 +203,39 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	protected ICharPairMatcher createPairMatcher() {
 		return null;
 	}
+	
+	
+	protected IIndentSettings getIndentSettings() {
+		return null;
+	}
+	
+	@Override
+	public int getTabWidth(final ISourceViewer sourceViewer) {
+		final IIndentSettings settings = getIndentSettings();
+		if (settings != null) {
+			return settings.getTabSize();
+		}
+		return super.getTabWidth(sourceViewer);
+	}
+	
+	@Override
+	public String[] getIndentPrefixes(final ISourceViewer sourceViewer, final String contentType) {
+		final IIndentSettings settings = getIndentSettings();
+		if (settings != null) {
+			final String[] prefixes = getIndentPrefixesForTab(getTabWidth(sourceViewer));
+			if (settings.getIndentDefaultType() == IIndentSettings.IndentationType.SPACES) {
+				for (int i = prefixes.length-2; i > 0; i--) {
+					prefixes[i] = prefixes[i-1];
+				}
+				prefixes[0] = new String(IndentUtil.repeat(' ', settings.getIndentSpacesCount()));
+			}
+			return prefixes;
+		}
+		else {
+			return super.getIndentPrefixes(sourceViewer, contentType);
+		}
+	}
+	
 	
 	@Override
 	public IContentAssistant getContentAssistant(final ISourceViewer sourceViewer) {

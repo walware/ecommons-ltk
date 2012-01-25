@@ -11,7 +11,10 @@
 
 package de.walware.ecommons.ltk.ui.sourceediting;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,9 +27,13 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
+import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
+import org.eclipse.ui.texteditor.spelling.SpellingProblem;
 
+import de.walware.ecommons.text.IIndentSettings;
 import de.walware.ecommons.text.PartitioningConfiguration;
 import de.walware.ecommons.text.ui.presentation.ITextPresentationConstants;
 import de.walware.ecommons.text.ui.settings.DecorationPreferences;
@@ -36,7 +43,8 @@ import de.walware.ecommons.ui.ISettingsChangedHandler;
 /**
  * Controls the configuration of an {@link ISourceEditor}.
  */
-public abstract class SourceEditorViewerConfigurator implements ISettingsChangedHandler {
+public abstract class SourceEditorViewerConfigurator implements ISettingsChangedHandler,
+		PropertyChangeListener {
 	
 	
 	private final SourceEditorViewerConfiguration fConfiguration;
@@ -48,6 +56,11 @@ public abstract class SourceEditorViewerConfigurator implements ISettingsChanged
 	
 	protected boolean fIsConfigured;
 	
+	protected boolean fUpdateCompleteConfig;
+	protected boolean fUpdateTextPresentation;
+	protected boolean fUpdateTabSize;
+	protected boolean fUpdateIndent;
+	protected boolean fUpdateInfoHovers;
 	
 	
 	protected SourceEditorViewerConfigurator(final SourceEditorViewerConfiguration config) {
@@ -67,6 +80,7 @@ public abstract class SourceEditorViewerConfigurator implements ISettingsChanged
 	
 	public abstract PartitioningConfiguration getPartitioning();
 	
+	protected abstract Set<String> getResetGroupIds();
 	
 	public SourceEditorViewerConfiguration getSourceViewerConfiguration() {
 		return fConfiguration;
@@ -157,7 +171,83 @@ public abstract class SourceEditorViewerConfigurator implements ISettingsChanged
 		}
 	}
 	
-	protected final void reconfigureSourceViewer() {
+	@Override
+	public void propertyChange(final PropertyChangeEvent event) {
+		final String name = event.getPropertyName();
+		if (name.equals(IIndentSettings.TAB_SIZE_PROP)) {
+			fUpdateTabSize = true;
+			fUpdateIndent = true;
+			return;
+		}
+		if (name.equals(IIndentSettings.INDENT_SPACES_COUNT_PROP)
+				|| name.equals(IIndentSettings.INDENT_DEFAULT_TYPE_PROP)) {
+			fUpdateIndent = true;
+			return;
+		}
+	}
+	
+	@Override
+	public void handleSettingsChanged(Set<String> groupIds, Map<String, Object> options) {
+		final SourceViewer viewer;
+		if (fSourceEditor == null || (viewer = fSourceEditor.getViewer()) == null) {
+			return;
+		}
+		final Point selectedRange = viewer.getSelectedRange();
+		if (groupIds == null) {
+			groupIds = getResetGroupIds();
+		}
+		if (options == null) {
+			options = new HashMap<String, Object>();
+		}
+		options.put(ISettingsChangedHandler.VIEWER_KEY, viewer);
+		
+		checkSettingsChanges(groupIds, options);
+		
+		if (options.containsKey(ITextPresentationConstants.SETTINGSCHANGE_AFFECTSPRESENTATION_KEY)) {
+			fUpdateTextPresentation = true;
+		}
+		
+		updateSourceViewer(viewer);
+		viewer.setSelectedRange(selectedRange.x, selectedRange.y);
+	}
+	
+	protected void checkSettingsChanges(final Set<String> groupIds, final Map<String, Object> options) {
+		fConfiguration.handleSettingsChanged(groupIds, options);
+	}
+	
+	
+	protected void updateSourceViewer(final ISourceViewer viewer) {
+		if (!fIsConfigured) {
+			return;
+		}
+		if (fUpdateCompleteConfig) {
+			if (fSourceEditor instanceof ITextEditor) {
+				SpellingProblem.removeAllInActiveEditor((ITextEditor) fSourceEditor, null);
+			}
+			reconfigureSourceViewer();
+		}
+		else {
+			if (fUpdateTabSize) {
+				viewer.getTextWidget().setTabs(getSourceViewerConfiguration().getTabWidth(viewer));
+			}
+			if (fUpdateTextPresentation) {
+				viewer.invalidateTextPresentation();
+			}
+			if (fUpdateIndent && fSourceEditor instanceof SourceEditor1) {
+				((SourceEditor1) fSourceEditor).updateIndentSettings();
+			}
+			if (fUpdateInfoHovers) {
+				updateConfiguredInfoHovers();
+			}
+		}
+		
+		fUpdateCompleteConfig = false;
+		fUpdateTextPresentation = false;
+		fUpdateTabSize = false;
+		fUpdateIndent = false;
+	}
+	
+	private final void reconfigureSourceViewer() {
 		if (fIsConfigured) {
 			fIsConfigured = false;
 			fSourceEditor.getViewer().unconfigure();
@@ -166,21 +256,7 @@ public abstract class SourceEditorViewerConfigurator implements ISettingsChanged
 		}
 	}
 	
-	@Override
-	public void handleSettingsChanged(final Set<String> groupIds, final Map<String, Object> options) {
-		final SourceViewer viewer;
-		if (fSourceEditor == null || (viewer = fSourceEditor.getViewer()) == null
-				|| fConfiguration == null || groupIds == null) {
-			return;
-		}
-		fConfiguration.handleSettingsChanged(groupIds, options);
-		
-		if (options.containsKey(ITextPresentationConstants.SETTINGSCHANGE_AFFECTSPRESENTATION_KEY)) {
-			viewer.invalidateTextPresentation();
-		}
-	}
-	
-	protected void updateConfiguredInfoHovers() {
+	private void updateConfiguredInfoHovers() {
 		final SourceViewer viewer = fSourceEditor.getViewer();
 		final String[] contentTypes = fConfiguration.getConfiguredContentTypes(viewer);
 		for (final String contentType : contentTypes) {

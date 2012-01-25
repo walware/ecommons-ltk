@@ -72,6 +72,20 @@ public class Messages extends NLS {
 	public static String CodeTemplates_Export_Exists_title;
 	public static String CodeTemplates_Export_Exists_message;
 	
+	public static String CodeStyle_TabSize_label;
+	public static String CodeStyle_TabSize_error_message;
+	public static String CodeStyle_Indent_group;
+	public static String CodeStyle_Indent_Type_label;
+	public static String CodeStyle_Indent_Type_UseTabs_name;
+	public static String CodeStyle_Indent_Type_UseSpaces_name;
+	public static String CodeStyle_Indent_Levels_label;
+	public static String CodeStyle_Indent_ConserveExisting_label;
+	public static String CodeStyle_Indent_NumOfSpaces_label;
+	public static String CodeStyle_Indent_NumOfSpaces_error_message;
+	public static String CodeStyle_Indent_ReplaceOtherTabs_label;
+	public static String CodeStyle_LineWidth_label;
+	public static String CodeStyle_LineWidth_error_message;
+	
 	
 	static {
 		NLS.initializeMessages(Messages.class.getName(), Messages.class);

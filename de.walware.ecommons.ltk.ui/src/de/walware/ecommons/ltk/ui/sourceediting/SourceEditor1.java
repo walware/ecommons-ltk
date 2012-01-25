@@ -1152,6 +1152,11 @@ public abstract class SourceEditor1 extends TextEditor
 		}
 	}
 	
+	protected void updateIndentSettings() {
+		updateIndentPrefixes();
+	}
+	
+	
 	@Override
 	protected void handleCursorPositionChanged() {
 		fCurrentSelection = getSourceViewer().getSelectedRange();

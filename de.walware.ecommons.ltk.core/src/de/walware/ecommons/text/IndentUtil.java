@@ -18,6 +18,8 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.osgi.util.NLS;
 
+import de.walware.ecommons.text.IIndentSettings.IndentationType;
+
 
 /**
  * Util to compute and edit line indentations
@@ -26,9 +28,6 @@ public class IndentUtil {
 	
 	public static final int COLUMN_IDX = 0;
 	public static final int OFFSET_IDX = 1;
-	
-	public static final int CONSERVE_STRATEGY = 1;
-	public static final int CORRECT_STRATEGY = 2;
 	
 	public static final char[] repeat(final char c, final int n) {
 		final char[] chars = new char[n];
@@ -287,25 +286,35 @@ public class IndentUtil {
 	
 	
 	private final IDocument fDocument;
-	private int fTabWidth;
-	private boolean fTabAsDefault;
-	private int fNumOfSpaces;
-	private EditStrategy fEditStrategy;
+	private final int fTabWidth;
+	private final boolean fTabAsDefault;
+	private final int fNumOfSpaces;
+	private final EditStrategy fEditStrategy;
 	
 	
-	public IndentUtil(final IDocument document, final int editStrategy, final boolean tabsAsDefault, final int tabWidth, final int numOfSpaces) {
+//	public IndentUtil(final IDocument document, final booeditStrategy,
+//			final boolean tabsAsDefault, final int tabWidth, final int numOfSpaces) {
+//		fDocument = document;
+//		switch (editStrategy) {
+//		case CONSERVE_STRATEGY:
+//			fConservative = new ConserveStrategy();
+//			break;
+//		case CORRECT_STRATEGY:
+//			fConservative = new CorrectStrategy();
+//			break;
+//		}
+//		fTabAsDefault = tabsAsDefault;
+//		fTabWidth = tabWidth;
+//		fNumOfSpaces = numOfSpaces;
+//	}
+//	
+	public IndentUtil(final IDocument document, final IIndentSettings settings) {
 		fDocument = document;
-		switch (editStrategy) {
-		case CONSERVE_STRATEGY:
-			fEditStrategy = new ConserveStrategy();
-			break;
-		case CORRECT_STRATEGY:
-			fEditStrategy = new CorrectStrategy();
-			break;
-		}
-		fTabAsDefault = tabsAsDefault;
-		fTabWidth = tabWidth;
-		fNumOfSpaces = numOfSpaces;
+		fEditStrategy = (settings.getReplaceConservative()) ?
+				new ConserveStrategy() : new CorrectStrategy();
+		fTabAsDefault = (settings.getIndentDefaultType() == IndentationType.TAB);
+		fTabWidth = settings.getTabSize();
+		fNumOfSpaces = settings.getIndentSpacesCount();
 	}
 	
 	/**
@@ -465,6 +474,7 @@ public class IndentUtil {
 	/**
 	 * Computes the column for the specified offset.
 	 * Linebreak are not specially handled.
+	 * 
 	 * @param offset offset in document
 	 * @return char column of offset
 	 * @throws BadLocationException
@@ -485,6 +495,7 @@ public class IndentUtil {
 	
 	/**
 	 * Returns the configured width of a default indentation.
+	 * 
 	 * @return number of visual char columns
 	 */
 	public int getLevelColumns() {
@@ -498,6 +509,7 @@ public class IndentUtil {
 	
 	/**
 	 * Computes the indentation column adding the specified levels to the current indentColumn.
+	 * 
 	 * @param currentColumn indentColumn in visual char columns
 	 * @param levels number of indentation levels
 	 * @return indentColumn in visual char columns
@@ -532,6 +544,11 @@ public class IndentUtil {
 			final int rest = currentColumn % fNumOfSpaces;
 			return new String(repeat(' ', fNumOfSpaces-rest));
 		}
+	}
+	
+	public String createTabSpacesCompletionString(final int currentColumn) {
+		final int rest = currentColumn % fTabWidth;
+		return new String(repeat(' ', fTabWidth-rest));
 	}
 	
 	
