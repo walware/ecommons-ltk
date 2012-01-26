@@ -66,36 +66,50 @@ public class Partitioner extends FastPartitioner {
 	
 	@Override
 	public ITypedRegion getPartition(final int offset, final boolean preferOpenPartitions) {
-		ITypedRegion region = getPartition(offset);
+		final ITypedRegion region = getPartition(offset);
 		if (preferOpenPartitions) {
 			if (offset > 0) {
 				if (offset == fDocument.getLength()) {
-					return getPartition(offset-1);
+					return getPartition(offset - 1);
 				}
 				try {
 					char c = fDocument.getChar(offset);
 					if ((c == '\n' || c == '\r') &&
-							((c = fDocument.getChar(offset-1)) != '\n' && c != '\r') ) {
-						return getPartition(offset-1);
+							((c = fDocument.getChar(offset - 1)) != '\n' && c != '\r') ) {
+						return getPartition(offset - 1);
 					}
 				} catch (final BadLocationException e) {
 				}
 			}
 			
-			String contentType = region.getType();
+			final String contentType = region.getType();
 			if (region.getOffset() == offset && !(
 					contentType.equals(IDocument.DEFAULT_CONTENT_TYPE) || contentType.endsWith("_default"))) { //$NON-NLS-1$
+				String type;
 				if (offset > 0) {
-					region= getPartition(offset - 1);
-					contentType = region.getType();
-					if (contentType.equals(IDocument.DEFAULT_CONTENT_TYPE) || contentType.endsWith("_default")) { //$NON-NLS-1$
+					final ITypedRegion open = getPartition(offset - 1);
+					type = getPrefereOpenType(open.getType(), contentType);
+					if (type == open.getType()) {
+						return open;
+					}
+					if (type == contentType) {
 						return region;
 					}
 				}
-				return new TypedRegion(offset, 0, IDocument.DEFAULT_CONTENT_TYPE);
+				else {
+					type = IDocument.DEFAULT_CONTENT_TYPE;
+				}
+				return new TypedRegion(offset, 0, type);
 			}
 		}
 		return region;
+	}
+	
+	protected String getPrefereOpenType(final String open, final String opening) {
+		if (open.equals(IDocument.DEFAULT_CONTENT_TYPE) || open.endsWith("_default")) {
+			return open;
+		}
+		return IDocument.DEFAULT_CONTENT_TYPE;
 	}
 	
 }
