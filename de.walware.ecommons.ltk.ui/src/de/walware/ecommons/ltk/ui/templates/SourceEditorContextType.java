@@ -19,6 +19,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TextUtilities;
+import org.eclipse.jface.text.templates.DocumentTemplateContext;
 import org.eclipse.jface.text.templates.GlobalTemplateVariables;
 import org.eclipse.jface.text.templates.SimpleTemplateVariableResolver;
 import org.eclipse.jface.text.templates.TemplateBuffer;
@@ -155,6 +156,23 @@ public class SourceEditorContextType extends TemplateContextType {
 		
 	}
 	
+	private static class MyLineSelection extends GlobalTemplateVariables.LineSelection {
+		
+		@Override
+		protected String resolve(final TemplateContext context) {
+			String value = super.resolve(context);
+			final int length = value.length();
+			if (length > 0 && context instanceof DocumentTemplateContext) {
+				final char c = value.charAt(length-1);
+				if (c != '\n' && c != '\r') {
+					value += TextUtilities.getDefaultLineDelimiter(((DocumentTemplateContext) context).getDocument());
+				}
+			}
+			return value;
+		}
+		
+	}
+	
 	
 	public static final String FILENAME_VARIABLE = "file_name"; //$NON-NLS-1$
 	public static final String SELECT_START_VARIABLE = "selection_begin"; //$NON-NLS-1$
@@ -186,7 +204,7 @@ public class SourceEditorContextType extends TemplateContextType {
 	protected void addEditorVariables() {
 		addResolver(new GlobalTemplateVariables.Cursor());
 		addResolver(new GlobalTemplateVariables.WordSelection());
-		addResolver(new GlobalTemplateVariables.LineSelection());
+		addResolver(new MyLineSelection());
 	}
 	
 	protected void addSourceUnitGenerationVariables() {

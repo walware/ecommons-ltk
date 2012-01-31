@@ -21,6 +21,7 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
 import org.eclipse.jface.text.templates.DocumentTemplateContext;
+import org.eclipse.jface.text.templates.GlobalTemplateVariables;
 import org.eclipse.jface.text.templates.Template;
 import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateContextType;
@@ -43,6 +44,8 @@ public abstract class TemplatesCompletionComputer implements IContentAssistCompu
 	
 	private static final TemplateComparator fgTemplateComparator = new TemplateProposal.TemplateComparator();
 	
+	private static final String LINE_SELECTION = "{" + GlobalTemplateVariables.LineSelection.NAME + "}"; //$NON-NLS-1$ //$NON-NLS-2$
+	private static final String WORD_SELECTION = "{" + GlobalTemplateVariables.WordSelection.NAME + "}"; //$NON-NLS-1$ //$NON-NLS-2$
 	
 	protected final TemplateStore fTemplateStore;
 	protected final ContextTypeRegistry fTypeRegistry;
@@ -85,49 +88,79 @@ public abstract class TemplatesCompletionComputer implements IContentAssistCompu
 		else {
 			region = new Region(context.getOffset(), context.getLength());
 		}
-		final DocumentTemplateContext templateContext = createTemplateContext(context, region);
+		DocumentTemplateContext templateContext = createTemplateContext(context, region);
 		if (templateContext == null) {
 			return null;
 		}
 		
 		int count = 0;
-		if (prefix.length() > 0 && prefix.length() == context.getLength()) {
-			count = doComputeProposals(tenders, templateContext, prefix, region);
+		if (context.getLength() > 0) {
+			if (prefix.length() == context.getLength()) {
+				count = doComputeProposals(tenders, templateContext, prefix, 0, region);
+			}
 			prefix = ""; // wenn erfolglos, dann ohne prefix //$NON-NLS-1$
+			if (count != 0) {
+				templateContext = createTemplateContext(context, region);
+			}
 		}
-		
-		if (count == 0) {
-			try {
-				final String text = viewer.getDocument().get(context.getOffset(), context.getLength());
-				templateContext.setVariable("selection", text); // name of the selection variables {line, word}_selection //$NON-NLS-1$
-				doComputeProposals(tenders, templateContext, prefix, region);
+		try {
+			final IDocument document = viewer.getDocument();
+			final String text = document.get(context.getOffset(), context.getLength());
+			int selectionType;
+			if (context.getLength() > 0) {
+				selectionType = 1;
 			}
-			catch (final BadLocationException e) {
+			else {
+				selectionType = 0;
 			}
+			templateContext.setVariable("selection", text); // name of the selection variables {line, word}_selection //$NON-NLS-1$
+			doComputeProposals(tenders, templateContext, prefix, selectionType, region);
+		}
+		catch (final BadLocationException e) {
 		}
 		return null;
 	}
 	
 	private int doComputeProposals(final AssistProposalCollector<IAssistCompletionProposal> proposals,
-			final DocumentTemplateContext context, final String prefix, final IRegion replacementRegion) {
+			final DocumentTemplateContext context, final String prefix, final int selectionType,
+			final IRegion replacementRegion) {
 		// Add Templates
 		final int count = 0;
 		final Template[] templates = getTemplates(context.getContextType().getId());
 		for (int i = 0; i < templates.length; i++) {
 			final Template template = templates[i];
-			try {
-				context.getContextType().validate(template.getPattern());
-			}
-			catch (final TemplateException e) {
-				continue;
-			}
 			if (include(template, prefix)) { // Change <-> super
+				final String pattern = template.getPattern();
+				if (selectionType > 0 && !isSelectionTemplate(pattern)) {
+					continue;
+				}
+				try {
+					context.getContextType().validate(template.getPattern());
+				}
+				catch (final TemplateException e) {
+					continue;
+				}
 				proposals.add(createProposal(template, context, replacementRegion,
 						getRelevance(template, prefix) ));
 			}
 		}
 		
 		return count;
+	}
+	
+	private boolean isSelectionTemplate(final String pattern) {
+		int offset = 0;
+		while (true) {
+			offset = pattern.indexOf('$', offset) + 1;
+			if (offset <= 0 && offset + 2 < pattern.length()) {
+				return false;
+			}
+			if (pattern.regionMatches(offset, WORD_SELECTION, 0, WORD_SELECTION.length())
+					|| pattern.regionMatches(offset, LINE_SELECTION, 0, LINE_SELECTION.length()) ) {
+				return true;
+			}
+			offset++;
+		}
 	}
 	
 	protected boolean include(final Template template, final String prefix) {
