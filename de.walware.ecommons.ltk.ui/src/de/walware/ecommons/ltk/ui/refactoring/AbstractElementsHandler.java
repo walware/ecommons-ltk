@@ -20,29 +20,19 @@ import org.eclipse.swt.dnd.Transfer;
 import de.walware.ecommons.ui.util.DNDUtil;
 import de.walware.ecommons.ui.util.UIAccess;
 
-import de.walware.ecommons.ltk.core.refactoring.RefactoringAdapter;
+import de.walware.ecommons.ltk.core.refactoring.CommonRefactoringFactory;
 
 
 public abstract class AbstractElementsHandler extends AbstractHandler {
 	
 	
-	private RefactoringAdapter fLTK;
+	protected final CommonRefactoringFactory fRefactoring;
 	
 	
-	public AbstractElementsHandler(final RefactoringAdapter ltk) {
-		fLTK = ltk;
+	public AbstractElementsHandler(final CommonRefactoringFactory refactoring) {
+		fRefactoring = refactoring;
 	}
 	
-	
-	protected RefactoringAdapter getRefactoringAdapter() {
-		return fLTK;
-	}
-	
-	@Override
-	public void dispose() {
-		super.dispose();
-		fLTK = null;
-	}
 	
 	protected boolean copyToClipboard(final ExecutionEvent event, final String sourceCode) {
 		final Clipboard clipboard = new Clipboard(UIAccess.getDisplay());

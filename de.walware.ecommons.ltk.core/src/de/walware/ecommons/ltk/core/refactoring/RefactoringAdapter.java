@@ -43,23 +43,31 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.BadPartitioningException;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITypedRegion;
+import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
+import org.eclipse.ltk.core.refactoring.participants.CopyArguments;
+import org.eclipse.ltk.core.refactoring.participants.CopyParticipant;
 import org.eclipse.ltk.core.refactoring.participants.DeleteArguments;
 import org.eclipse.ltk.core.refactoring.participants.DeleteParticipant;
+import org.eclipse.ltk.core.refactoring.participants.MoveArguments;
+import org.eclipse.ltk.core.refactoring.participants.MoveParticipant;
 import org.eclipse.ltk.core.refactoring.participants.ParticipantManager;
 import org.eclipse.ltk.core.refactoring.participants.RefactoringParticipant;
 import org.eclipse.ltk.core.refactoring.participants.RefactoringProcessor;
+import org.eclipse.ltk.core.refactoring.participants.ReorgExecutionLog;
 import org.eclipse.ltk.core.refactoring.participants.SharableParticipants;
 import org.eclipse.ltk.core.refactoring.resource.DeleteResourceChange;
 import org.eclipse.ltk.internal.core.refactoring.Resources;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.text.edits.DeleteEdit;
+import org.eclipse.text.edits.InsertEdit;
 import org.eclipse.text.edits.MultiTextEdit;
 
+import de.walware.ecommons.collections.ConstList;
 import de.walware.ecommons.io.FileUtil;
 import de.walware.ecommons.text.BasicHeuristicTokenScanner;
 import de.walware.ecommons.text.PartitioningConfiguration;
@@ -97,8 +105,8 @@ public abstract class RefactoringAdapter {
 				}
 				if (result == 0) {
 					if (e1 instanceof ISourceElement && e2 instanceof ISourceElement) {
-						return (((ISourceStructElement) e1).getSourceRange().getOffset() - 
-								((ISourceStructElement) e2).getSourceRange().getOffset());
+						return (((ISourceElement) e1).getSourceRange().getOffset() - 
+								((ISourceElement) e2).getSourceRange().getOffset());
 					}
 					if (e1 instanceof ISourceUnit) {
 						if (e2 instanceof ISourceUnit) {
@@ -126,13 +134,11 @@ public abstract class RefactoringAdapter {
 	};
 	
 	
-	protected final BasicHeuristicTokenScanner fScanner;
-	protected final PartitioningConfiguration fPartitioning;
+	private final String fModelTypeId;
 	
 	
-	public RefactoringAdapter(final BasicHeuristicTokenScanner scanner) {
-		fScanner = scanner;
-		fPartitioning = scanner.getPartitioningConfig();
+	public RefactoringAdapter(final String modelTypeId) {
+		fModelTypeId = modelTypeId;
 	}
 	
 	
@@ -140,9 +146,19 @@ public abstract class RefactoringAdapter {
 		return MODELELEMENT_SORTER;
 	}
 	
+	public String getModelTypeId() {
+		return fModelTypeId;
+	}
+	
+	public boolean isSupportedModelType(final String typeId) {
+		return (fModelTypeId == typeId);
+	}
+	
 	public abstract String getPluginIdentifier();
 	
 	public abstract boolean isCommentContent(final ITypedRegion partition);
+	
+	public abstract BasicHeuristicTokenScanner getScanner(final ISourceUnit su);
 	
 	/**
 	 * - Sort elements
@@ -186,11 +202,11 @@ public abstract class RefactoringAdapter {
 		if (elements == null || elements.length == 0) {
 			return null;
 		}
-		final ISourceUnit sourceUnit = elements[0].getSourceUnit();
-		if (sourceUnit == null) {
+		final ISourceUnit su = elements[0].getSourceUnit();
+		if (su == null) {
 			return null;
 		}
-		final AbstractDocument doc = sourceUnit.getDocument(null);
+		final AbstractDocument doc = su.getDocument(null);
 		if (doc == null) {
 			return null;
 		}
@@ -198,12 +214,14 @@ public abstract class RefactoringAdapter {
 		// check if no other code is between the elements
 		// and create one single range including comments at line end
 		try {
-			fScanner.configure(doc);
+			final BasicHeuristicTokenScanner scanner = getScanner(su);
+			final PartitioningConfiguration partitioning = scanner.getPartitioningConfig();
+			scanner.configure(doc);
 			final int start = elements[0].getSourceRange().getOffset();
 			int end = elements[0].getSourceRange().getOffset() + elements[0].getSourceRange().getLength();
 			
 			for (int i = 1; i < elements.length; i++) {
-				if (elements[i].getSourceUnit() != sourceUnit) {
+				if (elements[i].getSourceUnit() != su) {
 					return null;
 				}
 				final int elementStart = elements[i].getSourceRange().getOffset();
@@ -213,8 +231,8 @@ public abstract class RefactoringAdapter {
 				}
 				int match;
 				while (end < elementStart &&
-						(match = fScanner.findAnyNonBlankForward(end, elementStart, true)) >= 0) {
-					final ITypedRegion partition = doc.getPartition(fPartitioning.getPartitioning(), match, false);
+						(match = scanner.findAnyNonBlankForward(end, elementStart, true)) >= 0) {
+					final ITypedRegion partition = doc.getPartition(partitioning.getPartitioning(), match, false);
 					if (isCommentContent(partition)) {
 						end = partition.getOffset() + partition.getLength();
 					}
@@ -225,9 +243,9 @@ public abstract class RefactoringAdapter {
 				end = elementEnd;
 			}
 			final IRegion lastLine = doc.getLineInformationOfOffset(end);
-			final int match = fScanner.findAnyNonBlankForward(end, lastLine.getOffset()+lastLine.getLength(), true);
+			final int match = scanner.findAnyNonBlankForward(end, lastLine.getOffset()+lastLine.getLength(), true);
 			if (match >= 0) {
-				final ITypedRegion partition = doc.getPartition(fPartitioning.getPartitioning(), match, false);
+				final ITypedRegion partition = doc.getPartition(partitioning.getPartitioning(), match, false);
 				if (isCommentContent(partition)) {
 					end = partition.getOffset() + partition.getLength();
 				}
@@ -241,17 +259,23 @@ public abstract class RefactoringAdapter {
 		return null;
 	}
 	
-	public String getSourceCodeStringedTogether(final ISourceStructElement[] sourceElements, final IProgressMonitor monitor) throws CoreException {
-		final SubMonitor progress = SubMonitor.convert(monitor, sourceElements.length * 2);
+	public String getSourceCodeStringedTogether(final ISourceStructElement[] sourceElements,
+			final IProgressMonitor monitor) throws CoreException {
+		return getSourceCodeStringedTogether(new RefactoringElementSet(sourceElements), monitor);
+	}
+	
+	public String getSourceCodeStringedTogether(final RefactoringElementSet sourceElements,
+			final IProgressMonitor monitor) throws CoreException {
+		final SubMonitor progress = SubMonitor.convert(monitor, sourceElements.countElements() * 2);
 		ISourceUnit lastUnit = null;
+		BasicHeuristicTokenScanner scanner = null;
 		try {
-			final RefactoringElementSet elements = new RefactoringElementSet(sourceElements);
-			elements.removeElementsWithAncestorsOnList();
-			Collections.sort(elements.getModelElements(), getModelElementComparator());
+			sourceElements.removeElementsWithAncestorsOnList();
+			Collections.sort(sourceElements.getModelElements(), getModelElementComparator());
 			final String lineDelimiter = TextUtil.getPlatformLineDelimiter();
 			
 			AbstractDocument doc = null;
-			final List<IModelElement> modelElements = elements.getModelElements();
+			final List<IModelElement> modelElements = sourceElements.getModelElements();
 			int todo = modelElements.size();
 			
 			final StringBuilder sb = new StringBuilder(todo*100);
@@ -265,9 +289,11 @@ public abstract class RefactoringAdapter {
 					}
 					su.connect(progress.newChild(1));
 					lastUnit = su;
+					scanner = getScanner(su);
 					doc = su.getDocument(monitor);
 				}
-				final IRegion range = expandElementRange((ISourceStructElement) element, doc);
+				final IRegion range = expandElementRange((ISourceStructElement) element, doc,
+						scanner );
 				sb.append(doc.get(range.getOffset(), range.getLength()));
 				sb.append(lineDelimiter);
 				
@@ -290,7 +316,8 @@ public abstract class RefactoringAdapter {
 		}
 	}
 	
-	public IRegion expandElementRange(final ISourceElement element, final AbstractDocument doc) 
+	public IRegion expandElementRange(final ISourceElement element, final AbstractDocument doc,
+			final BasicHeuristicTokenScanner scanner) 
 			throws BadLocationException, BadPartitioningException {
 		final IRegion sourceRange = element.getSourceRange();
 		int start = sourceRange.getOffset();
@@ -306,14 +333,15 @@ public abstract class RefactoringAdapter {
 			}
 		}
 		
-		fScanner.configure(doc);
+		scanner.configure(doc);
 		
 		IRegion lastLineInfo;
 		int match;
 		lastLineInfo = doc.getLineInformationOfOffset(end);
-		match = fScanner.findAnyNonBlankForward(end, lastLineInfo.getOffset()+lastLineInfo.getLength(), true);
+		match = scanner.findAnyNonBlankForward(end, lastLineInfo.getOffset()+lastLineInfo.getLength(), true);
 		if (match >= 0) {
-			final ITypedRegion partition = doc.getPartition(fPartitioning.getPartitioning(), match, false);
+			final ITypedRegion partition = doc.getPartition(scanner.getPartitioningConfig().getPartitioning(),
+					match, false );
 			if (isCommentContent(partition)) {
 				end = partition.getOffset() + partition.getLength();
 			}
@@ -321,7 +349,7 @@ public abstract class RefactoringAdapter {
 		final int checkLine = doc.getLineOfOffset(end)+1;
 		if (checkLine < doc.getNumberOfLines()) {
 			final IRegion checkLineInfo = doc.getLineInformation(checkLine);
-			match = fScanner.findAnyNonBlankForward(
+			match = scanner.findAnyNonBlankForward(
 					end, checkLineInfo.getOffset()+checkLineInfo.getLength(), true);
 			if (match < 0) {
 				end = checkLineInfo.getOffset()+checkLineInfo.getLength();
@@ -331,8 +359,9 @@ public abstract class RefactoringAdapter {
 		return new Region(start, end-start);
 	}
 	
-	public IRegion expandWhitespaceBlock(final AbstractDocument document, final IRegion region) throws BadLocationException {
-		fScanner.configure(document);
+	public IRegion expandWhitespaceBlock(final AbstractDocument document, final IRegion region,
+			final BasicHeuristicTokenScanner scanner) throws BadLocationException {
+		scanner.configure(document);
 		final int firstLine = document.getLineOfOffset(region.getOffset());
 		int lastLine = document.getLineOfOffset(region.getOffset()+region.getLength());
 		if (lastLine > firstLine && document.getLineOffset(lastLine) == region.getOffset()+region.getLength()) {
@@ -341,9 +370,9 @@ public abstract class RefactoringAdapter {
 		int result;
 		final int min = document.getLineOffset(firstLine);
 		final int max = document.getLineOffset(lastLine)+document.getLineLength(lastLine);
-		result = fScanner.findAnyNonBlankForward(region.getOffset()+region.getLength(), max, true);
+		result = scanner.findAnyNonBlankForward(region.getOffset()+region.getLength(), max, true);
 		final int end = (result >= 0) ? result : max;
-		result = fScanner.findAnyNonBlankBackward(region.getOffset(), min, true);
+		result = scanner.findAnyNonBlankBackward(region.getOffset(), min, true);
 		if (result >= 0) {
 			return new Region(result+1, end-(result+1));
 		}
@@ -357,7 +386,7 @@ public abstract class RefactoringAdapter {
 		if (elements.getInitialObjects().length == 0) {
 			return false;
 		}
-		if (elements.isOK()) {
+		if (!elements.isOK()) {
 			return false;
 		}
 		for (final IModelElement element : elements.getModelElements()) {
@@ -380,6 +409,9 @@ public abstract class RefactoringAdapter {
 //		if ((element.getElementType() & IModelElement.MASK_C1) == IModelElement.PROJECT) {
 //			return false;
 //		}
+		if (!isSupportedModelType(element.getModelTypeId())) {
+			return false;
+		}
 		if (element.isReadOnly()) {
 			return false;
 		}
@@ -402,7 +434,69 @@ public abstract class RefactoringAdapter {
 		return true;
 	}
 	
-	public void checkInitialForModification(final RefactoringStatus result, final RefactoringElementSet elements) {
+	public boolean canInsert(final RefactoringElementSet elements, final RefactoringDestination to) {
+		if (to.getInitialObjects()[0] instanceof ISourceElement) {
+			return canInsert(elements, (ISourceElement) to.getInitialObjects()[0], to.getPosition());
+		}
+		return false;
+	}
+	
+	protected boolean canInsert(final RefactoringElementSet elements, final ISourceElement to,
+			final RefactoringDestination.Position pos) {
+		if (elements.getInitialObjects().length == 0) {
+			return false;
+		}
+		if (!elements.isOK()) {
+			return false;
+		}
+		if (!canInsertTo(to)) {
+			return false;
+		}
+		for (final IModelElement element : elements.getModelElements()) {
+			if (!canInsert(element)) {
+				return false;
+			}
+		}
+		for (final IResource element : elements.getResources()) {
+//			if (!canInsert(element, parent) {
+				return false;
+//			}
+		}
+		return !elements.includes(to);
+	}
+	
+	protected boolean canInsert(final IModelElement element) {
+		if (!element.exists()) {
+			return false;
+		}
+		if (!isSupportedModelType(element.getModelTypeId())) {
+			return false;
+		}
+		return true;
+	}
+	
+	public boolean canInsertTo(final RefactoringDestination destination) {
+		if (destination.getModelElements().size() != 1) {
+			return false;
+		}
+		return canInsertTo(destination.getModelElements().get(0));
+	}
+	
+	protected boolean canInsertTo(final IModelElement element) {
+		if (!element.exists()) {
+			return false;
+		}
+		if (!isSupportedModelType(element.getModelTypeId())) {
+			return false;
+		}
+		if (element.isReadOnly()) {
+			return false;
+		}
+		return true;
+	}
+	
+	
+	public void checkInitialToModify(final RefactoringStatus result, final RefactoringElementSet elements) {
 		final Set<IResource> resources = new HashSet<IResource>();
 		resources.addAll(elements.getResources());
 		for(final IModelElement element : elements.getModelElements()) {
@@ -419,7 +513,7 @@ public abstract class RefactoringAdapter {
 				));
 	}
 	
-	public void checkFinalForModification(final RefactoringStatus result, final RefactoringElementSet elements, final IProgressMonitor monitor) {
+	public void checkFinalToModify(final RefactoringStatus result, final RefactoringElementSet elements, final IProgressMonitor monitor) {
 		final Set<IResource> resources = new HashSet<IResource>();
 		resources.addAll(elements.getResources());
 		for(final IModelElement element : elements.getModelElements()) {
@@ -438,7 +532,7 @@ public abstract class RefactoringAdapter {
 	
 	public void checkFinalToDelete(final RefactoringStatus result, final RefactoringElementSet elements) throws CoreException {
 		for (final IModelElement element : elements.getModelElements()) {
-			checkFinalToDeletion(result, element);
+			checkFinalToDelete(result, element);
 		}
 		for (final IResource element : elements.getResources()) {
 			checkFinalToDelete(result, element);
@@ -463,7 +557,7 @@ public abstract class RefactoringAdapter {
 		}
 	}
 	
-	public void checkFinalToDeletion(final RefactoringStatus result, final IModelElement element) throws CoreException {
+	public void checkFinalToDelete(final RefactoringStatus result, final IModelElement element) throws CoreException {
 		if ((element.getElementType() & IModelElement.MASK_C2) == IModelElement.C2_SOURCE_FILE) {
 			if (element instanceof IWorkspaceSourceUnit) {
 				checkFinalToDelete(result, ((IWorkspaceSourceUnit) element).getResource());
@@ -473,7 +567,7 @@ public abstract class RefactoringAdapter {
 				&& element instanceof ISourceStructElement) {
 			final List<? extends IModelElement> children = ((ISourceStructElement) element).getSourceChildren(null);
 			for (final IModelElement child : children) {
-				checkFinalToDeletion(result, child);
+				checkFinalToDelete(result, child);
 			}
 		}
 	}
@@ -554,27 +648,84 @@ public abstract class RefactoringAdapter {
 	}
 	
 	
-	public void addParticipantsToDelete(final RefactoringElementSet elements,
+	public void addParticipantsToDelete(final RefactoringElementSet elementsToDelete,
 			final List<RefactoringParticipant> list,
 			final RefactoringStatus status, final RefactoringProcessor processor, 
-			final String[] natures, final SharableParticipants shared) {
+			final SharableParticipants shared)
+			throws CoreException {
+		final String[] natures = RefactoringElementSet.getAffectedProjectNatures(elementsToDelete);
 		final DeleteArguments arguments = new DeleteArguments();
-		for (final IResource resource : elements.getResources()) {
+		for (final IResource resource : elementsToDelete.getResources()) {
 			final DeleteParticipant[] deletes = ParticipantManager.loadDeleteParticipants(status, 
 				processor, resource, 
 				arguments, natures, shared);
 			list.addAll(Arrays.asList(deletes));
 		}
-		for (final IResource resource : elements.getResourcesOwnedByElements()) {
+		for (final IResource resource : elementsToDelete.getResourcesOwnedByElements()) {
 			final DeleteParticipant[] deletes = ParticipantManager.loadDeleteParticipants(status, 
 				processor, resource, 
 				arguments, natures, shared);
 			list.addAll(Arrays.asList(deletes));
 		}
-		for (final IModelElement element : elements.getModelElements()) {
+		for (final IModelElement element : elementsToDelete.getModelElements()) {
 			final DeleteParticipant[] deletes = ParticipantManager.loadDeleteParticipants(status, 
 				processor, element, 
 				arguments, natures, shared);
+			list.addAll(Arrays.asList(deletes));
+		}
+	}
+	
+	public void addParticipantsToMove(final RefactoringElementSet elementsToMove,
+			final RefactoringDestination destination,
+			final List<RefactoringParticipant> list,
+			final RefactoringStatus status, final RefactoringProcessor processor, 
+			final SharableParticipants shared, final ReorgExecutionLog executionLog)
+			throws CoreException {
+		final String[] natures = RefactoringElementSet.getAffectedProjectNatures(
+				new ConstList<RefactoringElementSet>(elementsToMove, destination) );
+		final MoveArguments mArguments = new MoveArguments(destination.getModelElements().get(0),
+				false );
+//		for (final IResource resource : elementsToCopy.getResources()) {
+//			final MoveParticipant[] deletes = ParticipantManager.loadMoveParticipants(status, 
+//					processor, resource, arguments, natures, shared );
+//			list.addAll(Arrays.asList(deletes));
+//		}
+//		for (final IResource resource : elementsToCopy.getResourcesOwnedByElements()) {
+//			final MoveParticipant[] deletes = ParticipantManager.loadMoveParticipants(status, 
+//					processor, resource, arguments, natures, shared );
+//			list.addAll(Arrays.asList(deletes));
+//		}
+		for (final IModelElement element : elementsToMove.getModelElements()) {
+			final MoveParticipant[] deletes = ParticipantManager.loadMoveParticipants(status,
+					processor, element, mArguments, natures, shared );
+			list.addAll(Arrays.asList(deletes));
+		}
+	}
+	
+	public void addParticipantsToCopy(final RefactoringElementSet elementsToCopy,
+			final RefactoringDestination destination,
+			final List<RefactoringParticipant> list,
+			final RefactoringStatus status, final RefactoringProcessor processor, 
+			final SharableParticipants shared, final ReorgExecutionLog executionLog)
+			throws CoreException {
+		final String[] natures = RefactoringElementSet.getAffectedProjectNatures(
+				new ConstList<RefactoringElementSet>(elementsToCopy, destination) );
+		final CopyArguments mArguments = new CopyArguments(destination.getModelElements().get(0),
+				executionLog );
+//		for (final IResource resource : elementsToCopy.getResources()) {
+//			final CopyParticipant[] deletes = ParticipantManager.loadCopyParticipants(status,
+//					processor, resource, arguments, natures, shared );
+//			list.addAll(Arrays.asList(deletes));
+//		}
+//		for (final IResource resource : elementsToCopy.getResourcesOwnedByElements()) {
+//			final CopyParticipant[] deletes = ParticipantManager.loadCopyParticipants(status,
+//					processor, resource, arguments, natures, shared);
+//			list.addAll(Arrays.asList(deletes));
+//		}
+		for (final IModelElement element : elementsToCopy.getModelElements()) {
+			final CopyParticipant[] deletes = ParticipantManager.loadCopyParticipants(status,
+					processor, element,
+					mArguments, natures, shared);
 			list.addAll(Arrays.asList(deletes));
 		}
 	}
@@ -592,6 +743,23 @@ public abstract class RefactoringAdapter {
 		}
 	}
 	
+	public void buildDeltaToModify(final RefactoringElementSet elements,
+			final IResourceChangeDescriptionFactory resourceDelta) {
+		for (final IResource resource : elements.getResources()) {
+			if (resource instanceof IFile) {
+				resourceDelta.change((IFile) resource);
+			}
+		}
+		for (final IResource resource : elements.getResourcesOwnedByElements()) {
+			if (resource instanceof IFile) {
+				resourceDelta.change((IFile) resource);
+			}
+		}
+		for (final IFile file : elements.getFilesContainingElements()) {
+			resourceDelta.change(file);
+		}
+	}
+	
 	/**
 	 * @param changeName the name of the change
 	 * @param resources the resources to delete
@@ -599,14 +767,58 @@ public abstract class RefactoringAdapter {
 	 * @return the created change
 	 * @throws CoreException 
 	 */
-	public Change createChangeToDelete(final String changeName, 
+	public Change createChangeToDelete(final String changeName,
 			final RefactoringElementSet elementsToDelete,
 			final TextChangeManager manager, final IProgressMonitor monitor) throws CoreException {
+		final SubMonitor progress = SubMonitor.convert(monitor, 1);
+		final CompositeChange result = new CompositeChange(changeName);
+		
+		addChangesToDelete(result, elementsToDelete, manager, progress.newChild(1));
+		
+		result.addAll(manager.getAllChanges());
+		return result;
+	}
+	
+	public Change createChangeToMove(final String changeName, 
+			final RefactoringElementSet elementsToMove, final RefactoringDestination destination,
+			final TextChangeManager manager, final IProgressMonitor monitor) throws CoreException {
+		final SubMonitor progress = SubMonitor.convert(monitor, 3);
+		final CompositeChange result = new CompositeChange(changeName);
+		
+		final String code = getSourceCodeStringedTogether(elementsToMove, progress.newChild(1));
+		
+		addChangesToDelete(result, elementsToMove, manager, progress.newChild(1));
+		addChangesToInsert(result, code, destination, manager, progress.newChild(1));
+		
+		result.addAll(manager.getAllChanges());
+		return result;
+	}
+	
+	public Change createChangeToCopy(final String changeName, 
+			final RefactoringElementSet elementsToMove, final RefactoringDestination destination,
+			final TextChangeManager manager, final IProgressMonitor monitor) throws CoreException {
+		final SubMonitor progress = SubMonitor.convert(monitor, 2);
+		final CompositeChange result = new CompositeChange(changeName);
+		
+		final String code = getSourceCodeStringedTogether(elementsToMove, progress.newChild(1));
+		
+		addChangesToInsert(result, code, destination, manager, progress.newChild(1));
+		
+		result.addAll(manager.getAllChanges());
+		return result;
+	}
+	
+	public Change createChangeToInsert(final String changeName,
+			final String code, final RefactoringDestination destination,
+			final TextChangeManager manager,
+			final IProgressMonitor monitor) throws CoreException {
+		assert (changeName != null && code != null && destination != null && manager != null);
 		final SubMonitor progress = SubMonitor.convert(monitor);
 		final CompositeChange result = new CompositeChange(changeName);
 		
-		addChangesToDelete(result, elementsToDelete, manager, progress);
+		addChangesToInsert(result, code, destination, manager, progress);
 		
+		result.addAll(manager.getAllChanges());
 		return result;
 	}
 	
@@ -635,12 +847,12 @@ public abstract class RefactoringAdapter {
 		if (!suSubChanges.isEmpty()) {
 			progress.setWorkRemaining(suSubChanges.size()*3);
 			for (final Map.Entry<ISourceUnit, List<IModelElement>> suChanges : suSubChanges.entrySet()) {
-				result.add(createChangeToDelete(elements, suChanges.getKey(), suChanges.getValue(), manager, progress));
+				createChangeToDelete(elements, suChanges.getKey(), suChanges.getValue(), manager, progress);
 			}
 		}
 	}
 	
-	private Change createChangeToDelete(final RefactoringElementSet elements,
+	private void createChangeToDelete(final RefactoringElementSet elements,
 			final ISourceUnit su, final List<IModelElement> elementsInUnit,
 			final TextChangeManager manager, final SubMonitor progress) throws CoreException {
 		if (!(su instanceof IWorkspaceSourceUnit)
@@ -649,22 +861,17 @@ public abstract class RefactoringAdapter {
 		}
 		su.connect(progress.newChild(1));
 		try {
-			final TextFileChange textFileChange = manager.get(su);
-			if (su.getWorkingContext() == LTK.EDITOR_CONTEXT) {
-				textFileChange.setSaveMode(TextFileChange.LEAVE_DIRTY);
-			}
-			final MultiTextEdit rootEdit = new MultiTextEdit();
-			textFileChange.setEdit(rootEdit);
+			final MultiTextEdit rootEdit = getRootEdit(manager, su);
 			
+			final BasicHeuristicTokenScanner scanner = getScanner(su);
+			final AbstractDocument document = su.getDocument(null);
 			for (final IModelElement element : elementsInUnit) {
 				final ISourceElement member = (ISourceElement) element;
-				final IRegion sourceRange = expandElementRange(member, member.getSourceUnit().getDocument(null));
+				final IRegion sourceRange = expandElementRange(member, document, scanner);
 				final DeleteEdit edit = new DeleteEdit(sourceRange.getOffset(), sourceRange.getLength());
 				rootEdit.addChild(edit);
 			}
 			progress.worked(1);
-			
-			return textFileChange;
 		}
 		catch (final BadLocationException e) {
 			throw new CoreException(failCreation(e));
@@ -699,12 +906,96 @@ public abstract class RefactoringAdapter {
 		throw new IllegalStateException();
 	}
 	
+	
+	protected void addChangesToInsert(final CompositeChange result, final String code,
+			final RefactoringDestination destination,
+			final TextChangeManager manager, final SubMonitor progress) throws CoreException {
+		final ISourceElement element = (ISourceElement) destination.getModelElements().get(0);
+		final ISourceUnit su = LTKUtil.getSourceUnit(element);
+		
+		progress.setWorkRemaining(3);
+		createChangeToInsert(su, code, element, destination, manager, progress);
+	}
+	
+	private void createChangeToInsert(final ISourceUnit su,
+			final String code,
+			final ISourceElement desElement, final RefactoringDestination destination,
+			final TextChangeManager manager, final SubMonitor progress) throws CoreException {
+		if (!(su instanceof IWorkspaceSourceUnit)
+				|| ((IWorkspaceSourceUnit) su).getResource().getType() != IResource.FILE ) {
+			throw new IllegalArgumentException();
+		}
+		su.connect(progress.newChild(1));
+		try {
+			final AbstractDocument document = su.getDocument(progress.newChild(1));
+			final BasicHeuristicTokenScanner scanner = getScanner(su);
+			
+			final int offset;
+			if (destination.getPosition() == RefactoringDestination.Position.AT) {
+				offset = destination.getOffset();
+			}
+			else {
+				offset = getInsertionOffset(document, desElement, destination.getPosition(), scanner);
+			}
+			
+			final MultiTextEdit rootEdit = getRootEdit(manager, su);
+			
+			final InsertEdit edit = new InsertEdit(offset, code);
+			rootEdit.addChild(edit);
+			((SourceUnitChange) manager.get(su)).setInsertPosition(new Position(edit.getOffset()));
+			
+			progress.worked(1);
+		}
+		catch (final BadLocationException e) {
+			throw new CoreException(failCreation(e));
+		}
+		catch (final BadPartitioningException e) {
+			throw new CoreException(failCreation(e));
+		}
+		finally {
+			su.disconnect(progress.newChild(1));
+		}
+	}
+	
+	protected int getInsertionOffset(final AbstractDocument document, final ISourceElement element,
+			final RefactoringDestination.Position pos,
+			final BasicHeuristicTokenScanner scanner) throws BadLocationException, BadPartitioningException {
+		final IRegion range = expandElementRange(element, document, scanner);
+		if (pos == RefactoringDestination.Position.ABOVE) {
+			final int offset = range.getOffset();
+			
+			return offset;
+		}
+		else {
+			int offset = range.getOffset()+range.getLength();
+			
+			final int line = document.getLineOfOffset(offset);
+			final IRegion lineInformation = document.getLineInformation(line);
+			if (offset == lineInformation.getOffset() + lineInformation.getLength()) {
+				offset += document.getLineDelimiter(line).length();
+			}
+			return offset;
+		}
+	}
+	
+	private MultiTextEdit getRootEdit(final TextChangeManager manager, final ISourceUnit su) {
+		final TextFileChange textFileChange = manager.get(su);
+		if (su.getWorkingContext() == LTK.EDITOR_CONTEXT) {
+			textFileChange.setSaveMode(TextFileChange.LEAVE_DIRTY);
+		}
+		if (textFileChange.getEdit() == null) {
+			textFileChange.setEdit(new MultiTextEdit());
+		}
+		return (MultiTextEdit) textFileChange.getEdit();
+	}
+	
+	
 	protected IStatus failDocAnalyzation(final Throwable e) {
-		return new Status(IStatus.ERROR, LTK.PLUGIN_ID, Messages.Common_error_AnalyzingSourceDocument_message);
+		return new Status(IStatus.ERROR, LTK.PLUGIN_ID, Messages.Common_error_AnalyzingSourceDocument_message, e);
 	}
 	
 	protected IStatus failCreation(final Throwable e) {
-		return new Status(IStatus.ERROR, LTK.PLUGIN_ID, Messages.Common_error_CreatingElementChange_message);
+		return new Status(IStatus.ERROR, LTK.PLUGIN_ID, Messages.Common_error_CreatingElementChange_message, e);
 	}
 	
 }

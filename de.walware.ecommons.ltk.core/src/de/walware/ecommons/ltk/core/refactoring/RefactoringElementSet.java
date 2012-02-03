@@ -12,6 +12,7 @@
 package de.walware.ecommons.ltk.core.refactoring;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -32,7 +33,29 @@ import de.walware.ecommons.ltk.LTKUtil;
 public class RefactoringElementSet {
 	
 	
-	private static final int POST_PROCESS = 10000;
+	public static String[] getAffectedProjectNatures(final RefactoringElementSet set)
+			throws CoreException {
+		return getAffectedProjectNatures(Collections.singletonList(set));
+	}
+	
+	public static String[] getAffectedProjectNatures(final List<RefactoringElementSet> sets)
+			throws CoreException {
+		final Set<String> natureIds = new HashSet<String>();
+		for (final RefactoringElementSet set : sets) {
+			final Set<IProject> affectedProjects = set.getAffectedProjects();
+			for (final IProject project : affectedProjects) {
+				final String[] ids = project.getDescription().getNatureIds();
+				for (final String id : ids) {
+					natureIds.add(id);
+				}
+			}
+		}
+		return natureIds.toArray(new String[natureIds.size()]);
+	}
+	
+	
+	private static final int POST_INIT =    0x10000;
+	private static final int POST_PROCESS = 0x70000;
 	
 	
 	protected Object[] fOrgTargets;
@@ -56,10 +79,10 @@ public class RefactoringElementSet {
 			fResources = new ArrayList<IResource>(0);
 		}
 		if (countElements() == fOrgTargets.length) {
-			fProcessState = 10;
+			fProcessState = POST_INIT;
 		}
 		else {
-			fProcessState = -10;
+			fProcessState = -POST_INIT;
 		}
 	}
 	
@@ -202,23 +225,14 @@ public class RefactoringElementSet {
 		}
 	}
 	
-	public String[] getAffectedProjectNatures() throws CoreException {
-		final Set<IProject> affectedProjects = getAffectedProjects();
-		final Set<String> natureIds = new HashSet<String>();
-		for (final IProject project : affectedProjects) {
-			final String[] ids = project.getDescription().getNatureIds();
-			for (final String id : ids) {
-				natureIds.add(id);
-			}
-		}
-		return natureIds.toArray(new String[natureIds.size()]);
-	}
-	
 	
 	public void removeElementsWithAncestorsOnList() {
-		removeResourcesDescendantsOfResources();
-		removeResourcesDescendantsOfModelElements();
-		removeModelElementsDescendantsOfModelElements();
+		if ((fProcessState & 0x10) == 0) {
+			removeResourcesDescendantsOfResources();
+			removeResourcesDescendantsOfModelElements();
+			removeModelElementsDescendantsOfModelElements();
+			fProcessState |= 0x10;
+		}
 	}
 	
 	private void removeResourcesDescendantsOfResources() {
@@ -258,6 +272,19 @@ public class RefactoringElementSet {
 				}
 			}
 		}
+	}
+	
+	public boolean includes(final IModelElement element) {
+		if (fModelElements.contains(element)) {
+			return true;
+		}
+		for (final IModelElement e : fModelElements) {
+			if (isDescendantOf(element, e)) {
+				return true;
+			}
+		}
+		// TODO check resources
+		return false;
 	}
 	
 	protected boolean isDescendantOf(final IResource subResource, final IResource superResource) {
@@ -308,7 +335,7 @@ public class RefactoringElementSet {
 				}
 			}
 		}
-		fProcessState = POST_PROCESS;
+		fProcessState = POST_PROCESS | (fProcessState & 0xffff);
 	}
 	
 }

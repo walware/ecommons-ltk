@@ -17,10 +17,11 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
 	
 	
+	public static String DeleteElements_error_message;
 	public static String CutElements_error_message;
+	public static String MoveElements_error_message;
 	public static String CopyElements_error_message;
 	public static String PastingElements_error_message;
-	public static String DeleteElements_error_message;
 	
 	public static String ExecutionHelper_CannotExecute_message;
 	

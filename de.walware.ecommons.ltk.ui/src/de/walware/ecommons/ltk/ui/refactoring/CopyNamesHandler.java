@@ -25,7 +25,7 @@ import de.walware.ecommons.ui.util.DNDUtil;
 import de.walware.ecommons.ui.util.UIAccess;
 
 import de.walware.ecommons.ltk.IModelElement;
-import de.walware.ecommons.ltk.core.refactoring.RefactoringAdapter;
+import de.walware.ecommons.ltk.core.refactoring.CommonRefactoringFactory;
 import de.walware.ecommons.ltk.ui.util.WorkbenchUIUtil;
 
 
@@ -35,8 +35,8 @@ import de.walware.ecommons.ltk.ui.util.WorkbenchUIUtil;
 public class CopyNamesHandler extends AbstractElementsHandler {
 	
 	
-	public CopyNamesHandler(final RefactoringAdapter ltk) {
-		super(ltk);
+	public CopyNamesHandler(final CommonRefactoringFactory refactoring) {
+		super(refactoring);
 	}
 	
 	

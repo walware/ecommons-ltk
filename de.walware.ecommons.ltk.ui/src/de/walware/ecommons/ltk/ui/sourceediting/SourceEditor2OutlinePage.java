@@ -46,14 +46,11 @@ public abstract class SourceEditor2OutlinePage extends SourceEditor1OutlinePage 
 	
 	protected class SelectCodeRangeAction extends Action {
 		
-		protected final RefactoringAdapter fLTK;
 		
-		public SelectCodeRangeAction(final RefactoringAdapter ltk) {
+		public SelectCodeRangeAction(final CommonRefactoringFactory refactoring) {
 			super();
-			
 			setText(EditingMessages.SelectSourceCode_label);
 			
-			fLTK = ltk;
 			setEnabled(!getSelection().isEmpty());
 		}
 		
@@ -61,8 +58,12 @@ public abstract class SourceEditor2OutlinePage extends SourceEditor1OutlinePage 
 		public void run() {
 			final ISourceStructElement[] elements = LTKSelectionUtil.getSelectedSourceStructElements(getSelection());
 			if (elements != null) {
-				Arrays.sort(elements, fLTK.getModelElementComparator());
-				final IRegion range = fLTK.getContinuousSourceRange(elements);
+				RefactoringAdapter adapter = fRefactoring.createAdapter(elements);
+				if (adapter == null) {
+					adapter = fRefactoring.createAdapter(null);
+				}
+				Arrays.sort(elements, adapter.getModelElementComparator());
+				final IRegion range = adapter.getContinuousSourceRange(elements);
 				if (range != null) {
 					selectInEditor(new TextSelection(range.getOffset(), range.getLength()));
 				}
@@ -73,42 +74,44 @@ public abstract class SourceEditor2OutlinePage extends SourceEditor1OutlinePage 
 	
 	
 	private final CommonRefactoringFactory fRefactoring;
-	private final RefactoringAdapter fLTK;
 	
 	
 	public SourceEditor2OutlinePage(final SourceEditor1 editor, final String mainType,
 			final CommonRefactoringFactory refactoring, final String contextMenuId) {
 		super(editor, mainType, contextMenuId);
 		fRefactoring = refactoring;
-		fLTK = refactoring.createAdapter();
 	}
 	
+	
+	protected CommonRefactoringFactory getRefactoringFactory() {
+		return fRefactoring;
+	}
 	
 	@Override
 	protected void initActions(final IServiceLocator serviceLocator, final HandlerCollection handlers) {
 		super.initActions(serviceLocator, handlers);
 		
 		final IHandlerService handlerService = (IHandlerService) serviceLocator.getService(IHandlerService.class);
-		{	final AbstractElementsHandler handler = new CutElementsHandler(fLTK, fRefactoring);
+		{	final AbstractElementsHandler handler = new CutElementsHandler(fRefactoring);
 			handlers.add(IWorkbenchCommandConstants.EDIT_CUT, handler);
 			registerHandlerToUpdate(handler);
 			handlerService.activateHandler(IWorkbenchCommandConstants.EDIT_CUT, handler);
 		}
-		{	final AbstractElementsHandler handler = new CopyElementsHandler(fLTK);
+		{	final AbstractElementsHandler handler = new CopyElementsHandler(fRefactoring);
 			handlers.add(IWorkbenchCommandConstants.EDIT_COPY, handler);
 			registerHandlerToUpdate(handler);
 			handlerService.activateHandler(IWorkbenchCommandConstants.EDIT_COPY, handler);
 		}
-		{	final AbstractElementsHandler handler = new CopyNamesHandler(fLTK);
+		{	final AbstractElementsHandler handler = new CopyNamesHandler(fRefactoring);
 			handlers.add(ISourceEditorCommandIds.COPY_ELEMENT_NAME, handler);
 			registerHandlerToUpdate(handler);
 			handlerService.activateHandler(ISourceEditorCommandIds.COPY_ELEMENT_NAME, handler);
 		}
-		{	final AbstractElementsHandler handler = new PasteElementsHandler(getSourceEditor(), fLTK);
+		{	final AbstractElementsHandler handler = new PasteElementsHandler(getSourceEditor(), fRefactoring);
 			handlers.add(IWorkbenchCommandConstants.EDIT_PASTE, handler);
 			handlerService.activateHandler(IWorkbenchCommandConstants.EDIT_PASTE, handler);
 		}
-		{	final AbstractElementsHandler handler = new DeleteElementsHandler(fLTK, fRefactoring);
+		{	final AbstractElementsHandler handler = new DeleteElementsHandler(fRefactoring);
 			handlers.add(IWorkbenchCommandConstants.EDIT_DELETE, handler);
 			handlerService.activateHandler(IWorkbenchCommandConstants.EDIT_DELETE, handler);
 		}
@@ -118,7 +121,7 @@ public abstract class SourceEditor2OutlinePage extends SourceEditor1OutlinePage 
 	protected void contextMenuAboutToShow(final IMenuManager m) {
 		final IPageSite site = getSite();
 		
-		m.add(new SelectCodeRangeAction(fLTK));
+		m.add(new SelectCodeRangeAction(fRefactoring));
 		
 		m.add(new Separator(SharedUIResources.EDIT_COPYPASTE_MENU_ID));
 		m.add(new CommandContributionItem(new CommandContributionItemParameter(

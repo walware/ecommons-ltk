@@ -30,6 +30,17 @@ public class Messages extends NLS {
 	public static String DeleteRefactoring_description_singular;
 	public static String DeleteRefactoring_description_plural;
 	
+	public static String MoveRefactoring_label;
+	public static String MoveRefactoring_description_singular;
+	public static String MoveRefactoring_description_plural;
+	
+	public static String CopyRefactoring_label;
+	public static String CopyRefactoring_description_singular;
+	public static String CopyRefactoring_description_plural;
+	
+	public static String PasteRefactoring_label;
+	public static String PasteRefactoring_Code_description;
+	
 	
 	static {
 		initializeMessages(Messages.class.getName(), Messages.class);

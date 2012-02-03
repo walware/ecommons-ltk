@@ -18,7 +18,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.Position;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.ContentStamp;
 import org.eclipse.ltk.core.refactoring.TextChange;
@@ -37,6 +39,8 @@ public final class SourceUnitChange extends TextFileChange {
 	
 	
 	private final ISourceUnit fSourceUnit;
+	
+	private Position fInsertPosition;
 	
 	/** The (optional) refactoring descriptor */
 //	private ChangeDescriptor fDescriptor;
@@ -77,6 +81,15 @@ public final class SourceUnitChange extends TextFileChange {
 		return fSourceUnit;
 	}
 	
+	public void setInsertPosition(final Position position) {
+		fInsertPosition = new Position(position.getOffset(), 0);
+	}
+	
+	public Position getInsertPosition() {
+		return fInsertPosition;
+	}
+	
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -84,7 +97,17 @@ public final class SourceUnitChange extends TextFileChange {
 	protected IDocument acquireDocument(final IProgressMonitor monitor) throws CoreException {
 		final SubMonitor progress = SubMonitor.convert(monitor, 3);
 		fSourceUnit.connect(progress.newChild(1));
-		return super.acquireDocument(progress.newChild(2));
+		final IDocument document = super.acquireDocument(progress.newChild(2));
+		if (fInsertPosition != null) {
+			fInsertPosition = new Position(fInsertPosition.getOffset(), document.getLength()-fInsertPosition.getOffset());
+			try {
+				document.addPosition(fInsertPosition);
+			}
+			catch (final BadLocationException e) {
+				fInsertPosition = null;
+			}
+		}
+		return document;
 	}
 	
 	/**
@@ -93,9 +116,13 @@ public final class SourceUnitChange extends TextFileChange {
 	@Override
 	protected void releaseDocument(final IDocument document, final IProgressMonitor monitor) throws CoreException {
 		final SubMonitor progress = SubMonitor.convert(monitor, 3);
+		if (fInsertPosition != null) {
+			document.removePosition(fInsertPosition);
+		}
 		super.releaseDocument(document, progress.newChild(2));
 		fSourceUnit.disconnect(progress.newChild(1));
 	}
+	
 	
 	/**
 	 * {@inheritDoc}

@@ -27,7 +27,9 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.text.Position;
 import org.eclipse.ltk.core.refactoring.Change;
+import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.PerformChangeOperation;
 import org.eclipse.ltk.core.refactoring.Refactoring;
 import org.eclipse.ltk.core.refactoring.RefactoringCore;
@@ -39,7 +41,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.progress.IProgressService;
 
+import de.walware.ecommons.ltk.ISourceUnit;
 import de.walware.ecommons.ltk.core.refactoring.IScheduledRefactoring;
+import de.walware.ecommons.ltk.core.refactoring.SourceUnitChange;
 import de.walware.ecommons.ltk.internal.ui.refactoring.Messages;
 
 
@@ -57,6 +61,9 @@ public class RefactoringExecutionHelper {
 	
 	private final Shell fParent;
 	private final int fStopSeverity;
+	
+	private ISourceUnit fInsertPositionSourceUnit;
+	private Position fInsertPosition;
 	
 	
 	/**
@@ -131,6 +138,9 @@ public class RefactoringExecutionHelper {
 						change.initializeValidationData(
 								progress.newChild(1, SubMonitor.SUPPRESS_NONE) );
 						
+						final SourceUnitChange insertTracker = (fInsertPositionSourceUnit != null) ?
+								search(change) : null;
+						
 						operation = new PerformChangeOperation(change);
 						operation.setUndoManager(RefactoringCore.getUndoManager(), fRefactoring.getName());
 						operation.setSchedulingRule(rule);
@@ -141,7 +151,7 @@ public class RefactoringExecutionHelper {
 						op.set(operation);
 						
 						if (forkChangeExecution) {
-							operation.run(progress.newChild(4, SubMonitor.SUPPRESS_NONE) );
+							operation.run(progress.newChild(4, SubMonitor.SUPPRESS_NONE));
 						}
 						else {
 							final AtomicReference<Exception> opException = new AtomicReference<Exception>();
@@ -150,7 +160,7 @@ public class RefactoringExecutionHelper {
 								public void run() {
 									try {
 										final PerformChangeOperation operation = op.get();
-										operation.run(progress.newChild(4, SubMonitor.SUPPRESS_NONE) );
+										operation.run(progress.newChild(4, SubMonitor.SUPPRESS_NONE));
 									}
 									catch (final CoreException e) {
 										opException.set(e);
@@ -183,6 +193,10 @@ public class RefactoringExecutionHelper {
 									Messages.ExecutionHelper_CannotExecute_message, 
 									validationStatus.getMessageMatchingSeverity(RefactoringStatus.FATAL) ));
 							return;
+						}
+						
+						if (insertTracker != null) {
+							fInsertPosition = insertTracker.getInsertPosition();
 						}
 					}
 					catch (final OperationCanceledException e) {
@@ -221,6 +235,34 @@ public class RefactoringExecutionHelper {
 				throw e;
 			}
 		}
+	}
+	
+	
+	
+	public void enableInsertPosition(final ISourceUnit su) {
+		fInsertPositionSourceUnit = su;
+	}
+	
+	public Position getInsertPosition() {
+		return fInsertPosition;
+	}
+	
+	private SourceUnitChange search(final Change change) {
+		if (change instanceof SourceUnitChange) {
+			if (((SourceUnitChange) change).getSourceUnit() == fInsertPositionSourceUnit) {
+				return (SourceUnitChange) change;
+			}
+		}
+		if (change instanceof CompositeChange) {
+			final Change[] children = ((CompositeChange) change).getChildren();
+			for (int i = 0; i < children.length; i++) {
+				final SourceUnitChange child = search(children[i]);
+				if (child != null) {
+					return child;
+				}
+			}
+		}
+		return null;
 	}
 	
 }

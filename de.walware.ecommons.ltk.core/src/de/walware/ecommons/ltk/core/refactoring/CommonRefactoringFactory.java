@@ -11,7 +11,10 @@
 
 package de.walware.ecommons.ltk.core.refactoring;
 
+import org.eclipse.ltk.core.refactoring.participants.CopyProcessor;
 import org.eclipse.ltk.core.refactoring.participants.DeleteProcessor;
+import org.eclipse.ltk.core.refactoring.participants.MoveProcessor;
+import org.eclipse.ltk.core.refactoring.participants.RefactoringProcessor;
 
 
 /**
@@ -20,12 +23,39 @@ import org.eclipse.ltk.core.refactoring.participants.DeleteProcessor;
 public class CommonRefactoringFactory {
 	
 	
-	public RefactoringAdapter createAdapter() {
-		throw new UnsupportedOperationException();
+	public RefactoringAdapter createAdapter(final Object elements) {
+		return null;
 	}
 	
-	public DeleteProcessor createDeleteProcessor(final Object[] elements, final RefactoringAdapter adapter) {
-		throw new UnsupportedOperationException();
+	public DeleteProcessor createDeleteProcessor(final Object elementsToDelete,
+			final RefactoringAdapter adapter) {
+		return null;
+	}
+	
+	public MoveProcessor createMoveProcessor(final Object elementsToMove, final RefactoringDestination destination,
+			final RefactoringAdapter adapter) {
+		return null;
+	}
+	
+	public CopyProcessor createCopyProcessor(final Object elementsToCopy, final RefactoringDestination destination,
+			final RefactoringAdapter adapter) {
+		return null;
+	}
+	
+	public RefactoringProcessor createPasteProcessor(final Object elementsToPaste, final RefactoringDestination destination,
+			final RefactoringAdapter adapter) {
+		return null;
+	}
+	
+	
+	protected RefactoringElementSet createElementSet(final Object elements) {
+		if (elements instanceof RefactoringElementSet) {
+			return (RefactoringElementSet) elements;
+		}
+		if (elements instanceof Object[]) {
+			return new RefactoringElementSet((Object[]) elements);
+		}
+		return new RefactoringElementSet(new Object[] { elements });
 	}
 	
 }

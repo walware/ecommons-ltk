@@ -44,13 +44,8 @@ import de.walware.ecommons.ltk.ui.util.WorkbenchUIUtil;
 public class CutElementsHandler extends AbstractElementsHandler {
 	
 	
-	private final CommonRefactoringFactory fRefactoringFactory;
-	
-	
-	public CutElementsHandler(final RefactoringAdapter refactoringAdapter, final CommonRefactoringFactory refactoringFactory) {
-		super(refactoringAdapter);
-		
-		fRefactoringFactory = refactoringFactory;
+	public CutElementsHandler(final CommonRefactoringFactory refactoring) {
+		super(refactoring);
 	}
 	
 	
@@ -76,8 +71,12 @@ public class CutElementsHandler extends AbstractElementsHandler {
 		}
 		final ISourceStructElement[] sourceElements = LTKSelectionUtil.getSelectedSourceStructElements(selection);
 		if (sourceElements != null) {
+			final RefactoringAdapter adapter = fRefactoring.createAdapter(sourceElements);
+			if (adapter == null) {
+				return null;
+			}
 			try {
-				final String code = getRefactoringAdapter().getSourceCodeStringedTogether(sourceElements, null);
+				final String code = adapter.getSourceCodeStringedTogether(sourceElements, null);
 				if (copyToClipboard(event, code)) {
 					// start cut
 					final IWorkbenchPart activePart = HandlerUtil.getActivePart(event);
@@ -85,21 +84,21 @@ public class CutElementsHandler extends AbstractElementsHandler {
 					final Shell shell = site.getShell();
 					final IProgressService progressService = (IProgressService) site.getService(IProgressService.class);
 					
-					startCutRefactoring(sourceElements, shell, progressService);
+					startCutRefactoring(sourceElements, adapter, shell, progressService);
 				}
 			}
 			catch (final CoreException e) {
 				StatusManager.getManager().handle(new Status(
-						IStatus.ERROR, getRefactoringAdapter().getPluginIdentifier(), -1,
-						Messages.CutElements_error_message, 
-						e),
+						IStatus.ERROR, adapter.getPluginIdentifier(), -1,
+						Messages.CutElements_error_message,
+						e ),
 						StatusManager.LOG | StatusManager.SHOW);
 			}
 			catch (final InvocationTargetException e) {
 				StatusManager.getManager().handle(new Status(
-						IStatus.ERROR, getRefactoringAdapter().getPluginIdentifier(), -1,
-						Messages.CutElements_error_message, 
-						e.getCause()),
+						IStatus.ERROR, adapter.getPluginIdentifier(), -1,
+						Messages.CutElements_error_message,
+						e.getCause() ),
 						StatusManager.LOG | StatusManager.SHOW);
 			}
 			catch (final InterruptedException e) {
@@ -108,8 +107,13 @@ public class CutElementsHandler extends AbstractElementsHandler {
 		return null;
 	}
 	
-	private void startCutRefactoring(final Object[] elements, final Shell shell, final IProgressService context) throws InvocationTargetException, InterruptedException {
-		final DeleteProcessor processor = fRefactoringFactory.createDeleteProcessor(elements, getRefactoringAdapter());
+	private void startCutRefactoring(final Object[] elements, final RefactoringAdapter adapter,
+			final Shell shell, final IProgressService context)
+			throws InvocationTargetException, InterruptedException {
+		final DeleteProcessor processor = fRefactoring.createDeleteProcessor(elements, adapter);
+		if (processor == null) {
+			return;
+		}
 		final Refactoring refactoring = new DeleteRefactoring(processor);
 		final RefactoringExecutionHelper helper = new RefactoringExecutionHelper(refactoring, 
 				RefactoringCore.getConditionCheckingFailedSeverity(), 

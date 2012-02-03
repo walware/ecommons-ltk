@@ -43,13 +43,8 @@ import de.walware.ecommons.ltk.ui.util.WorkbenchUIUtil;
 public class DeleteElementsHandler extends AbstractElementsHandler {
 	
 	
-	private final CommonRefactoringFactory fRefactoringFactory;
-	
-	
-	public DeleteElementsHandler(final RefactoringAdapter refactoringAdapter, final CommonRefactoringFactory refactoringFactory) {
-		super(refactoringAdapter);
-		
-		fRefactoringFactory = refactoringFactory;
+	public DeleteElementsHandler(final CommonRefactoringFactory refactoring) {
+		super(refactoring);
 	}
 	
 	
@@ -75,18 +70,23 @@ public class DeleteElementsHandler extends AbstractElementsHandler {
 		}
 		final ISourceStructElement[] sourceElements = LTKSelectionUtil.getSelectedSourceStructElements(selection);
 		if (sourceElements != null) {
+			final RefactoringAdapter adapter = fRefactoring.createAdapter(sourceElements);
+			if (adapter == null) {
+				return null;
+			}
+			
 			final IWorkbenchPart activePart = HandlerUtil.getActivePart(event);
 			final IWorkbenchPartSite site = activePart.getSite();
 			final Shell shell = site.getShell();
 			final IProgressService progressService = (IProgressService) site.getService(IProgressService.class);
 			try {
-				startCutRefactoring(sourceElements, shell, progressService);
+				startCutRefactoring(sourceElements, adapter, shell, progressService);
 			}
 			catch (final InvocationTargetException e) {
 				StatusManager.getManager().handle(new Status(
-						IStatus.ERROR, getRefactoringAdapter().getPluginIdentifier(), -1,
-						Messages.DeleteElements_error_message, 
-						e.getCause()),
+						IStatus.ERROR, adapter.getPluginIdentifier(), -1,
+						Messages.DeleteElements_error_message,
+						e.getCause() ),
 						StatusManager.LOG | StatusManager.SHOW);
 			}
 			catch (final InterruptedException e) {
@@ -95,12 +95,17 @@ public class DeleteElementsHandler extends AbstractElementsHandler {
 		return null;
 	}
 	
-	private void startCutRefactoring(final Object[] elements, final Shell shell, final IProgressService context) throws InvocationTargetException, InterruptedException {
-		final DeleteProcessor processor = fRefactoringFactory.createDeleteProcessor(elements, getRefactoringAdapter());
+	private void startCutRefactoring(final Object[] elements, final RefactoringAdapter adapter,
+			final Shell shell, final IProgressService context)
+			throws InvocationTargetException, InterruptedException {
+		final DeleteProcessor processor = fRefactoring.createDeleteProcessor(elements, adapter);
+		if (processor == null) {
+			return;
+		}
 		final Refactoring refactoring = new DeleteRefactoring(processor);
 		final RefactoringExecutionHelper helper = new RefactoringExecutionHelper(refactoring, 
 				RefactoringCore.getConditionCheckingFailedSeverity(), 
-				shell, context);
+				shell, context );
 		helper.perform(false, false);
 	}
 	

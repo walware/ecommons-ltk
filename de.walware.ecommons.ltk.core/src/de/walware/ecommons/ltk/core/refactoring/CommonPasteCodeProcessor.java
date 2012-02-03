@@ -25,8 +25,8 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
-import org.eclipse.ltk.core.refactoring.participants.DeleteProcessor;
 import org.eclipse.ltk.core.refactoring.participants.RefactoringParticipant;
+import org.eclipse.ltk.core.refactoring.participants.RefactoringProcessor;
 import org.eclipse.ltk.core.refactoring.participants.ResourceChangeChecker;
 import org.eclipse.ltk.core.refactoring.participants.SharableParticipants;
 import org.eclipse.osgi.util.NLS;
@@ -34,22 +34,26 @@ import org.eclipse.osgi.util.NLS;
 import de.walware.ecommons.ltk.internal.core.refactoring.Messages;
 
 
-public abstract class CommonDeleteProcessor extends DeleteProcessor {
+public abstract class CommonPasteCodeProcessor extends RefactoringProcessor {
 	
 	
 	private final RefactoringAdapter fAdapter;
 	
-	private final RefactoringElementSet fElementsToDelete;
+	private final String fCode;
+	private final RefactoringDestination fDestination;
 	
-	private Change fDeleteChange;
+	private Change fInsertChange;
 	
 	
-	public CommonDeleteProcessor(final RefactoringElementSet elements,
+	public CommonPasteCodeProcessor(final String code, final RefactoringDestination destination,
 			final RefactoringAdapter adapter) {
-		assert (elements != null);
+		assert (code != null);
+		assert (destination != null);
 		assert (adapter != null);
 		
-		fElementsToDelete = elements;
+		fDestination = destination;
+		fCode = code;
+		
 		fAdapter = adapter;
 	}
 	
@@ -61,28 +65,28 @@ public abstract class CommonDeleteProcessor extends DeleteProcessor {
 	
 	@Override
 	public String getProcessorName() {
-		return Messages.DeleteRefactoring_label; 
+		return Messages.PasteRefactoring_label; 
 	}
 	
 	@Override
 	public Object[] getElements() {
-		return fElementsToDelete.getInitialObjects();
+		return fDestination.getInitialObjects();
 	}
 	
-	public Change getDeleteChange() {
-		return fDeleteChange;
+	public Change getInsertChange() {
+		return fInsertChange;
 	}
 	
 	@Override
 	public boolean isApplicable() throws CoreException {
-		return fAdapter.canDelete(fElementsToDelete);
+		return fAdapter.canInsertTo(fDestination);
 	}
 	
 	@Override
 	public RefactoringStatus checkInitialConditions(final IProgressMonitor monitor)
 			throws CoreException {
 		final RefactoringStatus result = new RefactoringStatus();
-		fAdapter.checkInitialToModify(result, fElementsToDelete);
+		fAdapter.checkInitialToModify(result, fDestination);
 		return result;
 	}
 	
@@ -94,18 +98,17 @@ public abstract class CommonDeleteProcessor extends DeleteProcessor {
 		try{
 			final RefactoringStatus result = new RefactoringStatus();
 			
-			recalculateElementsToDelete();
-			
-			fElementsToDelete.postProcess();
-			fAdapter.checkFinalToDelete(result, fElementsToDelete);
+			fDestination.postProcess();
+			fAdapter.checkFinalToModify(result, fDestination, progress.newChild(1));
 			
 			final TextChangeManager textManager = new TextChangeManager();
 			
-			fDeleteChange = fAdapter.createChangeToDelete(getProcessorName(), fElementsToDelete, textManager, progress.newChild(1));
+			fInsertChange = fAdapter.createChangeToInsert(getProcessorName(),
+					fCode, fDestination, textManager, progress.newChild(1) );
 			
 			final ResourceChangeChecker checker = (ResourceChangeChecker) context.getChecker(ResourceChangeChecker.class);
 			final IResourceChangeDescriptionFactory deltaFactory = checker.getDeltaFactory();
-			fAdapter.buildDeltaToDelete(fElementsToDelete, deltaFactory);
+			fAdapter.buildDeltaToModify(fDestination, deltaFactory);
 			
 			return result;
 		}
@@ -122,22 +125,8 @@ public abstract class CommonDeleteProcessor extends DeleteProcessor {
 			final SharableParticipants shared)
 			throws CoreException {
 		final List<RefactoringParticipant> result = new ArrayList<RefactoringParticipant>();
-		fAdapter.addParticipantsToDelete(fElementsToDelete, result, status, this, shared);
+//		fAdapter.addParticipantsTo(fElementsToDelete, result, status, this, shared);
 		return result.toArray(new RefactoringParticipant[result.size()]);
-	}
-	
-	/*
-	 * The set of elements that will eventually be deleted may be very different from the set
-	 * originally selected - there may be fewer, more or different elements.
-	 * This method is used to calculate the set of elements that will be deleted - if necessary, 
-	 * it asks the user.
-	 */
-	protected void recalculateElementsToDelete() throws CoreException {
-		//the sequence is critical here
-		
-		fElementsToDelete.removeElementsWithAncestorsOnList();
-		
-		fAdapter.confirmDeleteOfReadOnlyElements(fElementsToDelete, null);
 	}
 	
 	@Override
@@ -145,9 +134,8 @@ public abstract class CommonDeleteProcessor extends DeleteProcessor {
 		try {
 			monitor.beginTask(RefactoringMessages.Common_CreateChanges_label, 1);
 			final Map<String, String> arguments = new HashMap<String, String>();
-			final String description = (fElementsToDelete.getElementCount() == 1) ? 
-					Messages.DeleteRefactoring_description_singular : Messages.DeleteRefactoring_description_plural;
-			final IProject resource = fElementsToDelete.getSingleProject();
+			final String description = Messages.PasteRefactoring_Code_description;
+			final IProject resource = fDestination.getSingleProject();
 			final String project = (resource != null) ? resource.getName() : null;
 			final String source = (project != null) ? NLS.bind(RefactoringMessages.Common_Source_Project_label, project) : RefactoringMessages.Common_Source_Workspace_label;
 //			final String header = NLS.bind(RefactoringCoreMessages.JavaDeleteProcessor_header, new String[] { String.valueOf(fElements.length), source});
@@ -172,13 +160,14 @@ public abstract class CommonDeleteProcessor extends DeleteProcessor {
 					getIdentifier(), project, description, comment, arguments, flags);
 			
 			return new DynamicValidationRefactoringChange(descriptor,
-					Messages.DeleteRefactoring_label, 
-					new Change[] { fDeleteChange },
+					getProcessorName(), 
+					new Change[] { fInsertChange },
 					null );
 		}
 		finally {
 			monitor.done();
 		}
 	}
+	
 	
 }

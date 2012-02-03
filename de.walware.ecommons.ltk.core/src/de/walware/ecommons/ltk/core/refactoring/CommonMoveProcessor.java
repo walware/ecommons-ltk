@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2008-2012 WalWare/StatET-Project (www.walware.de/goto/statet)
- * and others. All rights reserved. This program and the accompanying materials
+ * Copyright (c) 2012 WalWare/StatET-Project (www.walware.de/goto/statet).
+ * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
@@ -25,31 +25,40 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
-import org.eclipse.ltk.core.refactoring.participants.DeleteProcessor;
+import org.eclipse.ltk.core.refactoring.participants.MoveProcessor;
 import org.eclipse.ltk.core.refactoring.participants.RefactoringParticipant;
+import org.eclipse.ltk.core.refactoring.participants.ReorgExecutionLog;
 import org.eclipse.ltk.core.refactoring.participants.ResourceChangeChecker;
 import org.eclipse.ltk.core.refactoring.participants.SharableParticipants;
 import org.eclipse.osgi.util.NLS;
 
+import de.walware.ecommons.ltk.IModelElement;
 import de.walware.ecommons.ltk.internal.core.refactoring.Messages;
 
 
-public abstract class CommonDeleteProcessor extends DeleteProcessor {
+public abstract class CommonMoveProcessor extends MoveProcessor {
 	
 	
 	private final RefactoringAdapter fAdapter;
 	
-	private final RefactoringElementSet fElementsToDelete;
+	private final RefactoringElementSet fElementsToMove;
+	private final RefactoringDestination fDestination;
 	
-	private Change fDeleteChange;
+	private Change fMoveChange;
+	private ReorgExecutionLog fExecutionLog;
 	
 	
-	public CommonDeleteProcessor(final RefactoringElementSet elements,
+	public CommonMoveProcessor(final RefactoringElementSet elements, final RefactoringDestination destination,
 			final RefactoringAdapter adapter) {
 		assert (elements != null);
 		assert (adapter != null);
 		
-		fElementsToDelete = elements;
+		fElementsToMove = elements;
+		fDestination = destination;
+		if (destination.fOrgTargets.length != 1
+				|| !(destination.fOrgTargets[0] instanceof IModelElement) ) {
+			throw new IllegalArgumentException();
+		}
 		fAdapter = adapter;
 	}
 	
@@ -59,53 +68,59 @@ public abstract class CommonDeleteProcessor extends DeleteProcessor {
 	
 	protected abstract String getRefactoringIdentifier();
 	
-	@Override
-	public String getProcessorName() {
-		return Messages.DeleteRefactoring_label; 
-	}
 	
 	@Override
 	public Object[] getElements() {
-		return fElementsToDelete.getInitialObjects();
+		final Object[] elements = new Object[fElementsToMove.fOrgTargets.length + 1];
+		for (int i = 0; i < fElementsToMove.fOrgTargets.length; i++) {
+			elements[i] = fElementsToMove.fOrgTargets[i];
+		}
+		elements[elements.length - 1] = fDestination.fOrgTargets;
+		return elements;
 	}
 	
-	public Change getDeleteChange() {
-		return fDeleteChange;
+	@Override
+	public String getProcessorName() {
+		return Messages.MoveRefactoring_label; 
 	}
 	
 	@Override
 	public boolean isApplicable() throws CoreException {
-		return fAdapter.canDelete(fElementsToDelete);
+		return (fAdapter.canInsert(fElementsToMove, fDestination)
+				&& fAdapter.canDelete(fElementsToMove) );
 	}
 	
 	@Override
 	public RefactoringStatus checkInitialConditions(final IProgressMonitor monitor)
 			throws CoreException {
 		final RefactoringStatus result = new RefactoringStatus();
-		fAdapter.checkInitialToModify(result, fElementsToDelete);
+		fAdapter.checkInitialToModify(result, fDestination);
+		fAdapter.checkInitialToModify(result, fElementsToMove);
 		return result;
 	}
 	
 	@Override
 	public RefactoringStatus checkFinalConditions(final IProgressMonitor monitor,
 			final CheckConditionsContext context)
-			throws CoreException {
+			throws CoreException, OperationCanceledException {
 		final SubMonitor progress = SubMonitor.convert(monitor, RefactoringMessages.Common_FinalCheck_label, 1); 
 		try{
 			final RefactoringStatus result = new RefactoringStatus();
 			
-			recalculateElementsToDelete();
+			fElementsToMove.removeElementsWithAncestorsOnList();
 			
-			fElementsToDelete.postProcess();
-			fAdapter.checkFinalToDelete(result, fElementsToDelete);
+			fElementsToMove.postProcess();
+			fAdapter.checkFinalToDelete(result, fElementsToMove);
+			fAdapter.checkFinalToModify(result, fDestination, monitor);
 			
 			final TextChangeManager textManager = new TextChangeManager();
 			
-			fDeleteChange = fAdapter.createChangeToDelete(getProcessorName(), fElementsToDelete, textManager, progress.newChild(1));
+			fMoveChange = fAdapter.createChangeToMove(getProcessorName(),
+					fElementsToMove, fDestination, textManager, progress.newChild(1) );
 			
 			final ResourceChangeChecker checker = (ResourceChangeChecker) context.getChecker(ResourceChangeChecker.class);
 			final IResourceChangeDescriptionFactory deltaFactory = checker.getDeltaFactory();
-			fAdapter.buildDeltaToDelete(fElementsToDelete, deltaFactory);
+			fAdapter.buildDeltaToModify(fElementsToMove, deltaFactory);
 			
 			return result;
 		}
@@ -122,32 +137,21 @@ public abstract class CommonDeleteProcessor extends DeleteProcessor {
 			final SharableParticipants shared)
 			throws CoreException {
 		final List<RefactoringParticipant> result = new ArrayList<RefactoringParticipant>();
-		fAdapter.addParticipantsToDelete(fElementsToDelete, result, status, this, shared);
+		fExecutionLog = new ReorgExecutionLog();
+		fAdapter.addParticipantsToMove(fElementsToMove, fDestination, result, status, this,
+				shared, fExecutionLog );
 		return result.toArray(new RefactoringParticipant[result.size()]);
 	}
 	
-	/*
-	 * The set of elements that will eventually be deleted may be very different from the set
-	 * originally selected - there may be fewer, more or different elements.
-	 * This method is used to calculate the set of elements that will be deleted - if necessary, 
-	 * it asks the user.
-	 */
-	protected void recalculateElementsToDelete() throws CoreException {
-		//the sequence is critical here
-		
-		fElementsToDelete.removeElementsWithAncestorsOnList();
-		
-		fAdapter.confirmDeleteOfReadOnlyElements(fElementsToDelete, null);
-	}
-	
 	@Override
-	public Change createChange(final IProgressMonitor monitor) throws CoreException {
+	public Change createChange(final IProgressMonitor monitor)
+			throws CoreException, OperationCanceledException {
 		try {
 			monitor.beginTask(RefactoringMessages.Common_CreateChanges_label, 1);
 			final Map<String, String> arguments = new HashMap<String, String>();
-			final String description = (fElementsToDelete.getElementCount() == 1) ? 
-					Messages.DeleteRefactoring_description_singular : Messages.DeleteRefactoring_description_plural;
-			final IProject resource = fElementsToDelete.getSingleProject();
+			final String description = (fElementsToMove.getElementCount() == 1) ? 
+					Messages.MoveRefactoring_description_singular : Messages.MoveRefactoring_description_plural;
+			final IProject resource = fElementsToMove.getSingleProject();
 			final String project = (resource != null) ? resource.getName() : null;
 			final String source = (project != null) ? NLS.bind(RefactoringMessages.Common_Source_Project_label, project) : RefactoringMessages.Common_Source_Workspace_label;
 //			final String header = NLS.bind(RefactoringCoreMessages.JavaDeleteProcessor_header, new String[] { String.valueOf(fElements.length), source});
@@ -172,9 +176,9 @@ public abstract class CommonDeleteProcessor extends DeleteProcessor {
 					getIdentifier(), project, description, comment, arguments, flags);
 			
 			return new DynamicValidationRefactoringChange(descriptor,
-					Messages.DeleteRefactoring_label, 
-					new Change[] { fDeleteChange },
-					null );
+					Messages.MoveRefactoring_label, 
+					new Change[] { fMoveChange },
+					fExecutionLog );
 		}
 		finally {
 			monitor.done();
