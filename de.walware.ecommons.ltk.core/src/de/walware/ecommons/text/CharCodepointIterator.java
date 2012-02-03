@@ -135,20 +135,24 @@ public abstract class CharCodepointIterator implements ICodepointIterator {
 	protected abstract char getChar(int index, byte prepare);
 	
 	
+	@Override
 	public final int first() {
 		internalSet(fBeginIndex, PREPARE_FORWARD);
 		return fCurrentCodepoint;
 	}
 	
+	@Override
 	public final int last() {
 		internalSet((fBeginIndex < fEndIndex) ? fEndIndex - 1 : fEndIndex, PREPARE_STEPBACK);
 		return fCurrentCodepoint;
 	}
 	
+	@Override
 	public final int current() {
 		return fCurrentCodepoint;
 	}
 	
+	@Override
 	public final int next() {
 		if (fCurrentIndex < fEndIndex) {
 			internalSet(fCurrentIndex + fCurrentCharLength, PREPARE_FORWARD);
@@ -167,6 +171,7 @@ public abstract class CharCodepointIterator implements ICodepointIterator {
 		return (count == 0) ? fCurrentCodepoint : EOF;
 	}
 	
+	@Override
 	public final int previous() {
 		if (fCurrentIndex > fBeginIndex) {
 			internalSet(fCurrentIndex - 1, PREPARE_STEPBACK);
@@ -185,6 +190,7 @@ public abstract class CharCodepointIterator implements ICodepointIterator {
 		return (count == 0) ? fCurrentCodepoint : EOF;
 	}
 	
+	@Override
 	public void setIndex(final int index, final byte prepare) throws BadLocationException {
 		if (index < fBeginIndex || index > fEndIndex) {
 			throw new BadLocationException();
@@ -221,18 +227,22 @@ public abstract class CharCodepointIterator implements ICodepointIterator {
 		}
 	}
 	
+	@Override
 	public final int getBeginIndex() {
 		return fBeginIndex;
 	}
 	
+	@Override
 	public final int getEndIndex() {
 		return fEndIndex;
 	}
 	
+	@Override
 	public final int getCurrentIndex() {
 		return fCurrentIndex;
 	}
 	
+	@Override
 	public final int getCurrentLength() {
 		return fCurrentCharLength;
 	}

@@ -86,6 +86,7 @@ public abstract class RefactoringAdapter {
 		
 		private final Collator ID_COMPARATOR = Collator.getInstance();
 		
+		@Override
 		public int compare(final IModelElement e1, final IModelElement e2) {
 			final ISourceUnit u1 = LTKUtil.getSourceUnit(e1);
 			final ISourceUnit u2 = LTKUtil.getSourceUnit(e2);
@@ -451,6 +452,7 @@ public abstract class RefactoringAdapter {
 		}
 		else {
 			element.accept(new IResourceVisitor() {
+				@Override
 				public boolean visit(final IResource visitedResource) throws CoreException {
 					if (visitedResource instanceof IFile) {
 						warnIfDirty(result, (IFile) visitedResource);

@@ -70,6 +70,7 @@ public class IndentUtil {
 	
 	private class ConserveStrategy implements EditStrategy {
 		
+		@Override
 		public void editInIndent(final int firstLine, final int lastLine, final IndentEditAction action)
 				throws BadLocationException {
 			final StringBuilder replacement = new StringBuilder(20);
@@ -141,6 +142,7 @@ public class IndentUtil {
 			}
 		}
 		
+		@Override
 		public void changeIndent(final int firstLine, final int lastLine, final IndentEditAction action)
 				throws BadLocationException {
 			final StringBuilder replacement = new StringBuilder(20);
@@ -197,6 +199,7 @@ public class IndentUtil {
 			}
 		}
 		
+		@Override
 		public String copyLineIndent(final int line) throws BadLocationException {
 			final IRegion lineInfo = fDocument.getLineInformation(line);
 			int offset = lineInfo.getOffset();
@@ -219,6 +222,7 @@ public class IndentUtil {
 	
 	private class CorrectStrategy implements EditStrategy {
 		
+		@Override
 		public void editInIndent(final int firstLine, final int lastLine, final IndentEditAction action)
 				throws BadLocationException {
 			final StringBuilder replacement = new StringBuilder(20);
@@ -239,6 +243,7 @@ public class IndentUtil {
 			}
 		}
 		
+		@Override
 		public void changeIndent(final int firstLine, final int lastLine, final IndentEditAction action)
 				throws BadLocationException {
 			final StringBuilder replacement = new StringBuilder(20);
@@ -257,6 +262,7 @@ public class IndentUtil {
 			
 		}
 		
+		@Override
 		public String copyLineIndent(final int line) throws BadLocationException {
 			final IRegion lineInfo = fDocument.getLineInformation(line);
 			int column = 0;

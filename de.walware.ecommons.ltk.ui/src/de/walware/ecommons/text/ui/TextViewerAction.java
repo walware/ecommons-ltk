@@ -52,6 +52,7 @@ public class TextViewerAction extends Action implements IUpdate {
 	}
 	
 	
+	@Override
 	public void update() {
 		setEnabled(fOperationTarget.canDoOperation(fOperationCode));
 	}

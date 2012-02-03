@@ -95,6 +95,7 @@ public class AssistInvocationContext implements IQuickAssistInvocationContext, I
 		return fEditor;
 	}
 	
+	@Override
 	public SourceViewer getSourceViewer() {
 		return fSourceViewer;
 	}
@@ -104,6 +105,7 @@ public class AssistInvocationContext implements IQuickAssistInvocationContext, I
 	 * 
 	 * @return offset of selection
 	 */
+	@Override
 	public int getOffset() {
 		return fSelectionOffset;
 	}
@@ -113,6 +115,7 @@ public class AssistInvocationContext implements IQuickAssistInvocationContext, I
 	 * 
 	 * @return length of selection (>= 0)
 	 */
+	@Override
 	public int getLength() {
 		return fSelectionLength;
 	}

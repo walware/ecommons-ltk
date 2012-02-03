@@ -65,12 +65,14 @@ public class TextViewerJFaceUpdater {
 		fSymbolicFontName = symbolicFontName;
 		
 		viewer.getTextWidget().addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(final DisposeEvent e) {
 				dispose();
 			}
 		});
 		
 		fFontChangeListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 				if (fSymbolicFontName.equals(event.getProperty())) {
 					updateFont();

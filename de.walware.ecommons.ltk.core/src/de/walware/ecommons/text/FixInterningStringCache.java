@@ -38,6 +38,7 @@ public class FixInterningStringCache implements IStringCache {
 	}
 	
 	
+	@Override
 	public String get(final String s) {
 		switch (s.length()) {
 		case 0:

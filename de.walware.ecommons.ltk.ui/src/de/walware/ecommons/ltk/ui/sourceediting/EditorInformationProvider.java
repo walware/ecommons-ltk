@@ -45,10 +45,12 @@ public abstract class EditorInformationProvider
 		return fEditor;
 	}
 	
+	@Override
 	public String getInformation(final ITextViewer textViewer, final IRegion region) {
 		return null;
 	}
 	
+	@Override
 	public Object getInformation2(final ITextViewer textViewer, final IRegion region) {
 		fBestHover = null;
 		try {
@@ -70,6 +72,7 @@ public abstract class EditorInformationProvider
 		return null;
 	}
 	
+	@Override
 	public IInformationControlCreator getInformationPresenterControlCreator() {
 		if (fBestHover != null) {
 			return fBestHover.getHoverControlCreator();

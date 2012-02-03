@@ -57,16 +57,19 @@ public class AnnotationMarkerPositionResolver implements IMarkerPositionResolver
 	}
 	
 	
+	@Override
 	public IDocument getDocument() {
 		return fDocument;
 	}
 	
+	@Override
 	public Position getPosition(final IMarker marker) {
 		synchronized (fAnnotationModel.getLockObject()) {
 			return fAnnotationModel.getMarkerPosition(marker);
 		}
 	}
 	
+	@Override
 	public int getLine(final IMarker marker) {
 		final Position position = getPosition(marker);
 		if (position != null) {

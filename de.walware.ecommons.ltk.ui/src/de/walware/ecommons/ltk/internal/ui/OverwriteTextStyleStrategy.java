@@ -32,6 +32,7 @@ public class OverwriteTextStyleStrategy implements ITextStyleStrategy, IDisposab
 	}
 	
 	
+	@Override
 	public void applyTextStyle(final StyleRange styleRange, final Color annotationColor) {
 		Color color = fColor;
 		if (fColor == null) {
@@ -51,12 +52,14 @@ public class OverwriteTextStyleStrategy implements ITextStyleStrategy, IDisposab
 		return fallback;
 	}
 	
+	@Override
 	public void settingsChanged(final Set<String> groupIds) {
 //		if (groupIds.contains(GROUP_ID)) {
 //			fColor = null;
 //		}
 	}
 	
+	@Override
 	public void dispose() {
 //		PreferencesUtil.getSettingsChangeNotifier().removeChangeListener(this);
 	}

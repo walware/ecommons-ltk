@@ -63,6 +63,7 @@ public abstract class SourceAnnotationModel extends ResourceMarkerAnnotationMode
 //		return new CompilationUnitAnnotationModelEvent(this, getResource());
 //	}
 	
+	@Override
 	public void beginReportingSequence() {
 		ProblemRequestorState state = fProblemRequestorState.get();
 		if (state == null) {
@@ -72,6 +73,7 @@ public abstract class SourceAnnotationModel extends ResourceMarkerAnnotationMode
 		state.sequenceCount++;
 	}
 	
+	@Override
 	public void endReportingSequence() {
 		final ProblemRequestorState state = fProblemRequestorState.get();
 		if (state == null) {
@@ -84,6 +86,7 @@ public abstract class SourceAnnotationModel extends ResourceMarkerAnnotationMode
 		}
 	}
 	
+	@Override
 	public void acceptProblems(final String type, final List<IProblem> problems) {
 		if (isHandlingTemporaryProblems()) {
 			final ProblemRequestorState state = fProblemRequestorState.get();

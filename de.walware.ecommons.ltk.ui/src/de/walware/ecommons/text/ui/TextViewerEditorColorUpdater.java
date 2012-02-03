@@ -58,12 +58,14 @@ public class TextViewerEditorColorUpdater {
 		fPreferenceStore = preferenceStore;
 		
 		viewer.getTextWidget().addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(final DisposeEvent e) {
 				dispose();
 			}
 		});
 		
 		fListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 				if (PREFERENCE_COLOR_FOREGROUND.equals(event.getProperty())
 						|| PREFERENCE_COLOR_FOREGROUND_SYSTEM_DEFAULT.equals(event.getProperty())

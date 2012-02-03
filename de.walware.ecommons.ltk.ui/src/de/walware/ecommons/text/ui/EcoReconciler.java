@@ -90,10 +90,12 @@ public class EcoReconciler implements IReconciler {
 			return Status.OK_STATUS;
 		}
 		
+		@Override
 		public boolean contains(final ISchedulingRule rule) {
 			return rule == this;
 		}
 		
+		@Override
 		public boolean isConflicting(final ISchedulingRule rule) {
 			return rule == this;
 		}
@@ -101,6 +103,7 @@ public class EcoReconciler implements IReconciler {
 	
 	
 	private class VisibleListener implements Listener {
+		@Override
 		public void handleEvent(final Event event) {
 			switch (event.type) {
 			case SWT.Show:
@@ -118,19 +121,23 @@ public class EcoReconciler implements IReconciler {
 	 */
 	private class DocumentListener implements IDocumentListener, ITextInputListener {
 		
+		@Override
 		public void documentAboutToBeChanged(final DocumentEvent e) {
 		}
 		
+		@Override
 		public void documentChanged(final DocumentEvent e) {
 			scheduleReconcile();
 		}
 		
+		@Override
 		public void inputDocumentAboutToBeChanged(final IDocument oldInput, final IDocument newInput) {
 			if (fDocument != null && oldInput == fDocument && newInput != fDocument) {
 				disconnectDocument();
 			}
 		}
 		
+		@Override
 		public void inputDocumentChanged(final IDocument oldInput, final IDocument newInput) {
 			connectDocument();
 		}
@@ -216,6 +223,7 @@ public class EcoReconciler implements IReconciler {
 	}
 	
 	
+	@Override
 	public void install(final ITextViewer textViewer) {
 		Assert.isNotNull(textViewer);
 		fViewer = textViewer;
@@ -230,6 +238,7 @@ public class EcoReconciler implements IReconciler {
 		connectDocument();
 	}
 	
+	@Override
 	public void uninstall() {
 		if (fViewer != null) {
 			disconnectDocument();
@@ -342,6 +351,7 @@ public class EcoReconciler implements IReconciler {
 		return fStrategies.toArray();
 	}
 	
+	@Override
 	public IReconcilingStrategy getReconcilingStrategy(final String contentType) {
 		return null;
 	}

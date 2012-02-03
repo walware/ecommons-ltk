@@ -51,6 +51,7 @@ public abstract class SimpleCompletionProposal extends CompletionProposalWithOve
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Image getImage() {
 		return null;
 	}
@@ -58,6 +59,7 @@ public abstract class SimpleCompletionProposal extends CompletionProposalWithOve
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public String getDisplayString() {
 		return getReplacementString();
 	}
@@ -65,6 +67,7 @@ public abstract class SimpleCompletionProposal extends CompletionProposalWithOve
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public String getAdditionalProposalInfo() {
 		return null;
 	}
@@ -73,10 +76,12 @@ public abstract class SimpleCompletionProposal extends CompletionProposalWithOve
 	 * {@inheritDoc}
 	 * {@value}
 	 */
+	@Override
 	public int getRelevance() {
 		return 50;
 	}
 	
+	@Override
 	public String getSortingString() {
 		return fReplacementString;
 	}
@@ -84,6 +89,7 @@ public abstract class SimpleCompletionProposal extends CompletionProposalWithOve
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean validate(final IDocument document, final int offset, final DocumentEvent event) {
 		try {
 			final int replacementOffset = getReplacementOffset();
@@ -123,6 +129,7 @@ public abstract class SimpleCompletionProposal extends CompletionProposalWithOve
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Point getSelection(final IDocument document) {
 		if (fCursorPosition >= 0) {
 			return new Point(fCursorPosition, 0);
@@ -130,6 +137,7 @@ public abstract class SimpleCompletionProposal extends CompletionProposalWithOve
 		return null;
 	}
 	
+	@Override
 	public IContextInformation getContextInformation() {
 		return null;
 	}

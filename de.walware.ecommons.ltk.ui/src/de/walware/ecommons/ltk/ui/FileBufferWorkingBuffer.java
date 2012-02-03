@@ -53,6 +53,7 @@ public class FileBufferWorkingBuffer extends WorkingBuffer {
 			throws InvocationTargetException {
 		final AtomicReference<InvocationTargetException> error = new AtomicReference<InvocationTargetException>();
 		UIAccess.getDisplay().syncExec(new Runnable() {
+			@Override
 			public void run() {
 				Object docLock = null;
 				final AbstractDocument document = runnable.getDocument();
@@ -208,6 +209,7 @@ public class FileBufferWorkingBuffer extends WorkingBuffer {
 		return super.checkState(validate, monitor);
 	}
 	
+	@Override
 	public boolean isSynchronized() {
 		return fBuffer.isSynchronized();
 	}

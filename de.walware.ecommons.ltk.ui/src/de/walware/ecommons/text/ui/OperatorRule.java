@@ -109,6 +109,7 @@ public class OperatorRule implements IRule {
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.text.rules.IRule#evaluate(org.eclipse.jface.text.rules.ICharacterScanner)
 	 */
+	@Override
 	public IToken evaluate(final ICharacterScanner scanner) {
 		final CharLeaf matchLeaf = searchLeaf(scanner);
 		if (matchLeaf != null) {

@@ -44,18 +44,22 @@ public class OpenFileHyperlink implements IHyperlink {
 	}
 	
 	
+	@Override
 	public String getTypeLabel() {
 		return null;
 	}
 	
+	@Override
 	public IRegion getHyperlinkRegion() {
 		return fRegion;
 	}
 	
+	@Override
 	public String getHyperlinkText() {
 		return NLS.bind(EditingMessages.OpenFileHyperlink_label, fStore.toString());
 	}
 	
+	@Override
 	public void open() {
 		try {
 			IDE.openEditorOnFileStore(UIAccess.getActiveWorkbenchPage(true), fStore);

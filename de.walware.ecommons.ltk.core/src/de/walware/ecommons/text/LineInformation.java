@@ -23,6 +23,7 @@ public class LineInformation implements ILineInformation {
 	}
 	
 	
+	@Override
 	public int getLineOfOffset(final int offset) {
 		if (fOffsets.length == 0) {
 			return -1;

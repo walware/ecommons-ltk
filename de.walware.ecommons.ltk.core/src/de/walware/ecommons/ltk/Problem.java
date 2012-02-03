@@ -53,30 +53,37 @@ public class Problem implements IProblem {
 	}
 	
 	
+	@Override
 	public ISourceUnit getSourceUnit() {
 		return fUnit;
 	}
 	
+	@Override
 	public int getSourceLine() {
 		return fLine;
 	}
 	
+	@Override
 	public int getSourceStartOffset() {
 		return fStart;
 	}
 	
+	@Override
 	public int getSourceStopOffset() {
 		return fStop;
 	}
 	
+	@Override
 	public int getSeverity() {
 		return fSeverity;
 	}
 	
+	@Override
 	public int getCode() {
 		return fCode;
 	}
 	
+	@Override
 	public String getMessage() {
 		return fMessage;
 	}

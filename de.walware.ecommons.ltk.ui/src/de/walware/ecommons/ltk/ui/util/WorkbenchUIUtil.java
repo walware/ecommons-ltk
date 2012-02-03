@@ -66,7 +66,7 @@ public class WorkbenchUIUtil {
 	
 	public static IWorkbenchPart getActivePart(final Object context) {
 		if (context instanceof IEvaluationContext) {
-			Object object = ((IEvaluationContext) context).getVariable(ISources.ACTIVE_PART_NAME);
+			final Object object = ((IEvaluationContext) context).getVariable(ISources.ACTIVE_PART_NAME);
 			if (object instanceof IWorkbenchPart) {
 				return (IWorkbenchPart) object;
 			}
@@ -77,6 +77,7 @@ public class WorkbenchUIUtil {
 	public static void openEditor(final IWorkbenchPage page, final IFile file, final IRegion initialSelection) {
 		final Display display = page.getWorkbenchWindow().getShell().getDisplay();
 		display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				IMarker marker;
 				try { 

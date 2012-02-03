@@ -182,6 +182,7 @@ public class SourceEditorTextHandler extends AbstractHandler {
 				&& (!isEditAction() || editor.isEditable(false)) );
 	}
 	
+	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 		final ISourceEditor editor = getEditor(event.getApplicationContext());
 		if (editor == null) {

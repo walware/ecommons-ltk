@@ -51,14 +51,17 @@ public class CodeGenerationTemplateContext extends TemplateContext implements IW
 	}
 	
 	
+	@Override
 	public SourceEditor1 getEditor() {
 		return null;
 	}
 	
+	@Override
 	public ISourceUnit getSourceUnit() {
 		return fSourceUnit;
 	}
 	
+	@Override
 	public String evaluateInfo(final Template template) throws BadLocationException, TemplateException {
 		final TemplateBuffer buffer = evaluate(template);
 		if (buffer != null) {

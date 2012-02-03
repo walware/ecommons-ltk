@@ -37,18 +37,19 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	public GenericUriSourceUnit(final String id, final IFileStore store) {
 		fId = id;
 		fName = new IElementName() {
+			@Override
 			public int getType() {
 				return 0x011; // see RElementName
 			}
+			@Override
 			public String getDisplayName() {
 				return fStore.toString();
 			}
+			@Override
 			public String getSegmentName() {
 				return fId;
 			}
-			public IElementName getNamespace() {
-				return null;
-			}
+			@Override
 			public IElementName getNextSegment() {
 				return null;
 			}
@@ -60,10 +61,12 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public ISourceUnit getUnderlyingUnit() {
 		return null;
 	}
 	
+	@Override
 	public boolean isSynchronized() {
 		return fBuffer.isSynchronized();
 	}
@@ -71,6 +74,7 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public String getId() {
 		return fId;
 	}
@@ -81,6 +85,7 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	 * A source unit of this type is usually of the type
 	 * {@link IModelElement#C2_SOURCE_FILE C2_SOURCE_FILE}.
 	 */
+	@Override
 	public int getElementType() {
 		return IModelElement.C2_SOURCE_FILE;
 	}
@@ -88,6 +93,7 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public IElementName getElementName() {
 		return fName;
 	}
@@ -95,6 +101,7 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean exists() {
 		return fCounter > 0;
 	}
@@ -102,10 +109,12 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean isReadOnly() {
 		return false;
 	}
 	
+	@Override
 	public boolean checkState(final boolean validate, final IProgressMonitor monitor) {
 		return fBuffer.checkState(validate, monitor);
 	}
@@ -116,6 +125,7 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	 * 
 	 * A source unit of this type is usually doesn't have a resource/path.
 	 */
+	@Override
 	public Object getResource() {
 		return fStore;
 	}
@@ -124,6 +134,7 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public AbstractDocument getDocument(final IProgressMonitor monitor) {
 		return fBuffer.getDocument(monitor);
 	}
@@ -131,6 +142,7 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public SourceContent getContent(final IProgressMonitor monitor) {
 		return fBuffer.getContent(monitor);
 	}
@@ -138,6 +150,7 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Object getAdapter(final Class required) {
 		if (IFileStore.class.equals(required)) {
 			return fStore;
@@ -149,6 +162,7 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public AstInfo<?> getAstInfo(final String type, final boolean ensureSync, final IProgressMonitor monitor) {
 		return null;
 	}
@@ -156,6 +170,7 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public ISourceUnitModelInfo getModelInfo(final String type, final int syncLevel, final IProgressMonitor monitor) {
 		return null;
 	}
@@ -163,6 +178,7 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public IModelElement getModelParent() {
 		return null;
 	}
@@ -170,6 +186,7 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean hasModelChildren(final Filter filter) {
 		return false;
 	}
@@ -177,6 +194,7 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public List<? extends IModelElement> getModelChildren(final Filter filter) {
 		return NO_CHILDREN;
 	}
@@ -184,6 +202,7 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public IProblemRequestor getProblemRequestor() {
 		return null;
 	}
@@ -192,6 +211,7 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public synchronized final void connect(final IProgressMonitor monitor) {
 		fCounter++;
 		if (fCounter == 1) {
@@ -207,6 +227,7 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public synchronized final void disconnect(final IProgressMonitor monitor) {
 		fCounter--;
 		if (fCounter == 0) {
@@ -219,6 +240,7 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public synchronized boolean isConnected() {
 		return (fCounter > 0);
 	}

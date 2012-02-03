@@ -74,6 +74,7 @@ public class TemplateProposal implements IAssistCompletionProposal,
 		
 		private final Collator fgCollator = Collator.getInstance();
 		
+		@Override
 		public int compare(final TemplateProposal arg0, final TemplateProposal arg1) {
 			final int result = fgCollator.compare(arg0.getTemplate().getName(), arg1.getTemplate().getName());
 			if (result != 0) {
@@ -116,18 +117,21 @@ public class TemplateProposal implements IAssistCompletionProposal,
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void selected(final ITextViewer textViewer, final boolean smartToggle) {
 	}
 	
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void unselected(final ITextViewer textViewer) {
 	}
 	
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean validate(final IDocument document, final int offset, final DocumentEvent event) {
 		try {
 			final int replaceOffset = getReplaceOffset();
@@ -150,6 +154,7 @@ public class TemplateProposal implements IAssistCompletionProposal,
 		return fTemplate;
 	}
 	
+	@Override
 	public boolean isValidFor(final IDocument document, final int offset) {
 		// not called anymore
 		return false;
@@ -158,6 +163,7 @@ public class TemplateProposal implements IAssistCompletionProposal,
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public char[] getTriggerCharacters() {
 		// no triggers
 		return new char[0];
@@ -168,14 +174,17 @@ public class TemplateProposal implements IAssistCompletionProposal,
 	 *
 	 * @return the relevance
 	 */
+	@Override
 	public int getRelevance() {
 		return fRelevance;
 	}
 	
+	@Override
 	public String getSortingString() {
 		return fTemplate.getName();
 	}
 	
+	@Override
 	public boolean isAutoInsertable() {
 		return fTemplate.isAutoInsertable();
 	}
@@ -183,6 +192,7 @@ public class TemplateProposal implements IAssistCompletionProposal,
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public String getDisplayString() {
 		return getStyledDisplayString().getString();
 	}
@@ -190,6 +200,7 @@ public class TemplateProposal implements IAssistCompletionProposal,
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public StyledString getStyledDisplayString() {
 		if (fDisplayString == null) {
 			final StyledString s = new StyledString(fTemplate.getName());
@@ -199,18 +210,22 @@ public class TemplateProposal implements IAssistCompletionProposal,
 		return fDisplayString;
 	}
 	
+	@Override
 	public Image getImage() {
 		return fImage;
 	}
 	
+	@Override
 	public IInformationControlCreator getInformationControlCreator() {
 		return null;
 	}
 	
+	@Override
 	public String getAdditionalProposalInfo() {
 		return null;
 	}
 	
+	@Override
 	public Object getAdditionalProposalInfo(final IProgressMonitor monitor) {
 		try {
 			final TemplateContext context = getContext();
@@ -233,10 +248,12 @@ public class TemplateProposal implements IAssistCompletionProposal,
 		return null;
 	}
 	
+	@Override
 	public void apply(final IDocument document) {
 		// not called anymore
 	}
 	
+	@Override
 	public void apply(final IDocument document, final char trigger, final int offset) {
 		// not called anymore
 	}
@@ -244,6 +261,7 @@ public class TemplateProposal implements IAssistCompletionProposal,
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void apply(final ITextViewer viewer, final char trigger, final int stateMask, final int offset) {
 		final IDocument document = viewer.getDocument();
 		final Position regionPosition = new Position(fRegion.getOffset(), fRegion.getLength());
@@ -359,11 +377,14 @@ public class TemplateProposal implements IAssistCompletionProposal,
 			
 			model.addLinkingListener(new ILinkedModeListener() {
 				
+				@Override
 				public void left(final LinkedModeModel environment, final int flags) {
 					ensurePositionCategoryRemoved(document);
 				}
 				
+				@Override
 				public void suspend(final LinkedModeModel environment) {}
+				@Override
 				public void resume(final LinkedModeModel environment, final int flags) {}
 			});
 		}
@@ -430,6 +451,7 @@ public class TemplateProposal implements IAssistCompletionProposal,
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public CharSequence getPrefixCompletionText(final IDocument document, final int completionOffset) {
 		return fTemplate.getName();
 	}
@@ -437,6 +459,7 @@ public class TemplateProposal implements IAssistCompletionProposal,
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public int getPrefixCompletionStart(final IDocument document, final int completionOffset) {
 		return getReplaceOffset();
 	}
@@ -444,6 +467,7 @@ public class TemplateProposal implements IAssistCompletionProposal,
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Point getSelection(final IDocument document) {
 		if (fSelectionToSet != null) {
 			return new Point(fSelectionToSet.getOffset(), fSelectionToSet.getLength());
@@ -454,6 +478,7 @@ public class TemplateProposal implements IAssistCompletionProposal,
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public int getContextInformationPosition() {
 		return fRegion.getOffset();
 	}
@@ -461,6 +486,7 @@ public class TemplateProposal implements IAssistCompletionProposal,
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public IContextInformation getContextInformation() {
 		return null;
 	}

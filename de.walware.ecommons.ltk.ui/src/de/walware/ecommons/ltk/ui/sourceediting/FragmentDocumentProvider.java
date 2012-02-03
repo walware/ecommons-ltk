@@ -128,6 +128,7 @@ public class FragmentDocumentProvider extends AbstractDocumentProvider
 		super.disposeElementInfo(element, elementInfo);
 	}
 	
+	@Override
 	public ISourceUnit getWorkingCopy(final Object element) {
 		final SourceElementInfo info = (SourceElementInfo) getElementInfo(element);
 		if (info != null) {

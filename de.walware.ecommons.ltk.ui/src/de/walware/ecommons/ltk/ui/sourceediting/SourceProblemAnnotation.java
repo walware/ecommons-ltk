@@ -112,10 +112,12 @@ public class SourceProblemAnnotation extends Annotation implements IAnnotationPr
 	}
 	
 	
+	@Override
 	public int getLayer() {
 		return fConfig.getLevel();
 	}
 	
+	@Override
 	public void paint(final GC gc, final Canvas canvas, final Rectangle bounds) {
 		final Image image = fConfig.getImage();
 		if (image != null) {
@@ -124,15 +126,18 @@ public class SourceProblemAnnotation extends Annotation implements IAnnotationPr
 	}
 	
 	
+	@Override
 	public void setQuickFixable(final boolean state) {
 		fIsQuickFixable = state;
 		fIsQuickFixableStateSet = true;
 	}
 	
+	@Override
 	public boolean isQuickFixableStateSet() {
 		return fIsQuickFixableStateSet;
 	}
 	
+	@Override
 	public boolean isQuickFixable() {
 		return fIsQuickFixable;
 	}

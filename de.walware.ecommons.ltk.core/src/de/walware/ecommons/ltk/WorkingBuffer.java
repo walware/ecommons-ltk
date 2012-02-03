@@ -113,6 +113,7 @@ public class WorkingBuffer implements IWorkingBuffer {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public synchronized AbstractDocument getDocument(final IProgressMonitor monitor) {
 		if (fDocument == null) {
 			final SubMonitor progress = SubMonitor.convert(monitor);
@@ -126,6 +127,7 @@ public class WorkingBuffer implements IWorkingBuffer {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public SourceContent getContent(final IProgressMonitor monitor) {
 		final SubMonitor progress = SubMonitor.convert(monitor);
 		final IDocument doc = fDocument;
@@ -135,13 +137,16 @@ public class WorkingBuffer implements IWorkingBuffer {
 		return createContent(progress);
 	}
 	
+	@Override
 	public void saveDocument(final IProgressMonitor monitor) {
 	}
 	
+	@Override
 	public synchronized void releaseDocument(final IProgressMonitor monitor) {
 		fDocument = null;
 	}
 	
+	@Override
 	public boolean checkState(final boolean validate, final IProgressMonitor monitor) {
 		final ISourceUnit underlyingUnit = fUnit.getUnderlyingUnit();
 		if (underlyingUnit != null) {
@@ -210,6 +215,7 @@ public class WorkingBuffer implements IWorkingBuffer {
 	protected final void loadDocumentFromFile(final IFile file, final AbstractDocument document, final SubMonitor progress) {
 		try {
 			FileUtil.getFileUtil(file).createReadTextFileOp(new FileUtil.ReaderAction() {
+				@Override
 				public void run(final BufferedReader reader, final IProgressMonitor monitor) throws IOException {
 					final StringBuilder buffer = new StringBuilder();
 					final char[] readBuffer = new char[2048];
@@ -251,6 +257,7 @@ public class WorkingBuffer implements IWorkingBuffer {
 	protected final void loadContentFromFile(final IFile file, final AtomicReference<SourceContent> content, final SubMonitor progress) {
 		try {
 			FileUtil.getFileUtil(file).createReadTextFileOp(new FileUtil.ReaderAction() {
+				@Override
 				public void run(final BufferedReader reader, final IProgressMonitor monitor) throws IOException {
 					final StringBuilder buffer = new StringBuilder();
 					final char[] readBuffer = new char[2048];
@@ -269,6 +276,7 @@ public class WorkingBuffer implements IWorkingBuffer {
 		}
 	}
 	
+	@Override
 	public boolean isSynchronized() {
 		return false;
 	}

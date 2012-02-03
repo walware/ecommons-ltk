@@ -127,16 +127,19 @@ public class ExtContentTypeServices implements IExtContentTypeManager, IDisposab
 	}
 	
 	
+	@Override
 	public String[] getSecondaryContentTypes(final String primaryContentType) {
 		final String[] types = fPrimaryToSecondary.get(primaryContentType);
 		return (types != null) ? types : NO_TYPES;
 	}
 	
+	@Override
 	public String[] getPrimaryContentTypes(final String secondaryContentType) {
 		final String[] types = fSecondaryToPrimary.get(secondaryContentType);
 		return (types != null) ? types : NO_TYPES;
 	}
 	
+	@Override
 	public boolean matchesActivatedContentType(final String primaryContentTypeId, final String activatedContentTypeId, final boolean self) {
 		final IContentTypeManager manager = Platform.getContentTypeManager();
 		final IContentType primaryContentType = manager.getContentType(primaryContentTypeId);
@@ -156,15 +159,18 @@ public class ExtContentTypeServices implements IExtContentTypeManager, IDisposab
 		return false;
 	}
 	
+	@Override
 	public String getContentTypeForModelType(final String modelTypeId) {
 		return fModelToPrimary.get(modelTypeId);
 	}
 	
+	@Override
 	public String getModelTypeForContentType(final String contentTypeId) {
 		return fPrimaryToModel.get(contentTypeId);
 	}
 	
 	
+	@Override
 	public void dispose() {
 		fSecondaryToPrimary.clear();
 		fPrimaryToSecondary.clear();

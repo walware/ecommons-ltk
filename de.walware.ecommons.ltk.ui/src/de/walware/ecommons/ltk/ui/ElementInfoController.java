@@ -61,10 +61,12 @@ public class ElementInfoController implements IModelElementInputProvider, IDispo
 			setUser(false);
 		}
 			
+		@Override
 		public boolean contains(final ISchedulingRule rule) {
 			return (rule == this);
 		}
 		
+		@Override
 		public boolean isConflicting(final ISchedulingRule rule) {
 			return (rule == this);
 		}
@@ -111,6 +113,7 @@ public class ElementInfoController implements IModelElementInputProvider, IDispo
 	
 	public ElementInfoController(final IModelManager manager, final WorkingContext context) {
 		fElementChangeListener = new IElementChangedListener() {
+			@Override
 			public void elementChanged(final ElementChangedEvent event) {
 				ISourceUnit input;
 				IModelElementInputListener[] listeners;
@@ -144,6 +147,7 @@ public class ElementInfoController implements IModelElementInputProvider, IDispo
 		fModelProvider.addElementChangedListener(fElementChangeListener, fModelContext);
 	}
 	
+	@Override
 	public void dispose() {
 		fModelProvider.removeElementChangedListener(fElementChangeListener, fModelContext);
 	}
@@ -214,10 +218,12 @@ public class ElementInfoController implements IModelElementInputProvider, IDispo
 		}
 	}
 	
+	@Override
 	public ISourceUnit getInput() {
 		return fInput;
 	}
 	
+	@Override
 	public void addListener(final IModelElementInputListener listener) {
 		synchronized (fInputLock) {
 			ISourceUnit input = fNewInput;
@@ -238,6 +244,7 @@ public class ElementInfoController implements IModelElementInputProvider, IDispo
 		}
 	}
 	
+	@Override
 	public void removeListener(final IModelElementInputListener listener) {
 		fNewListenerList.remove(listener);
 		fListenerList.remove(listener);

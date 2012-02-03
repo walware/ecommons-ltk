@@ -44,6 +44,7 @@ public final class InformationDispatchHandler extends AbstractHandler {
 	}
 	
 	
+	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 		if (fSourceViewer instanceof ITextViewerExtension4) {
 			final ITextViewerExtension4 extension4 = (ITextViewerExtension4) fSourceViewer;

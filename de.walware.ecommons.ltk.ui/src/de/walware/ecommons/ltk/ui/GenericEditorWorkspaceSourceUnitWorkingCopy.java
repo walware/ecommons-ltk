@@ -36,6 +36,7 @@ public abstract class GenericEditorWorkspaceSourceUnitWorkingCopy
 	}
 	
 	
+	@Override
 	public WorkingContext getWorkingContext() {
 		return LTK.EDITOR_CONTEXT;
 	}
@@ -45,6 +46,7 @@ public abstract class GenericEditorWorkspaceSourceUnitWorkingCopy
 		return ((IWorkspaceSourceUnit) fFrom).getResource();
 	}
 	
+	@Override
 	public IMarkerPositionResolver getMarkerPositionResolver() {
 		return AnnotationMarkerPositionResolver.createIfRequired(getResource());
 	}
@@ -54,6 +56,7 @@ public abstract class GenericEditorWorkspaceSourceUnitWorkingCopy
 		return new FileBufferWorkingBuffer(this);
 	}
 	
+	@Override
 	public void syncExec(final SourceDocumentRunnable runnable) throws InvocationTargetException {
 		FileBufferWorkingBuffer.syncExec(runnable);
 	}

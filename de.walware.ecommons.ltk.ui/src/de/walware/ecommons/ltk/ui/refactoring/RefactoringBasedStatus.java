@@ -31,38 +31,47 @@ public class RefactoringBasedStatus implements IStatus {
 	}
 	
 	
+	@Override
 	public String getPlugin() {
 		return LTKUIPlugin.PLUGIN_ID;
 	}
 	
+	@Override
 	public int getSeverity() {
 		return convertSeverity(fStatus.getSeverity());
 	}
 	
+	@Override
 	public boolean isOK() {
 		return (fStatus.getSeverity() == RefactoringStatus.OK);
 	}
 	
+	@Override
 	public String getMessage() {
 		return fStatus.getMessageMatchingSeverity(fStatus.getSeverity());
 	}
 	
+	@Override
 	public int getCode() {
 		return 0;
 	}
 	
+	@Override
 	public Throwable getException() {
 		return null;
 	}
 	
+	@Override
 	public boolean isMultiStatus() {
 		return false;
 	}
 	
+	@Override
 	public IStatus[] getChildren() {
 		return null;
 	}
 	
+	@Override
 	public boolean matches(final int severityMask) {
 		return (getSeverity() & severityMask) != 0;
 	}

@@ -173,6 +173,7 @@ public class ContentAssistComputerRegistry implements ManageListener, IDisposabl
 	}
 	
 	
+	@Override
 	public void dispose() {
 		final SettingsChangeNotifier notifier = PreferencesUtil.getSettingsChangeNotifier();
 		if (notifier != null) {
@@ -193,6 +194,7 @@ public class ContentAssistComputerRegistry implements ManageListener, IDisposabl
 		return fPrefOrderedCategoryIds;
 	}
 	
+	@Override
 	public void beforeSettingsChangeNotification(final Set<String> groupIds) {
 		if (fSettingsGroupId != null && groupIds.contains(fSettingsGroupId)) {
 			synchronized (this) {
@@ -204,6 +206,7 @@ public class ContentAssistComputerRegistry implements ManageListener, IDisposabl
 		}
 	}
 	
+	@Override
 	public void afterSettingsChangeNotification(final Set<String> groupIds) {
 	}
 	

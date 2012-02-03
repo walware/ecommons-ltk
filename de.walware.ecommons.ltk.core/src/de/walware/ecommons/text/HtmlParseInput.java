@@ -301,14 +301,17 @@ public class HtmlParseInput extends SourceParseInput implements CharSequence {
 	}
 	
 	
+	@Override
 	public int length() {
 		return fContent.length;
 	}
 	
+	@Override
 	public char charAt(final int index) {
 		return fContent[index];
 	}
 	
+	@Override
 	public CharSequence subSequence(final int start, final int end) {
 		return new String(fContent, start, end-start);
 	}

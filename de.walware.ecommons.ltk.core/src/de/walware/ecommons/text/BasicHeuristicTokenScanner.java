@@ -37,6 +37,7 @@ public class BasicHeuristicTokenScanner implements ITokenScanner {
 	
 	protected static final IPartitionConstraint ALL_PARTITIONS_CONSTRAINT = new IPartitionConstraint() {
 		
+		@Override
 		public boolean matches(final String partitionType) {
 			return true;
 		}
@@ -306,10 +307,12 @@ public class BasicHeuristicTokenScanner implements ITokenScanner {
 	 * @param document the document to scan
 	 * @param partition the partition to scan in
 	 */
+	@Override
 	public void configure(final IDocument document, final String partitionType) {
 		assert (document != null && partitionType != null);
 		fDocument = document;
 		fPartitionConstraint = new IPartitionConstraint() {
+			@Override
 			public boolean matches(final String partitionTypeToTest) {
 				return partitionType == partitionTypeToTest;
 			}
@@ -382,10 +385,12 @@ public class BasicHeuristicTokenScanner implements ITokenScanner {
 		return -1;
 	}
 	
+	@Override
 	public int findClosingPeer(final int start, final char[] pair) {
 		return findClosingPeer(start, pair, (char) 0);
 	}
 	
+	@Override
 	public int findClosingPeer(int start, final char[] pair, final char escapeChar) {
 		Assert.isNotNull(fDocument);
 		Assert.isTrue(start >= 0);
@@ -419,6 +424,7 @@ public class BasicHeuristicTokenScanner implements ITokenScanner {
 		}
 	}
 	
+	@Override
 	public int findOpeningPeer(int start, final char[] pair) {
 		if (start >= fDocument.getLength()) {
 			start = fDocument.getLength()-1;
@@ -452,6 +458,7 @@ public class BasicHeuristicTokenScanner implements ITokenScanner {
 		}
 	}
 	
+	@Override
 	public int findOpeningPeer(int start, final char[] pair, final char escapeChar) {
 		Assert.isTrue(start < fDocument.getLength());
 		if (escapeChar == (char) 0) {

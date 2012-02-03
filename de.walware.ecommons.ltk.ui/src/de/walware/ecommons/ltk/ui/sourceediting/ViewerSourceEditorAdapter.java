@@ -43,39 +43,48 @@ public class ViewerSourceEditorAdapter implements ISourceEditor {
 	}
 	
 	
+	@Override
 	public String getModelTypeId() {
 		return null;
 	}
 	
+	@Override
 	public ISourceUnit getSourceUnit() {
 		return null;
 	}
 	
+	@Override
 	public IWorkbenchPart getWorkbenchPart() {
 		return null;
 	}
 	
+	@Override
 	public IServiceLocator getServiceLocator() {
 		return null;
 	}
 	
+	@Override
 	public SourceViewer getViewer() {
 		return fSourceViewer;
 	}
 	
+	@Override
 	public PartitioningConfiguration getPartitioning() {
 		return fConfigurator.getPartitioning();
 	}
 	
 	
+	@Override
 	public ITextEditToolSynchronizer getTextEditToolSynchronizer() {
 		return null;
 	}
 	
+	@Override
 	public boolean isEditable(final boolean validate) {
 		return fSourceViewer.isEditable();
 	}
 	
+	@Override
 	public void selectAndReveal(final int offset, final int length) {
 		if (UIAccess.isOkToUse(fSourceViewer)) {
 			fSourceViewer.setSelectedRange(offset, length);
@@ -84,6 +93,7 @@ public class ViewerSourceEditorAdapter implements ISourceEditor {
 	}
 	
 	
+	@Override
 	public Object getAdapter(final Class adapter) {
 		return null;
 	}

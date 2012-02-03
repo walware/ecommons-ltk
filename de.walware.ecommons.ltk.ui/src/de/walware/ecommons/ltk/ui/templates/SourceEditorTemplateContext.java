@@ -49,14 +49,17 @@ public class SourceEditorTemplateContext extends DocumentTemplateContext impleme
 	}
 	
 	
+	@Override
 	public ISourceEditor getEditor() {
 		return fEditor;
 	}
 	
+	@Override
 	public ISourceUnit getSourceUnit() {
 		return fEditor.getSourceUnit();
 	}
 	
+	@Override
 	public String evaluateInfo(final Template template) throws BadLocationException, TemplateException {
 		final TemplateBuffer buffer = super.evaluate(template);
 		if (buffer != null) {

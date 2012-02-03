@@ -38,14 +38,17 @@ public class PartialStringParseInput extends SourceParseInput implements CharSeq
 	}
 	
 	
+	@Override
 	public int length() {
 		return fOffset+fContent.length;
 	}
 	
+	@Override
 	public char charAt(final int index) {
 		return fContent[index-fOffset];
 	}
 	
+	@Override
 	public CharSequence subSequence(final int start, final int end) {
 		return new String(fContent, start-fOffset, end-(start-fOffset));
 	}

@@ -34,6 +34,7 @@ public final class TemplateVariableProcessor implements IContentAssistProcessor 
 	private static Comparator<TemplateVariableProposal> fgTemplateVariableProposalComparator = 
 				new Comparator<TemplateVariableProposal>() {
 		
+		@Override
 		public int compare(final TemplateVariableProposal proposal0, final TemplateVariableProposal proposal1) {
 			return proposal0.getDisplayString().compareTo(proposal1.getDisplayString());
 		}
@@ -76,6 +77,7 @@ public final class TemplateVariableProcessor implements IContentAssistProcessor 
 		return fContextType;
 	}
 	
+	@Override
 	public ICompletionProposal[] computeCompletionProposals(final ITextViewer viewer,	final int documentOffset) {
 		if (fContextType == null) {
 			return null;
@@ -119,22 +121,27 @@ public final class TemplateVariableProcessor implements IContentAssistProcessor 
 		return end;
 	}
 	
+	@Override
 	public IContextInformation[] computeContextInformation(final ITextViewer viewer, final int documentOffset) {
 		return null;
 	}
 	
+	@Override
 	public char[] getCompletionProposalAutoActivationCharacters() {
 		return new char[] {'$'};
 	}
 	
+	@Override
 	public char[] getContextInformationAutoActivationCharacters() {
 		return null;
 	}
 	
+	@Override
 	public String getErrorMessage() {
 		return null;
 	}
 	
+	@Override
 	public IContextInformationValidator getContextInformationValidator() {
 		return null;
 	}

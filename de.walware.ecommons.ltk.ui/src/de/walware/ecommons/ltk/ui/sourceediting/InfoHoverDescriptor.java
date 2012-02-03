@@ -37,7 +37,7 @@ public class InfoHoverDescriptor {
 	
 	boolean fIsEnabled;
 	
-	private IConfigurationElement fConfigurationElement;
+	private final IConfigurationElement fConfigurationElement;
 	
 	
 	/**

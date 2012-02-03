@@ -71,6 +71,7 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	
 	private static final Comparator<IAssistCompletionProposal> PROPOSAL_COMPARATOR = new Comparator<IAssistCompletionProposal>() {
 		
+		@Override
 		public int compare(final IAssistCompletionProposal proposal1, final IAssistCompletionProposal proposal2) {
 			final int diff = proposal2.getRelevance() - proposal1.getRelevance();
 			if (diff != 0) {
@@ -89,6 +90,7 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	 */
 	private final class CompletionListener implements ICompletionListener, ICompletionListenerExtension {
 		
+		@Override
 		public void assistSessionStarted(final ContentAssistEvent event) {
 			if (event.processor != ContentAssistProcessor.this || event.assistant != fAssistant) {
 				return;
@@ -125,6 +127,7 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 			}
 		}
 		
+		@Override
 		public void assistSessionEnded(final ContentAssistEvent event) {
 			if (event.processor != ContentAssistProcessor.this || event.assistant != fAssistant) {
 				return;
@@ -154,9 +157,11 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 			}
 		}
 		
+		@Override
 		public void selectionChanged(final ICompletionProposal proposal, final boolean smartToggle) {
 		}
 		
+		@Override
 		public void assistSessionRestarted(final ContentAssistEvent event) {
 			fRepetition = 0;
 		}
@@ -222,6 +227,7 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public final ICompletionProposal[] computeCompletionProposals(final ITextViewer viewer, final int offset) {
 		final long start = System.nanoTime();
 		
@@ -368,6 +374,7 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public IContextInformation[] computeContextInformation(final ITextViewer viewer, final int offset) {
 		fNumberOfComputedResults = 0;
 		IContextInformation[] result = null;
@@ -453,6 +460,7 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public final char[] getCompletionProposalAutoActivationCharacters() {
 		return fCompletionAutoActivationCharacters;
 	}
@@ -460,6 +468,7 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public char[] getContextInformationAutoActivationCharacters() {
 		return null;
 	}
@@ -467,6 +476,7 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public String getErrorMessage() {
 		return fErrorMessage;
 	}
@@ -477,6 +487,7 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	 * This implementation returns the validator created by
 	 * {@link #createContextInformationValidator()}
 	 */
+	@Override
 	public final IContextInformationValidator getContextInformationValidator() {
 		if (fContextInformationValidator == null) {
 			fContextInformationValidator = createContextInformationValidator();

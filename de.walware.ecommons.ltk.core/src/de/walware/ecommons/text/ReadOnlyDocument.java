@@ -39,21 +39,26 @@ public class ReadOnlyDocument extends AbstractDocument {
 			fContent = content;
 		}
 		
+		@Override
 		public char get(final int offset) {
 			return fContent.charAt(offset);
 		}
 		
+		@Override
 		public String get(final int offset, final int length) {
 			return fContent.substring(offset, offset + length);
 		}
 		
+		@Override
 		public int getLength() {
 			return fContent.length();
 		}
 		
+		@Override
 		public void replace(final int offset, final int length, final String text) {
 		}
 		
+		@Override
 		public void set(final String text) {
 		}
 		

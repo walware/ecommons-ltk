@@ -82,9 +82,11 @@ public abstract class SourceEditor1OutlinePage extends AbstractEditorOutlinePage
 			return ISourceUnit.UNKNOWN_MODIFICATION_STAMP;
 		}
 		
+		@Override
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
 		}
 		
+		@Override
 		public Object[] getElements(final Object inputElement) {
 			if (inputElement instanceof ISourceUnit) {
 				final ISourceUnitModelInfo info = ((ISourceUnit) inputElement).getModelInfo(fMainType, 0, null); 
@@ -97,19 +99,23 @@ public abstract class SourceEditor1OutlinePage extends AbstractEditorOutlinePage
 			return new Object[0];
 		}
 		
+		@Override
 		public void dispose() {
 		}
 		
+		@Override
 		public Object getParent(final Object element) {
 			final ISourceStructElement o = (ISourceStructElement) element;
 			return o.getSourceParent();
 		}
 		
+		@Override
 		public boolean hasChildren(final Object element) {
 			final ISourceStructElement o = (ISourceStructElement) element;
 			return o.hasSourceChildren(getContentFilter());
 		}
 		
+		@Override
 		public Object[] getChildren(final Object parentElement) {
 			final ISourceStructElement o = (ISourceStructElement) parentElement;
 			final List<? extends ISourceStructElement> children = o.getSourceChildren(getContentFilter());
@@ -179,6 +185,7 @@ public abstract class SourceEditor1OutlinePage extends AbstractEditorOutlinePage
 		@Override
 		public void run() {
 			final Runnable runnable = new Runnable() {
+				@Override
 				public void run() {
 					final boolean on = isChecked();
 					configure(on);
@@ -215,9 +222,11 @@ public abstract class SourceEditor1OutlinePage extends AbstractEditorOutlinePage
 			}
 		}
 		
+		@Override
 		public void inputChanged() {
 		}
 		
+		@Override
 		public void stateChanged(final LTKInputData state) {
 			if (!state.isStillValid()) {
 				return;
@@ -226,6 +235,7 @@ public abstract class SourceEditor1OutlinePage extends AbstractEditorOutlinePage
 				elementUpdatedInfo(state.getInputElement(), null);
 			}
 			UIAccess.getDisplay().syncExec(new Runnable() {
+				@Override
 				public void run() {
 					if (state.isStillValid() && isChecked()) {
 						select(state.getModelSelection());
@@ -320,6 +330,7 @@ public abstract class SourceEditor1OutlinePage extends AbstractEditorOutlinePage
 	}
 	
 	
+	@Override
 	public void elementChanged(final IModelElement element) {
 		fInputUnit = element;
 		fCurrentModelStamp = ISourceUnit.UNKNOWN_MODIFICATION_STAMP;
@@ -329,16 +340,19 @@ public abstract class SourceEditor1OutlinePage extends AbstractEditorOutlinePage
 		}
 	}
 	
+	@Override
 	public void elementInitialInfo(final IModelElement element) {
 		elementUpdatedInfo(element, null);
 	}
 	
+	@Override
 	public void elementUpdatedInfo(final IModelElement element, final IModelElementDelta delta) {
 		if (element != fInputUnit || (element == null && fInputUnit == null)) {
 			return;
 		}
 		final Display display = UIAccess.getDisplay();
 		display.syncExec(new Runnable() {
+			@Override
 			public void run() {
 				final TreeViewer viewer = getViewer();
 				
@@ -415,14 +429,17 @@ public abstract class SourceEditor1OutlinePage extends AbstractEditorOutlinePage
 	}
 	
 	
+	@Override
 	public ShowInContext getShowInContext() {
 		return new ShowInContext(fEditor.getEditorInput(), null);
 	}
 	
+	@Override
 	public String[] getShowInTargetIds() {
 		return new String[] { IPageLayout.ID_PROJECT_EXPLORER };
 	}
 	
+	@Override
 	public boolean show(final ShowInContext context) {
 		final IModelElement inputUnit = fInputUnit;
 		final ISelection selection = context.getSelection();
@@ -438,6 +455,7 @@ public abstract class SourceEditor1OutlinePage extends AbstractEditorOutlinePage
 	}
 	
 	
+	@Override
 	public ISourceEditor getSourceEditor() {
 		return fEditor;
 	}

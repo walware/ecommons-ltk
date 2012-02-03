@@ -96,12 +96,15 @@ public class SnippetEditor extends Object {
 		private boolean fActionUpdateScheduled = false;
 		
 		
+		@Override
 		public void selectionChanged(final SelectionChangedEvent event) {
 			schedule();
 		}
 		
+		@Override
 		public void documentAboutToBeChanged(final DocumentEvent event) {
 		}
+		@Override
 		public void documentChanged(final DocumentEvent event) {
 			schedule();
 		}
@@ -115,6 +118,7 @@ public class SnippetEditor extends Object {
 			fActionUpdateScheduled = true;
 		}
 		
+		@Override
 		public void run() {
 			fActionUpdateScheduled = false;
 			if (UIAccess.isOkToUse(fSourceViewer)) {
@@ -260,6 +264,7 @@ public class SnippetEditor extends Object {
 		final MenuManager manager = new MenuManager(null, null);
 		manager.setRemoveAllWhenShown(true);
 		manager.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(final IMenuManager mgr) {
 				fillContextMenu(mgr);
 			}

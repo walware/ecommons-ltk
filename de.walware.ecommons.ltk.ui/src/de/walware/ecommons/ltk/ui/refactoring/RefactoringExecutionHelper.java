@@ -90,6 +90,7 @@ public class RefactoringExecutionHelper {
 		final AtomicReference<PerformChangeOperation> op = new AtomicReference<PerformChangeOperation>();
 		try {
 			fExecContext.busyCursorWhile(new IRunnableWithProgress() {
+				@Override
 				public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 					final SubMonitor progress = SubMonitor.convert(monitor, fRefactoring.getName(), 10);
 					
@@ -113,6 +114,7 @@ public class RefactoringExecutionHelper {
 						if (status.getSeverity() >= fStopSeverity) {
 							final AtomicBoolean canceled = new AtomicBoolean();
 							fParent.getDisplay().syncExec(new Runnable() {
+								@Override
 								public void run() {
 									final Dialog dialog = RefactoringUI.createRefactoringStatusDialog(status, fParent, fRefactoring.getName(), false);
 									final int selection = dialog.open();
@@ -144,6 +146,7 @@ public class RefactoringExecutionHelper {
 						else {
 							final AtomicReference<Exception> opException = new AtomicReference<Exception>();
 							final Runnable runnable = new Runnable() {
+								@Override
 								public void run() {
 									try {
 										final PerformChangeOperation operation = op.get();

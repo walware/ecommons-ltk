@@ -3,11 +3,11 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: WalWare.de
 Bundle-Name: ECommons LTK UI
 Bundle-SymbolicName: de.walware.ecommons.ltk.ui;singleton:=true
-Bundle-Version: 1.2.0.qualifier
+Bundle-Version: 2.0.0.qualifier
 Bundle-Activator: de.walware.ecommons.ltk.internal.ui.LTKUIPlugin
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.eclipse.core.runtime;bundle-version="3.6.0",
  org.eclipse.core.filesystem,
  org.eclipse.core.filebuffers,
@@ -21,7 +21,7 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.6.0",
  org.eclipse.ltk.core.refactoring,
  org.eclipse.ltk.ui.refactoring,
  de.walware.ecommons.uimisc;bundle-version="1.0.0",
- de.walware.ecommons.ltk.core;bundle-version="[1.2.0,1.3.0)";visibility:=reexport,
+ de.walware.ecommons.ltk.core;bundle-version="[2.0.0,2.1.0)";visibility:=reexport,
  org.eclipse.ecf.docshare;bundle-version="2.1.0";resolution:=optional,
  org.eclipse.compare;resolution:=optional,
  org.eclipse.search;resolution:=optional

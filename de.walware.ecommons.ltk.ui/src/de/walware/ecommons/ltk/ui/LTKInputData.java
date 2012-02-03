@@ -79,6 +79,7 @@ public class LTKInputData implements ISelection {
 	}
 	
 	
+	@Override
 	public boolean isEmpty() {
 		return fSelection.isEmpty();
 	}

@@ -43,10 +43,12 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public ISourceUnit getUnderlyingUnit() {
 		return fFrom;
 	}
 	
+	@Override
 	public boolean isSynchronized() {
 		return fBuffer.isSynchronized();
 	}
@@ -54,6 +56,7 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public String getModelTypeId() {
 		return fFrom.getModelTypeId();
 	}
@@ -61,6 +64,7 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public int getElementType() {
 		return fFrom.getElementType();
 	}
@@ -68,6 +72,7 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public IElementName getElementName() {
 		return fFrom.getElementName();
 	}
@@ -75,6 +80,7 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public String getId() {
 		return fFrom.getId();
 	}
@@ -82,6 +88,7 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean exists() {
 		return fCounter > 0;
 	}
@@ -89,10 +96,12 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean isReadOnly() {
 		return false;
 	}
 	
+	@Override
 	public boolean checkState(final boolean validate, final IProgressMonitor monitor) {
 		return fBuffer.checkState(validate, monitor);
 	}
@@ -100,6 +109,7 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Object getResource() {
 		return fFrom.getResource();
 	}
@@ -108,6 +118,7 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public AbstractDocument getDocument(final IProgressMonitor monitor) {
 		return fBuffer.getDocument(monitor);
 	}
@@ -115,6 +126,7 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public SourceContent getContent(final IProgressMonitor monitor) {
 		return fBuffer.getContent(monitor);
 	}
@@ -123,6 +135,7 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public AstInfo<?> getAstInfo(final String type, final boolean ensureSync, final IProgressMonitor monitor) {
 		return null;
 	}
@@ -130,6 +143,7 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public ISourceUnitModelInfo getModelInfo(final String type, final int syncLevel, final IProgressMonitor monitor) {
 		return null;
 	}
@@ -137,6 +151,7 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public IModelElement getModelParent() {
 		return null; // directory
 	}
@@ -144,6 +159,7 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean hasModelChildren(final Filter filter) {
 		return false; 
 	}
@@ -151,6 +167,7 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public List<? extends IModelElement> getModelChildren(final Filter filter) {
 		return NO_CHILDREN; 
 	}
@@ -158,6 +175,7 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public IProblemRequestor getProblemRequestor() {
 		return null;
 	}
@@ -166,6 +184,7 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public synchronized final void connect(final IProgressMonitor monitor) {
 		fCounter++;
 		if (fCounter == 1) {
@@ -182,6 +201,7 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public synchronized final void disconnect(final IProgressMonitor monitor) {
 		fCounter--;
 		if (fCounter == 0) {
@@ -195,6 +215,7 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public synchronized boolean isConnected() {
 		return (fCounter > 0);
 	}
@@ -210,6 +231,7 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Object getAdapter(final Class required) {
 		return fFrom.getAdapter(required);
 	}

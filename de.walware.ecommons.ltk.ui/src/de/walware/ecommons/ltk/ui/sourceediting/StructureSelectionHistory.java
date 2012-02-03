@@ -44,6 +44,7 @@ public class StructureSelectionHistory {
 		fSourceEditor = editor;
 		fHistory = new ArrayList<IRegion>();
 		fSelectionListener = new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				if (fSelectionChangeListenerCounter == 0) {
 					flush();

@@ -142,6 +142,7 @@ public class RefactoringSaveHelper {
 				}
 				else {
 					final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+						@Override
 						public void run(final IProgressMonitor pm) throws InterruptedException {
 							final int count = dirtyEditors.size();
 							pm.beginTask("", count); //$NON-NLS-1$

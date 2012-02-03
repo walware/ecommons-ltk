@@ -37,6 +37,7 @@ public class ActivatedContentTypeTester extends PropertyTester {
 	public static final String MATCH_TYPE = "matchesContentType"; //$NON-NLS-1$
 	
 	
+	@Override
 	public boolean test(final Object receiver, final String property, final Object[] args, final Object expectedValue) {
 		if (!(expectedValue instanceof String)) {
 			return false;

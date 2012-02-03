@@ -136,6 +136,7 @@ public class SourceDocumentProvider<T extends ISourceUnit> extends TextFileDocum
 		}
 	}
 	
+	@Override
 	public T getWorkingCopy(final Object element) {
 		final FileInfo fileInfo = getFileInfo(element);
 		if (fileInfo instanceof SourceFileInfo) {

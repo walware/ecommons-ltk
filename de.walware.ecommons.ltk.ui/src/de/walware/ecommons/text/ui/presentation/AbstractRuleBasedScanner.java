@@ -61,6 +61,7 @@ public abstract class AbstractRuleBasedScanner extends BufferedRuleBasedScanner 
 		return fTextStyles.getToken(key);
 	}
 	
+	@Override
 	public void handleSettingsChanged(final Set<String> groupIds, final Map<String, Object> options) {
 		fTextStyles.handleSettingsChanged(groupIds, options);
 	}

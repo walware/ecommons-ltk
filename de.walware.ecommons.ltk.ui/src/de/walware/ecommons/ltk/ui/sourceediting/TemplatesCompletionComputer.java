@@ -53,18 +53,21 @@ public abstract class TemplatesCompletionComputer implements IContentAssistCompu
 	}
 	
 	
+	@Override
 	public void sessionStarted(final ISourceEditor editor) {
 	}
 	
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void sessionEnded() {
 	}
 	
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public IStatus computeCompletionProposals(final AssistInvocationContext context,
 			final int mode, final AssistProposalCollector<IAssistCompletionProposal> tenders, final IProgressMonitor monitor) {
 		final ISourceViewer viewer = context.getSourceViewer();
@@ -130,6 +133,7 @@ public abstract class TemplatesCompletionComputer implements IContentAssistCompu
 		return template.getName().regionMatches(true, 0, prefix, 0, prefix.length());
 	}
 	
+	@Override
 	public IStatus computeContextInformation(final AssistInvocationContext context,
 			final AssistProposalCollector<IAssistInformationProposal> tenders, final IProgressMonitor monitor) {
 		return null;

@@ -50,6 +50,7 @@ public final class SpecificContentAssistHandler extends AbstractHandler {
 	 * @param editor the editor to invoke code assist on
 	 * @param categoryId the id of the proposal category to show proposals for
 	 */
+	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 		final String par = event.getParameter(ISourceEditorCommandIds.SPECIFIC_CONTENT_ASSIST_CATEGORY_PARAMETER_ID);
 		if (par == null) {

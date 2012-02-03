@@ -184,6 +184,7 @@ public class SourceViewerInformationControl extends AbstractInformationControl {
 		super.setFocus();
 	}
 	
+	@Override
 	public boolean hasContents() {
 		return fText.getCharCount() > 0;
 	}

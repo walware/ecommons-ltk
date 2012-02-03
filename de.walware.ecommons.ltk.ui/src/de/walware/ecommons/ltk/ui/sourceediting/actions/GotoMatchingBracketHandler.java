@@ -49,6 +49,7 @@ public class GotoMatchingBracketHandler extends AbstractHandler {
 	}
 	
 	
+	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 		gotoMatchingBracket();
 		

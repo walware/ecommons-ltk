@@ -67,6 +67,7 @@ public abstract class ElementNameCompletionProposal extends CompletionProposalWi
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Image getImage() {
 		return fLabelProvider.getImage(fElement);
 	}
@@ -74,6 +75,7 @@ public abstract class ElementNameCompletionProposal extends CompletionProposalWi
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public String getDisplayString() {
 		return fLabelProvider.getText(fElement);
 	}
@@ -81,6 +83,7 @@ public abstract class ElementNameCompletionProposal extends CompletionProposalWi
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public StyledString getStyledDisplayString() {
 		return fLabelProvider.getStyledText(fElement);
 	}
@@ -88,6 +91,7 @@ public abstract class ElementNameCompletionProposal extends CompletionProposalWi
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public String getAdditionalProposalInfo() {
 		return fAdditionalProposalInfo;
 	}
@@ -95,10 +99,12 @@ public abstract class ElementNameCompletionProposal extends CompletionProposalWi
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public int getRelevance() {
 		return fRelevance;
 	}
 	
+	@Override
 	public String getSortingString() {
 		return fReplacementName.getSegmentName();
 	}
@@ -106,6 +112,7 @@ public abstract class ElementNameCompletionProposal extends CompletionProposalWi
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean validate(final IDocument document, final int offset, final DocumentEvent event) {
 		try {
 			final String content = document.get(getReplacementOffset(), offset - getReplacementOffset());
@@ -122,6 +129,7 @@ public abstract class ElementNameCompletionProposal extends CompletionProposalWi
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean isAutoInsertable() {
 		return false;
 	}
@@ -145,6 +153,7 @@ public abstract class ElementNameCompletionProposal extends CompletionProposalWi
 	 * 
 	 * This implementation returns <code>null</code>
 	 */
+	@Override
 	public IContextInformation getContextInformation() {
 		return null;
 	}
@@ -152,6 +161,7 @@ public abstract class ElementNameCompletionProposal extends CompletionProposalWi
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Point getSelection(final IDocument document) {
 		if (fCursorPosition >= 0) {
 			return new Point(fCursorPosition, 0);

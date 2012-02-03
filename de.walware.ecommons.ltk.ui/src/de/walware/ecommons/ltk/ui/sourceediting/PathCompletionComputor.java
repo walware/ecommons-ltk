@@ -105,14 +105,17 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 			return PathCompletionComputor.this.getPluginId();
 		}
 		
+		@Override
 		public int getRelevance() {
 			return 40;
 		}
 		
+		@Override
 		public String getSortingString() {
 			return fName;
 		}
 		
+		@Override
 		public boolean isAutoInsertable() {
 			return false;
 		}
@@ -154,6 +157,7 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 		/**
 		 * @{inheritDoc}
 		 */
+		@Override
 		public Image getImage() {
 			Image image = null;
 			if (fWorkspaceRef != null) {
@@ -172,6 +176,7 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 		/**
 		 * {@inheritDoc}
 		 */
+		@Override
 		public String getDisplayString() {
 			return fName;
 		}
@@ -179,6 +184,7 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 		/**
 		 * {@inheritDoc}
 		 */
+		@Override
 		public String getAdditionalProposalInfo() {
 			return null;
 		}
@@ -186,6 +192,7 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 		/**
 		 * {@inheritDoc}
 		 */
+		@Override
 		public IContextInformation getContextInformation() {
 			return null;
 		}
@@ -193,6 +200,7 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 		/**
 		 * {@inheritDoc}
 		 */
+		@Override
 		public IInformationControlCreator getInformationControlCreator() {
 			return null;
 		}
@@ -200,6 +208,7 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 		/**
 		 * {@inheritDoc}
 		 */
+		@Override
 		public boolean validate(final IDocument document, final int offset, final DocumentEvent event) {
 			final int replacementOffset = getReplacementOffset();
 			if (offset < replacementOffset) {
@@ -241,6 +250,7 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 			if (fIsDirectory && viewer instanceof ITextOperationTarget) {
 				final ITextOperationTarget target = viewer;
 				Display.getCurrent().asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						if (target.canDoOperation(ISourceViewer.CONTENTASSIST_PROPOSALS)) {
 							target.doOperation(ISourceViewer.CONTENTASSIST_PROPOSALS);
@@ -253,6 +263,7 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 		/**
 		 * {@inheritDoc}
 		 */
+		@Override
 		public Point getSelection(final IDocument document) {
 			if (fSelectionToSet != null) {
 				return new Point(fSelectionToSet.getOffset(), fSelectionToSet.getLength());
@@ -263,6 +274,7 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 		/**
 		 * {@inheritDoc}
 		 */
+		@Override
 		public int getPrefixCompletionStart(final IDocument document, final int completionOffset) {
 			return getReplacementOffset();
 		}
@@ -270,6 +282,7 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 		/**
 		 * {@inheritDoc}
 		 */
+		@Override
 		public CharSequence getPrefixCompletionText(final IDocument document, final int completionOffset) {
 			createCompletion(document);
 			return fCompletion;
@@ -290,6 +303,7 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void sessionStarted(final ISourceEditor editor) {
 		fPathSeparator = getDefaultFileSeparator();
 	}
@@ -297,6 +311,7 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void sessionEnded() {
 	}
 	
@@ -320,6 +335,7 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public IStatus computeCompletionProposals(final AssistInvocationContext context, final int mode,
 			final AssistProposalCollector<IAssistCompletionProposal> proposals, final IProgressMonitor monitor) {
 		try {
@@ -486,6 +502,7 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public IStatus computeContextInformation(final AssistInvocationContext context,
 			final AssistProposalCollector<IAssistInformationProposal> proposals, final IProgressMonitor monitor) {
 		return null;

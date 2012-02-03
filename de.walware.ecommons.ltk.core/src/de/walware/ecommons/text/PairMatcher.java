@@ -70,6 +70,7 @@ public class PairMatcher implements ICharacterPairMatcher {
 	}
 	
 	
+	@Override
 	public IRegion match(final IDocument document, final int offset) {
 		fOffset = offset;
 		if (fOffset < 0) {
@@ -86,14 +87,17 @@ public class PairMatcher implements ICharacterPairMatcher {
 		return null;
 	}
 	
+	@Override
 	public int getAnchor() {
 		return fAnchor;
 	}
 	
+	@Override
 	public void dispose() {
 		clear();
 	}
 	
+	@Override
 	public void clear() {
 	}
 	

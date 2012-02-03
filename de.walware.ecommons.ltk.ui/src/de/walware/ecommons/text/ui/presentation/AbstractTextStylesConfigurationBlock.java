@@ -536,6 +536,7 @@ public abstract class AbstractTextStylesConfigurationBlock extends OverlayStoreC
 		initBindings();
 		
 		UIAccess.getDisplay().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				if (UIAccess.isOkToUse(fSelectionViewer)) {
 					fSelectionViewer.setSelection(new StructuredSelection(fRootNodes[0]));
@@ -694,6 +695,7 @@ public abstract class AbstractTextStylesConfigurationBlock extends OverlayStoreC
 		// Observe changes in selection.
 		final IObservableValue selection = ViewersObservables.observeSingleSelection(fSelectionViewer);
 		selection.addValueChangeListener(new IValueChangeListener() {
+			@Override
 			public void handleValueChange(final ValueChangeEvent event) {
 				final SyntaxNode newNode = (SyntaxNode) event.diff.getNewValue();
 				if (newNode != null) {
@@ -705,6 +707,7 @@ public abstract class AbstractTextStylesConfigurationBlock extends OverlayStoreC
 		final IObservableList list = MasterDetailObservables.detailList(
 				BeansObservables.observeDetailValue(selection, "availableUseStyles", List.class), //$NON-NLS-1$
 				new IObservableFactory() {
+					@Override
 					public IObservable createObservable(final Object target) {
 						return Observables.staticObservableList(realm, (List) target);
 					}
@@ -713,6 +716,7 @@ public abstract class AbstractTextStylesConfigurationBlock extends OverlayStoreC
 		fUseControl.setInput(list);
 		final IObservableValue useStyle = BeansObservables.observeDetailValue(selection, SyntaxNode.PROP_USE, UseStyle.class);
 		useStyle.addValueChangeListener(new IValueChangeListener() {
+			@Override
 			public void handleValueChange(final ValueChangeEvent event) {
 				final IStructuredSelection selection = (IStructuredSelection) fSelectionViewer.getSelection();
 				final UseStyle newUse = (UseStyle) event.diff.getNewValue();

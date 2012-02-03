@@ -102,6 +102,7 @@ public class InfoHoverRegistry implements ManageListener, IDisposable {
 	}
 	
 	
+	@Override
 	public void dispose() {
 		final SettingsChangeNotifier notifier = PreferencesUtil.getSettingsChangeNotifier();
 		if (notifier != null) {
@@ -110,6 +111,7 @@ public class InfoHoverRegistry implements ManageListener, IDisposable {
 	}
 	
 	
+	@Override
 	public void beforeSettingsChangeNotification(final Set<String> groupIds) {
 		if (fSettingsGroupId != null && groupIds.contains(fSettingsGroupId)) {
 			synchronized (this) {
@@ -120,6 +122,7 @@ public class InfoHoverRegistry implements ManageListener, IDisposable {
 		}
 	}
 	
+	@Override
 	public void afterSettingsChangeNotification(final Set<String> groupIds) {
 	}
 	

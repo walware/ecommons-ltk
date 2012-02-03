@@ -73,6 +73,7 @@ public class SnippetEditorObservable extends AbstractVetoableValue {
 	private String oldValue;
 	
 	private final Listener updateListener = new Listener() {
+		@Override
 		public void handleEvent(final Event event) {
 			if (!updating) {
 				final String newValue = text.getText();
@@ -116,6 +117,7 @@ public class SnippetEditorObservable extends AbstractVetoableValue {
 		oldValue = text.getText();
 		
 		verifyListener = new VerifyListener() {
+			@Override
 			public void verifyText(final VerifyEvent e) {
 				if (!updating) {
 					final String currentText = text
@@ -132,6 +134,7 @@ public class SnippetEditorObservable extends AbstractVetoableValue {
 		text.addVerifyListener(verifyListener);
 		
 		text.addDisposeListener(new DisposeListener(){
+			@Override
 			public void widgetDisposed(final DisposeEvent e) {
 				SnippetEditorObservable.this.dispose();
 			}
@@ -175,6 +178,7 @@ public class SnippetEditorObservable extends AbstractVetoableValue {
 	 * 
 	 * @see org.eclipse.core.databinding.observable.value.IObservableValue#getValueType()
 	 */
+	@Override
 	public Object getValueType() {
 		return String.class;
 	}

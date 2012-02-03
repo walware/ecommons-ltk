@@ -36,6 +36,7 @@ public class TextUtil {
 	
 	private static class PositionComparator implements Comparator<Position> {
 		
+		@Override
 		public int compare(final Position o1, final Position o2) {
 			final int diff = o1.offset - o2.offset;
 			if (diff != 0) {

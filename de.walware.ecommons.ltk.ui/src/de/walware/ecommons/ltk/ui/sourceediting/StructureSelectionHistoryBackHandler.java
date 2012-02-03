@@ -40,10 +40,12 @@ public class StructureSelectionHistoryBackHandler extends AbstractHandler implem
 	}
 	
 	
+	@Override
 	public void update() {
 		setBaseEnabled(!fHistory.isEmpty());
 	}
 	
+	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 		final IRegion old = fHistory.getLast();
 		if (old != null) {

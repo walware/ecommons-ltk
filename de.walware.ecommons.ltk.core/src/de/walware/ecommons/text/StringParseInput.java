@@ -32,14 +32,17 @@ public class StringParseInput extends SourceParseInput implements CharSequence {
 	}
 	
 	
+	@Override
 	public int length() {
 		return fContent.length;
 	}
 	
+	@Override
 	public char charAt(final int index) {
 		return fBuffer[index];
 	}
 	
+	@Override
 	public CharSequence subSequence(final int start, final int end) {
 		return new String(fBuffer, start, end-start);
 	}

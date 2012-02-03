@@ -153,6 +153,7 @@ public class EditTemplateDialog extends ExtStatusDialog {
 		dialogArea.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
 		final ModifyListener listener= new ModifyListener() {
+			@Override
 			public void modifyText(final ModifyEvent e) {
 				fSuppressError = false;
 				updateButtons();
@@ -170,9 +171,11 @@ public class EditTemplateDialog extends ExtStatusDialog {
 			fNameText.addModifyListener(listener);
 			fNameText.addFocusListener(new FocusListener() {
 				
+				@Override
 				public void focusGained(final FocusEvent e) {
 				}
 				
+				@Override
 				public void focusLost(final FocusEvent e) {
 					if (fSuppressError) {
 						fSuppressError = false;
@@ -199,6 +202,7 @@ public class EditTemplateDialog extends ExtStatusDialog {
 			fContextCombo.setInput(contextTypes.toArray());
 			
 			fContextCombo.addSelectionChangedListener(new ISelectionChangedListener() {
+				@Override
 				public void selectionChanged(final SelectionChangedEvent event) {
 					final StructuredSelection selection = (StructuredSelection) event.getSelection();
 					doContextChanged(((TemplateContextType) selection.getFirstElement()));
@@ -236,11 +240,13 @@ public class EditTemplateDialog extends ExtStatusDialog {
 		fInsertVariableButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		fInsertVariableButton.setText(EditingMessages.EditTemplateDialog_InsertVariable);
 		fInsertVariableButton.addSelectionListener(new SelectionListener() {
+			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				fPatternEditor.getSourceViewer().getTextWidget().setFocus();
 				fPatternEditor.getSourceViewer().doOperation(ISourceViewer.CONTENTASSIST_PROPOSALS);
 			}
 			
+			@Override
 			public void widgetDefaultSelected(final SelectionEvent e) {}
 		});
 		
@@ -314,6 +320,7 @@ public class EditTemplateDialog extends ExtStatusDialog {
 		control.setLayoutData(data);
 		
 		fPatternEditor.getSourceViewer().addTextListener(new ITextListener() {
+			@Override
 			public void textChanged(final TextEvent event) {
 				if (event.getDocumentEvent() != null) {
 					doSourceChanged(event.getDocumentEvent().getDocument());

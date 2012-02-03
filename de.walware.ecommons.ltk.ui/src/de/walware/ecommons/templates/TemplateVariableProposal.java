@@ -53,6 +53,7 @@ public final class TemplateVariableProposal implements ICompletionProposal {
 	}
 	
 	
+	@Override
 	public void apply(final IDocument document) {
 		try {
 			final String variable = fVariable.getType().equals("dollar") ? "$$" : "${" + fVariable.getType() + '}'; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -65,22 +66,27 @@ public final class TemplateVariableProposal implements ICompletionProposal {
 		}
 	}
 	
+	@Override
 	public Point getSelection(final IDocument document) {
 		return fSelection;
 	}
 	
+	@Override
 	public String getAdditionalProposalInfo() {
 		return null;
 	}
 	
+	@Override
 	public String getDisplayString() {
 		return fVariable.getType() + " - " + fVariable.getDescription(); //$NON-NLS-1$
 	}
 	
+	@Override
 	public Image getImage() {
 		return null;
 	}
 	
+	@Override
 	public IContextInformation getContextInformation() {
 		return null;
 	}

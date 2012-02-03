@@ -25,18 +25,19 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	public GenericFragmentSourceUnit(final String id, final ISourceFragment fragment) {
 		fFragment = fragment;
 		fName = new IElementName() {
+			@Override
 			public int getType() {
 				return 0x011;
 			}
+			@Override
 			public String getDisplayName() {
 				return fFragment.getName();
 			}
+			@Override
 			public String getSegmentName() {
 				return fFragment.getName();
 			}
-			public IElementName getNamespace() {
-				return null;
-			}
+			@Override
 			public IElementName getNextSegment() {
 				return null;
 			}
@@ -48,14 +49,17 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public ISourceUnit getUnderlyingUnit() {
 		return null;
 	}
 	
+	@Override
 	public boolean isSynchronized() {
 		return true;
 	}
 	
+	@Override
 	public String getId() {
 		return fFragment.getId();
 	}
@@ -70,6 +74,7 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	 * A source unit of this type is usually of the type
 	 * {@link IModelElement#C2_SOURCE_CHUNK C2_SOURCE_CHUNK}.
 	 */
+	@Override
 	public int getElementType() {
 		return IModelElement.C2_SOURCE_CHUNK;
 	}
@@ -77,6 +82,7 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public IElementName getElementName() {
 		return fName;
 	}
@@ -84,6 +90,7 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean exists() {
 		return fCounter > 0;
 	}
@@ -91,10 +98,12 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean isReadOnly() {
 		return false;
 	}
 	
+	@Override
 	public boolean checkState(final boolean validate, final IProgressMonitor monitor) {
 		return false;
 	}
@@ -105,6 +114,7 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	 * 
 	 * A source unit of this type is usually doesn't have a resource/path.
 	 */
+	@Override
 	public Object getResource() {
 		return null;
 	}
@@ -113,6 +123,7 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public synchronized AbstractDocument getDocument(final IProgressMonitor monitor) {
 		if (fDocument == null) {
 			fDocument = new ReadOnlyDocument(fFragment.getSource(), fTimestamp);
@@ -123,6 +134,7 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public SourceContent getContent(final IProgressMonitor monitor) {
 		return new SourceContent(fTimestamp, fFragment.getSource());
 	}
@@ -130,6 +142,7 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Object getAdapter(final Class required) {
 		if (ISourceFragment.class.equals(required)) {
 			return fFragment;
@@ -141,6 +154,7 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public AstInfo<?> getAstInfo(final String type, final boolean ensureSync, final IProgressMonitor monitor) {
 		return null;
 	}
@@ -148,6 +162,7 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public ISourceUnitModelInfo getModelInfo(final String type, final int syncLevel, final IProgressMonitor monitor) {
 		return null;
 	}
@@ -155,6 +170,7 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public IModelElement getModelParent() {
 		return null;
 	}
@@ -162,6 +178,7 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean hasModelChildren(final Filter filter) {
 		return false;
 	}
@@ -169,6 +186,7 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public List<? extends IModelElement> getModelChildren(final Filter filter) {
 		return NO_CHILDREN;
 	}
@@ -176,6 +194,7 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public IProblemRequestor getProblemRequestor() {
 		return null;
 	}
@@ -184,6 +203,7 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public synchronized final void connect(final IProgressMonitor monitor) {
 		fCounter++;
 		if (fCounter == 1) {
@@ -195,6 +215,7 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public synchronized final void disconnect(final IProgressMonitor monitor) {
 		fCounter--;
 		if (fCounter == 0) {
@@ -205,6 +226,7 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public synchronized boolean isConnected() {
 		return (fCounter > 0);
 	}

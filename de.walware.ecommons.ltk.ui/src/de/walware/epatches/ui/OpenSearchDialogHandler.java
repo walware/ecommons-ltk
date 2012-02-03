@@ -31,6 +31,7 @@ public class OpenSearchDialogHandler extends AbstractHandler {
 	}
 	
 	
+	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 		final String pageId = event.getParameter("pageId");
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);

@@ -46,11 +46,13 @@ public class DefaultBrowserInformationInput extends BrowserInformationControlInp
 			updateStyleSheet();
 		}
 		
+		@Override
 		public void dispose() {
 			JFaceResources.getFontRegistry().removeListener(this);
 			FORMATTER = null;
 		}
 		
+		@Override
 		public void propertyChange(final PropertyChangeEvent event) {
 			if (event.getProperty().equals(JFaceResources.DIALOG_FONT)) {
 				updateStyleSheet();

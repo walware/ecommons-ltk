@@ -49,6 +49,7 @@ public class AdapterFactory {
 			fConfigurationElement = contributionElement;
 		}
 		
+		@Override
 		public Object getAdapter(final String modelTypeId, final Class<?> required) {
 			try {
 				return fConfigurationElement.createExecutableExtension(CLASS_ATTRIBUTE_NAME);
@@ -73,6 +74,7 @@ public class AdapterFactory {
 			fConfigurationElement = configurationElement;
 		}
 		
+		@Override
 		public Object getAdapter(final String modelTypeId, final Class<?> required) {
 			synchronized (this) {
 				if (fConfigurationElement != null) {

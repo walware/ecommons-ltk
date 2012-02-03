@@ -45,6 +45,7 @@ public class AstSelection {
 		
 		private int fInCovering = SEARCH_STATE_BEFORE;
 		
+		@Override
 		public void visit(final IAstNode node) throws InvocationTargetException {
 			if (fInCovering >= SEARCH_STATE_BEHIND) {
 				return;
@@ -74,6 +75,7 @@ public class AstSelection {
 		
 		private int fInCovering = SEARCH_STATE_BEFORE;
 		
+		@Override
 		public void visit(final IAstNode node) throws InvocationTargetException {
 			if (fInCovering >= SEARCH_STATE_BEHIND) {
 				return;
@@ -101,6 +103,7 @@ public class AstSelection {
 		
 		private int fInCovering = SEARCH_STATE_BEFORE;
 		
+		@Override
 		public void visit(final IAstNode node) throws InvocationTargetException {
 			if (fInCovering >= SEARCH_STATE_BEHIND) {
 				return;

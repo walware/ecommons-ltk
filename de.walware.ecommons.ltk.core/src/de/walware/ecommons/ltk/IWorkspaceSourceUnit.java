@@ -27,6 +27,7 @@ public interface IWorkspaceSourceUnit extends ISourceUnit {
 	 * 
 	 * @return the resource
 	 */
+	@Override
 	public IResource getResource();
 	
 	/**

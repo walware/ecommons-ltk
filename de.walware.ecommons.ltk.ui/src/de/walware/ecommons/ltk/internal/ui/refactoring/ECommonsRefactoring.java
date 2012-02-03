@@ -11,8 +11,8 @@
 
 package de.walware.ecommons.ltk.internal.ui.refactoring;
 
-import de.walware.ecommons.preferences.PreferencesUtil;
 import de.walware.ecommons.preferences.Preference.BooleanPref;
+import de.walware.ecommons.preferences.PreferencesUtil;
 
 import de.walware.ecommons.ltk.internal.ui.LTKUIPlugin;
 

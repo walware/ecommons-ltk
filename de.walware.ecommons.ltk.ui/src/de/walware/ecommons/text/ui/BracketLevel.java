@@ -16,9 +16,9 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.text.link.ILinkedModeListener;
 import org.eclipse.jface.text.link.LinkedModeModel;
-import org.eclipse.jface.text.link.LinkedPosition;
 import org.eclipse.jface.text.link.LinkedModeUI.ExitFlags;
 import org.eclipse.jface.text.link.LinkedModeUI.IExitPolicy;
+import org.eclipse.jface.text.link.LinkedPosition;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.VerifyEvent;
 
@@ -68,6 +68,7 @@ public abstract class BracketLevel implements IExitPolicy {
 	}
 	
 	
+	@Override
 	public ExitFlags doExit(final LinkedModeModel model, final VerifyEvent event,
 			final int offset, final int length) {
 		try {

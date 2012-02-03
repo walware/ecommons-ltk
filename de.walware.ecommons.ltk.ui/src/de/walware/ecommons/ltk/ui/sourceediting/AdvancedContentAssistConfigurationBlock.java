@@ -308,6 +308,7 @@ public class AdvancedContentAssistConfigurationBlock extends ManagedConfiguratio
 		final List<ContentAssistCategory> defaultCategories = new ArrayList<ContentAssistCategory>(orderedCategories);
 		Collections.sort(defaultCategories, new Comparator<ContentAssistCategory>() {
 			private final Collator NAMES_COLLARTOR = Collator.getInstance();
+			@Override
 			public int compare(final ContentAssistCategory o1, final ContentAssistCategory o2) {
 				return NAMES_COLLARTOR.compare(o1.getDisplayName(), o2.getDisplayName());
 			}

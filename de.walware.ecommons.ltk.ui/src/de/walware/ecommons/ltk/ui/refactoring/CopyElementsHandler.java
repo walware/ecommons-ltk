@@ -51,6 +51,7 @@ public class CopyElementsHandler extends AbstractElementsHandler {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 		final ISelection selection = WorkbenchUIUtil.getCurrentSelection(event.getApplicationContext());
 		if (selection == null || selection.isEmpty()) {

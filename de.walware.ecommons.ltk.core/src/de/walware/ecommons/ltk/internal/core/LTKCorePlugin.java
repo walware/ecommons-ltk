@@ -112,10 +112,12 @@ public final class LTKCorePlugin extends Plugin implements IAppEnvironment {
 	}
 	
 	
+	@Override
 	public void log(final IStatus status) {
 		getLog().log(status);
 	}
 	
+	@Override
 	public void addStoppingListener(final IDisposable listener) {
 		if (listener == null) {
 			throw new NullPointerException();
@@ -128,6 +130,7 @@ public final class LTKCorePlugin extends Plugin implements IAppEnvironment {
 		}
 	}
 	
+	@Override
 	public void removeStoppingListener(final IDisposable listener) {
 		fDisposables.remove(listener);
 	}

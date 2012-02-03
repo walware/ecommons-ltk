@@ -85,6 +85,7 @@ public abstract class SourceEditorViewerConfigurator implements ISettingsChanged
 		fSourceEditor = sourceEditor;
 		if (!(fSourceEditor instanceof AbstractDecoratedTextEditor)) {
 			fSourceEditor.getViewer().getControl().addDisposeListener(new DisposeListener() {
+				@Override
 				public void widgetDisposed(final DisposeEvent e) {
 					if (fIsConfigured) {
 						uninstallCurrentAddons();
@@ -161,6 +162,7 @@ public abstract class SourceEditorViewerConfigurator implements ISettingsChanged
 		}
 	}
 	
+	@Override
 	public void handleSettingsChanged(final Set<String> groupIds, final Map<String, Object> options) {
 		final SourceViewer viewer = fSourceEditor.getViewer();
 		if (viewer == null || fConfiguration == null

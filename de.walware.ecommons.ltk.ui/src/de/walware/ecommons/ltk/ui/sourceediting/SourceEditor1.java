@@ -312,6 +312,7 @@ public abstract class SourceEditor1 extends TextEditor
 					&& fOperationTarget.canDoOperation(ITextOperationTarget.STRIP_PREFIX) );
 		}
 		
+		@Override
 		public Object execute(final ExecutionEvent event) throws ExecutionException {
 			final ISourceViewer sourceViewer = SourceEditor1.this.getSourceViewer();
 			
@@ -335,6 +336,7 @@ public abstract class SourceEditor1 extends TextEditor
 			}
 			
 			BusyIndicator.showWhile(display, new Runnable() {
+				@Override
 				public void run() {
 					fOperationTarget.doOperation(operationCode);
 				}
@@ -443,6 +445,7 @@ public abstract class SourceEditor1 extends TextEditor
 		private EffectSynchonizer() {
 		}
 		
+		@Override
 		public void install(final LinkedModeModel model) {
 			fEffectSynchonizerCounter++;
 			if (fMarkOccurrencesProvider != null) {
@@ -451,14 +454,17 @@ public abstract class SourceEditor1 extends TextEditor
 			model.addLinkingListener(this);
 		}
 		
+		@Override
 		public void left(final LinkedModeModel model, final int flags) {
 			fEffectSynchonizerCounter--;
 			updateMarkOccurrencesEnablement();
 		}
 		
+		@Override
 		public void resume(final LinkedModeModel model, final int flags) {
 		}
 		
+		@Override
 		public void suspend(final LinkedModeModel model) {
 		}
 		
@@ -664,27 +670,33 @@ public abstract class SourceEditor1 extends TextEditor
 		updateStateDependentActions();
 	}
 	
+	@Override
 	public ISourceUnit getSourceUnit() {
 		return fSourceUnit;
 	}
 	
 	
+	@Override
 	public SourceViewer getViewer() {
 		return (SourceViewer) super.getSourceViewer();
 	}
 	
+	@Override
 	public PartitioningConfiguration getPartitioning() {
 		return fConfigurator.getPartitioning();
 	}
 	
+	@Override
 	public IWorkbenchPart getWorkbenchPart() {
 		return this;
 	}
 	
+	@Override
 	public IServiceLocator getServiceLocator() {
 		return getSite();
 	}
 	
+	@Override
 	public boolean isEditable(final boolean validate) {
 		if (validate) {
 			return SourceEditor1.this.validateEditorInputState();
@@ -717,8 +729,10 @@ public abstract class SourceEditor1 extends TextEditor
 			fModelPostSelection = new PostSelectionWithElementInfoController(fModelProvider,
 					(IPostSelectionProvider) getSelectionProvider(), new PostSelectionEditorCancel());
 			fModelPostSelection.addListener(new ISelectionWithElementInfoListener() {
+				@Override
 				public void inputChanged() {
 				}
+				@Override
 				public void stateChanged(final LTKInputData state) {
 					final IRegion toHighlight = getRangeToHighlight(state);
 					if (toHighlight != null) {
@@ -737,11 +751,13 @@ public abstract class SourceEditor1 extends TextEditor
 			final SourceEditorViewerConfigurator config = createInfoConfigurator();
 			if (config != null) {
 				final IInformationControlCreator presentationCreator = new IInformationControlCreator() {
+					@Override
 					public IInformationControl createInformationControl(final Shell parent) {
 						return new SourceViewerInformationControl(parent, createInfoConfigurator(), getOrientation());
 					}
 				};
 				fFoldingSupport.setHoverControlCreator(new IInformationControlCreator() {
+					@Override
 					public IInformationControl createInformationControl(final Shell parent) {
 						return new SourceViewerInformationControl(parent, createInfoConfigurator(), getOrientation(), presentationCreator);
 					}
@@ -750,9 +766,11 @@ public abstract class SourceEditor1 extends TextEditor
 			}
 			fFoldingSupport.install();
 			viewer.addProjectionListener(new IProjectionListener() {
+				@Override
 				public void projectionEnabled() {
 					installFoldingProvider();
 				}
+				@Override
 				public void projectionDisabled() {
 					uninstallFoldingProvider();
 				}
@@ -856,6 +874,7 @@ public abstract class SourceEditor1 extends TextEditor
 	private void updateFoldingEnablement() {
 		if (fFoldingEnablement != null) {
 			UIAccess.getDisplay().asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					final Boolean enable = PreferencesUtil.getInstancePrefs().getPreferenceValue(fFoldingEnablement);
 					final ProjectionViewer viewer = (ProjectionViewer) getSourceViewer();
@@ -884,6 +903,7 @@ public abstract class SourceEditor1 extends TextEditor
 	private void updateMarkOccurrencesEnablement() {
 		if (fMarkOccurrencesEnablement != null) {
 			UIAccess.getDisplay().asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					final Boolean enable = PreferencesUtil.getInstancePrefs().getPreferenceValue(fMarkOccurrencesEnablement);
 					if (enable) {
@@ -1046,6 +1066,7 @@ public abstract class SourceEditor1 extends TextEditor
 	}
 	
 	
+	@Override
 	public ITextEditToolSynchronizer getTextEditToolSynchronizer() {
 		if (fEffectSynchronizer == null) {
 			fEffectSynchronizer = new EffectSynchonizer();
@@ -1087,9 +1108,11 @@ public abstract class SourceEditor1 extends TextEditor
 	}
 	
 	
+	@Override
 	public void settingsChanged(final Set<String> groupIds) {
 		final Map<String, Object> options = new HashMap<String, Object>();
 		UIAccess.getDisplay().syncExec(new Runnable() {
+			@Override
 			public void run() {
 				handleSettingsChanged(groupIds, options);
 			}
@@ -1105,6 +1128,7 @@ public abstract class SourceEditor1 extends TextEditor
 		}
 	}
 	
+	@Override
 	public void preferenceChange(final PreferenceChangeEvent event) {
 		if (fFoldingEnablement != null && event.getKey().equals(fFoldingEnablement.getKey())) {
 			updateFoldingEnablement();
@@ -1234,6 +1258,7 @@ public abstract class SourceEditor1 extends TextEditor
 		fModelPostSelection = null;
 	}
 	
+	@Override
 	public ShowInContext getShowInContext() {
 		final Point selectionPoint = fCurrentSelection;
 		final ISourceViewer sourceViewer = getSourceViewer();
@@ -1245,6 +1270,7 @@ public abstract class SourceEditor1 extends TextEditor
 		return new ShowInContext(getEditorInput(), selection);
 	}
 	
+	@Override
 	public String[] getShowInTargetIds() {
 		return new String[] { IPageLayout.ID_PROJECT_EXPLORER };
 	}

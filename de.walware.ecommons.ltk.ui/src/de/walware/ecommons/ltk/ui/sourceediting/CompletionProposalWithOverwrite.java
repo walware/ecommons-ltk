@@ -60,6 +60,7 @@ public abstract class CompletionProposalWithOverwrite implements IAssistCompleti
 	protected abstract String getPluginId();
 	
 	
+	@Override
 	public final void selected(final ITextViewer viewer, final boolean smartToggle) {
 		if (isInOverwriteMode(smartToggle)) {
 			addOverwriteStyle();
@@ -68,6 +69,7 @@ public abstract class CompletionProposalWithOverwrite implements IAssistCompleti
 		}
 	}
 	
+	@Override
 	public final void unselected(final ITextViewer viewer) {
 		repairPresentation();
 	}
@@ -75,12 +77,14 @@ public abstract class CompletionProposalWithOverwrite implements IAssistCompleti
 	/**
 	 * not supported, use {@link #apply(ITextViewer, char, int, int)}
 	 */
+	@Override
 	public void apply(final IDocument document) {
 	}
 	
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public final void apply(final ITextViewer viewer, final char trigger, final int stateMask, final int offset) {
 		assert (fContext.getSourceViewer() == viewer);
 		

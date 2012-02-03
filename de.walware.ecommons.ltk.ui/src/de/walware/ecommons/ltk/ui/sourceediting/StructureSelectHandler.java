@@ -101,6 +101,7 @@ public abstract class StructureSelectHandler extends AbstractHandler {
 	}
 	
 	
+	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 		final ISourceUnit su = fSourceEditor.getSourceUnit();
 		if (su == null) {

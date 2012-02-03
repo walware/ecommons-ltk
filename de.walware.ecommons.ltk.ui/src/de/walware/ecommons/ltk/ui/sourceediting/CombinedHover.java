@@ -39,6 +39,7 @@ public class CombinedHover implements IInfoHover {
 	}
 	
 	
+	@Override
 	public Object getHoverInfo(final AssistInvocationContext context) {
 		fBestHover = null;
 		if (fDescriptors == null) {
@@ -61,6 +62,7 @@ public class CombinedHover implements IInfoHover {
 		return null;
 	}
 	
+	@Override
 	public IInformationControlCreator getHoverControlCreator() {
 		if (fBestHover != null) {
 			return fBestHover.getHoverControlCreator();

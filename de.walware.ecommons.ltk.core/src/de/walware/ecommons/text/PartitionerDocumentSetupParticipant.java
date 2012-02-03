@@ -31,6 +31,7 @@ public abstract class PartitionerDocumentSetupParticipant implements IDocumentSe
 	}
 	
 	
+	@Override
 	public void setup(final IDocument document) {
 		if (document instanceof IDocumentExtension3) {
 			final IDocumentExtension3 extension3 = (IDocumentExtension3) document;

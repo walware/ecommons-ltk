@@ -58,10 +58,12 @@ public class QuickAssistProcessor implements IQuickAssistProcessor {
 	}
 	
 	
+	@Override
 	public boolean canAssist(final IQuickAssistInvocationContext invocationContext) {
 		return false;
 	}
 	
+	@Override
 	public boolean canFix(final Annotation annotation) {
 		if (annotation.isMarkedDeleted()) {
 			return false;
@@ -99,6 +101,7 @@ public class QuickAssistProcessor implements IQuickAssistProcessor {
 	}
 	
 	
+	@Override
 	public ICompletionProposal[] computeQuickAssistProposals(final IQuickAssistInvocationContext invocationContext) {
 		fErrorMessage = null;
 		
@@ -164,6 +167,7 @@ public class QuickAssistProcessor implements IQuickAssistProcessor {
 	protected void addModelAssistProposals(final List<ICompletionProposal> proposals, final AssistInvocationContext context) {
 	}
 	
+	@Override
 	public String getErrorMessage() {
 		return fErrorMessage;
 	}

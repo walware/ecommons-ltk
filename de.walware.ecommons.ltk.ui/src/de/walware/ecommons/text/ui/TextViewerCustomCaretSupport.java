@@ -58,6 +58,7 @@ public class TextViewerCustomCaretSupport {
 	
 	private class ToggleOverwriteHandler extends AbstractHandler {
 		
+		@Override
 		public Object execute(final ExecutionEvent event) throws ExecutionException {
 			toggleOverwriteMode();
 			return null;
@@ -71,6 +72,7 @@ public class TextViewerCustomCaretSupport {
 	private final IPreferenceStore fPreferenceStore;
 	
 	private final IPropertyChangeListener fPreferencePropertyListener = new IPropertyChangeListener() {
+		@Override
 		public void propertyChange(final PropertyChangeEvent event) {
 			final String property = event.getProperty();
 			if (AbstractTextEditor.PREFERENCE_USE_CUSTOM_CARETS.equals(property)
@@ -81,6 +83,7 @@ public class TextViewerCustomCaretSupport {
 	};
 	
 	private final IPropertyChangeListener fFontPropertyListener = new IPropertyChangeListener() {
+		@Override
 		public void propertyChange(final PropertyChangeEvent event) {
 			final String property = event.getProperty();
 			if (JFaceResources.TEXT_FONT.equals(property) ) {
@@ -118,6 +121,7 @@ public class TextViewerCustomCaretSupport {
 		fPreferenceStore = preferences;
 		
 		fTextViewer.getTextWidget().addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(final DisposeEvent e) {
 				dispose();
 			}

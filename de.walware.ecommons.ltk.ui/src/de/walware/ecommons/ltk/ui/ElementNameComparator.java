@@ -44,6 +44,7 @@ public class ElementNameComparator extends ViewerComparator implements Comparato
 		return 100;
 	}
 	
+	@Override
 	public int compare(final IModelElement e1, final IModelElement e2) {
 		final int c1 = category(e1);
 		final int c2 = category(e2);

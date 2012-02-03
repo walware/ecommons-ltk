@@ -101,6 +101,7 @@ public class TextChangeManager {
 		final Set<ISourceUnit> suSet = fMap.keySet();
 		final ISourceUnit[] sus = suSet.toArray(new ISourceUnit[suSet.size()]);
 		Arrays.sort(sus, new Comparator<ISourceUnit>() {
+			@Override
 			public int compare(final ISourceUnit su1, final ISourceUnit su2) {
 				return su1.getId().compareTo(su2.getId());
 			}

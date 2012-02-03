@@ -26,8 +26,10 @@ public interface IAstNode extends IRegion {
 	
 	public int getStatusCode();
 	
+	@Override
 	public int getOffset();
 	public int getStopOffset();
+	@Override
 	public int getLength();
 	
 	public void accept(ICommonAstVisitor visitor) throws InvocationTargetException;

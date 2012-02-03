@@ -51,6 +51,7 @@ public class FoldingActionGroup extends ActionGroup implements IProjectionListen
 			setBaseEnabled(UIAccess.isOkToUse(fViewer) && fViewer.isProjectionMode());
 		}
 		
+		@Override
 		public Object execute(final ExecutionEvent event) throws ExecutionException {
 			if (UIAccess.isOkToUse(fViewer) && fViewer.canDoOperation(fOperationCode)) {
 				fViewer.doOperation(fOperationCode);
@@ -150,10 +151,12 @@ public class FoldingActionGroup extends ActionGroup implements IProjectionListen
 		update();
 	}
 	
+	@Override
 	public void projectionEnabled() {
 		update();
 	}
 	
+	@Override
 	public void projectionDisabled() {
 		update();
 	}

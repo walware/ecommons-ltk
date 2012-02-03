@@ -22,6 +22,7 @@ import de.walware.ecommons.text.ISourceFragment;
 public abstract class AbstractEditorSourceUnitFactory implements ISourceUnitFactory {
 	
 	
+	@Override
 	public String createId(final Object from) {
 		if (from instanceof IFileStore) {
 			return AbstractFilePersistenceSourceUnitFactory.createResourceId(((IFileStore) from).toURI());
@@ -32,6 +33,7 @@ public abstract class AbstractEditorSourceUnitFactory implements ISourceUnitFact
 		return null;
 	}
 	
+	@Override
 	public ISourceUnit createSourceUnit(final String id, final Object from) {
 		if (from instanceof IWorkspaceSourceUnit) {
 			return createSourceUnit(id, (IWorkspaceSourceUnit) from);

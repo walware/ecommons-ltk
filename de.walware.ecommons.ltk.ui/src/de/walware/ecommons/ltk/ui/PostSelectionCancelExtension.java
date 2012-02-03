@@ -31,6 +31,7 @@ public abstract class PostSelectionCancelExtension implements ITextInputListener
 	public abstract void dispose();
 	
 	
+	@Override
 	public void inputDocumentAboutToBeChanged(final IDocument oldInput, final IDocument newInput) {
 		if (oldInput != null) {
 			oldInput.removeDocumentListener(this);
@@ -38,16 +39,19 @@ public abstract class PostSelectionCancelExtension implements ITextInputListener
 		fController.cancel();
 	}
 	
+	@Override
 	public void inputDocumentChanged(final IDocument oldInput, final IDocument newInput) {
 		if (newInput != null) {
 			newInput.addDocumentListener(this);
 		}
 	}
 	
+	@Override
 	public void documentAboutToBeChanged(final DocumentEvent event) {
 		fController.cancel();
 	}
 	
+	@Override
 	public void documentChanged(final DocumentEvent event) {
 	}
 	

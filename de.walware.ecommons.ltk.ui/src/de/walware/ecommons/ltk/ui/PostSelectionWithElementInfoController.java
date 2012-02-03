@@ -164,6 +164,7 @@ public class PostSelectionWithElementInfoController {
 		
 		private boolean active;
 		
+		@Override
 		public void selectionChanged(final SelectionChangedEvent event) {
 			if (!active) {
 				return;
@@ -232,6 +233,7 @@ public class PostSelectionWithElementInfoController {
 		fModelProvider = modelProvider;
 		
 		fElementChangeListener = new IModelElementInputListener() {
+			@Override
 			public void elementChanged(final IModelElement element) {
 				synchronized (fInputLock) {
 					if (fUpdateJob.getState() == Job.WAITING) {
@@ -244,9 +246,11 @@ public class PostSelectionWithElementInfoController {
 					fUpdateJob.schedule();
 				}
 			}
+			@Override
 			public void elementInitialInfo(final IModelElement element) {
 				checkUpdate(element);
 			}
+			@Override
 			public void elementUpdatedInfo(final IModelElement element, final IModelElementDelta delta) {
 				checkUpdate(element);
 			}

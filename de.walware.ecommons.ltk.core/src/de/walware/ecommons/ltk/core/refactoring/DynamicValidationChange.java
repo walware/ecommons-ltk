@@ -94,6 +94,7 @@ public class DynamicValidationChange extends CompositeChange implements IResourc
 		return result;
 	}
 	
+	@Override
 	public void resourceChanged(final IResourceChangeEvent event) {
 		if (System.nanoTime() - fTimeStamp < LIFE_TIME) {
 			return;
@@ -109,9 +110,11 @@ public class DynamicValidationChange extends CompositeChange implements IResourc
 		for (int i= 0; i < children.length; i++) {
 			final Change change = children[i];
 			SafeRunner.run(new ISafeRunnable() {
+				@Override
 				public void run() throws Exception {
 					change.dispose();
 				}
+				@Override
 				public void handleException(final Throwable exception) {
 				}
 			});

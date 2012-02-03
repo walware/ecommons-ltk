@@ -32,6 +32,7 @@ public class ModelElementTester extends PropertyTester {
 	}
 	
 	
+	@Override
 	public boolean test(final Object receiver, final String property, final Object[] args, final Object expectedValue) {
 		if (!(receiver instanceof IStructuredSelection)) {
 			return false;

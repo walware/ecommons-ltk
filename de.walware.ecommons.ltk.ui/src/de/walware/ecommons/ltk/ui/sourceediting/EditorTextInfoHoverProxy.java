@@ -66,14 +66,17 @@ public abstract class EditorTextInfoHoverProxy implements ITextHover, ITextHover
 		return (fHover != null);
 	}
 	
+	@Override
 	public IRegion getHoverRegion(final ITextViewer textViewer, final int offset) {
 		return null;
 	}
 	
+	@Override
 	public String getHoverInfo(final ITextViewer textViewer, final IRegion hoverRegion) {
 		return null;
 	}
 	
+	@Override
 	public Object getHoverInfo2(final ITextViewer textViewer, final IRegion hoverRegion) {
 		if (ensureHover()) {
 			try {
@@ -93,6 +96,7 @@ public abstract class EditorTextInfoHoverProxy implements ITextHover, ITextHover
 	
 	protected abstract AssistInvocationContext createContext(final IRegion region);
 	
+	@Override
 	public IInformationControlCreator getHoverControlCreator() {
 		if (ensureHover()) {
 			return fHover.getHoverControlCreator();

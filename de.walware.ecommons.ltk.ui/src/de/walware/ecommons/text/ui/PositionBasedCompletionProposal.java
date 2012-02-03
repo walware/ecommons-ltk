@@ -91,18 +91,21 @@ public final class PositionBasedCompletionProposal implements ICompletionProposa
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void selected(final ITextViewer viewer, final boolean smartToggle) {
 	}
 	
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void unselected(final ITextViewer viewer) {
 	}
 	
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean isValidFor(final IDocument document, final int offset) {
 		// not called anymore
 		return false;
@@ -111,6 +114,7 @@ public final class PositionBasedCompletionProposal implements ICompletionProposa
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean validate(final IDocument document, final int offset, final DocumentEvent event) {
 		try {
 			final String content = document.get(fReplacementPosition.getOffset(), offset - fReplacementPosition.getOffset());
@@ -126,6 +130,7 @@ public final class PositionBasedCompletionProposal implements ICompletionProposa
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public char[] getTriggerCharacters() {
 		return null;
 	}
@@ -133,6 +138,7 @@ public final class PositionBasedCompletionProposal implements ICompletionProposa
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Image getImage() {
 		return fImage;
 	}
@@ -140,6 +146,7 @@ public final class PositionBasedCompletionProposal implements ICompletionProposa
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public String getDisplayString() {
 		if (fDisplayString != null) {
 			return fDisplayString;
@@ -150,14 +157,17 @@ public final class PositionBasedCompletionProposal implements ICompletionProposa
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public String getAdditionalProposalInfo() {
 		return fAdditionalProposalInfo;
 	}
 	
 	
+	@Override
 	public void apply(final IDocument document, final char trigger, final int offset) {
 	}
 	
+	@Override
 	public void apply(final IDocument document) {
 		try {
 			document.replace(fReplacementPosition.getOffset(), fReplacementPosition.getLength(), fReplacementString);
@@ -169,6 +179,7 @@ public final class PositionBasedCompletionProposal implements ICompletionProposa
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void apply(final ITextViewer viewer, final char trigger, final int stateMask, final int offset) {
 		apply(viewer.getDocument());
 	}
@@ -176,6 +187,7 @@ public final class PositionBasedCompletionProposal implements ICompletionProposa
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Point getSelection(final IDocument document) {
 		return new Point(fReplacementPosition.getOffset() + fCursorPosition, 0);
 	}
@@ -183,6 +195,7 @@ public final class PositionBasedCompletionProposal implements ICompletionProposa
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public IContextInformation getContextInformation() {
 		return fContextInformation;
 	}
@@ -190,6 +203,7 @@ public final class PositionBasedCompletionProposal implements ICompletionProposa
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public int getContextInformationPosition() {
 		return fReplacementPosition.getOffset();
 	}

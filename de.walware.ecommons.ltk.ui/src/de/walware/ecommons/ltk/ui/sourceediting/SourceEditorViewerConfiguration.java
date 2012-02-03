@@ -101,6 +101,7 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	private static final IInformationControlCreator DEFAULT_INFORMATION_CONTROL_CREATOR =
 			new IInformationControlCreator() {
 				
+				@Override
 				public IInformationControl createInformationControl(final Shell parent) {
 					return new DefaultInformationControl(parent, true);
 				}
@@ -167,6 +168,7 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	}
 	
 	
+	@Override
 	public void handleSettingsChanged(final Set<String> groupIds, final Map<String, Object> options) {
 		if (fAssistPreferences != null && groupIds.contains(fAssistPreferences.getGroupId())) {
 			if (fContentAssistant != null) {
@@ -302,6 +304,7 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 			fProcessor = processor;
 		}
 		
+		@Override
 		public String getHoverInfo(final ITextViewer textViewer, final IRegion subject) {
 			try {
 				final IDocument doc= textViewer.getDocument();
@@ -324,6 +327,7 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 			return null;
 		}
 		
+		@Override
 		public IRegion getHoverRegion(final ITextViewer textViewer, final int offset) {
 			if (textViewer != null) {
 				return WordFinder.findWord(textViewer.getDocument(), offset);

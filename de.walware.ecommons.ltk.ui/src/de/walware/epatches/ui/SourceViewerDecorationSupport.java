@@ -48,7 +48,7 @@ public class SourceViewerDecorationSupport extends org.eclipse.ui.texteditor.Sou
 	
 	@Override
 	protected AnnotationPainter createAnnotationPainter() {
-		AnnotationPainter painter = super.createAnnotationPainter();
+		final AnnotationPainter painter = super.createAnnotationPainter();
 		
 		painter.addTextStyleStrategy("de.walware.overwrite", fgOverwriteStrategy);
 		painter.addAnnotationType("de.walware.ecommons.text.editorAnnotations.ContentAssistOverwrite", "de.walware.overwrite");

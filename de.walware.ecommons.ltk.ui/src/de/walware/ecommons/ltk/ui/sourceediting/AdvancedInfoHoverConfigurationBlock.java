@@ -53,15 +53,18 @@ public class AdvancedInfoHoverConfigurationBlock extends ManagedConfigurationBlo
 	
 	private class CheckProvider implements ICheckStateProvider, ICheckStateListener {
 		
+		@Override
 		public boolean isGrayed(final Object element) {
 			return false;
 		}
 		
+		@Override
 		public boolean isChecked(final Object element) {
 			final InfoHoverDescriptor descriptor = (InfoHoverDescriptor) element;
 			return descriptor.fIsEnabled;
 		}
 		
+		@Override
 		public void checkStateChanged(final CheckStateChangedEvent event) {
 			final InfoHoverDescriptor descriptor = (InfoHoverDescriptor) event.getElement();
 			descriptor.fIsEnabled = event.getChecked();
@@ -128,6 +131,7 @@ public class AdvancedInfoHoverConfigurationBlock extends ManagedConfigurationBlo
 		fHoverTableViewer.setUseHashlookup(true);
 		fHoverTableViewer.setContentProvider(new ArrayContentProvider());
 		fHoverTableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				handleHoverListSelection();
 			}
@@ -146,6 +150,7 @@ public class AdvancedInfoHoverConfigurationBlock extends ManagedConfigurationBlo
 		}
 		fModifierEditor.addKeyListener(new KeyListener() {
 			
+			@Override
 			public void keyPressed(final KeyEvent e) {
 				e.doit = false;
 				final InfoHoverDescriptor descriptor = getSelecteddescriptor();
@@ -165,6 +170,7 @@ public class AdvancedInfoHoverConfigurationBlock extends ManagedConfigurationBlo
 				fHoverTableViewer.refresh(descriptor);
 			}
 			
+			@Override
 			public void keyReleased(final KeyEvent e) {
 			}
 			

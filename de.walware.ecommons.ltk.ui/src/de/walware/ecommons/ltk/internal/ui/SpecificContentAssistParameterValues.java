@@ -36,6 +36,7 @@ public class SpecificContentAssistParameterValues implements IParameterValues {
 	}
 	
 	
+	@Override
 	public Map<String, String> getParameterValues() {
 		Map<String, String> map = fParameterValues;
 		if (map == null) {
