@@ -230,9 +230,10 @@ public class WorkingBuffer implements IWorkingBuffer {
 	
 	protected void checkDocument(final AbstractDocument document) {
 		if (document instanceof ISynchronizable) {
-			final ISynchronizable synchronizable = (ISynchronizable) document;
-			if (synchronizable.getLockObject() == null) {
-				synchronizable.setLockObject(new Object());
+			synchronized (document) {
+				if (((ISynchronizable) document).getLockObject() == null) {
+					((ISynchronizable) document).setLockObject(new Object());
+				}
 			}
 		}
 	}

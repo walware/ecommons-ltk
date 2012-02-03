@@ -12,12 +12,9 @@
 package de.walware.ecommons.text;
 
 import org.eclipse.core.filebuffers.IDocumentSetupParticipant;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentExtension3;
-
-import de.walware.ecommons.ltk.internal.core.LTKCorePlugin;
+import org.eclipse.jface.text.ISynchronizable;
 
 
 /**
@@ -36,21 +33,36 @@ public abstract class PartitionerDocumentSetupParticipant implements IDocumentSe
 		if (document instanceof IDocumentExtension3) {
 			final IDocumentExtension3 extension3 = (IDocumentExtension3) document;
 			
-			if (extension3.getDocumentPartitioner(getPartitioningId()) == null) {
-				// Setup the document scanner
-				final Partitioner partitioner = createDocumentPartitioner();
-				partitioner.connect(document, true);
-				extension3.setDocumentPartitioner(getPartitioningId(), partitioner);
+			Object synch;
+			if (document instanceof ISynchronizable) {
+				synchronized (document) {
+					synch = ((ISynchronizable) document).getLockObject();
+					if (synch == null) {
+						synch = new Object();
+						((ISynchronizable) document).setLockObject(synch);
+					}
+				}
 			}
 			else {
-				final Partitioner partitioner = createDocumentPartitioner();
-				partitioner.connect(document, true);
-				if (!Partitioner.equalPartitioner(partitioner, extension3.getDocumentPartitioner(getPartitioningId()))) {
-					LTKCorePlugin.getDefault().getLog().log(new Status(IStatus.WARNING, LTKCorePlugin.PLUGIN_ID,
-							"Different partitioner for same partitioning!")); //$NON-NLS-1$
-				}
-				partitioner.disconnect();
+				synch = new Object();
 			}
+			synchronized (synch) {
+				if (extension3.getDocumentPartitioner(getPartitioningId()) == null) {
+					// Setup the document scanner
+					final Partitioner partitioner = createDocumentPartitioner();
+					partitioner.connect(document, true);
+					extension3.setDocumentPartitioner(getPartitioningId(), partitioner);
+				}
+			}
+//			else {
+//				final Partitioner partitioner = createDocumentPartitioner();
+//				partitioner.connect(document, true);
+//				if (!Partitioner.equalPartitioner(partitioner, extension3.getDocumentPartitioner(getPartitioningId()))) {
+//					LTKCorePlugin.getDefault().getLog().log(new Status(IStatus.WARNING, LTKCorePlugin.PLUGIN_ID,
+//							"Different partitioner for same partitioning!")); //$NON-NLS-1$
+//				}
+//				partitioner.disconnect();
+//			}
 		}
 	}
 	
