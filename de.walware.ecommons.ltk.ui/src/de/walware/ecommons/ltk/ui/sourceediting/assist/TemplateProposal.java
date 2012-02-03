@@ -332,9 +332,8 @@ public class TemplateProposal implements IAssistCompletionProposal,
 				
 				if (fContext instanceof IWorkbenchTemplateContext) {
 					final ISourceEditor editor = ((IWorkbenchTemplateContext) fContext).getEditor();
-					final ITextEditToolSynchronizer synch = editor.getTextEditToolSynchronizer();
-					if (synch != null) {
-						synch.install(model);
+					if (editor.getTextEditToolSynchronizer() != null) {
+						editor.getTextEditToolSynchronizer().install(model);
 					}
 				}
 				

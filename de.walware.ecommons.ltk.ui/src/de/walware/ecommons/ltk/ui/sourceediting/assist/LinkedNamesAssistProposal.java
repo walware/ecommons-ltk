@@ -38,7 +38,7 @@ import de.walware.ecommons.text.ui.DefaultBrowserInformationInput;
 
 import de.walware.ecommons.ltk.internal.ui.LTKUIPlugin;
 import de.walware.ecommons.ltk.ui.LTKUI;
-import de.walware.ecommons.ltk.ui.sourceediting.SourceEditor1;
+import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditor;
 
 
 public abstract class LinkedNamesAssistProposal implements IAssistCompletionProposal,
@@ -134,22 +134,22 @@ public abstract class LinkedNamesAssistProposal implements IAssistCompletionProp
 	public void apply(final ITextViewer viewer, final char trigger, final int stateMask, final int offset) {
 		try {
 			Point seletion = viewer.getSelectedRange();
-			
 			final IDocument document = viewer.getDocument();
+			
+			final LinkedModeModel model = new LinkedModeModel();
+			
 			final LinkedPositionGroup group = new LinkedPositionGroup();
-			
 			collectPositions(document, group);
-			
 			if (group.isEmpty()) {
 				return;
 			}
-			
-			final LinkedModeModel model = new LinkedModeModel();
 			model.addGroup(group);
+			
 			model.forceInstall();
-			final SourceEditor1 editor = (SourceEditor1) fContext.getEditor();
-			if (editor != null) {
-				editor.getTextEditToolSynchronizer().install(model);
+			{	final ISourceEditor editor = fContext.getEditor();
+				if (editor != null && editor.getTextEditToolSynchronizer() != null) {
+					editor.getTextEditToolSynchronizer().install(model);
+				}
 			}
 			
 			final LinkedModeUI ui = new EditorLinkedModeUI(model, viewer);
