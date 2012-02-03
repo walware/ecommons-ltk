@@ -5,9 +5,9 @@
 	<locations>
 		<location includeAllPlatforms="false" includeMode="slicer" includeSource="false"
 				type="InstallableUnit">
-			<repository location="http://download.eclipse.org/releases/helios"/>
+			<repository location="http://download.eclipse.org/releases/indigo"/>
 			<unit id="org.eclipse.platform.feature.group"
-					version="3.6.2.r362_v20110210-9gF78Gs1FrIGnHDHWkEcopoN8AmxeZflGDGKQi"/>
+					version="3.7.1.r37x_v20110729-9gF7UHOxFtniV7mI3T556iZN9AU8bEZ1lHMcVK"/>
 		</location>
 	</locations>
 </target>
