@@ -22,9 +22,9 @@ public class SourceContent {
 	public final String text;
 	
 	
-	public SourceContent(final long stamp, final String content) {
+	public SourceContent(final long stamp, final String text) {
 		this.stamp = stamp;
-		this.text = content;
+		this.text = text;
 	}
 	
 }

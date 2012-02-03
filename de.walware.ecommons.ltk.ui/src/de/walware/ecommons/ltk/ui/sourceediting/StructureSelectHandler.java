@@ -107,7 +107,7 @@ public abstract class StructureSelectHandler extends AbstractHandler {
 		if (su == null) {
 			return null;
 		}
-		final AstInfo<? extends IAstNode> astInfo = su.getAstInfo(null, true, new NullProgressMonitor());
+		final AstInfo astInfo = su.getAstInfo(null, true, new NullProgressMonitor());
 		if (astInfo == null) {
 			return null;
 		}
@@ -127,8 +127,9 @@ public abstract class StructureSelectHandler extends AbstractHandler {
 		return null;
 	}
 	
-	public final IRegion getNewSelectionRange(final int oldStart, final int oldStop, final AstInfo<? extends IAstNode> ast) {
-		final AstSelection selection = AstSelection.search(ast.root, oldStart, oldStop, AstSelection.MODE_COVERING_GREATER);
+	public final IRegion getNewSelectionRange(final int oldStart, final int oldStop, final AstInfo ast) {
+		final AstSelection selection = AstSelection.search(ast.getRootNode(),
+				oldStart, oldStop, AstSelection.MODE_COVERING_GREATER );
 		if (selection.getCovering() == null) {
 			return null;
 		}

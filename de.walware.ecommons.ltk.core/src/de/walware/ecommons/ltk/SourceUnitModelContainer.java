@@ -13,15 +13,13 @@ package de.walware.ecommons.ltk;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import de.walware.ecommons.ltk.ast.IAstNode;
 
-
-public abstract class SourceUnitModelContainer<NodeT extends IAstNode> {
+public abstract class SourceUnitModelContainer {
 	
 	
 	private final ISourceUnit fSourceUnit;
 	
-	private AstInfo<NodeT> fAstInfo;
+	private AstInfo fAstInfo;
 	
 	private ISourceUnitModelInfo fModelInfo;
 	
@@ -35,7 +33,7 @@ public abstract class SourceUnitModelContainer<NodeT extends IAstNode> {
 		return fSourceUnit;
 	}
 	
-	public AstInfo<NodeT> getAstInfo(final boolean ensureSync, final IProgressMonitor monitor) {
+	public AstInfo getAstInfo(final boolean ensureSync, final IProgressMonitor monitor) {
 		if (ensureSync) {
 			getModelManager().reconcile(fSourceUnit, IModelManager.AST, false, monitor);
 		}
@@ -48,11 +46,11 @@ public abstract class SourceUnitModelContainer<NodeT extends IAstNode> {
 	
 	protected abstract IModelManager getModelManager();
 	
-	public AstInfo<NodeT> getCurrentAst() {
+	public AstInfo getCurrentAst() {
 		return fAstInfo;
 	}
 	
-	public void setAst(final AstInfo<NodeT> ast) {
+	public void setAst(final AstInfo ast) {
 		fAstInfo = ast;
 	}
 	

@@ -147,7 +147,7 @@ public abstract class SourceEditor1OutlinePage extends AbstractEditorOutlinePage
 				final AstInfo info = ((ISourceUnit) inputElement).getAstInfo(fMainType, false, null); 
 				if (info != null) {
 					fCurrentModelStamp = info.stamp;
-					return new Object[] { info.root };
+					return new Object[] { info.getRootNode() };
 				}
 			}
 			return new Object[0];

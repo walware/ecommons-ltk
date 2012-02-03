@@ -11,11 +11,39 @@
 
 package de.walware.ecommons.text;
 
+import org.eclipse.jface.text.BadLocationException;
 
+
+/**
+ * Lines in a text (document)
+ * 
+ * All indexes are 0-based
+ */
 public interface ILineInformation {
 	
+	/**
+	 * Returns the number of lines
+	 * 
+	 * @return count
+	 */
+	int getNumberOfLines();
 	
-	int getLineOfOffset(int offset);
+	/**
+	 * Returns the line of the specified offset
+	 * 
+	 * @param offset 
+	 * @return the line
+	 * @throws BadLocationException if offset out of bounds
+	 */
+	int getLineOfOffset(int offset) throws BadLocationException;
 	
+	/**
+	 * Returns the offset of the specified line
+	 * 
+	 * @param line
+	 * @return the offset or -1, if line out of bounds
+	 * @throws BadLocationException if line out of bounds
+	 */
+	int getLineOffset(int line) throws BadLocationException;
 	
 }

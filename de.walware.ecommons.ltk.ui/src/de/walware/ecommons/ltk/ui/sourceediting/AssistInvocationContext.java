@@ -75,8 +75,9 @@ public class AssistInvocationContext implements IQuickAssistInvocationContext, I
 			// TODO check if/how we can reduce model requirement in content assistant
 			fModelInfo = fSourceUnit.getModelInfo(type, synch, monitor);
 			fAstInfo = fModelInfo != null ? fModelInfo.getAst() : fSourceUnit.getAstInfo(type, true, monitor);
-			if (fAstInfo != null && fAstInfo.root != null) {
-				fAstSelection = AstSelection.search(fAstInfo.root, getOffset(), getOffset(), AstSelection.MODE_COVERING_SAME_LAST);
+			if (fAstInfo != null && fAstInfo.getRootNode() != null) {
+				fAstSelection = AstSelection.search(fAstInfo.getRootNode(),
+						getOffset(), getOffset(), AstSelection.MODE_COVERING_SAME_LAST );
 			}
 		}
 	}

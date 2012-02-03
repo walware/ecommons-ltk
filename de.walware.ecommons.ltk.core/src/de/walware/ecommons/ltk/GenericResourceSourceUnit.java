@@ -209,7 +209,7 @@ public abstract class GenericResourceSourceUnit implements IWorkspaceSourceUnit 
 	 * {@inheritDoc}
 	 */
 	@Override
-	public AstInfo<?> getAstInfo(final String type, final boolean ensureSync, final IProgressMonitor monitor) {
+	public AstInfo getAstInfo(final String type, final boolean ensureSync, final IProgressMonitor monitor) {
 		return null;
 	}
 	

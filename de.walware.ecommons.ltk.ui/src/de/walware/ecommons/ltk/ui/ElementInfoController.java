@@ -28,7 +28,6 @@ import de.walware.ecommons.ltk.IModelElementDelta;
 import de.walware.ecommons.ltk.IModelManager;
 import de.walware.ecommons.ltk.ISourceUnit;
 import de.walware.ecommons.ltk.WorkingContext;
-import de.walware.ecommons.ltk.ast.IAstNode;
 
 
 /**
@@ -84,7 +83,7 @@ public class ElementInfoController implements IModelElementInputProvider, IDispo
 					listeners = checkNewListeners();
 				}
 				else {
-					final AstInfo<? extends IAstNode> astInfo = fNewInput.getAstInfo(null, false, null);
+					final AstInfo astInfo = fNewInput.getAstInfo(null, false, null);
 					if (astInfo == null || (astInfo.level & AstInfo.DEFAULT_LEVEL_MASK) < 1) {
 						return Status.CANCEL_STATUS;
 					}

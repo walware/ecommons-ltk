@@ -11,22 +11,34 @@
 
 package de.walware.ecommons.text;
 
+import org.eclipse.jface.text.BadLocationException;
+
 
 public class LineInformation implements ILineInformation {
 	
 	
 	private final int[] fOffsets;
+	private final int fTextLength;
 	
 	
-	public LineInformation(final int[] offsets) {
+	public LineInformation(final int[] offsets, final int textLength) {
 		fOffsets = offsets;
+		fTextLength = textLength;
 	}
 	
 	
 	@Override
-	public int getLineOfOffset(final int offset) {
+	public int getNumberOfLines() {
+		return 1+fOffsets.length;
+	}
+	
+	@Override
+	public int getLineOfOffset(final int offset) throws BadLocationException {
+		if (offset < 0 || offset > fTextLength) {
+			throw new BadLocationException("offset " + offset);
+		}
 		if (fOffsets.length == 0) {
-			return -1;
+			return 0;
 		}
 		int low = 0;
 		int high = fOffsets.length-1;
@@ -44,6 +56,14 @@ public class LineInformation implements ILineInformation {
 			}
 		}
 		return low-1;
+	}
+	
+	@Override
+	public int getLineOffset(final int line) throws BadLocationException {
+		if (line < 0 || line >= fOffsets.length) {
+			throw new BadLocationException("line " + line);
+		}
+		return fOffsets[line];
 	}
 	
 }

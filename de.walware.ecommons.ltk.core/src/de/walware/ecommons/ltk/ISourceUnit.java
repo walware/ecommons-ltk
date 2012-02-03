@@ -19,8 +19,6 @@ import org.eclipse.jface.text.AbstractDocument;
 import org.eclipse.jface.text.IDocumentExtension4;
 import org.eclipse.jface.text.ISynchronizable;
 
-import de.walware.ecommons.ltk.ast.IAstNode;
-
 
 /**
  * A source unit provides a document for source code
@@ -97,7 +95,7 @@ public interface ISourceUnit extends IModelElement, IAdaptable {
 	 */
 	public void syncExec(SourceDocumentRunnable runnable) throws InvocationTargetException;
 	
-	public AstInfo<? extends IAstNode> getAstInfo(String type, boolean ensureSync, IProgressMonitor monitor);
+	public AstInfo getAstInfo(String type, boolean ensureSync, IProgressMonitor monitor);
 	
 	public IProblemRequestor getProblemRequestor();
 	

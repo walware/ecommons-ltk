@@ -92,7 +92,9 @@ public class LTKInputData implements ISelection {
 		if (fAstSelection == null) {
 			if (fSelection instanceof ITextSelection && getInputInfo() != null) {
 				final ITextSelection textSelection = (ITextSelection) fSelection;
-				fAstSelection = AstSelection.search(getInputInfo().getAst().root, textSelection.getOffset(), textSelection.getOffset()+textSelection.getLength(), AstSelection.MODE_COVERING_SAME_LAST);
+				fAstSelection = AstSelection.search(getInputInfo().getAst().getRootNode(),
+						textSelection.getOffset(), textSelection.getOffset()+textSelection.getLength(),
+						AstSelection.MODE_COVERING_SAME_LAST );
 			}
 		}
 		return fAstSelection;

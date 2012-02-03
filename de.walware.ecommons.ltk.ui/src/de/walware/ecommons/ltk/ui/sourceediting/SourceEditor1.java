@@ -832,7 +832,7 @@ public abstract class SourceEditor1 extends TextEditor
 				continue TRY_MODEL;
 			}
 		}
-		final IAstNode root = info.getAst().root;
+		final IAstNode root = info.getAst().getRootNode();
 		TRY_AST: if (root != null) {
 			final ITextSelection selection = (ITextSelection) state.getSelection();
 			final int n = root.getChildCount();

@@ -155,7 +155,7 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public AstInfo<?> getAstInfo(final String type, final boolean ensureSync, final IProgressMonitor monitor) {
+	public AstInfo getAstInfo(final String type, final boolean ensureSync, final IProgressMonitor monitor) {
 		return null;
 	}
 	
