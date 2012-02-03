@@ -129,6 +129,7 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	
 	protected void setup(final IPreferenceStore preferenceStore, final ColorManager colorManager,
 			final DecorationPreferences decoPrefs, final AssistPreferences assistPrefs) {
+		assert (preferenceStore != null);
 		fPreferenceStore = preferenceStore;
 		fColorManager = colorManager;
 		fDecorationPreferences = decoPrefs;
@@ -349,6 +350,10 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	
 	public boolean isSmartInsertSupported() {
 		return false;
+	}
+	
+	public boolean isSmartInsertByDefault() {
+		return true;
 	}
 	
 	public PairMatcher getPairMatcher() {

@@ -613,8 +613,22 @@ public abstract class SourceEditor1 extends TextEditor
 		fInputChange = false;
 		fInputUpdate = Integer.MAX_VALUE;
 		
+		initSmartInsert();
+		
 		if (input != null && fOutlinePage != null) {
 			updateOutlinePageInput(fOutlinePage);
+		}
+	}
+	
+	private void initSmartInsert() {
+		final SourceEditorViewerConfiguration config = fConfigurator.getSourceViewerConfiguration();
+		if (config.isSmartInsertSupported()) {
+			if (config.isSmartInsertByDefault()) {
+				setInsertMode(SMART_INSERT);
+			}
+			else {
+				setInsertMode(INSERT);
+			}
 		}
 	}
 	

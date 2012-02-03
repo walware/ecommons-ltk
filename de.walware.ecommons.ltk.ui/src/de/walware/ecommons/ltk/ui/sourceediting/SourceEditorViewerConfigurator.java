@@ -39,15 +39,22 @@ import de.walware.ecommons.ui.ISettingsChangedHandler;
 public abstract class SourceEditorViewerConfigurator implements ISettingsChangedHandler {
 	
 	
-	private SourceEditorViewerConfiguration fConfiguration;
+	private final SourceEditorViewerConfiguration fConfiguration;
+	
 	private ISourceEditor fSourceEditor;
+	
 	private final List<ISourceEditorAddon> fAddons = new ArrayList<ISourceEditorAddon>();
 	private List<ISourceEditorAddon> fConfigurationAddons;
 	
 	protected boolean fIsConfigured;
 	
 	
-	protected SourceEditorViewerConfigurator() {
+	
+	protected SourceEditorViewerConfigurator(final SourceEditorViewerConfiguration config) {
+		if (config == null) {
+			throw new NullPointerException("config");
+		}
+		fConfiguration = config;
 	}
 	
 	
@@ -60,9 +67,6 @@ public abstract class SourceEditorViewerConfigurator implements ISettingsChanged
 	
 	public abstract PartitioningConfiguration getPartitioning();
 	
-	protected void setConfiguration(final SourceEditorViewerConfiguration config) {
-		fConfiguration = config;
-	}
 	
 	public SourceEditorViewerConfiguration getSourceViewerConfiguration() {
 		return fConfiguration;
@@ -164,9 +168,9 @@ public abstract class SourceEditorViewerConfigurator implements ISettingsChanged
 	
 	@Override
 	public void handleSettingsChanged(final Set<String> groupIds, final Map<String, Object> options) {
-		final SourceViewer viewer = fSourceEditor.getViewer();
-		if (viewer == null || fConfiguration == null
-				|| groupIds == null) {
+		final SourceViewer viewer;
+		if (fSourceEditor == null || (viewer = fSourceEditor.getViewer()) == null
+				|| fConfiguration == null || groupIds == null) {
 			return;
 		}
 		fConfiguration.handleSettingsChanged(groupIds, options);
