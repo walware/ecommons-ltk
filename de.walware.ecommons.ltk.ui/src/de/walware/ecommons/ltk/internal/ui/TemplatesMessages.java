@@ -26,6 +26,23 @@ public class TemplatesMessages extends NLS {
 	
 	public static String Templates_Variable_SelectedLines_description;
 	
+	public static String Preview_label;
+	
+	public static String Config_error_Read_message;
+	public static String Config_error_Write_message;
+	public static String Config_RestoreDefaults_title;
+	public static String Config_RestoreDefaults_Completely_label;
+	public static String Config_RestoreDefaults_Deleted_label;
+	
+	public static String Config_Import_title;
+	public static String Config_Export_title;
+	public static String Config_Export_filename;
+	public static String Config_Export_error_title;
+	public static String Config_Export_error_Hidden_message;
+	public static String Config_Export_error_CanNotWrite_message;
+	public static String Config_Export_Exists_title;
+	public static String Config_Export_Exists_message;
+	
 	
 	static {
 		NLS.initializeMessages(TemplatesMessages.class.getName(), TemplatesMessages.class);

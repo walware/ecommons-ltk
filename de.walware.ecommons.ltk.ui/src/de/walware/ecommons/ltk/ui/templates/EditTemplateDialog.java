@@ -70,18 +70,25 @@ import de.walware.ecommons.ltk.ui.sourceediting.SourceEditorViewerConfigurator;
 public class EditTemplateDialog extends ExtStatusDialog {
 	
 	
+	public static final int EDITOR_TEMPLATE = 1;
+	public static final int CUSTOM_TEMPLATE = 2;
+	public static final int FIX_TEMPLATE = 3;
+	
+	
 	private final Template fOriginalTemplate;
 	private Template fNewTemplate;
+	
+	private final int fFlags;
 	
 	private final SourceEditorViewerConfigurator fConfigurator;
 	
 	private Text fNameText;
 	private Text fDescriptionText;
 	private ComboViewer fContextCombo;
-	private SnippetEditor fPatternEditor;
+	private final SnippetEditor fPatternEditor;
 	private Button fInsertVariableButton;
 	private Button fAutoInsertCheckbox;
-	private final boolean fIsNameModifiable;
+	
 	
 	private final StatusInfo fValidationStatus;
 	private boolean fSuppressError = true;
@@ -96,12 +103,14 @@ public class EditTemplateDialog extends ExtStatusDialog {
 	 * @param parent the shell parent of the dialog
 	 * @param template the template to edit
 	 * @param edit whether this is a new template or an existing being edited
-	 * @param isNameModifiable whether the name of the template may be modified
+	 * @param flags edit mode
+	 * @param configurator configurator for the source viewer
+	 * @param processor the template variable processor
 	 * @param registry the context type registry to use
 	 */
 	public EditTemplateDialog(final Shell parent, final Template template,
-			final boolean edit, final boolean isNameModifiable,
-			final SourceEditorViewerConfigurator configuration,
+			final boolean edit, final int flags,
+			final SourceEditorViewerConfigurator configurator,
 			final TemplateVariableProcessor processor, final ContextTypeRegistry registry) {
 		super(parent);
 		
@@ -110,7 +119,7 @@ public class EditTemplateDialog extends ExtStatusDialog {
 				EditingMessages.EditTemplateDialog_title_New );
 		
 		fOriginalTemplate = template;
-		fIsNameModifiable = isNameModifiable;
+		fFlags = flags;
 		
 		fValidationStatus = new StatusInfo();
 		
@@ -119,7 +128,7 @@ public class EditTemplateDialog extends ExtStatusDialog {
 		
 		final TemplateContextType type = fContextTypeRegistry.getContextType(template.getContextTypeId());
 		fTemplateProcessor.setContextType(type);
-		fConfigurator = configuration;
+		fConfigurator = configurator;
 		fPatternEditor = new SnippetEditor(fConfigurator, template.getPattern(), PlatformUI.getWorkbench());
 	}
 	
@@ -160,7 +169,7 @@ public class EditTemplateDialog extends ExtStatusDialog {
 			}
 		};
 		
-		if (fIsNameModifiable) {
+		if ((fFlags & 0xf) == EDITOR_TEMPLATE) {
 			createLabel(dialogArea, EditingMessages.EditTemplateDialog_Name_label);
 			
 			final Composite composite = new Composite(dialogArea, SWT.NONE);
@@ -219,8 +228,8 @@ public class EditTemplateDialog extends ExtStatusDialog {
 		
 		createLabel(dialogArea, EditingMessages.EditTemplateDialog_Description_label);
 		
-		final int descFlags= fIsNameModifiable ? SWT.BORDER : SWT.BORDER | SWT.READ_ONLY;
-		fDescriptionText= new Text(dialogArea, descFlags );
+		final int descFlags = ((fFlags & 0xf) == FIX_TEMPLATE) ? (SWT.BORDER | SWT.READ_ONLY) : SWT.BORDER;
+		fDescriptionText = new Text(dialogArea, descFlags);
 		fDescriptionText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		fDescriptionText.addModifyListener(listener);
@@ -251,11 +260,12 @@ public class EditTemplateDialog extends ExtStatusDialog {
 		});
 		
 		fDescriptionText.setText(fOriginalTemplate.getDescription());
-		if (fIsNameModifiable) {
+		if (fNameText != null) {
 			fNameText.setText(fOriginalTemplate.getName());
 			fNameText.addModifyListener(listener);
 			fContextCombo.setSelection(new StructuredSelection(fContextTypeRegistry.getContextType(fOriginalTemplate.getContextTypeId())));
-		} else {
+		}
+		else {
 			fPatternEditor.getControl().setFocus();
 		}
 		
@@ -365,7 +375,7 @@ public class EditTemplateDialog extends ExtStatusDialog {
 	
 	@Override
 	protected void okPressed() {
-		final String name= fNameText == null ? fOriginalTemplate.getName() : fNameText.getText();
+		final String name = fNameText == null ? fOriginalTemplate.getName() : fNameText.getText();
 		final boolean isAutoInsertable= fAutoInsertCheckbox != null && fAutoInsertCheckbox.getSelection();
 		fNewTemplate = new Template(name, fDescriptionText.getText(), getContextType().getId(), fPatternEditor.getDocument().get(), isAutoInsertable);
 		super.okPressed();
@@ -382,8 +392,9 @@ public class EditTemplateDialog extends ExtStatusDialog {
 			}
 		} else if (!isValidPattern(fPatternEditor.getDocument().get())) {
 			status = new StatusInfo();
-			if (!fSuppressError)
+			if (!fSuppressError) {
 				status.setError(EditingMessages.EditTemplateDialog_error_invalidPattern);
+			}
 		} else {
 			status= fValidationStatus;
 		}
@@ -402,8 +413,9 @@ public class EditTemplateDialog extends ExtStatusDialog {
 	protected boolean isValidPattern(final String pattern) {
 		for (int i= 0; i < pattern.length(); i++) {
 			final char ch= pattern.charAt(i);
-			if (!(ch == 9 || ch == 10 || ch == 13 || ch >= 32))
+			if (!(ch == 9 || ch == 10 || ch == 13 || ch >= 32)) {
 				return false;
+			}
 		}
 		return true;
 	}
