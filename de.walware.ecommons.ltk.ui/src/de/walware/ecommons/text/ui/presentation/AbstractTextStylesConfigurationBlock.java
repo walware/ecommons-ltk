@@ -138,6 +138,10 @@ public abstract class AbstractTextStylesConfigurationBlock extends OverlayStoreC
 			return new UseStyle(otherKey, NLS.bind(Messages.SyntaxColoring_Use_OtherStyle_label, otherLabel));
 		}
 		
+		public static UseStyle createUseOtherStyle(final String otherKey, final String cat, final String otherLabel) {
+			return new UseStyle(otherKey, NLS.bind(Messages.SyntaxColoring_Use_OtherStyleOf_label, otherLabel, cat));
+		}
+		
 		
 		public static final String PROP_USE = "useStyle"; //$NON-NLS-1$
 		public static final String PROP_COLOR = "color"; //$NON-NLS-1$

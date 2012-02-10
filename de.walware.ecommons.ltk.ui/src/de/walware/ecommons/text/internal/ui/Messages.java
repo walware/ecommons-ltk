@@ -41,6 +41,7 @@ public class Messages extends NLS {
 	public static String SyntaxColoring_Use_CustomStyle_label;
 	public static String SyntaxColoring_Use_NoExtraStyle_label;
 	public static String SyntaxColoring_Use_OtherStyle_label;
+	public static String SyntaxColoring_Use_OtherStyleOf_label;
 	public static String SyntaxColoring_Color;
 	public static String SyntaxColoring_Bold;
 	public static String SyntaxColoring_Italic;
