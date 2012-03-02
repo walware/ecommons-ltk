@@ -51,16 +51,6 @@ public class AssistPreferences {
 	 * Preference for content assist auto insert
 	 */
 	private final BooleanPref fAutoInsertPrefix;
-	/**
-	 * Preference for content assist proposal color
-	 */
-	private final RGBPref fProposalsBackground;
-	
-	
-	/**
-	 * Preference for content assist proposal color
-	 */
-	private final RGBPref fProposalsForeground;
 	
 	/**
 	 * Preference key for content assist parameters color.
@@ -93,8 +83,6 @@ public class AssistPreferences {
 		fAutoInsertSingle = new BooleanPref(prefQualifier, "AutoInsert.Single.enable"); //$NON-NLS-1$
 		fAutoInsertPrefix = new BooleanPref(prefQualifier, "AutoInsert.Prefix.enable"); //$NON-NLS-1$
 		
-		fProposalsBackground = new RGBPref(prefQualifier, "Proposals.background"); //$NON-NLS-1$
-		fProposalsForeground = new RGBPref(prefQualifier, "Proposals.foreground"); //$NON-NLS-1$
 		fInformationBackground = new RGBPref(prefQualifier, "Parameters.background"); //$NON-NLS-1$
 		fInformationForeground = new RGBPref(prefQualifier, "Parameters.foreground"); //$NON-NLS-1$
 		
@@ -141,14 +129,6 @@ public class AssistPreferences {
 		return fAutoInsertPrefix;
 	}
 	
-	public RGBPref getProposalsBackgroundPref() {
-		return fProposalsBackground;
-	}
-	
-	public RGBPref getProposalsForegroundPref() {
-		return fProposalsForeground;
-	}
-	
 	public RGBPref getInformationBackgroundPref() {
 		return fInformationBackground;
 	}
@@ -177,8 +157,6 @@ public class AssistPreferences {
 		assistant.setAutoActivationDelay(statet.getPreferenceValue(fAutoActivationDelay));
 		assistant.enableAutoInsert(statet.getPreferenceValue(fAutoInsertSingle));
 		assistant.enablePrefixCompletion(statet.getPreferenceValue(fAutoInsertPrefix));
-		assistant.setProposalSelectorForeground(manager.getColor(statet.getPreferenceValue(fProposalsForeground)));
-		assistant.setProposalSelectorBackground(manager.getColor(statet.getPreferenceValue(fProposalsBackground)));
 		{	final Color c = manager.getColor(statet.getPreferenceValue(fInformationForeground));
 			assistant.setContextInformationPopupForeground(c);
 			assistant.setContextSelectorForeground(c);
@@ -205,11 +183,6 @@ public class AssistPreferences {
 	 * Configure the given quick assistant according common StatET settings.
 	 */
 	public void configure(final IQuickAssistAssistant assistant) {
-		final ColorManager manager = SharedUIResources.getColors();
-		final IPreferenceAccess statet = PreferencesUtil.getInstancePrefs();
-		
-		assistant.setProposalSelectorForeground(manager.getColor(statet.getPreferenceValue(fProposalsForeground)));
-		assistant.setProposalSelectorBackground(manager.getColor(statet.getPreferenceValue(fProposalsBackground)));
 	}
 	
 }

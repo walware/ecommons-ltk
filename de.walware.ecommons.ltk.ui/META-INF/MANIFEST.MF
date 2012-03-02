@@ -44,4 +44,6 @@ Export-Package: de.walware.ecommons.ltk.ui,
  de.walware.ecommons.text.ui,
  de.walware.ecommons.text.ui.presentation,
  de.walware.ecommons.text.ui.settings,
- de.walware.epatches.ui
+ de.walware.epatches.ui,
+ de.walware.workbench.ui,
+ de.walware.workbench.ui.util
