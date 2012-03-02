@@ -327,7 +327,7 @@ public class ContentAssistComputerRegistry implements ManageListener, IDisposabl
 		return copies;
 	}
 	
-	Map<Preference, Object> createPreferences(final List<ContentAssistCategory> orderedCategories) {
+	Map<Preference<?>, Object> createPreferences(final List<ContentAssistCategory> orderedCategories) {
 		final Set<String> disabledIds = new HashSet<String>();
 		final String[] orderedPref = new String[orderedCategories.size()];
 		
@@ -340,7 +340,7 @@ public class ContentAssistComputerRegistry implements ManageListener, IDisposabl
 					(category.fIsEnabledAsSeparate ? ":true" : ":false");
 		}
 		
-		final Map<Preference, Object> prefMap = new HashMap<Preference, Object>();
+		final Map<Preference<?>, Object> prefMap = new HashMap<Preference<?>, Object>();
 		prefMap.put(getPrefDefaultDisabledCategoryIds(), disabledIds);
 		prefMap.put(getPrefCirclingOrderedCategoryIds(), orderedPref);
 		return prefMap;

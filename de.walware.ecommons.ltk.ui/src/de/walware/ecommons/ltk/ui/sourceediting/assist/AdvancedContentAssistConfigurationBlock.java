@@ -175,9 +175,11 @@ public class AdvancedContentAssistConfigurationBlock extends ManagedConfiguratio
 	
 	@Override
 	protected void createBlockArea(final Composite pageComposite) {
-		final Map<Preference, String> prefs = new HashMap<Preference, String>();
+		final Map<Preference<?>, String> prefs = new HashMap<Preference<?>, String>();
+		
 		prefs.put(fRegistry.getPrefDefaultDisabledCategoryIds(), fRegistry.getSettingsGroupId());
 		prefs.put(fRegistry.getPrefCirclingOrderedCategoryIds(), fRegistry.getSettingsGroupId());
+		
 		setupPreferenceManager(prefs);
 		
 		prepareKeybindingInfo();
@@ -335,7 +337,7 @@ public class AdvancedContentAssistConfigurationBlock extends ManagedConfiguratio
 			category.fIsEnabledAsSeparate = fCirclingList.getChecked(category);
 		}
 		
-		final Map<Preference, Object> preferences = fRegistry.createPreferences(orderedCategories);
+		final Map<Preference<?>, Object> preferences = fRegistry.createPreferences(orderedCategories);
 		setPrefValues(preferences);
 	}
 	

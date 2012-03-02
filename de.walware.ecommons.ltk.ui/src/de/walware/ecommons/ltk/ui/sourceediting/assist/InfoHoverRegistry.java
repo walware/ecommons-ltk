@@ -197,8 +197,8 @@ public class InfoHoverRegistry implements ManageListener, IDisposable {
 		return sortedDescriptors;
 	}
 	
-	Map<Preference, Object> toPreferencesMap(final List<InfoHoverDescriptor> descriptors) {
-		final Map<Preference, Object> map = new HashMap<Preference, Object>();
+	Map<Preference<?>, Object> toPreferencesMap(final List<InfoHoverDescriptor> descriptors) {
+		final Map<Preference<?>, Object> map = new HashMap<Preference<?>, Object>();
 		final String[] settings = new String[descriptors.size()];
 		for (int i = 0; i < settings.length; i++) {
 			final InfoHoverDescriptor descriptor = descriptors.get(i);

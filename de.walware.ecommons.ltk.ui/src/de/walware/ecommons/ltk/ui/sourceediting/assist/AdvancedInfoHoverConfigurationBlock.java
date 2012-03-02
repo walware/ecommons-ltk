@@ -92,8 +92,10 @@ public class AdvancedInfoHoverConfigurationBlock extends ManagedConfigurationBlo
 	
 	@Override
 	protected void createBlockArea(final Composite pageComposite) {
-		final Map<Preference, String> prefs = new HashMap<Preference, String>();
+		final Map<Preference<?>, String> prefs = new HashMap<Preference<?>, String>();
+		
 		prefs.put(fRegistry.getPrefSeparateSettings(), fRegistry.getSettingsGroupId());
+		
 		setupPreferenceManager(prefs);
 		
 		final Composite composite = new Composite(pageComposite, SWT.NONE);
@@ -213,10 +215,7 @@ public class AdvancedInfoHoverConfigurationBlock extends ManagedConfigurationBlo
 	
 	@Override
 	protected void updatePreferences() {
-		final Map<Preference, Object> map = fRegistry.toPreferencesMap(fDescriptors);
-		for (final Map.Entry<Preference, Object> entry : map.entrySet()) {
-			setPrefValue(entry.getKey(), entry.getValue());
-		}
+		setPrefValues(fRegistry.toPreferencesMap(fDescriptors));
 		super.updatePreferences();
 	}
 	

@@ -478,8 +478,10 @@ public class CodeTemplatesConfigurationBlock extends ManagedConfigurationBlock
 	
 	@Override
 	protected void createBlockArea(final Composite pageComposite) {
-		final Map<Preference, String> prefs = new HashMap<Preference, String>();
+		final Map<Preference<?>, String> prefs = new HashMap<Preference<?>, String>();
+		
 		prefs.put(fDefaultPref, null);
+		
 		setupPreferenceManager(prefs);
 		
 		{	final Label label = new Label(pageComposite, SWT.LEFT);
