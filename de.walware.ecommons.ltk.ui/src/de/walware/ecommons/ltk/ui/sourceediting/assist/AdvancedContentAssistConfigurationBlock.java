@@ -226,8 +226,8 @@ public class AdvancedContentAssistConfigurationBlock extends ManagedConfiguratio
 			
 			fOrderButtons = new ButtonGroup<ContentAssistCategory>(group);
 			fOrderButtons.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
-			fOrderButtons.addUpButton();
-			fOrderButtons.addDownButton();
+			fOrderButtons.addUpButton(null);
+			fOrderButtons.addDownButton(null);
 		}
 		
 		fOrderedCategories = new WritableList();

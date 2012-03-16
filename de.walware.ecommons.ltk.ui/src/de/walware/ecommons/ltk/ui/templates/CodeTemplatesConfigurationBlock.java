@@ -500,22 +500,22 @@ public class CodeTemplatesConfigurationBlock extends ManagedConfigurationBlock
 			fButtonGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
 			
 			if (fEnableAdd) {
-				fButtonGroup.addAddButton();
-				fButtonGroup.addCopyButton();
+				fButtonGroup.addAddButton(null);
+				fButtonGroup.addCopyButton(null);
 			}
-			fButtonGroup.addEditButton();
+			fButtonGroup.addEditButton(null);
 			if (fEnableAdd) {
-				fButtonGroup.addDeleteButton();
+				fButtonGroup.addDeleteButton(null);
 			}
 			
 			if (fDefaultPref != null) {
 				fButtonGroup.addSeparator();
-				fButtonGroup.addDefaultButton();
+				fButtonGroup.addDefaultButton(null);
 			}
 			
 			fButtonGroup.addSeparator();
-			fButtonGroup.addImportButton();
-			fButtonGroup.addExportButton();
+			fButtonGroup.addImportButton(null);
+			fButtonGroup.addExportButton(null);
 		}
 		
 		fPreview = new TemplatePreview();
