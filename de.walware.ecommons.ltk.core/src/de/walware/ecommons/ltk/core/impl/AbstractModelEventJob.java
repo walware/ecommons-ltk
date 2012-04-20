@@ -55,7 +55,7 @@ public abstract class AbstractModelEventJob<ElementType extends IModelElement, I
 		
 		@Override
 		public void handleException(final Throwable exception) {
-			LTKCorePlugin.getDefault().log(new Status(IStatus.ERROR, LTK.PLUGIN_ID, -1,
+			LTKCorePlugin.getSafe().log(new Status(IStatus.ERROR, LTK.PLUGIN_ID, -1,
 					"An error occured while notifying an ElementChangedListener.", exception));  //$NON-NLS-1$
 		}
 		
@@ -154,7 +154,7 @@ public abstract class AbstractModelEventJob<ElementType extends IModelElement, I
 				task.run();
 			}
 			catch (final Throwable e) {
-				LTKCorePlugin.getDefault().log(new Status(IStatus.ERROR, LTK.PLUGIN_ID, -1,
+				LTKCorePlugin.getSafe().log(new Status(IStatus.ERROR, LTK.PLUGIN_ID, -1,
 						"An error occurred when firing model event for " + fModelManager.getModelTypeId() + ".", e )); //$NON-NLS-1$
 			}
 		}

@@ -62,7 +62,7 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 		public void dispose() {
 			final ISourceUnit su = get();
 			if (su != null && su.isConnected()) {
-				LTKCorePlugin.getDefault().getLog().log(
+				LTKCorePlugin.getSafe().log(
 						new Status(IStatus.WARNING, LTKCorePlugin.PLUGIN_ID, -1,
 								NLS.bind("Source Unit ''{0}'' disposed but connected.", su.getId()), null));
 			}
@@ -152,7 +152,7 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 						}
 					}
 					catch (final Exception e) {
-						LTKCorePlugin.getDefault().getLog().log(new Status(IStatus.ERROR, LTK.PLUGIN_ID, ICommonStatusConstants.INTERNAL_PLUGGED_IN,
+						LTKCorePlugin.getSafe().log(new Status(IStatus.ERROR, LTK.PLUGIN_ID, ICommonStatusConstants.INTERNAL_PLUGGED_IN,
 								"Error loading working context contributions", e)); //$NON-NLS-1$
 					}
 				}

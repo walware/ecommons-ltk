@@ -26,15 +26,15 @@ public class LTK {
 	
 	
 	public static ISourceUnitManager getSourceUnitManager() {
-		return LTKCorePlugin.getDefault().getSourceUnitManager();
+		return LTKCorePlugin.getSafe().getSourceUnitManager();
 	}
 	
 	public static IExtContentTypeManager getExtContentTypeManager() {
-		return LTKCorePlugin.getDefault().getContentTypeServices();
+		return LTKCorePlugin.getSafe().getContentTypeServices();
 	}
 	
 	public static Object getModelAdapter(final String type, final Class<?> required) {
-		return LTKCorePlugin.getDefault().getModelAdapterFactory().get(type, required);
+		return LTKCorePlugin.getSafe().getModelAdapterFactory().get(type, required);
 	}
 	
 }

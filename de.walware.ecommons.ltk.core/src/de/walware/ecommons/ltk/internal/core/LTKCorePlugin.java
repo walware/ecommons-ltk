@@ -14,6 +14,7 @@ package de.walware.ecommons.ltk.internal.core;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
@@ -37,14 +38,15 @@ public final class LTKCorePlugin extends Plugin implements IAppEnvironment {
 	
 	/** The shared instance. */
 	private static LTKCorePlugin gPlugin;
+	private static LTKCorePlugin gSafe;
 	
 	/**
 	 * Returns the shared plug-in instance
 	 * 
 	 * @return the shared instance
 	 */
-	public static LTKCorePlugin getDefault() {
-		return gPlugin;
+	public static LTKCorePlugin getSafe() {
+		return gSafe;
 	}
 	
 	
@@ -63,6 +65,7 @@ public final class LTKCorePlugin extends Plugin implements IAppEnvironment {
 	 */
 	public LTKCorePlugin() {
 		gPlugin = this;
+		gSafe = this;
 	}
 	
 	/**
@@ -114,7 +117,10 @@ public final class LTKCorePlugin extends Plugin implements IAppEnvironment {
 	
 	@Override
 	public void log(final IStatus status) {
-		getLog().log(status);
+		final ILog log = getLog();
+		if (log != null) {
+			log.log(status);
+		}
 	}
 	
 	@Override

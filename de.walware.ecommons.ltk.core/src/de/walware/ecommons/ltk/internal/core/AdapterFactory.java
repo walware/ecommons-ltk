@@ -55,7 +55,7 @@ public class AdapterFactory {
 				return fConfigurationElement.createExecutableExtension(CLASS_ATTRIBUTE_NAME);
 			}
 			catch (final CoreException e) {
-				LTKCorePlugin.getDefault().log(new Status(IStatus.ERROR, LTKCorePlugin.PLUGIN_ID, 0,
+				LTKCorePlugin.getSafe().log(new Status(IStatus.ERROR, LTKCorePlugin.PLUGIN_ID, 0,
 						NLS.bind("An error occurred when loading adapter class for model ''{0}''.", modelTypeId),
 						e ));
 				fConfigurationElement = null;
@@ -83,7 +83,7 @@ public class AdapterFactory {
 						fConfigurationElement = null;
 					}
 					catch (final CoreException e) {
-						LTKCorePlugin.getDefault().log(new Status(IStatus.ERROR, LTKCorePlugin.PLUGIN_ID, 0,
+						LTKCorePlugin.getSafe().log(new Status(IStatus.ERROR, LTKCorePlugin.PLUGIN_ID, 0,
 								NLS.bind("An error occurred when loading adapter factory for model ''{0}''.", modelTypeId),
 								e ));
 						fConfigurationElement = null;
