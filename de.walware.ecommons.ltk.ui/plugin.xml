@@ -376,7 +376,7 @@
             id="de.walware.ecommons.ltk.propertyTester.ModelElements"
             class="de.walware.ecommons.ltk.internal.ui.refactoring.ModelElementTester"
             namespace="de.walware.ecommons.ltk"
-            properties="isElementC1TypeSelection,isElementC2TypeSelection"
+            properties="isElementSelection,isElementC1TypeSelection,isElementC2TypeSelection"
             type="org.eclipse.jface.viewers.ISelection"/>
    </extension>
    

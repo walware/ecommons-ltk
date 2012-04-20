@@ -24,6 +24,7 @@ import de.walware.ecommons.ltk.LTKUtil;
 public class ModelElementTester extends PropertyTester {
 	
 	
+	public static final String IS_ELEMENT_SELECTION = "isElementSelection"; //$NON-NLS-1$
 	public static final String IS_ELEMENT_C1_TYPE_SELECTION = "isElementC1TypeSelection"; //$NON-NLS-1$
 	public static final String IS_ELEMENT_C2_TYPE_SELECTION = "isElementC2TypeSelection"; //$NON-NLS-1$
 	
@@ -45,18 +46,26 @@ public class ModelElementTester extends PropertyTester {
 		else if (IS_ELEMENT_C2_TYPE_SELECTION.equals(property)) {
 			mask = IModelElement.MASK_C2;
 		}
-		if (mask != 0) {
-			if (selection.isEmpty()) {
-				return false;
-			}
-			final int[] types = parseInts(args);
-			final Iterator iter = selection.iterator();
-			boolean first = true;
-			ISourceUnit su = null;
-			ITER_ELEMENTS : while (iter.hasNext()) {
-				final Object obj = iter.next();
-				if (obj instanceof IModelElement) {
-					final IModelElement element = (IModelElement) obj;
+		int numSu = 1;
+		String modelType = (String) expectedValue;
+		if (modelType.length() > 0 && modelType.charAt(modelType.length()-1) == '*') {
+			modelType = modelType.substring(0, modelType.length() - 1);
+			numSu = -1;
+		}
+		
+		if (selection.isEmpty()) {
+			return false;
+		}
+		
+		final int[] types = parseInts(args);
+		final Iterator iter = selection.iterator();
+		boolean first = true;
+		ISourceUnit su = null;
+		ITER_ELEMENTS : while (iter.hasNext()) {
+			final Object obj = iter.next();
+			if (obj instanceof IModelElement) {
+				final IModelElement element = (IModelElement) obj;
+				if (numSu == 1) {
 					if (first) {
 						first = false;
 						if ((su = LTKUtil.getSourceUnit(element)) == null) {
@@ -68,25 +77,24 @@ public class ModelElementTester extends PropertyTester {
 							return false;
 						}
 					}
-					if (element.getModelTypeId().equals(expectedValue)) {
-						if (types.length == 0) {
+				}
+				if (element.getModelTypeId().equals(modelType)) {
+					if (mask == 0) {
+						continue ITER_ELEMENTS;
+					}
+					for (int i = 0; i < types.length; i++) {
+						if ((element.getElementType() & mask) == types[i]) {
 							continue ITER_ELEMENTS;
 						}
-						for (int i = 0; i < types.length; i++) {
-							if ((element.getElementType() & mask) == types[i]) {
-								continue ITER_ELEMENTS;
-							}
-						}
 					}
-					return false;
 				}
-				else {
-					return false;
-				}
+				return false;
 			}
-			return true;
+			else {
+				return false;
+			}
 		}
-		return false;
+		return true;
 	}
 	
 	private int[] parseInts(final Object[] args) {
