@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.core.databinding.validation.ValidationStatus;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
@@ -90,7 +92,7 @@ public class EditTemplateDialog extends ExtStatusDialog {
 	private Button fAutoInsertCheckbox;
 	
 	
-	private final StatusInfo fValidationStatus;
+	private IStatus fValidationStatus;
 	private boolean fSuppressError = true;
 	
 	private final ContextTypeRegistry fContextTypeRegistry;
@@ -120,8 +122,6 @@ public class EditTemplateDialog extends ExtStatusDialog {
 		
 		fOriginalTemplate = template;
 		fFlags = flags;
-		
-		fValidationStatus = new StatusInfo();
 		
 		fTemplateProcessor = processor;
 		fContextTypeRegistry = registry;
@@ -174,7 +174,7 @@ public class EditTemplateDialog extends ExtStatusDialog {
 			
 			final Composite composite = new Composite(dialogArea, SWT.NONE);
 			composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-			composite.setLayout(LayoutUtil.applyCompositeDefaults(new GridLayout(), 4));
+			composite.setLayout(LayoutUtil.createCompositeGrid(4));
 			
 			fNameText = createText(composite);
 			fNameText.addModifyListener(listener);
@@ -203,10 +203,8 @@ public class EditTemplateDialog extends ExtStatusDialog {
 			});
 			fContextCombo.setContentProvider(new ArrayContentProvider());
 			final List<TemplateContextType> contextTypes = new ArrayList<TemplateContextType>();
-			final Iterator iter = fContextTypeRegistry.contextTypes();
-			while (iter.hasNext()) {
-				final TemplateContextType contextType = (TemplateContextType) iter.next();
-				contextTypes.add(contextType);
+			for (final Iterator<TemplateContextType> iter = fContextTypeRegistry.contextTypes(); iter.hasNext(); ) {
+				contextTypes.add(iter.next());
 			}
 			fContextCombo.setInput(contextTypes.toArray());
 			
@@ -242,7 +240,7 @@ public class EditTemplateDialog extends ExtStatusDialog {
 		filler.setLayoutData(new GridData());
 		
 		final Composite composite= new Composite(dialogArea, SWT.NONE);
-		composite.setLayout(LayoutUtil.applyCompositeDefaults(new GridLayout(), 1));
+		composite.setLayout(LayoutUtil.createCompositeGrid(1));
 		composite.setLayoutData(new GridData());
 		
 		fInsertVariableButton= new Button(composite, SWT.NONE);
@@ -251,10 +249,8 @@ public class EditTemplateDialog extends ExtStatusDialog {
 		fInsertVariableButton.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				fPatternEditor.getSourceViewer().getTextWidget().setFocus();
-				fPatternEditor.getSourceViewer().doOperation(ISourceViewer.CONTENTASSIST_PROPOSALS);
+				insertVariablePressed();
 			}
-			
 			@Override
 			public void widgetDefaultSelected(final SelectionEvent e) {}
 		});
@@ -273,7 +269,7 @@ public class EditTemplateDialog extends ExtStatusDialog {
 		assistAction.setId("ContentAssistProposal"); //$NON-NLS-1$
 		assistAction.setText(EditingMessages.EditTemplateDialog_ContentAssist);
 		assistAction.setActionDefinitionId(ITextEditorActionDefinitionIds.CONTENT_ASSIST_PROPOSALS);
-		fPatternEditor.addAction(assistAction); 
+		fPatternEditor.addAction(assistAction);
 		
 		LayoutUtil.addSmallFiller(dialogArea, false);
 		applyDialogFont(dialogArea);
@@ -343,7 +339,7 @@ public class EditTemplateDialog extends ExtStatusDialog {
 /* Handlers *******************************************************************/
 	
 	
-	protected void doContextChanged(final TemplateContextType contextType) {
+	private void doContextChanged(final TemplateContextType contextType) {
 		fTemplateProcessor.setContextType(contextType);
 		configureForContext(contextType);
 		final Document document = fPatternEditor.getDocument();
@@ -359,18 +355,35 @@ public class EditTemplateDialog extends ExtStatusDialog {
 	
 	private void doValidate(final TemplateContextType contextType, final IDocument document) {
 		final String text = document.get();
-		fValidationStatus.setOK();
+		fValidationStatus = null;
 		if (contextType != null) {
-			try {
-				contextType.validate(text);
-			}
-			catch (final TemplateException e) {
-				fValidationStatus.setError(e.getLocalizedMessage());
+			final IStatus status = validate(contextType, text);
+			if (status != null && !status.isOK()) {
+				fValidationStatus = status;
 			}
 		}
 	}
 	
+	protected IStatus validate(final TemplateContextType contextType, final String text) {
+		try {
+			contextType.validate(text);
+			return ValidationStatus.ok();
+		}
+		catch (final TemplateException e) {
+			return ValidationStatus.error(e.getLocalizedMessage());
+		}
+	}
+	
 	protected void configureForContext(final TemplateContextType contextType) {
+	}
+	
+	protected void insertVariablePressed() {
+		fPatternEditor.getSourceViewer().getTextWidget().setFocus();
+		fPatternEditor.getSourceViewer().doOperation(ISourceViewer.CONTENTASSIST_PROPOSALS);
+	}
+	
+	protected void insertText(final String text) {
+		fPatternEditor.getSourceViewer().getTextWidget().insert(text);
 	}
 	
 	@Override
@@ -382,21 +395,23 @@ public class EditTemplateDialog extends ExtStatusDialog {
 	}
 	
 	private void updateButtons() {
-		StatusInfo status;
+		IStatus status;
 		
 		final boolean valid = (fNameText == null || fNameText.getText().trim().length() != 0);
 		if (!valid) {
-			status = new StatusInfo();
+			final StatusInfo info = new StatusInfo();
 			if (!fSuppressError) {
-				status.setError(EditingMessages.EditTemplateDialog_error_NoName);
+				info.setError(EditingMessages.EditTemplateDialog_error_NoName);
 			}
+			status = info;
 		} else if (!isValidPattern(fPatternEditor.getDocument().get())) {
-			status = new StatusInfo();
+			final StatusInfo info = new StatusInfo();
 			if (!fSuppressError) {
-				status.setError(EditingMessages.EditTemplateDialog_error_invalidPattern);
+				info.setError(EditingMessages.EditTemplateDialog_error_invalidPattern);
 			}
+			status = info;
 		} else {
-			status= fValidationStatus;
+			status = (fValidationStatus != null) ? fValidationStatus : ValidationStatus.ok();
 		}
 		updateStatus(status);
 	}

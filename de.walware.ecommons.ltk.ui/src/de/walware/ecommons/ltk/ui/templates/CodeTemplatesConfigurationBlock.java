@@ -47,6 +47,7 @@ import org.eclipse.jface.viewers.DecorationOverlayIcon;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
@@ -55,7 +56,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -64,6 +64,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.statushandlers.StatusManager;
 
+import de.walware.ecommons.collections.ConstList;
 import de.walware.ecommons.preferences.Preference;
 import de.walware.ecommons.preferences.ui.ManagedConfigurationBlock;
 import de.walware.ecommons.templates.TemplateVariableProcessor;
@@ -125,6 +126,12 @@ public class CodeTemplatesConfigurationBlock extends ManagedConfigurationBlock
 			return fItemImage;
 		}
 		
+		
+		@Override
+		public String toString() {
+			return fId;
+		}
+		
 	}
 	
 	protected static class TemplateItem {
@@ -141,6 +148,15 @@ public class CodeTemplatesConfigurationBlock extends ManagedConfigurationBlock
 			fGroup = group;
 			fData = data;
 			fContrib = contrib;
+		}
+		
+		
+		public TemplateGroup getGroup() {
+			return fGroup;
+		}
+		
+		public TemplatePersistenceData getData() {
+			return fData;
 		}
 		
 		
@@ -263,6 +279,14 @@ public class CodeTemplatesConfigurationBlock extends ManagedConfigurationBlock
 		
 	}
 	
+	
+	private static boolean equalContent(final Template t1, final Template t2) {
+		return (t1.getDescription().equals(t2.getDescription())
+				&& t1.getContextTypeId().equals(t2.getContextTypeId())
+				&& t1.getPattern().equals(t2.getPattern()) );
+	}
+	
+	
 	private class ThisContentProvider implements ITreeContentProvider {
 		
 		
@@ -310,9 +334,42 @@ public class CodeTemplatesConfigurationBlock extends ManagedConfigurationBlock
 						}
 					}
 				}
-				return items.toArray();
+				return items.toArray(new TemplateItem[items.size()]);
 			}
 			return new Object[0];
+		}
+		
+		public TemplateItem findItemByName(final TemplateGroup group, final String name) {
+			for (final ITemplateContribution contrib : fTemplateContributions) {
+				final TemplatePersistenceData[] templates = contrib.getTemplates(group.fId);
+				if (templates != null) {
+					for (int i = 0; i < templates.length; i++) {
+						if (name.equals(templates[i].getTemplate().getName())) {
+							return new TemplateItem(group, templates[i], contrib);
+						}
+					}
+				}
+			}
+			return null;
+		}
+		
+		public boolean containsItem(final TemplateGroup group, final Template template) {
+			final TemplateItem item = findItemByName(group, template.getName());
+			return (item != null && template.equals(item.fData.getTemplate()));
+		}
+		
+		public boolean containsItemContent(final TemplateGroup group, final Template template) {
+			for (final ITemplateContribution contrib : fTemplateContributions) {
+				final TemplatePersistenceData[] templates = contrib.getTemplates(group.fId);
+				if (templates != null) {
+					for (int i = 0; i < templates.length; i++) {
+						if (equalContent(templates[i].getTemplate(), template)) {
+							return true;
+						}
+					}
+				}
+			}
+			return false;
 		}
 		
 	}
@@ -345,10 +402,7 @@ public class CodeTemplatesConfigurationBlock extends ManagedConfigurationBlock
 		@Override
 		public Object change(final TemplateItem oldItem, final TemplateItem newItem,
 				final Object parent, final Object container) {
-			if (container == null) {
-				return null;
-			}
-			final ITemplateContribution contrib = (ITemplateContribution) container;
+			final ITemplateContribution contrib = newItem.fContrib;
 			if (oldItem == null) {
 				contrib.add(newItem.fData);
 			}
@@ -414,7 +468,7 @@ public class CodeTemplatesConfigurationBlock extends ManagedConfigurationBlock
 	
 	private TemplateGroup[] fTemplateGroups;
 	private ITemplateContribution[] fTemplateContributions;
-	private ITreeContentProvider fContentProvider;
+	private ThisContentProvider fContentProvider;
 	
 	private TreeViewer fTreeViewer;
 	private ButtonGroup<TemplateItem> fButtonGroup;
@@ -429,21 +483,23 @@ public class CodeTemplatesConfigurationBlock extends ManagedConfigurationBlock
 	private Map<Image, Image> fDefaultImages;
 	
 	
-	
 	public CodeTemplatesConfigurationBlock(final String title, final boolean enableAdd,
 			final TemplateGroup[] groups, final ITemplateContribution[] contributions,
 			final Preference<String> defaultPref) throws CoreException {
-		this(title, enableAdd);
+		this(title, enableAdd, defaultPref);
+		
 		init(groups, contributions);
-		fDefaultPref = defaultPref;
 	}
 	
-	public CodeTemplatesConfigurationBlock(final String title, final boolean enableAdd) throws CoreException {
+	public CodeTemplatesConfigurationBlock(final String title, final boolean enableAdd,
+			final Preference<String> defaultPref) throws CoreException {
 		super(null);
 		fTitle = title;
 		fEnableAdd = enableAdd;
 		
 		fEditTemplateProcessor = new TemplateVariableProcessor();
+		
+		fDefaultPref = defaultPref;
 	}
 	
 	
@@ -452,13 +508,22 @@ public class CodeTemplatesConfigurationBlock extends ManagedConfigurationBlock
 		fTemplateContributions = contributions;
 	}
 	
-	private TemplateGroup getGroup(final String groupId) {
+	protected List<TemplateGroup> getGroups() {
+		return new ConstList<TemplateGroup>(fTemplateGroups);
+	}
+	
+	protected TemplateGroup getGroup(final String groupId) {
 		for (final TemplateGroup group : fTemplateGroups) {
 			if (group.fId.equals(groupId)) {
 				return group;
 			}
 		}
 		return null;
+	}
+	
+	protected List<TemplateItem> getTemplates(final TemplateGroup group) {
+		final TemplateItem[] children = (TemplateItem[]) fContentProvider.getChildren(group);
+		return new ConstList<TemplateItem>(children);
 	}
 	
 	@Override
@@ -480,7 +545,9 @@ public class CodeTemplatesConfigurationBlock extends ManagedConfigurationBlock
 	protected void createBlockArea(final Composite pageComposite) {
 		final Map<Preference<?>, String> prefs = new HashMap<Preference<?>, String>();
 		
-		prefs.put(fDefaultPref, null);
+		if (fDefaultPref != null) {
+			prefs.put(fDefaultPref, null);
+		}
 		
 		setupPreferenceManager(prefs);
 		
@@ -491,7 +558,7 @@ public class CodeTemplatesConfigurationBlock extends ManagedConfigurationBlock
 		fContentProvider = new ThisContentProvider();
 		{	final Composite composite = new Composite(pageComposite, SWT.NONE);
 			composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-			composite.setLayout(LayoutUtil.applyCompositeDefaults(new GridLayout(), 2));
+			composite.setLayout(LayoutUtil.createCompositeGrid(2));
 			
 			fTreeViewer = createTreeViewer(composite);
 			fTreeViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -520,7 +587,7 @@ public class CodeTemplatesConfigurationBlock extends ManagedConfigurationBlock
 		
 		fPreview = new TemplatePreview();
 		{	final Label label = new Label(pageComposite, SWT.LEFT);
-			label.setText("Preview");
+			label.setText(TemplatesMessages.Config_Preview_label);
 			label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		}
 		{	final SourceViewer viewer = fPreview.createSourceViewer(pageComposite);
@@ -529,13 +596,16 @@ public class CodeTemplatesConfigurationBlock extends ManagedConfigurationBlock
 			viewer.getControl().setLayoutData(gd);
 		}
 		
-		fDefaultValue = createObservable(fDefaultPref);
+		if (fDefaultPref != null) {
+			fDefaultValue = createObservable(fDefaultPref);
+		}
 		fButtonGroup.connectTo(fTreeViewer, new ThisDataAdapter(fContentProvider, fDefaultValue));
 		
 		fTreeViewer.setInput(fTemplateGroups);
 		if (fTemplateGroups.length == 1) {
 			fTreeViewer.setExpandedState(fTemplateGroups[0], true);
 		}
+		fTreeViewer.setSelection(new StructuredSelection(fTemplateGroups[0]));
 		fButtonGroup.refresh();
 	}
 	
@@ -600,9 +670,8 @@ public class CodeTemplatesConfigurationBlock extends ManagedConfigurationBlock
 			item = new TemplateItem((TemplateGroup) parent,
 					new TemplatePersistenceData(template, true), contrib);
 		}
-		final EditTemplateDialog dialog = new EditTemplateDialog(
-				getShell(), item.fData.getTemplate(), ((command & ButtonGroup.ADD_ANY) != 0),
-				EditTemplateDialog.CUSTOM_TEMPLATE,
+		final EditTemplateDialog dialog = createEditDialog(
+				item.fData.getTemplate(), command,
 				item.fContrib.createViewerConfiguator(item.fData, fEditTemplateProcessor, fProject),
 				fEditTemplateProcessor, item.fContrib.getContextRegistry() );
 		if (dialog.open() == Window.OK) {
@@ -620,10 +689,18 @@ public class CodeTemplatesConfigurationBlock extends ManagedConfigurationBlock
 		return null;
 	}
 	
+	protected EditTemplateDialog createEditDialog(final Template template, final int command,
+			final SourceEditorViewerConfigurator configurator,
+			final  TemplateVariableProcessor processor, final ContextTypeRegistry registry) {
+		return new EditTemplateDialog(
+				getShell(), template, ((command & ButtonGroup.ADD_ANY) != 0),
+				EditTemplateDialog.CUSTOM_TEMPLATE, configurator, processor, registry );
+	}
+	
 	private String newName(final TemplateGroup group) {
 		String s;
 		do {
-			s = group + ":" + System.currentTimeMillis();
+			s = group.fId + ":" + System.currentTimeMillis(); //$NON-NLS-1$
 		} while (group.fItemNames.contains(s));
 		return s;
 	}
@@ -639,7 +716,7 @@ public class CodeTemplatesConfigurationBlock extends ManagedConfigurationBlock
 	public void importItems() {
 		final FileDialog dialog = new FileDialog(getShell(), SWT.OPEN);
 		dialog.setText(TemplatesMessages.Config_Import_title);
-		dialog.setFilterExtensions(new String[] { "*.xml", "*.*" });
+		dialog.setFilterExtensions(new String[] { "*.xml", "*.*" }); //$NON-NLS-1$ //$NON-NLS-2$
 		final String path = dialog.open();
 		
 		if (path == null) {
@@ -690,7 +767,14 @@ public class CodeTemplatesConfigurationBlock extends ManagedConfigurationBlock
 			fContentProvider.getChildren(group);
 		}
 		if (data.isUserAdded() && group.fItemNames.contains(data.getTemplate().getName())) {
+			if (fContentProvider.containsItem(group, data.getTemplate())) {
+				return;
+			}
 			data.getTemplate().setName(newName(group));
+		}
+		if (data.isUserAdded()
+				&& fContentProvider.containsItemContent(group, data.getTemplate())) {
+			return;
 		}
 		for (final ITemplateContribution contrib : fTemplateContributions) {
 			if (contrib.getGroups().contains(groupId)
@@ -712,7 +796,7 @@ public class CodeTemplatesConfigurationBlock extends ManagedConfigurationBlock
 	private void doExport(final TemplatePersistenceData[] templates) {
 		final FileDialog dialog = new FileDialog(getShell(), SWT.SAVE);
 		dialog.setText(NLS.bind(TemplatesMessages.Config_Export_title, String.valueOf(templates.length)));
-		dialog.setFilterExtensions(new String[] { "*.xml", "*.*" });
+		dialog.setFilterExtensions(new String[] { "*.xml", "*.*" }); //$NON-NLS-1$ //$NON-NLS-2$
 		dialog.setFileName(TemplatesMessages.Config_Export_filename);
 		final String path = dialog.open();
 		
@@ -777,7 +861,7 @@ public class CodeTemplatesConfigurationBlock extends ManagedConfigurationBlock
 		
 		public DefaultsDialog(final Shell parentShell) {
 			super(parentShell, TemplatesMessages.Config_RestoreDefaults_title, null,
-					TemplatesMessages.Config_RestoreDefaults_title + ": " + fTitle,
+					TemplatesMessages.Config_RestoreDefaults_title + ": " + fTitle, //$NON-NLS-1$
 					MessageDialog.QUESTION,
 					new String[] { IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL }, 0 );
 			setShellStyle(getShellStyle() | SWT.SHEET);
@@ -787,7 +871,7 @@ public class CodeTemplatesConfigurationBlock extends ManagedConfigurationBlock
 		@Override
 		protected Control createCustomArea(final Composite parent) {
 			final Composite composite = new Composite(parent, SWT.NONE);
-			composite.setLayout(LayoutUtil.applyCompositeDefaults(new GridLayout(), 1));
+			composite.setLayout(LayoutUtil.createCompositeGrid(1));
 			{	fCompleteControl = new Button(composite, SWT.RADIO);
 				final GridData gd = new GridData(SWT.FILL, SWT.FILL, true, false);
 				gd.horizontalIndent = LayoutUtil.defaultIndent();

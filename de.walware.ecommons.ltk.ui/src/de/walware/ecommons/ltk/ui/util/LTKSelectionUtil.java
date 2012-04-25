@@ -45,7 +45,7 @@ public class LTKSelectionUtil {
 	
 	public static IModelElement[] getSelectedElements(final IStructuredSelection selection) {
 		final IModelElement[] elements = new IModelElement[selection.size()];
-		final Iterator iter = selection.iterator();
+		final Iterator<?> iter = selection.iterator();
 		for (int i = 0; i < elements.length; i++) {
 			final Object next = iter.next();
 			if (next instanceof IModelElement) {
@@ -94,7 +94,7 @@ public class LTKSelectionUtil {
 	
 	public static ISourceStructElement[] getSelectedSourceStructElements(final IStructuredSelection selection) {
 		final ISourceStructElement[] elements = new ISourceStructElement[selection.size()];
-		final Iterator iter = selection.iterator();
+		final Iterator<?> iter = selection.iterator();
 		for (int i = 0; i < elements.length; i++) {
 			final Object next = iter.next();
 			if (next instanceof ISourceStructElement) {
@@ -115,7 +115,7 @@ public class LTKSelectionUtil {
 	
 	public static IFile[] getSelectedFiles(final IStructuredSelection selection) {
 		final IFile[] elements = new IFile[selection.size()];
-		final Iterator iter = selection.iterator();
+		final Iterator<?> iter = selection.iterator();
 		for (int i = 0; i < elements.length; i++) {
 			final Object next = iter.next();
 			if (next instanceof IFile) {
@@ -140,7 +140,9 @@ public class LTKSelectionUtil {
 			final int selectionEnd = selectionStart + selection.getLength();
 			if (selectionStart >= root.getSourceRange().getOffset() 
 					&& selectionEnd <= root.getSourceRange().getOffset()+root.getSourceRange().getLength()) {
-				return new ISourceStructElement[] { LTKUtil.getCoveringSourceElement(root, selectionStart, selectionEnd) };
+				return new ISourceStructElement[] {
+						LTKUtil.getCoveringSourceElement(root, selectionStart, selectionEnd),
+				};
 			}
 		}
 		return null;
