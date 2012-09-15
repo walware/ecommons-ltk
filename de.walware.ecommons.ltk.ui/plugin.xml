@@ -578,6 +578,15 @@
       <keyword
             id="de.walware.ecommons.ltk.keywords.SourceContentAssist"
             label="%keywords_ContentAssist"/>
+      <keyword
+            id="de.walware.ecommons.ltk.keywords.AutoBracket"
+            label="%keywords_AutoBracket"/>
+      <keyword
+            id="de.walware.ecommons.ltk.keywords.AutoIndent"
+            label="%keywords_AutoIndent"/>
+      <keyword
+            id="de.walware.ecommons.ltk.keywords.AutoWrap"
+            label="%keywords_AutoWrap"/>
    </extension>
    
    <extension
