@@ -16,9 +16,9 @@ import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.text.AbstractDocument;
+import org.eclipse.jface.text.ISynchronizable;
 
 import de.walware.ecommons.text.ISourceFragment;
-import de.walware.ecommons.text.ReadOnlyDocument;
 
 import de.walware.ecommons.ltk.AstInfo;
 import de.walware.ecommons.ltk.IElementName;
@@ -119,7 +119,7 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	 */
 	@Override
 	public boolean isReadOnly() {
-		return false;
+		return true;
 	}
 	
 	@Override
@@ -145,7 +145,7 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	@Override
 	public synchronized AbstractDocument getDocument(final IProgressMonitor monitor) {
 		if (fDocument == null) {
-			fDocument = new ReadOnlyDocument(fFragment.getSource(), fTimestamp);
+			fDocument = fFragment.getDocument();
 		}
 		return fDocument;
 	}
@@ -163,7 +163,17 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	 */
 	@Override
 	public SourceContent getContent(final IProgressMonitor monitor) {
-		return new SourceContent(fTimestamp, fFragment.getSource());
+		final AbstractDocument document = getDocument(monitor);
+		Object lockObject = null;
+		if (document instanceof ISynchronizable) {
+			lockObject = ((ISynchronizable) document).getLockObject();
+		}
+		if (lockObject == null) {
+			lockObject = fFragment;
+		}
+		synchronized (lockObject) {
+			return new SourceContent(document.getModificationStamp(), document.get());
+		}
 	}
 	
 	/**

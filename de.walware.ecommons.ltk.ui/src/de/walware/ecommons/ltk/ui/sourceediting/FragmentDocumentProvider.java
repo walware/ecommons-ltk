@@ -12,7 +12,6 @@ import org.eclipse.ui.texteditor.AbstractDocumentProvider;
 
 import de.walware.ecommons.text.ISourceFragment;
 import de.walware.ecommons.text.PartitionerDocumentSetupParticipant;
-import de.walware.ecommons.text.ReadOnlyDocument;
 
 import de.walware.ecommons.ltk.IDocumentModelProvider;
 import de.walware.ecommons.ltk.ISourceUnit;
@@ -83,7 +82,7 @@ public class FragmentDocumentProvider extends AbstractDocumentProvider
 	protected AbstractDocument createDocument(final Object element) throws CoreException {
 		if (element instanceof ISourceFragmentEditorInput) {
 			final ISourceFragment fragment = ((ISourceFragmentEditorInput) element).getSourceFragment();
-			return new ReadOnlyDocument(fragment.getSource(), System.currentTimeMillis());
+			return fragment.getDocument();
 		}
 		return null;
 	}

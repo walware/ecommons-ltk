@@ -12,6 +12,7 @@
 package de.walware.ecommons.text;
 
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.jface.text.AbstractDocument;
 
 
 public interface ISourceFragment extends IAdaptable {
@@ -23,6 +24,6 @@ public interface ISourceFragment extends IAdaptable {
 	
 	public String getFullName();
 	
-	public String getSource();
+	public AbstractDocument getDocument();
 	
 }
