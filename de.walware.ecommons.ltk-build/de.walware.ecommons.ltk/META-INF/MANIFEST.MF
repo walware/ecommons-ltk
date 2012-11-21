@@ -3,4 +3,4 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: WalWare.de
 Bundle-Name: ECommons LTK Framework
 Bundle-SymbolicName: de.walware.ecommons.ltk;singleton:=true
-Bundle-Version: 2.0.0.qualifier
+Bundle-Version: 2.1.0.qualifier

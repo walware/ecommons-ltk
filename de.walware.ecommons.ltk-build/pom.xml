@@ -5,7 +5,7 @@
 	
 	<groupId>de.walware.ecommons</groupId>
 	<artifactId>ecommons-ltk</artifactId>
-	<version>2.0-SNAPSHOT</version>
+	<version>2.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>ECommons LTK</name>
 	

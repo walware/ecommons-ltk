@@ -2,7 +2,7 @@
 <feature
       id="de.walware.ecommons.ltk.source"
       label="Commons - Sources of LTK Extensions"
-      version="2.0.1.qualifier"
+      version="2.1.0.qualifier"
       provider-name="WalWare.de"
       license-feature="de.walware.opensource.license"
       license-feature-version="1.0.0">
