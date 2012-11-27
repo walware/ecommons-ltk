@@ -11,10 +11,8 @@
 
 package de.walware.ecommons.text.ui.settings;
 
-import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.BeansObservables;
-import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.IValueChangeListener;
 import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
@@ -32,6 +30,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import de.walware.ecommons.databinding.IntegerValidator;
+import de.walware.ecommons.databinding.jface.DataBindingSupport;
 import de.walware.ecommons.text.IIndentSettings;
 import de.walware.ecommons.text.IIndentSettings.IndentationType;
 import de.walware.ecommons.text.internal.ui.Messages;
@@ -124,9 +123,9 @@ public class IndentSettingsUI {
 		}
 	}
 	
-	public void addBindings(final DataBindingContext dbc, final Realm realm, final Object model) {
-		dbc.bindValue(SWTObservables.observeText(fTabSize, SWT.Modify),
-				BeansObservables.observeValue(realm, model, IIndentSettings.TAB_SIZE_PROP),
+	public void addBindings(final DataBindingSupport db, final Object model) {
+		db.getContext().bindValue(SWTObservables.observeText(fTabSize, SWT.Modify),
+				BeansObservables.observeValue(db.getRealm(), model, IIndentSettings.TAB_SIZE_PROP),
 				new UpdateValueStrategy().setAfterGetValidator(new IntegerValidator(1, 32, Messages.CodeStyle_TabSize_error_message)),
 				null);
 		
@@ -140,22 +139,22 @@ public class IndentSettingsUI {
 				fIndentSpaceCount.setEnabled(t == IndentationType.SPACES);
 			}
 		});
-		dbc.bindValue(indentObservable, BeansObservables.observeValue(realm, model, IIndentSettings.INDENT_DEFAULT_TYPE_PROP),
+		db.getContext().bindValue(indentObservable, BeansObservables.observeValue(db.getRealm(), model, IIndentSettings.INDENT_DEFAULT_TYPE_PROP),
 				null, null );
-		dbc.bindValue(SWTObservables.observeText(fIndentSpaceCount, SWT.Modify),
-				BeansObservables.observeValue(realm, model, IIndentSettings.INDENT_SPACES_COUNT_PROP),
+		db.getContext().bindValue(SWTObservables.observeText(fIndentSpaceCount, SWT.Modify),
+				BeansObservables.observeValue(db.getRealm(), model, IIndentSettings.INDENT_SPACES_COUNT_PROP),
 				new UpdateValueStrategy().setAfterGetValidator(new IntegerValidator(1, 32, Messages.CodeStyle_Indent_NumOfSpaces_error_message)),
 				null );
-		dbc.bindValue(SWTObservables.observeSelection(fReplaceOtherTabs),
-				BeansObservables.observeValue(realm, model, IIndentSettings.REPLACE_TABS_WITH_SPACES_PROP),
+		db.getContext().bindValue(SWTObservables.observeSelection(fReplaceOtherTabs),
+				BeansObservables.observeValue(db.getRealm(), model, IIndentSettings.REPLACE_TABS_WITH_SPACES_PROP),
 				null, null );
-		dbc.bindValue(SWTObservables.observeSelection(fConserveIndent),
-				BeansObservables.observeValue(realm, model, IIndentSettings.REPLACE_CONSERVATIVE_PROP),
+		db.getContext().bindValue(SWTObservables.observeSelection(fConserveIndent),
+				BeansObservables.observeValue(db.getRealm(), model, IIndentSettings.REPLACE_CONSERVATIVE_PROP),
 				null, null );
 		
 		if (fLineWidthControl != null) {
-			dbc.bindValue(SWTObservables.observeText(fLineWidthControl, SWT.Modify),
-					BeansObservables.observeValue(realm, model, IIndentSettings.WRAP_LINE_WIDTH_PROP),
+			db.getContext().bindValue(SWTObservables.observeText(fLineWidthControl, SWT.Modify),
+					BeansObservables.observeValue(db.getRealm(), model, IIndentSettings.WRAP_LINE_WIDTH_PROP),
 					new UpdateValueStrategy().setAfterGetValidator(new IntegerValidator(40, 400, Messages.CodeStyle_LineWidth_error_message)),
 					null );
 		}
