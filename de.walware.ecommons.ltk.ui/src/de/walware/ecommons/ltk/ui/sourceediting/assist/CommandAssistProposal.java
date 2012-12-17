@@ -24,9 +24,9 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 
 import de.walware.ecommons.text.ui.DefaultBrowserInformationInput;
+import de.walware.ecommons.workbench.ui.WorkbenchUIUtil;
 
 import de.walware.ecommons.ltk.ui.sourceediting.ICommandAccess;
-import de.walware.ecommons.ltk.ui.util.WorkbenchUIUtil;
 
 
 public abstract class CommandAssistProposal implements IAssistCompletionProposal, ICommandAccess,

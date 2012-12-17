@@ -23,10 +23,10 @@ import org.eclipse.swt.dnd.Transfer;
 
 import de.walware.ecommons.ui.util.DNDUtil;
 import de.walware.ecommons.ui.util.UIAccess;
+import de.walware.ecommons.workbench.ui.WorkbenchUIUtil;
 
 import de.walware.ecommons.ltk.IModelElement;
 import de.walware.ecommons.ltk.core.refactoring.CommonRefactoringFactory;
-import de.walware.ecommons.ltk.ui.util.WorkbenchUIUtil;
 
 
 /**
