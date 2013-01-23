@@ -42,7 +42,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -186,7 +185,7 @@ public class AdvancedContentAssistConfigurationBlock extends ManagedConfiguratio
 		
 		final Composite composite = new Composite(pageComposite, SWT.NONE);
 		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		composite.setLayout(LayoutUtil.applyCompositeDefaults(new GridLayout(), 1));
+		composite.setLayout(LayoutUtil.createCompositeGrid(1));
 //		final Composite composite = pageComposite;
 		
 		final String keybinding = getDefaultKeybindingAsString();
@@ -200,7 +199,7 @@ public class AdvancedContentAssistConfigurationBlock extends ManagedConfiguratio
 		{	// Default
 			final Group group = new Group(composite, SWT.NONE);
 			group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-			group.setLayout(LayoutUtil.applyGroupDefaults(new GridLayout(), 1));
+			group.setLayout(LayoutUtil.createGroupGrid(1));
 			group.setText(EditingMessages.ContentAssistAdvancedConfig_Default_label);
 			
 			final Label label = new Label(group, SWT.NONE);
@@ -214,7 +213,7 @@ public class AdvancedContentAssistConfigurationBlock extends ManagedConfiguratio
 		{	// Default
 			final Group group = new Group(composite, SWT.NONE);
 			group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-			group.setLayout(LayoutUtil.applyGroupDefaults(new GridLayout(), 2));
+			group.setLayout(LayoutUtil.createGroupGrid(2));
 			group.setText(EditingMessages.ContentAssistAdvancedConfig_Cicling_label);
 			
 			final Label label = new Label(group, SWT.WRAP);
@@ -233,6 +232,9 @@ public class AdvancedContentAssistConfigurationBlock extends ManagedConfiguratio
 		fOrderedCategories = new WritableList();
 		fCirclingList.setInput(fOrderedCategories);
 		fOrderButtons.connectTo(fCirclingList, fOrderedCategories, null);
+		ViewerUtil.scheduleStandardSelection(fCirclingList);
+		
+		ViewerUtil.scheduleStandardSelection(fDefaultList);
 		
 		updateControls();
 	}

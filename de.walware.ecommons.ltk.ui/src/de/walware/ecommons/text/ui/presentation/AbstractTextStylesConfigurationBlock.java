@@ -60,7 +60,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -497,7 +496,7 @@ public abstract class AbstractTextStylesConfigurationBlock extends OverlayStoreC
 		
 		final Composite composite = new Composite(pageComposite, SWT.NONE);
 		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		composite.setLayout(LayoutUtil.applyCompositeDefaults(new GridLayout(), 1));
+		composite.setLayout(LayoutUtil.createCompositeGrid(1));
 		
 		// Tree / Options
 		{	final Label label = new Label(composite, SWT.NONE);
@@ -507,7 +506,7 @@ public abstract class AbstractTextStylesConfigurationBlock extends OverlayStoreC
 		
 		final Composite configComposite = new Composite(composite, SWT.NONE);
 		configComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		configComposite.setLayout(LayoutUtil.applyCompositeDefaults(new GridLayout(), 2));
+		configComposite.setLayout(LayoutUtil.createCompositeGrid(2));
 		{	final Control selectionControl = createTreeViewer(configComposite);
 			final GridData gd = new GridData(SWT.FILL, SWT.FILL, false, true);
 			final Point size = ViewerUtil.calculateTreeSizeHint(fSelectionViewer.getControl(), fRootNodes, 9);
@@ -589,12 +588,14 @@ public abstract class AbstractTextStylesConfigurationBlock extends OverlayStoreC
 	
 	private Control createOptionsControl(final Composite parent) {
 		final Composite composite = new Composite(parent, SWT.NONE);
-		composite.setLayout(LayoutUtil.applyCompositeDefaults(new GridLayout(), 2));
+		composite.setLayout(LayoutUtil.createCompositeGrid(2));
 		{	fUseControl = new ComboViewer(composite, SWT.READ_ONLY | SWT.DROP_DOWN);
 			fUseControl.setLabelProvider(new UseStyleLabelProvider());
 			final GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1);
-			gd.widthHint = LayoutUtil.hintWidth(fUseControl.getCombo(),
-					new String[] { "XXXXXXXXXXXXXXX", Messages.SyntaxColoring_Use_CustomStyle_label, Messages.SyntaxColoring_Use_NoExtraStyle_label }); 
+			gd.widthHint = LayoutUtil.hintWidth(fUseControl.getCombo(), new String[] {
+							"XXXXXXXXXXXXXXX", //$NON-NLS-1$
+							Messages.SyntaxColoring_Use_CustomStyle_label,
+							Messages.SyntaxColoring_Use_NoExtraStyle_label }); 
 			fUseControl.getControl().setLayoutData(gd);
 		}
 		final int indent = LayoutUtil.defaultSmallIndent();
@@ -791,10 +792,10 @@ public abstract class AbstractTextStylesConfigurationBlock extends OverlayStoreC
 		final StringBuilder description = new StringBuilder(tooltip);
 		final int end = Math.min(20, listItems.length);
 		for (int i = 0; i < end; i++) {
-			description.append("\n    "); 
+			description.append("\n    ");  //$NON-NLS-1$
 			description.append(listItems[i]);
 		}
-		description.append("\n["+end+"/"+listItems.length+"]"); 
+		description.append("\n["+end+"/"+listItems.length+"]");  //$NON-NLS-1$
 		return MessageUtil.escapeForTooltip(description);
 	}
 	

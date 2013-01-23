@@ -105,7 +105,7 @@ public class SourceViewerInformationControl extends AbstractInformationControl {
 		};
 		fContentComposite.setBackground(parent.getBackground());
 		
-		final GridLayout gridLayout = LayoutUtil.applyCompositeDefaults(new GridLayout(), 1);
+		final GridLayout gridLayout = LayoutUtil.createCompositeGrid(1);
 		fContentComposite.setLayout(gridLayout);
 		
 		final int vIndent = Math.max(1, LayoutUtil.defaultVSpacing() / 4);

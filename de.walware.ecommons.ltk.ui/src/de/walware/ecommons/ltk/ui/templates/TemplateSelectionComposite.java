@@ -25,7 +25,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -108,7 +107,7 @@ public class TemplateSelectionComposite extends Composite implements ISelectionC
 	
 	
 	protected void createControls() {
-		setLayout(LayoutUtil.applyCompositeDefaults(new GridLayout(), 1));
+		setLayout(LayoutUtil.createCompositeGrid(1));
 		
 		{	final Control control = createTableViewer(this);
 			control.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));

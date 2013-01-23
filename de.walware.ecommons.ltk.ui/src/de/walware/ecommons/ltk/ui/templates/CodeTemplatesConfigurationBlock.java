@@ -47,7 +47,6 @@ import org.eclipse.jface.viewers.DecorationOverlayIcon;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
@@ -72,6 +71,7 @@ import de.walware.ecommons.ui.SharedUIResources;
 import de.walware.ecommons.ui.components.ButtonGroup;
 import de.walware.ecommons.ui.components.DataAdapter;
 import de.walware.ecommons.ui.util.LayoutUtil;
+import de.walware.ecommons.ui.util.ViewerUtil;
 
 import de.walware.ecommons.ltk.internal.ui.LTKUIPlugin;
 import de.walware.ecommons.ltk.internal.ui.TemplatesMessages;
@@ -602,10 +602,8 @@ public class CodeTemplatesConfigurationBlock extends ManagedConfigurationBlock
 		fButtonGroup.connectTo(fTreeViewer, new ThisDataAdapter(fContentProvider, fDefaultValue));
 		
 		fTreeViewer.setInput(fTemplateGroups);
-		if (fTemplateGroups.length == 1) {
-			fTreeViewer.setExpandedState(fTemplateGroups[0], true);
-		}
-		fTreeViewer.setSelection(new StructuredSelection(fTemplateGroups[0]));
+		ViewerUtil.scheduleStandardSelection(fTreeViewer);
+		
 		fButtonGroup.refresh();
 	}
 	

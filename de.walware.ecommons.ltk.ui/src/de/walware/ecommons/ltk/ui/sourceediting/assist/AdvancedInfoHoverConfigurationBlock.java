@@ -32,7 +32,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -100,7 +99,7 @@ public class AdvancedInfoHoverConfigurationBlock extends ManagedConfigurationBlo
 		
 		final Composite composite = new Composite(pageComposite, SWT.NONE);
 		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		composite.setLayout(LayoutUtil.applyCompositeDefaults(new GridLayout(), 2));
+		composite.setLayout(LayoutUtil.createCompositeGrid(2));
 		
 		final CheckboxTableComposite tableComposite = new CheckboxTableComposite(composite,
 				SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION);
