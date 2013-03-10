@@ -74,20 +74,11 @@ public interface ISourceEditorCommandIds {
 	public static final String SPECIFIC_CONTENT_ASSIST_CATEGORY_PARAMETER_ID = "categoryId"; //$NON-NLS-1$
 	
 	
-//--Source--
-	
 	/**
 	 * Action definition ID of the 'source' &gt; 'toggle comment' action
 	 * 
 	 * Value: @value
 	 */
 	public static final String TOGGLE_COMMENT = 		"de.walware.ecommons.ltk.commands.ToggleComment"; //$NON-NLS-1$
-	
-	/**
-	 * Action definition ID of the 'correct indentation' action
-	 * 
-	 * Value: @value
-	 */
-	public static final String CORRECT_INDENT =        "de.walware.ecommons.ltk.commands.CorrectIndent"; //$NON-NLS-1$
 	
 }

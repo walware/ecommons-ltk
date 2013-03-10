@@ -219,7 +219,7 @@ public abstract class LinkedNamesAssistProposal implements IAssistCompletionProp
 	 */
 	@Override
 	public Image getImage() {
-		return LTKUI.getImages().get(LTKUI.OBJ_TEXT_LINKEDRENAME);
+		return LTKUI.getImages().get(LTKUI.OBJ_TEXT_LINKEDRENAME_IMAGE_ID);
 	}
 	
 	/**

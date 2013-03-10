@@ -21,7 +21,6 @@ import java.util.Set;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.commands.IHandler2;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectNature;
@@ -30,7 +29,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -109,6 +107,7 @@ import de.walware.ecommons.ltk.internal.ui.EditingMessages;
 import de.walware.ecommons.ltk.ui.IModelElementInputProvider;
 import de.walware.ecommons.ltk.ui.ISelectionWithElementInfoListener;
 import de.walware.ecommons.ltk.ui.LTKInputData;
+import de.walware.ecommons.ltk.ui.LTKUI;
 import de.walware.ecommons.ltk.ui.PostSelectionCancelExtension;
 import de.walware.ecommons.ltk.ui.PostSelectionWithElementInfoController;
 import de.walware.ecommons.ltk.ui.PostSelectionWithElementInfoController.IgnoreActivation;
@@ -988,15 +987,14 @@ public abstract class SourceEditor1 extends TextEditor
 					new GotoMatchingBracketHandler(matcher, this));
 		}
 		
-		{	final IHandler handler = createToggleCommentHandler();
+		{	final IHandler2 handler = createToggleCommentHandler();
 			if (handler != null) {
 				handlerService.activateHandler(ISourceEditorCommandIds.TOGGLE_COMMENT, handler);
 			}
 		}
-		{	final IAction action = createCorrectIndentAction();
-			if (action != null) {
-				setAction(action.getId(), action);
-				markAsContentDependentAction(action.getId(), true);
+		{	final IHandler2 handler = createCorrectIndentHandler();
+			if (handler != null) {
+				handlerService.activateHandler(LTKUI.CORRECT_INDENT_COMMAND_ID, handler);
 			}
 		}
 		
@@ -1023,13 +1021,13 @@ public abstract class SourceEditor1 extends TextEditor
 		return new FoldingActionGroup(this, (ProjectionViewer) getSourceViewer());
 	}
 	
-	protected IHandler createToggleCommentHandler() {
-		final ToggleCommentHandler commentHandler = new ToggleCommentHandler();
+	protected IHandler2 createToggleCommentHandler() {
+		final IHandler2 commentHandler = new ToggleCommentHandler();
 		markAsStateDependentHandler(commentHandler, true);
 		return commentHandler;
 	}
 	
-	protected IAction createCorrectIndentAction() {
+	protected IHandler2 createCorrectIndentHandler() {
 		return null;
 	}
 	
