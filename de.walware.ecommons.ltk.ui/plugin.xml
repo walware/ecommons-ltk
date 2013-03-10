@@ -134,7 +134,12 @@
             id="de.walware.ecommons.ltk.commands.ToggleComment"
             categoryId="de.walware.statet.base.commandCategorys.StatetSource"
             name="%commands_ToggleComment_name"
-            description="%commands_ToggleComment_description"
+            description="%commands_ToggleComment_description"/>
+      <command
+            id="de.walware.ecommons.ltk.commands.StripComments"
+            categoryId="de.walware.statet.base.commandCategorys.StatetSource"
+            name="%commands_StripComments_name"
+            description="%commands_StripComments_description"
             />
       <command
             id="de.walware.ecommons.ltk.commands.InsertAssignment"
@@ -283,6 +288,11 @@
             contextId="de.walware.ecommons.text.contexts.TextEditor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M2+C"/>
+      <key
+            commandId="de.walware.ecommons.ltk.commands.StripComments"
+            contextId="de.walware.ecommons.text.contexts.TextEditor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+D"/>
       <key
             commandId="de.walware.ecommons.ltk.commands.InsertAssignment"
             contextId="de.walware.ecommons.text.contexts.TextEditor"

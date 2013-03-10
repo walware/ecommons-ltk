@@ -133,9 +133,9 @@ public class LTKUIPlugin extends AbstractUIPlugin {
 		}
 		final ImageRegistryUtil util = new ImageRegistryUtil(this);
 		
-		util.register(LTKUI.OBJ_TEXT_TEMPLATE, ImageRegistryUtil.T_OBJ, "text-template.png"); //$NON-NLS-1$
-		util.register(LTKUI.OBJ_TEXT_AT_TAG, ImageRegistryUtil.T_OBJ, "text-at_tag.png"); //$NON-NLS-1$
-		util.register(LTKUI.OBJ_TEXT_LINKEDRENAME, ImageRegistryUtil.T_OBJ, "text-linked_rename.png"); //$NON-NLS-1$
+		util.register(LTKUI.OBJ_TEXT_TEMPLATE_IMAGE_ID, ImageRegistryUtil.T_OBJ, "text-template.png"); //$NON-NLS-1$
+		util.register(LTKUI.OBJ_TEXT_AT_TAG_IMAGE_ID, ImageRegistryUtil.T_OBJ, "text-at_tag.png"); //$NON-NLS-1$
+		util.register(LTKUI.OBJ_TEXT_LINKEDRENAME_IMAGE_ID, ImageRegistryUtil.T_OBJ, "text-linked_rename.png"); //$NON-NLS-1$
 	}
 	
 	

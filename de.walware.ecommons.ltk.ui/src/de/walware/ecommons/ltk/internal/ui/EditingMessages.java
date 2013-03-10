@@ -49,6 +49,7 @@ public class EditingMessages extends NLS {
 	public static String ContentAssistAdvancedConfig_CiclingTable_label;
 	
 	public static String ToggleCommentAction_error;
+	public static String GenericAction_error_message;
 	
 	public static String CodeFolding_label;
 	public static String CodeFolding_Enable_label;
