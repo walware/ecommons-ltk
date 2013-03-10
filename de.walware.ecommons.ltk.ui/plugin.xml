@@ -33,8 +33,7 @@
       </context>
       <context
             id="de.walware.ecommons.base.contexts.StructuredElementViewer"
-            parentId="org.eclipse.ui.contexts.window"
-            name="%contexts_StructuredElementViewer_name">
+            name="%contexts_StructuredElementViewer_name"
             description="%contexts_StructuredElementViewer_description">
       </context>
    </extension>
