@@ -71,7 +71,8 @@ public class FileBufferWorkingBuffer extends WorkingBuffer {
 					}
 					synchronized (docLock) {
 						if (runnable.getStampAssertion() > 0 && document.getModificationStamp() != runnable.getStampAssertion()) {
-							throw new CoreException(new Status(IStatus.ERROR, LTKUIPlugin.PLUGIN_ID, "Document out of sync (usuallly caused by concurrent document modifications)."));
+							throw new CoreException(new Status(IStatus.ERROR, LTKUIPlugin.PLUGIN_ID,
+									"Document out of sync (usuallly caused by concurrent document modifications)." ));
 						}
 						runnable.run();
 					}
@@ -114,7 +115,7 @@ public class FileBufferWorkingBuffer extends WorkingBuffer {
 				}
 				catch (final CoreException e) {
 					StatusManager.getManager().handle(new Status(IStatus.ERROR, LTKUIPlugin.PLUGIN_ID, -1,
-							"An error occurred when allocating the document of the file buffer.", e));
+							"An error occurred when allocating the document of the file buffer.", e ));
 				}
 			}
 			else if (getMode() == FILESTORE) {
@@ -125,7 +126,7 @@ public class FileBufferWorkingBuffer extends WorkingBuffer {
 				}
 				catch (final CoreException e) {
 					StatusManager.getManager().handle(new Status(IStatus.ERROR, LTKUIPlugin.PLUGIN_ID, -1,
-							"An error occurred when allocating the document of the file buffer.", e));
+							"An error occurred when allocating the document of the file buffer.", e ));
 				}
 			}
 			if (fBuffer != null) {
@@ -176,7 +177,7 @@ public class FileBufferWorkingBuffer extends WorkingBuffer {
 			}
 			catch (final CoreException e) {
 				StatusManager.getManager().handle(new Status(IStatus.ERROR, LTKUIPlugin.PLUGIN_ID, -1,
-						"An error occurred when releasing the document of the file buffer.", e));
+						"An error occurred when releasing the document of the file buffer.", e ));
 			}
 			finally {
 				fBuffer = null;
@@ -202,7 +203,7 @@ public class FileBufferWorkingBuffer extends WorkingBuffer {
 				}
 				catch (final CoreException e) {
 					StatusManager.getManager().handle(new Status(IStatus.ERROR, LTKUIPlugin.PLUGIN_ID, -1,
-							"An error occurred when validating file buffer state.", e));
+							"An error occurred when validating file buffer state.", e ));
 				}
 			}
 		}
@@ -211,7 +212,7 @@ public class FileBufferWorkingBuffer extends WorkingBuffer {
 	
 	@Override
 	public boolean isSynchronized() {
-		return fBuffer.isSynchronized();
+		return !fBuffer.isDirty();
 	}
 	
 }

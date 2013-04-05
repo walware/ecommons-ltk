@@ -85,7 +85,6 @@ import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
 import de.walware.ecommons.FastList;
 import de.walware.ecommons.ICommonStatusConstants;
-import de.walware.ecommons.IDisposable;
 import de.walware.ecommons.preferences.Preference;
 import de.walware.ecommons.preferences.PreferencesUtil;
 import de.walware.ecommons.preferences.SettingsChangeNotifier;
@@ -99,11 +98,14 @@ import de.walware.ecommons.ui.util.UIAccess;
 
 import de.walware.ecommons.ltk.IDocumentModelProvider;
 import de.walware.ecommons.ltk.IModelElement;
+import de.walware.ecommons.ltk.IModelManager;
 import de.walware.ecommons.ltk.ISourceStructElement;
 import de.walware.ecommons.ltk.ISourceUnit;
 import de.walware.ecommons.ltk.ISourceUnitModelInfo;
+import de.walware.ecommons.ltk.LTK;
 import de.walware.ecommons.ltk.ast.IAstNode;
 import de.walware.ecommons.ltk.internal.ui.EditingMessages;
+import de.walware.ecommons.ltk.ui.ElementInfoController;
 import de.walware.ecommons.ltk.ui.IModelElementInputProvider;
 import de.walware.ecommons.ltk.ui.ISelectionWithElementInfoListener;
 import de.walware.ecommons.ltk.ui.LTKInputData;
@@ -123,8 +125,7 @@ import de.walware.ecommons.ltk.ui.sourceediting.actions.SelectPreviousWordHandle
 /**
  * Abstract LTK based source editor.
  */
-public abstract class SourceEditor1 extends TextEditor
-		implements ISourceEditor, 
+public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 			SettingsChangeNotifier.ChangeListener, IPreferenceChangeListener,
 			IShowInSource, IShowInTargetList {
 	
@@ -134,6 +135,7 @@ public abstract class SourceEditor1 extends TextEditor
 	
 /*- Static utility methods --------------------------------------------------*/
 	
+	@Deprecated
 	protected static IProjectNature getProject(final IEditorInput input, final String projectNatureId) {
 		if (input != null && input instanceof IFileEditorInput) {
 			final IProject project = ((IFileEditorInput) input).getFile().getProject();
@@ -475,7 +477,7 @@ public abstract class SourceEditor1 extends TextEditor
 	private SourceEditorViewerConfigurator fConfigurator;
 	private boolean fLazySetup;
 	private ISourceUnit fSourceUnit;
-	private IModelElementInputProvider fModelProvider;
+	private ElementInfoController fModelProvider;
 	private PostSelectionWithElementInfoController fModelPostSelection;
 	protected volatile Point fCurrentSelection;
 	
@@ -536,10 +538,10 @@ public abstract class SourceEditor1 extends TextEditor
 	}
 	
 	
-	protected void enableStructuralFeatures(final IModelElementInputProvider provider,
+	protected void enableStructuralFeatures(final IModelManager modelManager,
 			final Preference<Boolean> codeFoldingEnablement,
 			final Preference<Boolean> markOccurrencesEnablement) {
-		fModelProvider = provider;
+		fModelProvider = new ElementInfoController(modelManager, LTK.EDITOR_CONTEXT);
 		fFoldingEnablement = codeFoldingEnablement;
 		fMarkOccurrencesEnablement = markOccurrencesEnablement;
 	}
@@ -594,6 +596,10 @@ public abstract class SourceEditor1 extends TextEditor
 	
 	@Override
 	protected void doSetInput(final IEditorInput input) throws CoreException {
+		if (fModelProvider != null && fSourceUnit != null) {
+			fModelProvider.setInput(null);
+		}
+		
 		// project has changed
 		final ISourceViewer sourceViewer = getSourceViewer();
 		if (sourceViewer != null) {
@@ -673,6 +679,9 @@ public abstract class SourceEditor1 extends TextEditor
 		final IDocumentProvider documentProvider = getDocumentProvider();
 		if (documentProvider instanceof IDocumentModelProvider) {
 			fSourceUnit = ((IDocumentModelProvider) documentProvider).getWorkingCopy(newInput);
+			if (fModelProvider != null) {
+				fModelProvider.setInput(fSourceUnit);
+			}
 		}
 	}
 	
@@ -1246,9 +1255,11 @@ public abstract class SourceEditor1 extends TextEditor
 	
 	@Override
 	public void dispose() {
-		if (fModelProvider instanceof IDisposable) {
-			((IDisposable) fModelProvider).dispose();
+		if (fModelProvider != null) {
+			fModelProvider.setInput(null);
+			fModelProvider.dispose();
 		}
+		
 		PreferencesUtil.getSettingsChangeNotifier().removeChangeListener(this);
 		if (fModelPostSelection != null) {
 			fModelPostSelection.dispose();
@@ -1271,6 +1282,7 @@ public abstract class SourceEditor1 extends TextEditor
 			fImageDescriptor = null;
 		}
 		
+		fSourceUnit = null;
 		fModelProvider = null;
 		fModelPostSelection = null;
 	}

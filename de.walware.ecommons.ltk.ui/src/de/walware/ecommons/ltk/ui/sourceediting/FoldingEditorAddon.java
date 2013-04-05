@@ -21,12 +21,20 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.text.AbstractDocument;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotationModel;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.ui.statushandlers.StatusManager;
 
 import de.walware.ecommons.preferences.PreferencesUtil;
 import de.walware.ecommons.preferences.SettingsChangeNotifier.ChangeListener;
@@ -38,11 +46,17 @@ import de.walware.ecommons.ltk.IModelElementDelta;
 import de.walware.ecommons.ltk.IModelManager;
 import de.walware.ecommons.ltk.ISourceUnit;
 import de.walware.ecommons.ltk.ISourceUnitModelInfo;
+import de.walware.ecommons.ltk.IWorkspaceSourceUnit;
 import de.walware.ecommons.ltk.ast.ICommonAstVisitor;
+import de.walware.ecommons.ltk.internal.ui.LTKUIPlugin;
 import de.walware.ecommons.ltk.ui.IModelElementInputListener;
 
 
 public class FoldingEditorAddon implements ISourceEditorAddon, IModelElementInputListener, ChangeListener {
+	
+	
+	private static final int EXPANDED_STATE = 1;
+	private static final int COLLAPSED_STATE = 2;
 	
 	
 	public static final class FoldingStructureComputationContext {
@@ -53,20 +67,16 @@ public class FoldingEditorAddon implements ISourceEditorAddon, IModelElementInpu
 		
 		public final boolean isInitial;
 		
-		private final ProjectionAnnotationModel fAnnnotationModel;
 		private final SortedMap<Position, FoldingAnnotation> fTable = new TreeMap<Position, FoldingAnnotation>(TextUtil.POSITION_COMPARATOR);
 		
 		
 		protected FoldingStructureComputationContext(final AbstractDocument document,
-				final ISourceUnitModelInfo model, final AstInfo ast,
-				final ProjectionAnnotationModel annotationModel, final boolean isInitial) {
+				final ISourceUnitModelInfo model, final AstInfo ast, final boolean isInitial) {
 			this.document = document;
 			this.model = model;
 			this.ast = ast;
 			
 			this.isInitial = isInitial;
-			
-			fAnnnotationModel = annotationModel;
 		}
 		
 		
@@ -83,10 +93,33 @@ public class FoldingEditorAddon implements ISourceEditorAddon, IModelElementInpu
 		
 		private String fType;
 		
+		private final int fInitialState;
+		
 		
 		public FoldingAnnotation(final String type, final boolean collapse) {
 			super(collapse);
 			fType = type;
+			fInitialState = (collapse) ? COLLAPSED_STATE : EXPANDED_STATE;
+		}
+		
+		
+		private int getInitialState() {
+			return fInitialState;
+		}
+		
+		private int getState() {
+			return (isCollapsed()) ? COLLAPSED_STATE : EXPANDED_STATE;
+		}
+		
+		private void applyState(final int state) {
+			switch (state) {
+			case EXPANDED_STATE:
+				markExpanded();
+				break;
+			case COLLAPSED_STATE:
+				markCollapsed();
+				break;
+			}
 		}
 		
 	}
@@ -94,6 +127,8 @@ public class FoldingEditorAddon implements ISourceEditorAddon, IModelElementInpu
 	public static abstract interface FoldingProvider {
 		
 		boolean checkConfig(Set<String> groupIds);
+		
+		boolean isRestoreStateEnabled();
 		
 		boolean requiresModel();
 		
@@ -112,12 +147,17 @@ public class FoldingEditorAddon implements ISourceEditorAddon, IModelElementInpu
 	private static final class Input {
 		
 		private final ISourceUnit fUnit;
-		private boolean fInitilized;
+		
+		private boolean fIsInitilized;
 		private long fUpdateStamp;
+		
+		private QualifiedName fSavePropertyName;
+		
+		public ProjectionAnnotationModel fAnnotationModel;
 		
 		Input(final ISourceUnit unit) {
 			fUnit = unit;
-			fInitilized = false;
+			fIsInitilized = false;
 			fUpdateStamp = Long.MIN_VALUE;
 		}
 		
@@ -129,6 +169,8 @@ public class FoldingEditorAddon implements ISourceEditorAddon, IModelElementInpu
 	private SourceEditor1 fEditor;
 	
 	private volatile Input fInput;
+	
+	private final List<Input> fInputToSave = new ArrayList<FoldingEditorAddon.Input>();
 	
 	
 	public FoldingEditorAddon(final FoldingProvider provider) {
@@ -146,8 +188,11 @@ public class FoldingEditorAddon implements ISourceEditorAddon, IModelElementInpu
 	
 	@Override
 	public void elementChanged(final IModelElement element) {
-		final Input input = new Input((ISourceUnit) element);
+		final Input input = (element != null) ? new Input((ISourceUnit) element) : null;
 		synchronized (this) {
+			if (fInput != null) {
+				saveState(fInput);
+			}
 			fInput = input;
 		}
 	}
@@ -155,7 +200,7 @@ public class FoldingEditorAddon implements ISourceEditorAddon, IModelElementInpu
 	@Override
 	public void elementInitialInfo(final IModelElement element) {
 		final Input input = fInput;
-		if (input.fUnit == element) {
+		if (input != null && input.fUnit == element) {
 			update(input, -1);
 		}
 	}
@@ -163,7 +208,7 @@ public class FoldingEditorAddon implements ISourceEditorAddon, IModelElementInpu
 	@Override
 	public void elementUpdatedInfo(final IModelElement element, final IModelElementDelta delta) {
 		final Input input = fInput;
-		if (input.fUnit == element) {
+		if (input != null && input.fUnit == element) {
 			update(input, delta.getNewAst().stamp);
 		}
 	}
@@ -192,12 +237,7 @@ public class FoldingEditorAddon implements ISourceEditorAddon, IModelElementInpu
 	}
 	
 	private FoldingStructureComputationContext createCtx(final Input input) {
-		final SourceEditor1 editor = fEditor;
-		if (editor == null) {
-			return null;
-		}
-		final ProjectionAnnotationModel annotationModel = (ProjectionAnnotationModel) editor.getAdapter(ProjectionAnnotationModel.class);
-		if (input.fUnit == null || annotationModel == null) {
+		if (input.fUnit == null) {
 			return null;
 		}
 		final IProgressMonitor monitor = new NullProgressMonitor();
@@ -219,12 +259,15 @@ public class FoldingEditorAddon implements ISourceEditorAddon, IModelElementInpu
 		if (ast == null || document == null || ast.stamp != document.getModificationStamp()) {
 			return null;
 		}
-		return new FoldingStructureComputationContext(document, modelInfo, ast,
-				annotationModel, !input.fInitilized );
+		return new FoldingStructureComputationContext(document, modelInfo, ast, !input.fIsInitilized);
 	}
 	
 	private void update(final Input input, final long stamp) {
 		synchronized(input) {
+			final SourceEditor1 editor = fEditor;
+			if (editor == null) {
+				return;
+			}
 			if (input.fUnit == null
 					|| (stamp != -1 && input.fUpdateStamp == stamp)) { // already uptodate
 				return;
@@ -247,19 +290,29 @@ public class FoldingEditorAddon implements ISourceEditorAddon, IModelElementInpu
 			ProjectionAnnotation[] deletions;
 			if (ctx.isInitial) {
 				deletions = null;
-				input.fInitilized = true;
+				input.fAnnotationModel = (ProjectionAnnotationModel) fEditor.getAdapter(ProjectionAnnotationModel.class);
+				if (input.fAnnotationModel == null) {
+					return;
+				}
+				input.fIsInitilized = true;
+				input.fSavePropertyName = new QualifiedName("de.walware.ecommons.ltk", "FoldingState-" + editor.getSite().getId()); //$NON-NLS-1$ //$NON-NLS-2$
+				
+				if (fProvider.isRestoreStateEnabled()) {
+					loadState(input, ctx.fTable);
+				}
 			}
 			else {
+				final ProjectionAnnotationModel model = input.fAnnotationModel;
 				final List<FoldingAnnotation> del = new ArrayList<FoldingAnnotation>();
-				for (final Iterator<FoldingAnnotation> iter = ctx.fAnnnotationModel.getAnnotationIterator(); iter.hasNext(); ) {
-					final FoldingAnnotation existingAnn = iter.next();
-					final Position position = ctx.fAnnnotationModel.getPosition(existingAnn);
+				for (final Iterator<FoldingAnnotation> iter = model.getAnnotationIterator(); iter.hasNext(); ) {
+					final FoldingAnnotation ann = iter.next();
+					final Position position = model.getPosition(ann);
 					final FoldingAnnotation newAnn = ctx.fTable.remove(position);
 					if (newAnn != null) {
-						existingAnn.fType = newAnn.fType;
+						ann.fType = newAnn.fType;
 					}
 					else {
-						del.add(existingAnn);
+						del.add(ann);
 					}
 				}
 				deletions = del.toArray(new FoldingAnnotation[del.size()]);
@@ -272,8 +325,287 @@ public class FoldingEditorAddon implements ISourceEditorAddon, IModelElementInpu
 				final Entry<Position, FoldingAnnotation> next = iter.next();
 				additions.put(next.getValue(), next.getKey());
 			}
-			ctx.fAnnnotationModel.modifyAnnotations(deletions, additions, null);
+			input.fAnnotationModel.modifyAnnotations(deletions, additions, null);
 			input.fUpdateStamp = ctx.ast.stamp;
+		}
+	}
+	
+	
+	//---- Persistence ----
+	
+	private static class EncodedValue {
+		
+		private static final int I_OFFSET = 0x20;
+		private static final int I_SHIFT = 14;
+		private static final int I_RADIX = 1 << I_SHIFT;
+		private static final int I_MASK = I_RADIX - 1;
+		private static final int I_FOLLOW = 1 << (I_SHIFT + 1);
+		private static final int I_VALUE = I_FOLLOW - 1;
+		
+		
+		public static void writeInt(final StringBuilder sb, int value) {
+			while (true) {
+				final int c = (value & I_MASK) + I_OFFSET;
+				value >>>= I_SHIFT;
+				if (value == 0) {
+					sb.append((char) c);
+					return;
+				}
+				sb.append((char) (I_FOLLOW | c));
+			}
+		}
+		
+		public static void writeLong(final StringBuilder sb, long value) {
+			while (true) {
+				final int c = (int) (value & I_MASK) + I_OFFSET;
+				value >>>= I_SHIFT;
+				if (value == 0) {
+					sb.append((char) c);
+					return;
+				}
+				sb.append((char) (I_FOLLOW | c));
+			}
+		}
+		
+		
+		private final String fValue;
+		
+		private int fOffset;
+		
+		public EncodedValue(final String value) {
+			fValue = value;
+		}
+		
+		
+		public boolean hasNext() {
+			return fOffset < fValue.length();
+		}
+		
+		public long readLong() {
+			long value = 0;
+			int shift = 0;
+			while (true) {
+				final int c = (fValue.charAt(fOffset++));
+				if ((c & I_FOLLOW) == 0) {
+					value |= (long) (c - I_OFFSET) << shift;
+					return value;
+				}
+				value |= ((c & I_VALUE) - I_OFFSET) << shift;
+				shift += I_SHIFT;
+			}
+		}
+		
+		public int readInt() {
+			int value = 0;
+			int shift = 0;
+			while (true) {
+				final int c = (fValue.charAt(fOffset++));
+				if ((c & I_FOLLOW) == 0) {
+					value |= (c - I_OFFSET) << shift;
+					return value;
+				}
+				value |= ((c & I_VALUE) - I_OFFSET) << shift;
+				shift += I_SHIFT;
+			}
+		}
+		
+	}
+	
+//	public static void main(String[] args) {
+//		StringBuilder sb = new StringBuilder();
+////		int start = 0;
+////		int stop = 10000000;
+//		int start = Integer.MAX_VALUE - 1000000;
+//		int stop = Integer.MAX_VALUE;
+//		for (int i = start; i < stop; i++) {
+//			EncodedValue.writeInt(sb, i);
+//		}
+//		
+//		EncodedValue v = new EncodedValue(sb.toString());
+//		for (int i = start; i < stop; i++) {
+//			int r = v.readInt();
+//			if (i != r) {
+//				System.out.println("ERROR " + i + " " + r);
+//			}
+//		}
+//	}
+	
+	private static final int MAX_PERSISTENT_LENGTH = 2 * 1024;
+	private static final int CURRENT_VERSION = 1;
+	
+	private class SaveJob extends Job {
+		
+		private final IResource fResource;
+		private final QualifiedName fPropertyName;
+		
+		public SaveJob(final IResource resource, final QualifiedName propertyName) {
+			super(NLS.bind("Save Folding State for '{0}'", resource.toString())); //$NON-NLS-1$
+			setSystem(true);
+			setUser(false);
+			setPriority(Job.LONG);
+			
+			fResource = resource;
+			fPropertyName = propertyName;
+		}
+		
+		@Override
+		protected IStatus run(final IProgressMonitor monitor) {
+			try {
+				if (!fResource.exists()) {
+					return Status.OK_STATUS;
+				}
+				String value = (String) fResource.getSessionProperty(fPropertyName);
+				value = checkValue(value);
+				if (value != null) {
+					fResource.setPersistentProperty(fPropertyName, value);
+				}
+				return Status.OK_STATUS;
+			}
+			catch (final CoreException e) {
+				return new Status(IStatus.ERROR, LTKUIPlugin.PLUGIN_ID,
+						NLS.bind("An error occurred when saving the code folding state for {0}", fResource.toString()),
+						e );
+			}
+		}
+		
+		private String checkValue(final String value) {
+			if (value == null || value.isEmpty()) {
+				return null;
+			}
+			if (value.length() <= MAX_PERSISTENT_LENGTH) {
+				return value;
+			}
+			final EncodedValue encoded = new EncodedValue(value);
+			final StringBuilder sb = new StringBuilder(MAX_PERSISTENT_LENGTH);
+			
+			if (encoded.readInt() != CURRENT_VERSION) {
+				return null;
+			}
+			EncodedValue.writeInt(sb, CURRENT_VERSION);
+			EncodedValue.writeLong(sb, encoded.readLong());
+			
+			int collapedBegin = -1;
+			int collapedEnd = -1;
+			while (encoded.hasNext()) {
+				final int l = sb.length();
+				
+				final int offset = encoded.readInt();
+				final int length = encoded.readInt();
+				final int state = encoded.readInt();
+				
+				if (offset >= collapedBegin && offset + length <= collapedEnd) {
+					continue;
+				}
+				
+				EncodedValue.writeInt(sb, offset);
+				EncodedValue.writeInt(sb, length);
+				EncodedValue.writeInt(sb, state);
+				
+				if (sb.length() > MAX_PERSISTENT_LENGTH) {
+					return sb.substring(0, l);
+				}
+				
+				if (state == COLLAPSED_STATE) {
+					collapedBegin = offset;
+					collapedEnd = offset + length;
+				}
+			}
+			return sb.toString();
+		}
+		
+	}
+	
+	private void saveState(final Input input) {
+		final SourceEditor1 editor = fEditor;
+		if (editor == null || !input.fIsInitilized || !input.fUnit.isSynchronized()
+				|| !(input.fUnit instanceof IWorkspaceSourceUnit) ) {
+			return;
+		}
+		final IResource resource = ((IWorkspaceSourceUnit) input.fUnit).getResource();
+		if (resource == null || !resource.exists()) {
+			return;
+		}
+		
+		final String value;
+		{	final StringBuilder sb = new StringBuilder(1024);
+			
+			EncodedValue.writeInt(sb, CURRENT_VERSION);
+			EncodedValue.writeLong(sb, resource.getModificationStamp());
+			
+			final ProjectionAnnotationModel model = input.fAnnotationModel;
+			for (final Iterator<FoldingAnnotation> iter = model.getAnnotationIterator(); iter.hasNext(); ) {
+				final FoldingAnnotation ann = iter.next();
+				final int state = ann.getState();
+				if (state != ann.getInitialState()) {
+					final Position position = model.getPosition(ann);
+					if (position != null) {
+						EncodedValue.writeInt(sb, position.getOffset());
+						EncodedValue.writeInt(sb, position.getLength());
+						EncodedValue.writeInt(sb, state);
+					}
+				}
+			}
+			value = sb.toString();
+		}
+		try {
+			final QualifiedName propertyName = input.fSavePropertyName;
+			
+			resource.setSessionProperty(propertyName, value);
+			
+			new SaveJob(resource, propertyName).schedule();
+		}
+		catch (final CoreException e) {
+			StatusManager.getManager().handle(new Status(IStatus.ERROR, LTKUIPlugin.PLUGIN_ID,
+					NLS.bind("An error occurred when saving the code folding state for {0}", resource.toString()),
+					e ));
+		}
+	}
+	
+	private void loadState(final Input input, final SortedMap<Position, FoldingAnnotation> table) {
+		final SourceEditor1 editor = fEditor;
+		if (editor == null || !input.fIsInitilized || !input.fUnit.isSynchronized()
+				|| !(input.fUnit instanceof IWorkspaceSourceUnit) ) {
+			return;
+		}
+		final IResource resource = ((IWorkspaceSourceUnit) input.fUnit).getResource();
+		if (resource == null || !resource.exists()) {
+			return;
+		}
+		EncodedValue encoded;
+		try {
+			final QualifiedName propertyName = input.fSavePropertyName;
+			
+			String s = (String) resource.getSessionProperty(propertyName);
+			if (s == null) {
+				s = resource.getPersistentProperty(propertyName);
+				if (s == null) {
+					resource.setSessionProperty(propertyName, ""); //$NON-NLS-1$
+					return;
+				}
+			}
+			if (s.isEmpty()) {
+				return;
+			}
+			encoded = new EncodedValue(s);
+		}
+		catch (final CoreException e) {
+			return;
+		}
+		if (encoded.readInt() != CURRENT_VERSION) {
+			return;
+		}
+		if (encoded.readLong() != resource.getModificationStamp()) {
+			return;
+		}
+		{	final Position position = new Position(0, 0);
+			while (encoded.hasNext()) {
+				position.offset = encoded.readInt();
+				position.length = encoded.readInt();
+				final FoldingAnnotation ann = table.get(position);
+				if (ann != null) {
+					ann.applyState(encoded.readInt());
+				}
+			}
 		}
 	}
 	
