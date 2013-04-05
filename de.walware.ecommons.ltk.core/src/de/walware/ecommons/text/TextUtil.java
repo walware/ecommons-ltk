@@ -13,6 +13,7 @@ package de.walware.ecommons.text;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
@@ -20,9 +21,12 @@ import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jface.text.AbstractDocument;
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.BadPartitioningException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
 
@@ -31,7 +35,7 @@ public class TextUtil {
 	
 	public static final Pattern LINE_DELIMITER_PATTERN = Pattern.compile("\\r[\\n]?|\\n"); //$NON-NLS-1$
 	
-	private static final IScopeContext PLATFORM_SCOPE = new InstanceScope();
+	private static final IScopeContext PLATFORM_SCOPE = InstanceScope.INSTANCE;
 	
 	
 	private static class PositionComparator implements Comparator<Position> {
@@ -131,6 +135,50 @@ public class TextUtil {
 		return 0;
 	}
 	
+	public static ArrayList<String> toLines(final String text) {
+		final ArrayList<String> lines = new ArrayList<String>(2 + text.length() / 30);
+		TextUtil.addLines(text, lines);
+		return lines;
+	}
+	
+	/**
+	 * Adds text of lines of a string without its line delimiters to the list.
+	 * 
+	 * @param text the text
+	 * @param lines list the lines are added to
+	 */
+	public static void addLines(final String text, final List<String> lines) {
+		final int n = text.length();
+		int i = 0;
+		int lineStart = 0;
+		while (i < n) {
+			switch (text.charAt(i)) {
+			case '\r':
+				lines.add(text.substring(lineStart, i));
+				i++;
+				if (i < n && text.charAt(i) == '\n') {
+					i++;
+				}
+				lineStart = i;
+				continue;
+			case '\n':
+				lines.add(text.substring(lineStart, i));
+				i++;
+				if (i < n && text.charAt(i) == '\r') {
+					i++;
+				}
+				lineStart = i;
+				continue;
+			default:
+				i++;
+				continue;
+			}
+		}
+		if (lineStart < n) {
+			lines.add(text.substring(lineStart, n));
+		}
+	}
+	
 	/**
 	 * Adds text of lines of a document without its line delimiters to the list.
 	 * 
@@ -143,7 +191,8 @@ public class TextUtil {
 	 * @param lines list the lines are added to
 	 * @throws BadLocationException
 	 */
-	public static final void addLines(final IDocument document, final int offset, final int length, final ArrayList<String> lines) throws BadLocationException {
+	public static final void addLines(final IDocument document, final int offset, final int length,
+			final ArrayList<String> lines) throws BadLocationException {
 		final int startLine = document.getLineOfOffset(offset);
 		final int endLine = document.getLineOfOffset(offset+length);
 		lines.ensureCapacity(lines.size() + endLine-startLine+1);
@@ -260,6 +309,63 @@ public class TextUtil {
 			}
 		}
 		return currentColumn;
+	}
+	
+	public static List<IRegion> getMatchingRegions(final AbstractDocument document,
+			final String partitioning, final IPartitionConstraint contraint,
+			final IRegion region, final boolean extend) throws BadLocationException, BadPartitioningException {
+		final List<IRegion> regions = new ArrayList<IRegion>();
+		
+		final int regionEnd = region.getOffset() + region.getLength();
+		int validBegin = -1;
+		int offset = region.getOffset();
+		
+		if (extend && offset > 0) {
+			final ITypedRegion partition = document.getPartition(partitioning, offset - 1, false);
+			if (contraint.matches(partition.getType())) {
+				offset = partition.getOffset();
+				do {
+					final ITypedRegion prevPartition = document.getPartition(partitioning, offset - 1, false);
+					if (!contraint.matches(prevPartition.getType())) {
+						break;
+					}
+					offset = prevPartition.getOffset();
+				} while (offset > 0);
+				validBegin = offset;
+			}
+			offset = partition.getOffset() + partition.getLength();
+		}
+		
+		do {
+			final ITypedRegion partition = document.getPartition(partitioning, offset, false);
+			if (validBegin < 0) {
+				if (contraint.matches(partition.getType())) {
+					validBegin = partition.getOffset();
+				}
+			}
+			else { // (validBegin >= 0)
+				if (!contraint.matches(partition.getType())) {
+					regions.add(new Region(validBegin, offset - validBegin));
+					validBegin = -1;
+				}
+			}
+			offset = partition.getOffset() + partition.getLength();
+		} while (offset < regionEnd);
+		
+		if (validBegin >= 0) {
+			if (extend) {
+				do {
+					final ITypedRegion partition = document.getPartition(partitioning, offset, false);
+					if (!contraint.matches(partition.getType())) {
+						break;
+					}
+					offset = partition.getOffset() + partition.getLength();
+				} while (offset < document.getLength());
+			}
+			regions.add(new Region(validBegin, offset - validBegin));
+		}
+		
+		return regions;
 	}
 	
 }

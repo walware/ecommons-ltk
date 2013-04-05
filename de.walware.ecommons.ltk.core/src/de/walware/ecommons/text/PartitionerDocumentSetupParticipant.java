@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2008-2013 WalWare/StatET-Project (www.walware.de/goto/statet)
- * and others. All rights reserved. This program and the accompanying materials
+ * Copyright (c) 2008-2013 Stephan Wahlbrink (WalWare.de) and others.
+ * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
@@ -33,19 +33,8 @@ public abstract class PartitionerDocumentSetupParticipant implements IDocumentSe
 		if (document instanceof IDocumentExtension3) {
 			final IDocumentExtension3 extension3 = (IDocumentExtension3) document;
 			
-			Object synch;
-			if (document instanceof ISynchronizable) {
-				synchronized (document) {
-					synch = ((ISynchronizable) document).getLockObject();
-					if (synch == null) {
-						synch = new Object();
-						((ISynchronizable) document).setLockObject(synch);
-					}
-				}
-			}
-			else {
-				synch = new Object();
-			}
+			final Object synch = getLockObject(document);
+			
 			synchronized (synch) {
 				if (extension3.getDocumentPartitioner(getPartitioningId()) == null) {
 					// Setup the document scanner
@@ -54,16 +43,27 @@ public abstract class PartitionerDocumentSetupParticipant implements IDocumentSe
 					extension3.setDocumentPartitioner(getPartitioningId(), partitioner);
 				}
 			}
-//			else {
-//				final Partitioner partitioner = createDocumentPartitioner();
-//				partitioner.connect(document, true);
-//				if (!Partitioner.equalPartitioner(partitioner, extension3.getDocumentPartitioner(getPartitioningId()))) {
-//					LTKCorePlugin.getDefault().getLog().log(new Status(IStatus.WARNING, LTKCorePlugin.PLUGIN_ID,
-//							"Different partitioner for same partitioning!")); //$NON-NLS-1$
-//				}
-//				partitioner.disconnect();
-//			}
 		}
+		else {
+			throw new UnsupportedOperationException("IDocumentExtension3 required."); //$NON-NLS-1$
+		}
+	}
+	
+	private Object getLockObject(final IDocument document) {
+		Object synch;
+		if (document instanceof ISynchronizable) {
+			synchronized (document) {
+				synch = ((ISynchronizable) document).getLockObject();
+				if (synch == null) {
+					synch = new Object();
+					((ISynchronizable) document).setLockObject(synch);
+				}
+			}
+		}
+		else {
+			synch = new Object();
+		}
+		return synch;
 	}
 	
 	public abstract String getPartitioningId();
