@@ -126,7 +126,7 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 					}
 					try {
 						final IConfigurationElement[] elements = Platform.getExtensionRegistry().
-								getConfigurationElementsFor("de.walware.ecommons.ltk.workingContexts"); //$NON-NLS-1$
+								getConfigurationElementsFor("de.walware.ecommons.ltk.modelTypes"); //$NON-NLS-1$
 						IConfigurationElement matchingElement = null;
 						for (final IConfigurationElement element : elements) {
 							if (element.getName().equals("unitType") && element.isValid()) { //$NON-NLS-1$

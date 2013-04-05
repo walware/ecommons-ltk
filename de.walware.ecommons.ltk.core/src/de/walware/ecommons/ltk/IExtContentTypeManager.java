@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2007-2013 WalWare/StatET-Project (www.walware.de/goto/statet)
- * and others. All rights reserved. This program and the accompanying materials
+ * Copyright (c) 2007-2013 Stephan Wahlbrink (WalWare.de) and others.
+ * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
@@ -20,12 +20,11 @@ package de.walware.ecommons.ltk;
 public interface IExtContentTypeManager {
 	
 	
-	public String[] getSecondaryContentTypes(String primaryContentType);
-	public String[] getPrimaryContentTypes(String secondaryContentType);
+	String[] getSecondaryContentTypes(String primaryContentType);
+	String[] getPrimaryContentTypes(String secondaryContentType);
 	
-	public boolean matchesActivatedContentType(String primaryContentTypeId, String secondaryContentTypeId, boolean self);
+	boolean matchesActivatedContentType(String primaryContentTypeId, String secondaryContentTypeId, boolean self);
 	
-	public String getContentTypeForModelType(String modelTypeId);
-	public String getModelTypeForContentType(String contentTypeId);
+	String getModelTypeForContentType(String contentTypeId);
 	
 }

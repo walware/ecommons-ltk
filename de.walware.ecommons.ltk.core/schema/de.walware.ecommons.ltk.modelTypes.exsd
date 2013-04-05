@@ -4,11 +4,14 @@
 <annotation>
       <appinfo>
          <meta.schema plugin="de.walware.ecommons.ltk.core"
-               id="de.walware.ecommons.ltk.modelAdapters"
-               name="LTK Model Adapters"/>
+               id="de.walware.ecommons.ltk.modelTypes"
+               name="LTK Model Types and Working Contexts"/>
       </appinfo>
       <documentation>
-         This extension-point allows to plug-in adapters for model types.
+         This extension-point allows to define model types and plug-in into its working contexts:
+&lt;ol&gt;
+&lt;li&gt;Add factories for shared source units (ISourceUnit).&lt;/li&gt;
+&lt;/ol&gt;
       </documentation>
    </annotation>
 
@@ -19,9 +22,10 @@
          </appinfo>
       </annotation>
       <complexType>
-         <choice minOccurs="1" maxOccurs="unbounded">
-            <element ref="adapterClass"/>
-            <element ref="adapterFactory"/>
+         <choice minOccurs="0" maxOccurs="unbounded">
+            <element ref="modelType"/>
+            <element ref="unitType"/>
+            <element ref="contentType"/>
          </choice>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -50,71 +54,87 @@
       </complexType>
    </element>
 
-   <element name="adapterClass">
+   <element name="modelType">
+      <annotation>
+         <documentation>
+            This points allows to define a model type.
+         </documentation>
+      </annotation>
       <complexType>
-         <choice minOccurs="1" maxOccurs="unbounded">
-            <element ref="adapter"/>
-         </choice>
-         <attribute name="modelTypeId" type="string" use="required">
+         <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  The id of the model type.
                </documentation>
                <appinfo>
-                  <meta.attribute kind="identifier" basedOn="de.walware.ecommons.ltk.modelTypes/modelType/@id"/>
-               </appinfo>
-            </annotation>
-         </attribute>
-         <attribute name="class" type="string" use="required">
-            <annotation>
-               <documentation>
-                  The fully qualified name of the class implementing the adapter(s).
-               </documentation>
-               <appinfo>
-                  <meta.attribute kind="java"/>
+                  <meta.attribute kind="identifier"/>
                </appinfo>
             </annotation>
          </attribute>
       </complexType>
    </element>
 
-   <element name="adapterFactory">
+   <element name="unitType">
+      <annotation>
+         <documentation>
+            This point allows to provide new types of source units, e.g. for an new model type or a special context of an existing model type.
+         </documentation>
+      </annotation>
       <complexType>
-         <choice minOccurs="1" maxOccurs="unbounded">
-            <element ref="adapter"/>
-         </choice>
          <attribute name="modelTypeId" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  The id of the model type.
                </documentation>
                <appinfo>
                   <meta.attribute kind="identifier" basedOn="de.walware.ecommons.ltk.modelTypes/modelType/@id"/>
                </appinfo>
             </annotation>
          </attribute>
-         <attribute name="class" type="string" use="required">
+         <attribute name="contextKey" type="string" use="required">
             <annotation>
                <documentation>
-                  The fully qualified name of the factory class providing the adapter(s).
+                  The key of the working context.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="unitFactory" type="string" use="required">
+            <annotation>
+               <documentation>
+                  An implementation of &lt;code&gt;de.walware.ecommons.ltk.ISourceUnitFactory&lt;/code&gt; supporting creation of source units for the specified model type and context.
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.core.runtime.IAdapterFactory"/>
+                  <meta.attribute kind="java" basedOn=":de.walware.ecommons.ltk.ISourceUnitFactory"/>
                </appinfo>
             </annotation>
          </attribute>
       </complexType>
    </element>
 
-   <element name="adapter">
+   <element name="contentType">
+      <annotation>
+         <documentation>
+            This point allows to links a model type to a content type
+         </documentation>
+      </annotation>
       <complexType>
-         <attribute name="type" type="string" use="required">
+         <attribute name="contentTypeId" type="string" use="required">
             <annotation>
                <documentation>
-                  The fully qualified name of a class that the adapter(s) can adapt to.
+                  The content type id.
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java"/>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.core.contenttype.contentTypes/content-type/@id"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="modelTypeId" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The model type id to activate for the content type.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="de.walware.ecommons.ltk.modelTypes/modelType/@id"/>
                </appinfo>
             </annotation>
          </attribute>
@@ -138,7 +158,7 @@
          <meta.section type="copyright"/>
       </appinfo>
       <documentation>
-         Copyright (c) 2011-2013 Stephan Wahlbrink (WalWare.de) and others.
+         Copyright (c) 2008-2013 Stephan Wahlbrink (WalWare.de) and others.
 All rights reserved. This program and the accompanying materials
 are made available under the terms of the Eclipse Public License v1.0
 which accompanies this distribution, and is available at

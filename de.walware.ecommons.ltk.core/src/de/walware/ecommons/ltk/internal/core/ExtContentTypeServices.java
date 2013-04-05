@@ -69,15 +69,14 @@ public class ExtContentTypeServices implements IExtContentTypeManager, IDisposab
 	
 	private static final String CONFIG_CONTENTTYPEACTIVATION_EXTENSIONPOINT_ID = "de.walware.ecommons.ltk.contentTypeActivation"; //$NON-NLS-1$
 	private static final String CONFIG_CONTENTTYPE_ELEMENT_NAME = "contentType"; //$NON-NLS-1$
-	private static final String CONFIG_MODELTYPE_ELEMENT_NAME = "modelType"; //$NON-NLS-1$
 	private static final String CONFIG_ID_ATTRIBUTE_NAME = "id"; //$NON-NLS-1$
 	private static final String CONFIG_CONTENTTYPE_ID_ATTRIBUTE_NAME = "contentTypeId"; //$NON-NLS-1$
 	private static final String CONFIG_SECONDARY_ID_ATTRIBUTE_NAME = "secondaryId"; //$NON-NLS-1$
+	private static final String CONFIG_MODELTYPE_ID_ATTRIBUTE_NAME = "modelTypeId"; //$NON-NLS-1$
 	
 	
 	private Map<String, String[]> fPrimaryToSecondary;
 	private Map<String, String[]> fSecondaryToPrimary;
-	private Map<String, String> fModelToPrimary;
 	private Map<String, String> fPrimaryToModel;
 	private final String[] NO_TYPES = new String[0];
 	
@@ -89,40 +88,45 @@ public class ExtContentTypeServices implements IExtContentTypeManager, IDisposab
 	
 	private void load() {
 		final IExtensionRegistry extensionRegistry = Platform.getExtensionRegistry();
-		final IConfigurationElement[] elements = extensionRegistry.getConfigurationElementsFor(CONFIG_CONTENTTYPEACTIVATION_EXTENSIONPOINT_ID); 
 		
 		final Map<String, Set<String>> primaryToSecondary = new HashMap<String, Set<String>>();
 		final Map<String, Set<String>> secondaryToPrimary = new HashMap<String, Set<String>>();
-		final Map<String, String> modelToPrimary = new HashMap<String, String>();
 		final Map<String, String> primaryToModel = new HashMap<String, String>();
 		
-		for (final IConfigurationElement element : elements) {
-			if (element.getName().equals(CONFIG_CONTENTTYPE_ELEMENT_NAME)) { 
-				String primary = element.getAttribute(CONFIG_ID_ATTRIBUTE_NAME); 
-				String secondary = element.getAttribute(CONFIG_SECONDARY_ID_ATTRIBUTE_NAME); 
-				if (primary != null && secondary != null
-						&& primary.length() > 0 && secondary.length() > 0) {
-					primary = primary.intern();
-					secondary = secondary.intern();
-					add(primaryToSecondary, primary, secondary);
-					add(secondaryToPrimary, secondary, primary);
-				}
-			}
-			if (element.getName().equals(CONFIG_MODELTYPE_ELEMENT_NAME)) {
-				String modelTypeId = element.getAttribute(CONFIG_ID_ATTRIBUTE_NAME); 
-				String contentTypeId = element.getAttribute(CONFIG_CONTENTTYPE_ID_ATTRIBUTE_NAME); 
-				if (modelTypeId != null && contentTypeId != null
-						&& modelTypeId.length() > 0 && contentTypeId.length() > 0) {
-					modelTypeId = modelTypeId.intern();
-					contentTypeId = contentTypeId.intern();
-					modelToPrimary.put(modelTypeId, contentTypeId);
-					primaryToModel.put(contentTypeId, modelTypeId);
+		{	final IConfigurationElement[] elements = extensionRegistry
+					.getConfigurationElementsFor(CONFIG_CONTENTTYPEACTIVATION_EXTENSIONPOINT_ID); 
+			for (final IConfigurationElement element : elements) {
+				if (element.getName().equals(CONFIG_CONTENTTYPE_ELEMENT_NAME)) { 
+					String primary = element.getAttribute(CONFIG_ID_ATTRIBUTE_NAME); 
+					String secondary = element.getAttribute(CONFIG_SECONDARY_ID_ATTRIBUTE_NAME); 
+					if (primary != null && secondary != null
+							&& primary.length() > 0 && secondary.length() > 0) {
+						primary = primary.intern();
+						secondary = secondary.intern();
+						add(primaryToSecondary, primary, secondary);
+						add(secondaryToPrimary, secondary, primary);
+					}
 				}
 			}
 		}
+		{	final IConfigurationElement[] elements = extensionRegistry
+					.getConfigurationElementsFor("de.walware.ecommons.ltk.modelTypes"); //$NON-NLS-1$
+			for (final IConfigurationElement element : elements) {
+				if (element.getName().equals(CONFIG_CONTENTTYPE_ELEMENT_NAME)) {
+					String contentTypeId = element.getAttribute(CONFIG_CONTENTTYPE_ID_ATTRIBUTE_NAME); 
+					String modelTypeId = element.getAttribute(CONFIG_MODELTYPE_ID_ATTRIBUTE_NAME); 
+					if (contentTypeId != null && !contentTypeId.isEmpty()
+							&& modelTypeId != null && !modelTypeId.isEmpty() ) {
+						contentTypeId = contentTypeId.intern();
+						modelTypeId = modelTypeId.intern();
+						primaryToModel.put(contentTypeId, modelTypeId);
+					}
+				}
+			}
+		}
+		
 		fPrimaryToSecondary = copy(primaryToSecondary, new HashMap<String, String[]>());
 		fSecondaryToPrimary = copy(secondaryToPrimary, new HashMap<String, String[]>());
-		fModelToPrimary = modelToPrimary;
 		fPrimaryToModel = primaryToModel;
 	}
 	
@@ -160,11 +164,6 @@ public class ExtContentTypeServices implements IExtContentTypeManager, IDisposab
 	}
 	
 	@Override
-	public String getContentTypeForModelType(final String modelTypeId) {
-		return fModelToPrimary.get(modelTypeId);
-	}
-	
-	@Override
 	public String getModelTypeForContentType(final String contentTypeId) {
 		return fPrimaryToModel.get(contentTypeId);
 	}
@@ -174,7 +173,7 @@ public class ExtContentTypeServices implements IExtContentTypeManager, IDisposab
 	public void dispose() {
 		fSecondaryToPrimary.clear();
 		fPrimaryToSecondary.clear();
-		fModelToPrimary.clear();
+		fPrimaryToModel.clear();
 	}
 	
 }

@@ -91,8 +91,7 @@ public class ActivatedContentTypeTester extends PropertyTester {
 				if (editor != null) {
 					final ISourceUnit sourceUnit = editor.getSourceUnit();
 					if (sourceUnit != null) {
-						final String modelTypeId = sourceUnit.getModelTypeId();
-						final String contentTypeId = LTK.getExtContentTypeManager().getContentTypeForModelType(modelTypeId);
+						final String contentTypeId = sourceUnit.getContentTypeId();
 						if (contentTypeId != null) {
 							contentType = Platform.getContentTypeManager().getContentType(contentTypeId);
 						}

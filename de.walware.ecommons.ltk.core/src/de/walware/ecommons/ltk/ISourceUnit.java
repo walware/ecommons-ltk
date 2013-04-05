@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2007-2013 WalWare/StatET-Project (www.walware.de/goto/statet)
- * and others. All rights reserved. This program and the accompanying materials
+ * Copyright (c) 2007-2013 Stephan Wahlbrink (WalWare.de) and others.
+ * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
@@ -31,25 +31,27 @@ import org.eclipse.jface.text.ISynchronizable;
 public interface ISourceUnit extends IModelElement, IAdaptable {
 	
 	
-	public static final long UNKNOWN_MODIFICATION_STAMP = IDocumentExtension4.UNKNOWN_MODIFICATION_STAMP;
+	long UNKNOWN_MODIFICATION_STAMP = IDocumentExtension4.UNKNOWN_MODIFICATION_STAMP;
 	
 	
-	public WorkingContext getWorkingContext();
-	public ISourceUnit getUnderlyingUnit();
+	WorkingContext getWorkingContext();
+	ISourceUnit getUnderlyingUnit();
 	
 	/**
 	 * If the content is synchronized with the underlying unit.
 	 * 
 	 * @return <code>true</code> if synchronized, otherwise <code>false</code>
 	 */
-	public boolean isSynchronized();
+	boolean isSynchronized();
+	
+	String getContentTypeId();
 	
 	/**
 	 * The file resource of the source unit. The type depends on the source unit.
 	 * 
 	 * @return the resource or <code>null</code> if without resource
 	 */
-	public Object getResource();
+	Object getResource();
 	
 	/**
 	 * Checks if the source is modifiable.
@@ -59,7 +61,7 @@ public interface ISourceUnit extends IModelElement, IAdaptable {
 	 * @return <code>true</code> if not yet validated or validated and modifiable,
 	 *     otherwise <code>false</code> (finally not modifiable).
 	 */
-	public boolean checkState(boolean validate, IProgressMonitor monitor);
+	boolean checkState(boolean validate, IProgressMonitor monitor);
 	
 	/**
 	 * Access to the document with the content of this source unit
@@ -71,7 +73,7 @@ public interface ISourceUnit extends IModelElement, IAdaptable {
 	 * @param monitor progress monitor (optional but recommended)
 	 * @return the shared document
 	 */
-	public AbstractDocument getDocument(IProgressMonitor monitor);
+	AbstractDocument getDocument(IProgressMonitor monitor);
 	
 	/**
 	 * Returns the current stamp of the content of this source unit.
@@ -82,7 +84,7 @@ public interface ISourceUnit extends IModelElement, IAdaptable {
 	 * @param monitor
 	 * @return the current stamp
 	 */
-	public long getContentStamp(IProgressMonitor monitor);
+	long getContentStamp(IProgressMonitor monitor);
 	
 	/**
 	 * Access to the current content of this source unit.
@@ -91,7 +93,7 @@ public interface ISourceUnit extends IModelElement, IAdaptable {
 	 * @param monitor progress monitor (optional but recommended)
 	 * @return the current content
 	 */
-	public SourceContent getContent(IProgressMonitor monitor);
+	SourceContent getContent(IProgressMonitor monitor);
 	
 	/**
 	 * Runs {@link SourceDocumentRunnable} with checks (modification stamp) and 
@@ -104,14 +106,14 @@ public interface ISourceUnit extends IModelElement, IAdaptable {
 	 * @param runnable the runnable
 	 * @throws InvocationTargetException forwarded from runnable
 	 */
-	public void syncExec(SourceDocumentRunnable runnable) throws InvocationTargetException;
+	void syncExec(SourceDocumentRunnable runnable) throws InvocationTargetException;
 	
-	public AstInfo getAstInfo(String type, boolean ensureSync, IProgressMonitor monitor);
+	AstInfo getAstInfo(String type, boolean ensureSync, IProgressMonitor monitor);
 	
-	public ISourceUnitModelInfo getModelInfo(String type, int syncLevel, IProgressMonitor monitor);
+	ISourceUnitModelInfo getModelInfo(String type, int syncLevel, IProgressMonitor monitor);
 	
-	public void connect(IProgressMonitor monitor);
-	public void disconnect(IProgressMonitor monitor);
-	public boolean isConnected();
+	void connect(IProgressMonitor monitor);
+	void disconnect(IProgressMonitor monitor);
+	boolean isConnected();
 	
 }

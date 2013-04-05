@@ -19,9 +19,9 @@
          name="Additional activation for content types"
          schema="schema/de.walware.ecommons.ltk.contentTypeActivation.exsd"/>
    
-   <extension-point id="de.walware.ecommons.ltk.workingContexts"
+   <extension-point id="de.walware.ecommons.ltk.modelTypes"
          name="LTK Working Contexts"
-         schema="schema/de.walware.ecommons.ltk.workingContexts.exsd"/>
+         schema="schema/de.walware.ecommons.ltk.modelTypes.exsd"/>
    <extension-point id="de.walware.ecommons.ltk.modelAdapters"
          name="LKT Model Adapters"
          schema="schema/de.walware.ecommons.ltk.modelAdapters.exsd"/>
