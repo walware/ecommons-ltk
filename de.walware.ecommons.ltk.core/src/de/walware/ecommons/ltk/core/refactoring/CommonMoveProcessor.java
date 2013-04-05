@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012-2013 WalWare/StatET-Project (www.walware.de/goto/statet).
+ * Copyright (c) 2012-2013 Stephan Wahlbrink (WalWare.de) and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,6 +33,7 @@ import org.eclipse.ltk.core.refactoring.participants.SharableParticipants;
 import org.eclipse.osgi.util.NLS;
 
 import de.walware.ecommons.ltk.IModelElement;
+import de.walware.ecommons.ltk.core.ElementSet;
 import de.walware.ecommons.ltk.internal.core.refactoring.Messages;
 
 
@@ -41,22 +42,22 @@ public abstract class CommonMoveProcessor extends MoveProcessor {
 	
 	private final RefactoringAdapter fAdapter;
 	
-	private final RefactoringElementSet fElementsToMove;
+	private final ElementSet fElementsToMove;
 	private final RefactoringDestination fDestination;
 	
 	private Change fMoveChange;
 	private ReorgExecutionLog fExecutionLog;
 	
 	
-	public CommonMoveProcessor(final RefactoringElementSet elements, final RefactoringDestination destination,
+	public CommonMoveProcessor(final ElementSet elements, final RefactoringDestination destination,
 			final RefactoringAdapter adapter) {
 		assert (elements != null);
 		assert (adapter != null);
 		
 		fElementsToMove = elements;
 		fDestination = destination;
-		if (destination.fOrgTargets.length != 1
-				|| !(destination.fOrgTargets[0] instanceof IModelElement) ) {
+		if (destination.getInitialObjects().size() != 1
+				|| !(destination.getInitialObjects().get(0) instanceof IModelElement) ) {
 			throw new IllegalArgumentException();
 		}
 		fAdapter = adapter;
@@ -71,11 +72,9 @@ public abstract class CommonMoveProcessor extends MoveProcessor {
 	
 	@Override
 	public Object[] getElements() {
-		final Object[] elements = new Object[fElementsToMove.fOrgTargets.length + 1];
-		for (int i = 0; i < fElementsToMove.fOrgTargets.length; i++) {
-			elements[i] = fElementsToMove.fOrgTargets[i];
-		}
-		elements[elements.length - 1] = fDestination.fOrgTargets;
+		final Object[] elements = fElementsToMove.getInitialObjects().toArray(
+				new Object[fElementsToMove.getInitialObjects().size() + 1] );
+		elements[elements.length - 1] = fDestination.getInitialObjects().get(0);
 		return elements;
 	}
 	

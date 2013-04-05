@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012-2013 WalWare/StatET-Project (www.walware.de/goto/statet).
+ * Copyright (c) 2012-2013 Stephan Wahlbrink (WalWare.de) and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,6 +33,7 @@ import org.eclipse.ltk.core.refactoring.participants.SharableParticipants;
 import org.eclipse.osgi.util.NLS;
 
 import de.walware.ecommons.ltk.IModelElement;
+import de.walware.ecommons.ltk.core.ElementSet;
 import de.walware.ecommons.ltk.internal.core.refactoring.Messages;
 
 
@@ -41,22 +42,22 @@ public abstract class CommonCopyProcessor extends CopyProcessor {
 	
 	private final RefactoringAdapter fAdapter;
 	
-	private final RefactoringElementSet fElementsToCopy;
+	private final ElementSet fElementsToCopy;
 	private final RefactoringDestination fDestination;
 	
 	private Change fCopyChange;
 	private ReorgExecutionLog fExecutionLog;
 	
 	
-	public CommonCopyProcessor(final RefactoringElementSet elements, final RefactoringDestination destination,
+	public CommonCopyProcessor(final ElementSet elements, final RefactoringDestination destination,
 			final RefactoringAdapter adapter) {
 		assert (elements != null);
 		assert (adapter != null);
 		
 		fElementsToCopy = elements;
 		fDestination = destination;
-		if (destination.fOrgTargets.length != 1
-				|| !(destination.fOrgTargets[0] instanceof IModelElement) ) {
+		if (destination.getInitialObjects().size() != 1
+				|| !(destination.getInitialObjects().get(0) instanceof IModelElement) ) {
 			throw new IllegalArgumentException();
 		}
 		fAdapter = adapter;
@@ -71,11 +72,9 @@ public abstract class CommonCopyProcessor extends CopyProcessor {
 	
 	@Override
 	public Object[] getElements() {
-		final Object[] elements = new Object[fElementsToCopy.fOrgTargets.length + 1];
-		for (int i = 0; i < fElementsToCopy.fOrgTargets.length; i++) {
-			elements[i] = fElementsToCopy.fOrgTargets[i];
-		}
-		elements[elements.length - 1] = fDestination.fOrgTargets[0];
+		final Object[] elements = fElementsToCopy.getInitialObjects().toArray(
+				new Object[fElementsToCopy.getInitialObjects().size() + 1] );
+		elements[elements.length - 1] = fDestination.getInitialObjects().get(0);
 		return elements;
 	}
 	

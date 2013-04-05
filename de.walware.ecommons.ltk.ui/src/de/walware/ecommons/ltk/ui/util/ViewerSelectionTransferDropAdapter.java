@@ -44,10 +44,10 @@ import de.walware.ecommons.ui.util.UIAccess;
 import de.walware.ecommons.ltk.ISourceElement;
 import de.walware.ecommons.ltk.ISourceStructElement;
 import de.walware.ecommons.ltk.ISourceUnit;
+import de.walware.ecommons.ltk.core.ElementSet;
 import de.walware.ecommons.ltk.core.refactoring.CommonRefactoringFactory;
 import de.walware.ecommons.ltk.core.refactoring.RefactoringAdapter;
 import de.walware.ecommons.ltk.core.refactoring.RefactoringDestination;
-import de.walware.ecommons.ltk.core.refactoring.RefactoringElementSet;
 import de.walware.ecommons.ltk.internal.ui.refactoring.Messages;
 import de.walware.ecommons.ltk.ui.refactoring.RefactoringExecutionHelper;
 import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditor;
@@ -62,7 +62,7 @@ public class ViewerSelectionTransferDropAdapter extends ViewerDropAdapter implem
 	private final CommonRefactoringFactory fRefactoring;
 	private RefactoringAdapter fAdapter;
 	
-	private RefactoringElementSet fElements;
+	private ElementSet fElements;
 	
 	private MoveProcessor fMoveProcessor;
 	private int fCanMoveElements;
@@ -208,7 +208,7 @@ public class ViewerSelectionTransferDropAdapter extends ViewerDropAdapter implem
 			return false;
 		}
 		fSelection = s;
-		fElements = new RefactoringElementSet(((IStructuredSelection) s).toArray());
+		fElements = new ElementSet(((IStructuredSelection) s).toArray());
 		if (!fElements.isOK()) {
 			return false;
 		}

@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2008-2013 WalWare/StatET-Project (www.walware.de/goto/statet)
- * and others. All rights reserved. This program and the accompanying materials
+ * Copyright (c) 2008-2013 Stephan Wahlbrink (WalWare.de) and others.
+ * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
@@ -31,6 +31,7 @@ import org.eclipse.ltk.core.refactoring.participants.ResourceChangeChecker;
 import org.eclipse.ltk.core.refactoring.participants.SharableParticipants;
 import org.eclipse.osgi.util.NLS;
 
+import de.walware.ecommons.ltk.core.ElementSet;
 import de.walware.ecommons.ltk.internal.core.refactoring.Messages;
 
 
@@ -39,12 +40,12 @@ public abstract class CommonDeleteProcessor extends DeleteProcessor {
 	
 	private final RefactoringAdapter fAdapter;
 	
-	private final RefactoringElementSet fElementsToDelete;
+	private final ElementSet fElementsToDelete;
 	
 	private Change fDeleteChange;
 	
 	
-	public CommonDeleteProcessor(final RefactoringElementSet elements,
+	public CommonDeleteProcessor(final ElementSet elements,
 			final RefactoringAdapter adapter) {
 		assert (elements != null);
 		assert (adapter != null);
@@ -66,7 +67,7 @@ public abstract class CommonDeleteProcessor extends DeleteProcessor {
 	
 	@Override
 	public Object[] getElements() {
-		return fElementsToDelete.getInitialObjects();
+		return fElementsToDelete.getInitialObjects().toArray();
 	}
 	
 	public Change getDeleteChange() {

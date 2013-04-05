@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2008-2013 WalWare/StatET-Project (www.walware.de/goto/statet)
- * and others. All rights reserved. This program and the accompanying materials
+ * Copyright (c) 2008-2013 Stephan Wahlbrink (WalWare.de) and others.
+ * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
@@ -20,8 +20,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.ibm.icu.text.Collator;
 
 import org.eclipse.core.filebuffers.FileBuffers;
 import org.eclipse.core.filebuffers.ITextFileBuffer;
@@ -80,6 +78,8 @@ import de.walware.ecommons.ltk.ISourceUnit;
 import de.walware.ecommons.ltk.IWorkspaceSourceUnit;
 import de.walware.ecommons.ltk.LTK;
 import de.walware.ecommons.ltk.LTKUtil;
+import de.walware.ecommons.ltk.core.ElementSet;
+import de.walware.ecommons.ltk.core.util.ElementComparator;
 import de.walware.ecommons.ltk.internal.core.refactoring.Messages;
 
 
@@ -90,48 +90,7 @@ import de.walware.ecommons.ltk.internal.core.refactoring.Messages;
 public abstract class RefactoringAdapter {
 	
 	
-	private static final Comparator<IModelElement> MODELELEMENT_SORTER = new Comparator<IModelElement>() {
-		
-		private final Collator ID_COMPARATOR = Collator.getInstance();
-		
-		@Override
-		public int compare(final IModelElement e1, final IModelElement e2) {
-			final ISourceUnit u1 = LTKUtil.getSourceUnit(e1);
-			final ISourceUnit u2 = LTKUtil.getSourceUnit(e2);
-			int result = 0;
-			if (u1 != null && u2 != null) {
-				if (u1 != u2) {
-					result = ID_COMPARATOR.compare(u1.getId(), u2.getId());
-				}
-				if (result == 0) {
-					if (e1 instanceof ISourceElement && e2 instanceof ISourceElement) {
-						return (((ISourceElement) e1).getSourceRange().getOffset() - 
-								((ISourceElement) e2).getSourceRange().getOffset());
-					}
-					if (e1 instanceof ISourceUnit) {
-						if (e2 instanceof ISourceUnit) {
-							return 0;
-						}
-						return -1000000;
-					}
-					else if (e2 instanceof ISourceUnit) {
-						return 1000000;
-					}
-				}
-				else {
-					return result;
-				}
-				return ID_COMPARATOR.compare(e1.getId(), e2.getId());
-			}
-			if (u1 == null && u2 != null) {
-				return Integer.MAX_VALUE;
-			}
-			if (u2 == null && u1 != null) {
-				return Integer.MIN_VALUE;
-			}
-			return 0;
-		}
-	};
+	private static final Comparator<IModelElement> MODELELEMENT_SORTER = new ElementComparator();
 	
 	
 	private final String fModelTypeId;
@@ -261,12 +220,12 @@ public abstract class RefactoringAdapter {
 	
 	public String getSourceCodeStringedTogether(final ISourceStructElement[] sourceElements,
 			final IProgressMonitor monitor) throws CoreException {
-		return getSourceCodeStringedTogether(new RefactoringElementSet(sourceElements), monitor);
+		return getSourceCodeStringedTogether(new ElementSet(sourceElements), monitor);
 	}
 	
-	public String getSourceCodeStringedTogether(final RefactoringElementSet sourceElements,
+	public String getSourceCodeStringedTogether(final ElementSet sourceElements,
 			final IProgressMonitor monitor) throws CoreException {
-		final SubMonitor progress = SubMonitor.convert(monitor, sourceElements.countElements() * 2);
+		final SubMonitor progress = SubMonitor.convert(monitor, sourceElements.getElementCount() * 2);
 		ISourceUnit lastUnit = null;
 		BasicHeuristicTokenScanner scanner = null;
 		try {
@@ -279,6 +238,7 @@ public abstract class RefactoringAdapter {
 			int todo = modelElements.size();
 			
 			final StringBuilder sb = new StringBuilder(todo*100);
+			final List<String> codeFragments = new ArrayList<String>();
 			for (final IModelElement element : modelElements) {
 				final ISourceUnit su = LTKUtil.getSourceUnit(element);
 				if (su != lastUnit) {
@@ -292,10 +252,12 @@ public abstract class RefactoringAdapter {
 					scanner = getScanner(su);
 					doc = su.getDocument(monitor);
 				}
-				final IRegion range = expandElementRange((ISourceStructElement) element, doc,
-						scanner );
-				sb.append(doc.get(range.getOffset(), range.getLength()));
-				sb.append(lineDelimiter);
+				getSourceCode((ISourceElement) element, doc, scanner, codeFragments);
+				for (final String s : codeFragments) {
+					sb.append(s);
+					sb.append(lineDelimiter);
+				}
+				codeFragments.clear();
 				
 				todo--;
 			}
@@ -316,7 +278,16 @@ public abstract class RefactoringAdapter {
 		}
 	}
 	
-	public IRegion expandElementRange(final ISourceElement element, final AbstractDocument doc,
+	protected void getSourceCode(final ISourceElement element, final AbstractDocument doc,
+			final BasicHeuristicTokenScanner scanner, final List<String> codeFragments) 
+			throws BadLocationException, BadPartitioningException {
+		final IRegion range = expandElementRange(element, doc, scanner);
+		if (range != null && range.getLength() > 0) {
+			codeFragments.add(doc.get(range.getOffset(), range.getLength()));
+		}
+	}
+	
+	public IRegion expandElementRange(final ISourceElement element, final AbstractDocument document,
 			final BasicHeuristicTokenScanner scanner) 
 			throws BadLocationException, BadPartitioningException {
 		final IRegion sourceRange = element.getSourceRange();
@@ -333,6 +304,12 @@ public abstract class RefactoringAdapter {
 			}
 		}
 		
+		return expandSourceRange(start, end, document, scanner);
+	}
+	
+	protected IRegion expandSourceRange(final int start, int end, final AbstractDocument doc,
+			final BasicHeuristicTokenScanner scanner) 
+			throws BadLocationException, BadPartitioningException {
 		scanner.configure(doc);
 		
 		IRegion lastLineInfo;
@@ -382,8 +359,8 @@ public abstract class RefactoringAdapter {
 	}
 	
 	
-	public boolean canDelete(final RefactoringElementSet elements) {
-		if (elements.getInitialObjects().length == 0) {
+	public boolean canDelete(final ElementSet elements) {
+		if (elements.getInitialObjects().size() == 0) {
 			return false;
 		}
 		if (!elements.isOK()) {
@@ -434,16 +411,16 @@ public abstract class RefactoringAdapter {
 		return true;
 	}
 	
-	public boolean canInsert(final RefactoringElementSet elements, final RefactoringDestination to) {
-		if (to.getInitialObjects()[0] instanceof ISourceElement) {
-			return canInsert(elements, (ISourceElement) to.getInitialObjects()[0], to.getPosition());
+	public boolean canInsert(final ElementSet elements, final RefactoringDestination to) {
+		if (to.getInitialObjects().get(0) instanceof ISourceElement) {
+			return canInsert(elements, (ISourceElement) to.getInitialObjects().get(0), to.getPosition());
 		}
 		return false;
 	}
 	
-	protected boolean canInsert(final RefactoringElementSet elements, final ISourceElement to,
+	protected boolean canInsert(final ElementSet elements, final ISourceElement to,
 			final RefactoringDestination.Position pos) {
-		if (elements.getInitialObjects().length == 0) {
+		if (elements.getInitialObjects().size() == 0) {
 			return false;
 		}
 		if (!elements.isOK()) {
@@ -496,7 +473,7 @@ public abstract class RefactoringAdapter {
 	}
 	
 	
-	public void checkInitialToModify(final RefactoringStatus result, final RefactoringElementSet elements) {
+	public void checkInitialToModify(final RefactoringStatus result, final ElementSet elements) {
 		final Set<IResource> resources = new HashSet<IResource>();
 		resources.addAll(elements.getResources());
 		for(final IModelElement element : elements.getModelElements()) {
@@ -513,7 +490,7 @@ public abstract class RefactoringAdapter {
 				));
 	}
 	
-	public void checkFinalToModify(final RefactoringStatus result, final RefactoringElementSet elements, final IProgressMonitor monitor) {
+	public void checkFinalToModify(final RefactoringStatus result, final ElementSet elements, final IProgressMonitor monitor) {
 		final Set<IResource> resources = new HashSet<IResource>();
 		resources.addAll(elements.getResources());
 		for(final IModelElement element : elements.getModelElements()) {
@@ -530,7 +507,7 @@ public abstract class RefactoringAdapter {
 		result.merge(RefactoringStatus.create(Resources.makeCommittable(array, IWorkspace.VALIDATE_PROMPT)));
 	}
 	
-	public void checkFinalToDelete(final RefactoringStatus result, final RefactoringElementSet elements) throws CoreException {
+	public void checkFinalToDelete(final RefactoringStatus result, final ElementSet elements) throws CoreException {
 		for (final IModelElement element : elements.getModelElements()) {
 			checkFinalToDelete(result, element);
 		}
@@ -590,12 +567,12 @@ public abstract class RefactoringAdapter {
 		}
 	}
 	
-	public boolean confirmDeleteOfReadOnlyElements(final RefactoringElementSet elements, final Object queries) throws CoreException {
+	public boolean confirmDeleteOfReadOnlyElements(final ElementSet elements, final Object queries) throws CoreException {
 		// TODO add query support
 		return hasReadOnlyElements(elements);
 	}
 	
-	public boolean hasReadOnlyElements(final RefactoringElementSet elements) throws CoreException {
+	public boolean hasReadOnlyElements(final ElementSet elements) throws CoreException {
 		for (final IResource element : elements.getResources()) {
 			if (hasReadOnlyElements(element)) {
 				return true;
@@ -648,12 +625,12 @@ public abstract class RefactoringAdapter {
 	}
 	
 	
-	public void addParticipantsToDelete(final RefactoringElementSet elementsToDelete,
+	public void addParticipantsToDelete(final ElementSet elementsToDelete,
 			final List<RefactoringParticipant> list,
 			final RefactoringStatus status, final RefactoringProcessor processor, 
 			final SharableParticipants shared)
 			throws CoreException {
-		final String[] natures = RefactoringElementSet.getAffectedProjectNatures(elementsToDelete);
+		final String[] natures = ElementSet.getAffectedProjectNatures(elementsToDelete);
 		final DeleteArguments arguments = new DeleteArguments();
 		for (final IResource resource : elementsToDelete.getResources()) {
 			final DeleteParticipant[] deletes = ParticipantManager.loadDeleteParticipants(status, 
@@ -675,14 +652,14 @@ public abstract class RefactoringAdapter {
 		}
 	}
 	
-	public void addParticipantsToMove(final RefactoringElementSet elementsToMove,
+	public void addParticipantsToMove(final ElementSet elementsToMove,
 			final RefactoringDestination destination,
 			final List<RefactoringParticipant> list,
 			final RefactoringStatus status, final RefactoringProcessor processor, 
 			final SharableParticipants shared, final ReorgExecutionLog executionLog)
 			throws CoreException {
-		final String[] natures = RefactoringElementSet.getAffectedProjectNatures(
-				new ConstList<RefactoringElementSet>(elementsToMove, destination) );
+		final String[] natures = ElementSet.getAffectedProjectNatures(
+				new ConstList<ElementSet>(elementsToMove, destination) );
 		final MoveArguments mArguments = new MoveArguments(destination.getModelElements().get(0),
 				false );
 //		for (final IResource resource : elementsToCopy.getResources()) {
@@ -702,14 +679,14 @@ public abstract class RefactoringAdapter {
 		}
 	}
 	
-	public void addParticipantsToCopy(final RefactoringElementSet elementsToCopy,
+	public void addParticipantsToCopy(final ElementSet elementsToCopy,
 			final RefactoringDestination destination,
 			final List<RefactoringParticipant> list,
 			final RefactoringStatus status, final RefactoringProcessor processor, 
 			final SharableParticipants shared, final ReorgExecutionLog executionLog)
 			throws CoreException {
-		final String[] natures = RefactoringElementSet.getAffectedProjectNatures(
-				new ConstList<RefactoringElementSet>(elementsToCopy, destination) );
+		final String[] natures = ElementSet.getAffectedProjectNatures(
+				new ConstList<ElementSet>(elementsToCopy, destination) );
 		final CopyArguments mArguments = new CopyArguments(destination.getModelElements().get(0),
 				executionLog );
 //		for (final IResource resource : elementsToCopy.getResources()) {
@@ -730,7 +707,7 @@ public abstract class RefactoringAdapter {
 		}
 	}
 	
-	public void buildDeltaToDelete(final RefactoringElementSet elements,
+	public void buildDeltaToDelete(final ElementSet elements,
 			final IResourceChangeDescriptionFactory resourceDelta) {
 		for (final IResource resource : elements.getResources()) {
 			resourceDelta.delete(resource);
@@ -743,7 +720,7 @@ public abstract class RefactoringAdapter {
 		}
 	}
 	
-	public void buildDeltaToModify(final RefactoringElementSet elements,
+	public void buildDeltaToModify(final ElementSet elements,
 			final IResourceChangeDescriptionFactory resourceDelta) {
 		for (final IResource resource : elements.getResources()) {
 			if (resource instanceof IFile) {
@@ -768,7 +745,7 @@ public abstract class RefactoringAdapter {
 	 * @throws CoreException 
 	 */
 	public Change createChangeToDelete(final String changeName,
-			final RefactoringElementSet elementsToDelete,
+			final ElementSet elementsToDelete,
 			final TextChangeManager manager, final IProgressMonitor monitor) throws CoreException {
 		final SubMonitor progress = SubMonitor.convert(monitor, 1);
 		final CompositeChange result = new CompositeChange(changeName);
@@ -780,7 +757,7 @@ public abstract class RefactoringAdapter {
 	}
 	
 	public Change createChangeToMove(final String changeName, 
-			final RefactoringElementSet elementsToMove, final RefactoringDestination destination,
+			final ElementSet elementsToMove, final RefactoringDestination destination,
 			final TextChangeManager manager, final IProgressMonitor monitor) throws CoreException {
 		final SubMonitor progress = SubMonitor.convert(monitor, 3);
 		final CompositeChange result = new CompositeChange(changeName);
@@ -795,7 +772,7 @@ public abstract class RefactoringAdapter {
 	}
 	
 	public Change createChangeToCopy(final String changeName, 
-			final RefactoringElementSet elementsToMove, final RefactoringDestination destination,
+			final ElementSet elementsToMove, final RefactoringDestination destination,
 			final TextChangeManager manager, final IProgressMonitor monitor) throws CoreException {
 		final SubMonitor progress = SubMonitor.convert(monitor, 2);
 		final CompositeChange result = new CompositeChange(changeName);
@@ -823,7 +800,7 @@ public abstract class RefactoringAdapter {
 	}
 	
 	protected void addChangesToDelete(final CompositeChange result, 
-			final RefactoringElementSet elements,
+			final ElementSet elements,
 			final TextChangeManager manager, final SubMonitor progress) throws CoreException {
 		for (final IResource resource : elements.getResources()) {
 			result.add(createChangeToDelete(elements, resource));
@@ -852,7 +829,7 @@ public abstract class RefactoringAdapter {
 		}
 	}
 	
-	private void createChangeToDelete(final RefactoringElementSet elements,
+	private void createChangeToDelete(final ElementSet elements,
 			final ISourceUnit su, final List<IModelElement> elementsInUnit,
 			final TextChangeManager manager, final SubMonitor progress) throws CoreException {
 		if (!(su instanceof IWorkspaceSourceUnit)
@@ -884,7 +861,7 @@ public abstract class RefactoringAdapter {
 		}
 	}
 	
-	protected Change createChangeToDelete(final RefactoringElementSet elements, final IModelElement element) throws CoreException {
+	protected Change createChangeToDelete(final ElementSet elements, final IModelElement element) throws CoreException {
 		final IResource resource = elements.getOwningResource(element);
 		if (resource != null) {
 			return createChangeToDelete(elements, resource);
@@ -892,14 +869,14 @@ public abstract class RefactoringAdapter {
 		throw new IllegalStateException(); 
 	}
 	
-	protected Change createChangeToDelete(final RefactoringElementSet elements, final IResource resource) {
+	protected Change createChangeToDelete(final ElementSet elements, final IResource resource) {
 		if (resource.getType() == IResource.ROOT || resource.getType() == IResource.PROJECT) {
 			throw new IllegalStateException();
 		}
 		return new DeleteResourceChange(resource.getFullPath(), true);
 	}
 	
-	protected Change createChangeToDelete(final RefactoringElementSet elements, final ISourceUnit su) throws CoreException {
+	protected Change createChangeToDelete(final ElementSet elements, final ISourceUnit su) throws CoreException {
 		if (su instanceof IWorkspaceSourceUnit) {
 			return createChangeToDelete(elements, ((IWorkspaceSourceUnit) su).getResource());
 		}

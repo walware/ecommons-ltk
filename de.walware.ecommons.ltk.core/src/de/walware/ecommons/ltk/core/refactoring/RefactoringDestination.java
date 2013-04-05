@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012-2013 WalWare/StatET-Project (www.walware.de/goto/statet).
+ * Copyright (c) 2012-2013 Stephan Wahlbrink (WalWare.de) and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,9 +12,10 @@
 package de.walware.ecommons.ltk.core.refactoring;
 
 import de.walware.ecommons.ltk.ISourceElement;
+import de.walware.ecommons.ltk.core.ElementSet;
 
 
-public class RefactoringDestination extends RefactoringElementSet {
+public class RefactoringDestination extends ElementSet {
 	
 	
 	public static enum Position {

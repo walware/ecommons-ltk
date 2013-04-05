@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2008-2013 WalWare/StatET-Project (www.walware.de/goto/statet)
- * and others. All rights reserved. This program and the accompanying materials
+ * Copyright (c) 2008-2013 Stephan Wahlbrink (WalWare.de) and others.
+ * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
@@ -15,6 +15,8 @@ import org.eclipse.ltk.core.refactoring.participants.CopyProcessor;
 import org.eclipse.ltk.core.refactoring.participants.DeleteProcessor;
 import org.eclipse.ltk.core.refactoring.participants.MoveProcessor;
 import org.eclipse.ltk.core.refactoring.participants.RefactoringProcessor;
+
+import de.walware.ecommons.ltk.core.ElementSet;
 
 
 /**
@@ -48,14 +50,14 @@ public class CommonRefactoringFactory {
 	}
 	
 	
-	protected RefactoringElementSet createElementSet(final Object elements) {
-		if (elements instanceof RefactoringElementSet) {
-			return (RefactoringElementSet) elements;
+	protected ElementSet createElementSet(final Object elements) {
+		if (elements instanceof ElementSet) {
+			return (ElementSet) elements;
 		}
 		if (elements instanceof Object[]) {
-			return new RefactoringElementSet((Object[]) elements);
+			return new ElementSet((Object[]) elements);
 		}
-		return new RefactoringElementSet(new Object[] { elements });
+		return new ElementSet(new Object[] { elements });
 	}
 	
 }
