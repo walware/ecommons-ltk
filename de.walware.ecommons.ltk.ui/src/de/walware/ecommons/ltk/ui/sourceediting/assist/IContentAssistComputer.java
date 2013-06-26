@@ -37,8 +37,11 @@ public interface IContentAssistComputer {
 	 * {@linkplain #computeCompletionProposals(ContentAssistInvocationContext, IProgressMonitor) computeCompletionProposals}
 	 * or
 	 * {@linkplain #computeContextInformation(ContentAssistInvocationContext, IProgressMonitor) computeContextInformation}.
+	 * 
+	 * @param editor the source editor the session belong to
+	 * @param assist the content assistant of the editor starting the session
 	 */
-	public void sessionStarted(ISourceEditor editor);
+	public void sessionStarted(ISourceEditor editor, ContentAssist assist);
 	
 	/**
 	 * Returns a list of completion proposals valid at the given invocation context.

@@ -104,7 +104,7 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 			for (final ContentAssistCategory category : fAvailableCategories) {
 				final List<IContentAssistComputer> computers = category.getComputers(fPartition);
 				for (final IContentAssistComputer computer : computers) {
-					computer.sessionStarted(fEditor);
+					computer.sessionStarted(fEditor, fAssistant);
 				}
 			}
 			
@@ -187,7 +187,7 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	private List<List<ContentAssistCategory>> fCategoryIteration;
 	private String fIterationGesture = null;
 	private int fNumberOfComputedResults = 0;
-	private String fErrorMessage;
+	private IStatus fStatus;
 	
 	private IContextInformationValidator fContextInformationValidator;
 	
@@ -314,7 +314,7 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	}
 	
 	private void clearState() {
-		fErrorMessage = null;
+		fStatus = null;
 		fNumberOfComputedResults = 0;
 	}
 	
@@ -336,7 +336,11 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 			final List<IContentAssistComputer> computers = category.getComputers(fPartition);
 			final SubMonitor computorsProgress = progress.newChild(1);
 			for (final IContentAssistComputer computer : computers) {
-				computer.computeCompletionProposals(context, mode, proposals, computorsProgress);
+				IStatus status = computer.computeCompletionProposals(context, mode, proposals, computorsProgress);
+				if (status != null && status.getSeverity() >= IStatus.INFO
+						&& (fStatus == null || status.getSeverity() > fStatus.getSeverity()) ) {
+					fStatus = status;
+				}
 			}
 		}
 		return true;
@@ -431,7 +435,7 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 			final List<IContentAssistComputer> computers = category.getComputers(fPartition);
 			final SubMonitor computersProgress = progress.newChild(1);
 			for (final IContentAssistComputer computer : computers) {
-				computer.sessionStarted(context.getEditor());
+				computer.sessionStarted(context.getEditor(), fAssistant);
 				final IStatus status;
 				try {
 					status = computer.computeContextInformation(context, proposals, computersProgress);
@@ -483,7 +487,8 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	 */
 	@Override
 	public String getErrorMessage() {
-		return fErrorMessage;
+		final IStatus status = fStatus;
+		return (status != null && status.getSeverity() == IStatus.ERROR) ? status.getMessage() : null;
 	}
 	
 	/**

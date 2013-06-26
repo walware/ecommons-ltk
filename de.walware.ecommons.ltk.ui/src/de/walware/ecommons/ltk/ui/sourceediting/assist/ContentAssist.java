@@ -40,6 +40,28 @@ public class ContentAssist extends ContentAssistant {
 		super.hide();
 	}
 	
+	public void showPossibleCompletions(final boolean restart, final boolean autostart) {
+		class AutoAssist extends AutoAssistListener {
+			
+			public static final int SHOW_PROPOSALS = 1;
+			
+			@Override
+			public void start(int showStyle) {
+				showAssist(showStyle);
+			}
+			
+		}
+		
+		if (restart) {
+			super.hide();
+		}
+		if (autostart) {
+			new AutoAssist().start(AutoAssist.SHOW_PROPOSALS);
+		}
+		else {
+			super.showPossibleCompletions();
+		}
+	}
 	
 	@Override
 	public void enableAutoInsert(final boolean enabled) {

@@ -58,7 +58,7 @@ public abstract class TemplatesCompletionComputer implements IContentAssistCompu
 	
 	
 	@Override
-	public void sessionStarted(final ISourceEditor editor) {
+	public void sessionStarted(final ISourceEditor editor, final ContentAssist assist) {
 	}
 	
 	/**
