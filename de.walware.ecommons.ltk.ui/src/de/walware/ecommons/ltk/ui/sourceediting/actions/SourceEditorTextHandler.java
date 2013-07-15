@@ -14,6 +14,7 @@ package de.walware.ecommons.ltk.ui.sourceediting.actions;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.AbstractDocument;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentRewriteSession;
@@ -32,6 +33,8 @@ import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.ui.editors.text.EditorsUI;
+import org.eclipse.ui.texteditor.AbstractTextEditor;
 
 import de.walware.ecommons.text.DocumentCodepointIterator;
 import de.walware.ecommons.text.ICodepointIterator;
@@ -41,7 +44,7 @@ import de.walware.ecommons.ui.util.DNDUtil;
 import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditor;
 
 
-public class SourceEditorTextHandler extends AbstractHandler {
+public abstract class SourceEditorTextHandler extends AbstractHandler {
 	// TODO Add CamelCase support
 	
 	
@@ -53,75 +56,85 @@ public class SourceEditorTextHandler extends AbstractHandler {
 	
 	protected static class ExecData {
 		
-		private final ISourceEditor fEditor;
-		private final SourceViewer fViewer;
-		private final StyledText fWidget;
+		private final ISourceEditor editor;
+		private final SourceViewer viewer;
+		private final StyledText widget;
 		
-		private final AbstractDocument fDocument;
+		private final AbstractDocument document;
 		
-		private final int fCaretWidgetOffset;
-		private final int fCaretDocOffset;
+		private final int caretWidgetOffset;
+		private final int caretDocOffset;
 		
-		private int fCaretDocLine = Integer.MIN_VALUE;
-		private IRegion fCaretDocLineInfo;
+		private int caretDocLine = Integer.MIN_VALUE;
+		private IRegion caretDocLineInfo;
 		
-		private LinkedModeModel fLinkedModel;
+		private LinkedModeModel linkedModel;
 		
 		
 		public ExecData(final ISourceEditor editor) throws BadLocationException {
-			fEditor = editor;
-			fViewer = editor.getViewer();
-			fWidget = getViewer().getTextWidget();
-			fDocument = (AbstractDocument) getViewer().getDocument();
-			fCaretWidgetOffset = this.getWidget().getCaretOffset();
-			fCaretDocOffset = getViewer().widgetOffset2ModelOffset(getCaretWidgetOffset());
-			if (fCaretDocOffset < 0) {
+			this.editor = editor;
+			this.viewer = editor.getViewer();
+			this.widget = getViewer().getTextWidget();
+			this.document = (AbstractDocument) getViewer().getDocument();
+			this.caretWidgetOffset = this.getWidget().getCaretOffset();
+			this.caretDocOffset = getViewer().widgetOffset2ModelOffset(getCaretWidgetOffset());
+			if (this.caretDocOffset < 0) {
 				throw new BadLocationException();
 			}
 		}
 		
 		
+		public boolean isSmartHomeBeginEndEnabled() {
+			final IPreferenceStore store = EditorsUI.getPreferenceStore();
+			return (store != null
+					&& store.getBoolean(AbstractTextEditor.PREFERENCE_NAVIGATION_SMART_HOME_END) );
+		}
+		
 		public ISourceEditor getEditor() {
-			return fEditor;
+			return this.editor;
 		}
 		
 		public SourceViewer getViewer() {
-			return fViewer;
+			return this.viewer;
 		}
 		
 		public StyledText getWidget() {
-			return fWidget;
+			return this.widget;
 		}
 		
 		
 		public AbstractDocument getDocument() {
-			return fDocument;
+			return this.document;
 		}
 		
 		public int toWidgetOffset(final int docOffset) {
-			return fViewer.modelOffset2WidgetOffset(docOffset);
+			return this.viewer.modelOffset2WidgetOffset(docOffset);
+		}
+		
+		public int toDocOffset(final int widgetOffset) {
+			return this.viewer.widgetOffset2ModelOffset(widgetOffset);
 		}
 		
 		public int getCaretWidgetOffset() {
-			return fCaretWidgetOffset;
+			return this.caretWidgetOffset;
 		}
 		
 		public int getCaretDocOffset() {
-			return fCaretDocOffset;
+			return this.caretDocOffset;
 		}
 		
 		public int getCaretDocLine() throws BadLocationException {
-			if (fCaretDocLine == Integer.MIN_VALUE) {
-				fCaretDocLine = getDocument().getLineOfOffset(getCaretDocOffset());
+			if (this.caretDocLine == Integer.MIN_VALUE) {
+				this.caretDocLine = getDocument().getLineOfOffset(getCaretDocOffset());
 			}
-			return fCaretDocLine;
+			return this.caretDocLine;
 		}
 		
 		public IRegion getCaretDocLineInformation() throws BadLocationException {
-			if (fCaretDocLineInfo == null) {
-				fCaretDocLineInfo = getDocument().getLineInformation(getCaretDocLine());
+			if (this.caretDocLineInfo == null) {
+				this.caretDocLineInfo = getDocument().getLineInformation(getCaretDocLine());
 			}
-			return fCaretDocLineInfo;
+			return this.caretDocLineInfo;
 		}
 		
 		public int getCaretDocLineBeginOffset() throws BadLocationException {
@@ -138,25 +151,25 @@ public class SourceEditorTextHandler extends AbstractHandler {
 		}
 		
 		public LinkedModeModel getLinkedModel() {
-			if (fLinkedModel == null) {
-				fLinkedModel = LinkedModeModel.getModel(getDocument(), getCaretDocOffset());
+			if (this.linkedModel == null) {
+				this.linkedModel = LinkedModeModel.getModel(getDocument(), getCaretDocOffset());
 			}
-			return fLinkedModel;
+			return this.linkedModel;
 		}
 		
 	}
 	
 	
-	private final ISourceEditor fEditor;
+	private final ISourceEditor editor;
 	
 	
 	public SourceEditorTextHandler(final ISourceEditor editor) {
-		fEditor = editor;
+		this.editor = editor;
 	}
 	
 	
 	private ISourceEditor getEditor(final Object context) {
-		return fEditor;
+		return this.editor;
 	}
 	
 	protected int getTextActionId() {
@@ -351,19 +364,51 @@ public class SourceEditorTextHandler extends AbstractHandler {
 		}
 	}
 	
+	public int getCaretSmartLineBeginOffset(final ExecData data) throws BadLocationException {
+		if (data.isSmartHomeBeginEndEnabled()) {
+			final LinkedModeModel linkedModel = data.getLinkedModel();
+			if (linkedModel != null) {
+				final LinkedPosition position = linkedModel.findPosition(
+						new LinkedPosition(data.getDocument(), data.getCaretDocOffset(), 0) );
+				if (position != null) {
+					if (data.getCaretDocOffset() > position.getOffset()) {
+						return position.getOffset();
+					}
+				}
+			}
+		}
+		return data.getCaretDocLineBeginOffset();
+	}
+	
+	public int getCaretSmartLineEndOffset(final ExecData data) throws BadLocationException {
+		if (data.isSmartHomeBeginEndEnabled()) {
+			final LinkedModeModel linkedModel = data.getLinkedModel();
+			if (linkedModel != null) {
+				final LinkedPosition position = linkedModel.findPosition(
+						new LinkedPosition(data.getDocument(), data.getCaretDocOffset(), 0) );
+				if (position != null) {
+					if (data.getCaretDocOffset() < position.getOffset() + position.getLength()) {
+						return position.getOffset() + position.getLength();
+					}
+				}
+			}
+		}
+		return data.getCaretDocLineEndOffset();
+	}
+	
 	protected IRegion getWholeLinesRegion(final ExecData data) throws BadLocationException {
 		final Point selectedRange = data.getViewer().getSelectedRange();
 		return TextUtil.getBlock(data.getDocument(), selectedRange.x, selectedRange.y);
 	}
 	
 	protected IRegion getToLineBeginRegion(final ExecData data) throws BadLocationException {
-		return new Region(data.getCaretDocLineBeginOffset(),
-				data.getCaretDocOffset() - data.getCaretDocLineBeginOffset() );
+		final int beginOffset = getCaretSmartLineBeginOffset(data);
+		return new Region(beginOffset, data.getCaretDocOffset() - beginOffset);
 	}
 	
 	protected IRegion getToLineEndRegion(final ExecData data) throws BadLocationException {
-		return new Region(data.getCaretDocOffset(),
-				data.getCaretDocLineEndOffset() - data.getCaretDocOffset() );
+		final int endOffset = getCaretSmartLineEndOffset(data);
+		return new Region(data.getCaretDocOffset(), endOffset - data.getCaretDocOffset());
 	}
 	
 	protected void expandBlockSelection(final ExecData data, final int newWidgetOffset) {
@@ -379,37 +424,16 @@ public class SourceEditorTextHandler extends AbstractHandler {
 		}
 	}
 	
-	protected void expandWidgetSelection(final ExecData data, final int newWidgetOffset) {
-		if (data.getCaretWidgetOffset() == newWidgetOffset) {
-			return;
-		}
-		int otherOffset;
-		{	final Point widgetSelection = data.getWidget().getSelection();
-			otherOffset = (data.getCaretWidgetOffset() == widgetSelection.x) ?
-				widgetSelection.y : widgetSelection.x;
-		}
-		if (newWidgetOffset >= 0 && otherOffset >= 0) {
-			data.getWidget().setSelectionRange(otherOffset, newWidgetOffset - otherOffset);
-		}
-	}
-	
 	protected void expandDocSelection(final ExecData data, final int newDocOffset) {
-		int otherOffset, newWidgetOffset;
+		int otherDocOffset;
 		{	final Point widgetSelection = data.getWidget().getSelection();
-			otherOffset = (data.getCaretWidgetOffset() == widgetSelection.x) ?
-					widgetSelection.y : widgetSelection.x;
-			newWidgetOffset = data.toWidgetOffset(newDocOffset);
+			otherDocOffset = data.toDocOffset((data.getCaretWidgetOffset() == widgetSelection.x) ?
+					widgetSelection.y : widgetSelection.x);
 		}
-		if (newWidgetOffset < 0 && data.getViewer() instanceof ProjectionViewer) {
-			otherOffset = data.getViewer().widgetOffset2ModelOffset(otherOffset);
-			if (((ProjectionViewer) data.getViewer()).exposeModelRange(new Region(newDocOffset, 0))) {
-				otherOffset = data.getViewer().modelOffset2WidgetOffset(otherOffset);
-				newWidgetOffset = data.toWidgetOffset(newDocOffset);
-			}
+		if (data.toWidgetOffset(newDocOffset) < 0 && data.getViewer() instanceof ProjectionViewer) {
+			((ProjectionViewer) data.getViewer()).exposeModelRange(new Region(newDocOffset, 0));
 		}
-		if (newWidgetOffset >= 0 && otherOffset >= 0) {
-			data.getWidget().setSelectionRange(otherOffset, newWidgetOffset - otherOffset);
-		}
+		selectAndReveal(data, otherDocOffset, newDocOffset - otherDocOffset);
 	}
 	
 	protected void copyToClipboard(final ExecData data, final IRegion docRegion)
@@ -434,10 +458,12 @@ public class SourceEditorTextHandler extends AbstractHandler {
 		if (docRegion.getLength() > 0) {
 			data.getDocument().replace(docRegion.getOffset(), docRegion.getLength(), ""); //$NON-NLS-1$
 		}
-		final int widgetOffset = data.getViewer().modelOffset2WidgetOffset(docRegion.getOffset());
-		if (widgetOffset >= 0) {
-			data.getWidget().setSelectionRange(widgetOffset, 0);
-		}
+		selectAndReveal(data, docRegion.getOffset(), 0);
+	}
+	
+	protected void selectAndReveal(final ExecData data, final int docOffset, final int length) {
+		data.getViewer().setSelectedRange(docOffset, length);
+		data.getViewer().revealRange(docOffset, length);
 	}
 	
 }

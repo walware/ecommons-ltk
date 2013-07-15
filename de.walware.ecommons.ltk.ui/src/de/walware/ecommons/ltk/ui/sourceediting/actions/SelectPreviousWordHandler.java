@@ -48,9 +48,8 @@ public class SelectPreviousWordHandler extends SourceEditorTextHandler {
 		}
 		else {
 			final int newDocOffset = findPreviousWordOffset(data, data.getCaretDocOffset(), false);
-			final int newWidgetOffset = data.toWidgetOffset(newDocOffset);
-			if (newWidgetOffset >= 0) {
-				expandWidgetSelection(data, newWidgetOffset);
+			if (data.toWidgetOffset(newDocOffset) >= 0) {
+				expandDocSelection(data, newDocOffset);
 			}
 			else {
 				data.getWidget().invokeAction(ST.SELECT_COLUMN_PREVIOUS);
