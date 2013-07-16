@@ -13,11 +13,22 @@ package de.walware.ecommons.ltk;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.text.IRegion;
 
 
 public class LTKUtil {
 	
+	
+	public static IModelElement getModelElement(Object element) {
+		if (element instanceof IModelElement) {
+			return (IModelElement) element;
+		}
+		if (element instanceof IAdaptable) {
+			return (IModelElement) ((IAdaptable) element).getAdapter(IModelElement.class);
+		}
+		return null;
+	}
 	
 	public static ISourceUnit getSourceUnit(final IModelElement element) {
 		if (element instanceof ISourceUnit) {
