@@ -15,6 +15,8 @@ import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.ITextHoverExtension;
 import org.eclipse.jface.text.ITextHoverExtension2;
 
+import de.walware.ecommons.ui.util.InformationDispatchHandler;
+
 
 /**
  * Interface for information hover providers.
@@ -23,6 +25,13 @@ import org.eclipse.jface.text.ITextHoverExtension2;
  * <code>de.walware.ecommons.ltk.advancedInfoHover</code>.
  */
 public interface IInfoHover {
+	
+	
+	int MODE_TOOLTIP = InformationDispatchHandler.MODE_TOOLTIP;
+	int MODE_PROPOSAL_INFO = InformationDispatchHandler.MODE_PROPOSAL_INFO;
+	
+	int MODE_FOCUS = InformationDispatchHandler.MODE_FOCUS;
+	
 	
 	/**
 	 * @see ITextHoverExtension2#getHoverInfo2(org.eclipse.jface.text.ITextViewer, org.eclipse.jface.text.IRegion)

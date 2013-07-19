@@ -14,6 +14,8 @@ package de.walware.ecommons.ltk.ui.sourceediting.assist;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IInformationControlCreator;
+import org.eclipse.jface.text.contentassist.ICompletionProposalExtension3;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension6;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.source.SourceViewer;
@@ -30,7 +32,7 @@ import de.walware.ecommons.ltk.ui.IElementLabelProvider;
  * Proposal completing a given {@link IElementName} of a element.
  */
 public abstract class ElementNameCompletionProposal extends CompletionProposalWithOverwrite
-		implements ICompletionProposalExtension6 {
+		implements ICompletionProposalExtension3, ICompletionProposalExtension6 {
 	
 	
 	protected final IElementName fReplacementName;
@@ -40,9 +42,6 @@ public abstract class ElementNameCompletionProposal extends CompletionProposalWi
 	private final int fRelevance;
 	
 	private final IElementLabelProvider fLabelProvider;
-	
-	/** The additional info of this proposal. */
-	private String fAdditionalProposalInfo;
 	
 	/** The cursor position after this proposal has been applied. */
 	private int fCursorPosition = -1;
@@ -93,7 +92,7 @@ public abstract class ElementNameCompletionProposal extends CompletionProposalWi
 	 */
 	@Override
 	public String getAdditionalProposalInfo() {
-		return fAdditionalProposalInfo;
+		return null;
 	}
 	
 	/**
@@ -166,6 +165,22 @@ public abstract class ElementNameCompletionProposal extends CompletionProposalWi
 		if (fCursorPosition >= 0) {
 			return new Point(fCursorPosition, 0);
 		}
+		return null;
+	}
+	
+	
+	@Override
+	public int getPrefixCompletionStart(IDocument document, int offset) {
+		return getReplacementOffset();
+	}
+	
+	@Override
+	public CharSequence getPrefixCompletionText(IDocument document, int offset) {
+		return null;
+	}
+	
+	@Override
+	public IInformationControlCreator getInformationControlCreator() {
 		return null;
 	}
 	
