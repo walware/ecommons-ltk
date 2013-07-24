@@ -32,21 +32,21 @@ public abstract class EditorInformationProvider
 		implements IInformationProvider, IInformationProviderExtension, IInformationProviderExtension2{
 	
 	
-	private final ISourceEditor fEditor;
+	private final ISourceEditor editor;
 	
-	private final IInfoHover[] fHovers;
+	private final IInfoHover[] hovers;
 	
-	private IInfoHover fBestHover;
+	private IInfoHover bestHover;
 	
 	
 	public EditorInformationProvider(final ISourceEditor editor, final IInfoHover[] hovers) {
-		fEditor = editor;
-		fHovers = hovers;
+		this.editor = editor;
+		this.hovers = hovers;
 	}
 	
 	
 	public ISourceEditor getEditor() {
-		return fEditor;
+		return this.editor;
 	}
 	
 	@Override
@@ -56,15 +56,15 @@ public abstract class EditorInformationProvider
 	
 	@Override
 	public Object getInformation2(final ITextViewer textViewer, final IRegion region) {
-		fBestHover = null;
+		this.bestHover = null;
 		final SubMonitor progress = SubMonitor.convert(null);
 		try {
 			final AssistInvocationContext context = createContext(region, progress);
 			if (context != null) {
-				for (int i = 0; i < fHovers.length; i++) {
-					final Object info = fHovers[i].getHoverInfo(context);
+				for (int i = 0; i < this.hovers.length; i++) {
+					final Object info = this.hovers[i].getHoverInfo(context);
 					if (info != null) {
-						fBestHover = fHovers[i];
+						this.bestHover = this.hovers[i];
 						return info;
 					}
 				}
@@ -79,8 +79,8 @@ public abstract class EditorInformationProvider
 	
 	@Override
 	public IInformationControlCreator getInformationPresenterControlCreator() {
-		if (fBestHover != null) {
-			return fBestHover.getHoverControlCreator();
+		if (this.bestHover != null) {
+			return this.bestHover.getHoverControlCreator();
 		}
 		return null;
 	}

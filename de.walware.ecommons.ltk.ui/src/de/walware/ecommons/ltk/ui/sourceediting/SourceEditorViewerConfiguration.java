@@ -21,6 +21,7 @@ import org.eclipse.jface.internal.text.html.BrowserInformationControl;
 import org.eclipse.jface.internal.text.html.HTMLTextPresenter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.text.AbstractInformationControlManager;
 import org.eclipse.jface.text.AbstractReusableInformationControlCreator;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DefaultInformationControl;
@@ -35,6 +36,7 @@ import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.information.IInformationPresenter;
 import org.eclipse.jface.text.information.IInformationProvider;
+import org.eclipse.jface.text.information.IInformationProviderExtension2;
 import org.eclipse.jface.text.information.InformationPresenter;
 import org.eclipse.jface.text.quickassist.IQuickAssistAssistant;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -112,33 +114,33 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 			};
 	
 	
-	private final ISourceEditor fSourceEditor;
+	private final ISourceEditor editor;
 	
-	private ColorManager fColorManager;
-	private final FastList<ISettingsChangedHandler> fSettingsHandler = new FastList<ISettingsChangedHandler>(ISettingsChangedHandler.class);
+	private ColorManager colorManager;
+	private final FastList<ISettingsChangedHandler> settingsHandler = new FastList<ISettingsChangedHandler>(ISettingsChangedHandler.class);
 	
-	private ICharPairMatcher fPairMatcher;
-	private ContentAssistant fContentAssistant;
-	private IQuickAssistAssistant fQuickAssistant;
+	private ICharPairMatcher pairMatcher;
+	private ContentAssistant contentAssistant;
+	private IQuickAssistAssistant quickAssistant;
 	
-	private DecorationPreferences fDecorationPreferences;
-	private AssistPreferences fAssistPreferences;
+	private DecorationPreferences decorationPreferences;
+	private AssistPreferences assistPreferences;
 	
-	private EffectiveHovers fEffectiveHovers;
+	private EffectiveHovers effectiveHovers;
 	
 	
 	public SourceEditorViewerConfiguration(final ISourceEditor sourceEditor) {
-		fSourceEditor = sourceEditor;
+		this.editor = sourceEditor;
 	}
 	
 	
 	protected void setup(final IPreferenceStore preferenceStore, final ColorManager colorManager,
 			final DecorationPreferences decoPrefs, final AssistPreferences assistPrefs) {
 		assert (preferenceStore != null);
-		fPreferenceStore = preferenceStore;
-		fColorManager = colorManager;
-		fDecorationPreferences = decoPrefs;
-		fAssistPreferences = assistPrefs;
+		this.fPreferenceStore = preferenceStore;
+		this.colorManager = colorManager;
+		this.decorationPreferences = decoPrefs;
+		this.assistPreferences = assistPrefs;
 	}
 	
 	/**
@@ -147,44 +149,44 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	protected void setScanners(final org.eclipse.jface.text.rules.ITokenScanner[] scanners) {
 		for (int i = 0; i < scanners.length; i++) {
 			if (scanners[i] instanceof ISettingsChangedHandler) {
-				fSettingsHandler.add((ISettingsChangedHandler) scanners[i]);
+				this.settingsHandler.add((ISettingsChangedHandler) scanners[i]);
 			}
 		}
 	}
 	
 	protected ISourceEditor getSourceEditor() {
-		return fSourceEditor;
+		return this.editor;
 	}
 	
 	public IPreferenceStore getPreferences() {
-		return fPreferenceStore;
+		return this.fPreferenceStore;
 	}
 	
 	protected ColorManager getColorManager() {
-		return fColorManager;
+		return this.colorManager;
 	}
 	
 	
 	public DecorationPreferences getDecorationPreferences() {
-		return fDecorationPreferences;
+		return this.decorationPreferences;
 	}
 	
 	public AssistPreferences getAssistPreferences() {
-		return fAssistPreferences;
+		return this.assistPreferences;
 	}
 	
 	
 	@Override
 	public void handleSettingsChanged(final Set<String> groupIds, final Map<String, Object> options) {
-		if (fAssistPreferences != null && groupIds.contains(fAssistPreferences.getGroupId())) {
-			if (fContentAssistant != null) {
-				fAssistPreferences.configure(fContentAssistant);
+		if (this.assistPreferences != null && groupIds.contains(this.assistPreferences.getGroupId())) {
+			if (this.contentAssistant != null) {
+				this.assistPreferences.configure(this.contentAssistant);
 			}
-			if (fQuickAssistant != null) {
-				fAssistPreferences.configure(fQuickAssistant);
+			if (this.quickAssistant != null) {
+				this.assistPreferences.configure(this.quickAssistant);
 			}
 		}
-		for (final ISettingsChangedHandler handler : fSettingsHandler.toArray()) {
+		for (final ISettingsChangedHandler handler : this.settingsHandler.toArray()) {
 			handler.handleSettingsChanged(groupIds, options);
 		}
 	}
@@ -194,10 +196,10 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	
 	
 	public ICharPairMatcher getPairMatcher() {
-		if (fPairMatcher == null) {
-			fPairMatcher = createPairMatcher();
+		if (this.pairMatcher == null) {
+			this.pairMatcher = createPairMatcher();
 		}
-		return fPairMatcher;
+		return this.pairMatcher;
 	}
 	
 	protected ICharPairMatcher createPairMatcher() {
@@ -239,18 +241,18 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	
 	@Override
 	public IContentAssistant getContentAssistant(final ISourceViewer sourceViewer) {
-		if (fContentAssistant == null) {
-			fContentAssistant = createContentAssistant(sourceViewer);
-			if (fContentAssistant != null) {
-				if (fAssistPreferences != null) {
-					fAssistPreferences.configure(fContentAssistant);
+		if (this.contentAssistant == null) {
+			this.contentAssistant = createContentAssistant(sourceViewer);
+			if (this.contentAssistant != null) {
+				if (this.assistPreferences != null) {
+					this.assistPreferences.configure(this.contentAssistant);
 				}
-				fContentAssistant.setProposalPopupOrientation(IContentAssistant.PROPOSAL_OVERLAY);
-				fContentAssistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_ABOVE);
-				fContentAssistant.setInformationControlCreator(getAssistInformationControlCreator(sourceViewer));
+				this.contentAssistant.setProposalPopupOrientation(IContentAssistant.PROPOSAL_OVERLAY);
+				this.contentAssistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_ABOVE);
+				this.contentAssistant.setInformationControlCreator(getAssistInformationControlCreator(sourceViewer));
 			}
 		}
-		return fContentAssistant;
+		return this.contentAssistant;
 	}
 	
 	protected ContentAssistant createContentAssistant(final ISourceViewer sourceViewer) {
@@ -260,16 +262,16 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	
 	@Override
 	public IQuickAssistAssistant getQuickAssistAssistant(final ISourceViewer sourceViewer) {
-		if (fQuickAssistant == null) {
-			fQuickAssistant = createQuickAssistant(sourceViewer);
-			if (fQuickAssistant != null) {
-				if (fAssistPreferences != null) {
-					fAssistPreferences.configure(fQuickAssistant);
+		if (this.quickAssistant == null) {
+			this.quickAssistant = createQuickAssistant(sourceViewer);
+			if (this.quickAssistant != null) {
+				if (this.assistPreferences != null) {
+					this.assistPreferences.configure(this.quickAssistant);
 				}
-				fQuickAssistant.setInformationControlCreator(getAssistInformationControlCreator(sourceViewer));
+				this.quickAssistant.setInformationControlCreator(getAssistInformationControlCreator(sourceViewer));
 			}
 		}
-		return fQuickAssistant;
+		return this.quickAssistant;
 	}
 	
 	protected IQuickAssistAssistant createQuickAssistant(final ISourceViewer sourceViewer) {
@@ -285,14 +287,14 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	
 	@Override
 	public int[] getConfiguredTextHoverStateMasks(final ISourceViewer sourceViewer, final String contentType) {
-		if (fSourceEditor != null) {
+		if (this.editor != null) {
 			final String[] partitioning = getConfiguredContentTypes(sourceViewer);
 			if (partitioning != null && partitioning.length > 0 && partitioning[0].equals(contentType)) {
 				final InfoHoverRegistry registry = getInfoHoverRegistry();
 				if (registry != null) {
-					fEffectiveHovers = registry.getEffectiveHoverDescriptors();
-					if (fEffectiveHovers != null) {
-						return fEffectiveHovers.getStateMasks();
+					this.effectiveHovers = registry.getEffectiveHoverDescriptors();
+					if (this.effectiveHovers != null) {
+						return this.effectiveHovers.getStateMasks();
 					}
 					return null;
 				}
@@ -302,7 +304,7 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	}
 	
 	public EffectiveHovers getEffectiveHovers() {
-		return fEffectiveHovers;
+		return this.effectiveHovers;
 	}
 	
 	@Override
@@ -345,13 +347,13 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	
 	protected static class TemplateVariableTextHover implements ITextHover {
 		
-		private final TemplateVariableProcessor fProcessor;
+		private final TemplateVariableProcessor processor;
 		
 		/**
 		 * @param processor the template variable processor
 		 */
 		public TemplateVariableTextHover(final TemplateVariableProcessor processor) {
-			fProcessor = processor;
+			this.processor = processor;
 		}
 		
 		@Override
@@ -361,7 +363,7 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 				final int offset= subject.getOffset();
 				if (offset >= 2 && "${".equals(doc.get(offset-2, 2))) {  //$NON-NLS-1$
 					final String varName= doc.get(offset, subject.getLength());
-					final TemplateContextType contextType= fProcessor.getContextType();
+					final TemplateContextType contextType = this.processor.getContextType();
 					if (contextType != null) {
 						final Iterator iter= contextType.resolvers();
 						while (iter.hasNext()) {
@@ -403,6 +405,31 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	
 	public boolean isSmartInsertByDefault() {
 		return true;
+	}
+	
+	
+	public IInformationPresenter getQuickPresenter(final ISourceViewer sourceViewer,
+			final int operation) {
+		final IInformationProvider provider = getQuickInformationProvider(sourceViewer, operation);
+		if (provider == null) {
+			return null;
+		}
+		final InformationPresenter presenter = new InformationPresenter(((IInformationProviderExtension2) provider).getInformationPresenterControlCreator());
+		presenter.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
+		presenter.setAnchor(AbstractInformationControlManager.ANCHOR_GLOBAL);
+		presenter.setSizeConstraints(50, 20, true, false);
+		
+		final String[] contentTypes = getConfiguredContentTypes(sourceViewer);
+		for (int i = 0; i < contentTypes.length; i++) {
+			presenter.setInformationProvider(provider, contentTypes[i]);
+		}
+		
+		return presenter;
+	}
+	
+	protected IInformationProvider getQuickInformationProvider(final ISourceViewer sourceViewer,
+			final int operation) {
+		return null;
 	}
 	
 }

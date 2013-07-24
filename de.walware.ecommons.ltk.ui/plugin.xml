@@ -110,6 +110,21 @@
             categoryId="org.eclipse.ui.category.navigate"
             name="%commands_GotoMatchingBracket_name"
             description="%commands_GotoMatchingBracket_description" />
+      <command
+            id="de.walware.ecommons.ltk.commands.ShowQuickSourceOutline"
+            categoryId="de.walware.statet.base.commandCategorys.StatetSource"
+            name="%commands_ShowQuickSourceOutline_name"
+            description="%commands_ShowQuickSourceOutline_description"/>
+      <command
+            id="de.walware.ecommons.ltk.commands.ShowQuickElementOutline"
+            categoryId="de.walware.statet.base.commandCategorys.StatetSource"
+            name="%commands_ShowQuickElementOutline_name"
+            description="%commands_ShowQuickElementOutline_description"/>
+      <command
+            id="de.walware.ecommons.ltk.commands.ShowQuickElementHierarchy"
+            categoryId="de.walware.statet.base.commandCategorys.StatetSource"
+            name="%commands_ShowQuickElementHierarchy_name"
+            description="%commands_ShowQuickElementHierarchy_description"/>
       
       <!-- search -->
       <command
@@ -345,6 +360,21 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M2+K">
       </key>
+      <key
+            commandId="de.walware.ecommons.ltk.commands.ShowQuickSourceOutline"
+            contextId="de.walware.ecommons.text.contexts.TextEditor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+O"/>
+      <key
+            commandId="de.walware.ecommons.ltk.commands.ShowQuickElementOutline"
+            contextId="de.walware.ecommons.text.contexts.TextEditor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+F3"/>
+      <key
+            commandId="de.walware.ecommons.ltk.commands.ShowQuickElementHierarchy"
+            contextId="de.walware.ecommons.text.contexts.TextEditor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+T"/>
       
       <key
             commandId="org.eclipse.ui.edit.text.showInformation"
@@ -387,6 +417,45 @@
             namespace="de.walware.ecommons.ltk"
             properties="isElementSelection,isElementC1TypeSelection,isElementC2TypeSelection"
             type="org.eclipse.jface.viewers.ISelection"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            commandId="de.walware.ecommons.ltk.commands.ShowQuickSourceOutline"
+            class="de.walware.ecommons.ltk.ui.sourceediting.actions.ShowQuickSourceOutlineHandler">
+         <activeWhen>
+            <with
+                  variable="activePart">
+               <instanceof
+                     value="de.walware.ecommons.ltk.ui.sourceediting.SourceEditor1">
+               </instanceof>
+            </with>
+         </activeWhen>
+      </handler>
+      <handler
+            commandId="de.walware.ecommons.ltk.commands.ShowQuickElementOutline"
+            class="de.walware.ecommons.ltk.ui.sourceediting.actions.ShowQuickElementOutlineHandler">
+         <activeWhen>
+            <with
+                  variable="activePart">
+               <instanceof
+                     value="de.walware.ecommons.ltk.ui.sourceediting.SourceEditor1">
+               </instanceof>
+            </with>
+         </activeWhen>
+      </handler>
+      <handler
+            commandId="de.walware.ecommons.ltk.commands.ShowQuickElementHierarchy"
+            class="de.walware.ecommons.ltk.ui.sourceediting.actions.ShowQuickElementHierarchyHandler">
+         <activeWhen>
+            <with
+                  variable="activePart">
+               <instanceof
+                     value="de.walware.ecommons.ltk.ui.sourceediting.SourceEditor1">
+               </instanceof>
+            </with>
+         </activeWhen>
+      </handler>
    </extension>
    
    <extension

@@ -55,6 +55,28 @@ public class LTKUI {
 	public static final String CORRECT_INDENT_COMMAND_ID = "de.walware.ecommons.ltk.commands.CorrectIndent"; //$NON-NLS-1$
 	
 	
+	/**
+	 * ID of command to show quick outline.
+	 * 
+	 * Value: @value
+	 */
+	public static final String SHOW_QUICK_SOURCE_OUTLINE_COMMAND_ID = "de.walware.ecommons.ltk.commands.ShowQuickSourceOutline"; //$NON-NLS-1$
+	
+	/**
+	 * ID of command to show quick element structure.
+	 * 
+	 * Value: @value
+	 */
+	public static final String SHOW_QUICK_ELEMENT_OUTLINE_COMMAND_ID = "de.walware.ecommons.ltk.commands.ShowQuickElementOutline"; //$NON-NLS-1$
+	
+	/**
+	 * ID of command to show quick element hierarchy.
+	 * 
+	 * Value: @value
+	 */
+	public static final String SHOW_QUICK_ELEMENT_HIERARCHY_COMMAND_ID = "de.walware.ecommons.ltk.commands.ShowQuickElementHierarchy"; //$NON-NLS-1$
+	
+	
 	public static final String OBJ_TEXT_TEMPLATE_IMAGE_ID = LTKUIPlugin.PLUGIN_ID + "/image/obj/text.template"; //$NON-NLS-1$
 	public static final String OBJ_TEXT_AT_TAG_IMAGE_ID = LTKUIPlugin.PLUGIN_ID + "/image/obj/text.at_tag"; //$NON-NLS-1$
 	

@@ -819,9 +819,8 @@ public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 		fAnnotationAccess = getAnnotationAccess();
 		fOverviewRuler = createOverviewRuler(getSharedColors());
 		
-		final ISourceViewer viewer = (fFoldingEnablement != null) ?
-				new ProjectionViewer(parent, ruler, getOverviewRuler(), isOverviewRulerVisible(), styles) :
-					new SourceViewer(parent, ruler, getOverviewRuler(), isOverviewRulerVisible(), styles);
+		final ISourceViewer viewer = new SourceEditorViewer(parent,
+				ruler, getOverviewRuler(), isOverviewRulerVisible(), styles);
 		// ensure decoration support has been created and configured.
 		getSourceViewerDecorationSupport(viewer);
 		
