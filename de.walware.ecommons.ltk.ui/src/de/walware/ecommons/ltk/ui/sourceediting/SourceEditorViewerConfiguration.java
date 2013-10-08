@@ -13,8 +13,10 @@ package de.walware.ecommons.ltk.ui.sourceediting;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.jface.internal.text.html.BrowserInformationControl;
@@ -38,7 +40,11 @@ import org.eclipse.jface.text.information.IInformationPresenter;
 import org.eclipse.jface.text.information.IInformationProvider;
 import org.eclipse.jface.text.information.IInformationProviderExtension2;
 import org.eclipse.jface.text.information.InformationPresenter;
+import org.eclipse.jface.text.presentation.IPresentationReconciler;
+import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.quickassist.IQuickAssistAssistant;
+import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
+import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.templates.TemplateContextType;
 import org.eclipse.jface.text.templates.TemplateVariableResolver;
@@ -81,8 +87,8 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 					@Override
 					public void setInformation(String content) {
 						if (content.startsWith("...<br")) { // spell correction change proposal //$NON-NLS-1$
-							content = content.replace("\\t", "    "); //$NON-NLS-1$ //$NON-NLS-2$
-							final StringBuffer s = new StringBuffer(content.length()+1000);
+							content= content.replace("\\t", "    "); //$NON-NLS-1$ //$NON-NLS-2$
+							final StringBuffer s= new StringBuffer(content.length()+1000);
 							s.append("<pre>"); //$NON-NLS-1$
 							s.append(content);
 							s.append("</pre>"); //$NON-NLS-1$
@@ -103,7 +109,7 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 		
 	};
 	
-	private static final IInformationControlCreator DEFAULT_INFORMATION_CONTROL_CREATOR =
+	private static final IInformationControlCreator DEFAULT_INFORMATION_CONTROL_CREATOR=
 			new IInformationControlCreator() {
 				
 				@Override
@@ -117,7 +123,9 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	private final ISourceEditor editor;
 	
 	private ColorManager colorManager;
-	private final FastList<ISettingsChangedHandler> settingsHandler = new FastList<ISettingsChangedHandler>(ISettingsChangedHandler.class);
+	private final FastList<ISettingsChangedHandler> settingsHandler= new FastList<ISettingsChangedHandler>(ISettingsChangedHandler.class);
+	
+	private final Map<String, ITokenScanner> scanners= new LinkedHashMap<String, ITokenScanner>();
 	
 	private ICharPairMatcher pairMatcher;
 	private ContentAssistant contentAssistant;
@@ -130,29 +138,31 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	
 	
 	public SourceEditorViewerConfiguration(final ISourceEditor sourceEditor) {
-		this.editor = sourceEditor;
+		this.editor= sourceEditor;
 	}
 	
 	
 	protected void setup(final IPreferenceStore preferenceStore, final ColorManager colorManager,
 			final DecorationPreferences decoPrefs, final AssistPreferences assistPrefs) {
 		assert (preferenceStore != null);
-		this.fPreferenceStore = preferenceStore;
-		this.colorManager = colorManager;
-		this.decorationPreferences = decoPrefs;
-		this.assistPreferences = assistPrefs;
+		this.fPreferenceStore= preferenceStore;
+		this.colorManager= colorManager;
+		this.decorationPreferences= decoPrefs;
+		this.assistPreferences= assistPrefs;
 	}
 	
-	/**
-	 * Initializes the scanners.
-	 */
-	protected void setScanners(final org.eclipse.jface.text.rules.ITokenScanner[] scanners) {
-		for (int i = 0; i < scanners.length; i++) {
-			if (scanners[i] instanceof ISettingsChangedHandler) {
-				this.settingsHandler.add((ISettingsChangedHandler) scanners[i]);
-			}
+	protected void addScanner(final String contentType, final ITokenScanner scanner) {
+		this.scanners.put(contentType, scanner);
+		
+		if (scanner instanceof ISettingsChangedHandler) {
+			this.settingsHandler.add((ISettingsChangedHandler) scanner);
 		}
 	}
+	
+	protected ITokenScanner getScanner(final String contentType) {
+		return this.scanners.get(contentType);
+	}
+	
 	
 	protected ISourceEditor getSourceEditor() {
 		return this.editor;
@@ -190,6 +200,29 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 			handler.handleSettingsChanged(groupIds, options);
 		}
 	}
+	
+	@Override
+	public IPresentationReconciler getPresentationReconciler(final ISourceViewer sourceViewer) {
+		final PresentationReconciler reconciler= new PresentationReconciler();
+		reconciler.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
+		
+		initPresentationReconciler(reconciler);
+		
+		return reconciler;
+	}
+	
+	protected void initPresentationReconciler(final PresentationReconciler reconciler) {
+		if (this.scanners != null) {
+			for (final Entry<String, ITokenScanner> entry : this.scanners.entrySet()) {
+				final String contentType= entry.getKey();
+				final DefaultDamagerRepairer dr= new DefaultDamagerRepairer(entry.getValue());
+				reconciler.setDamager(dr, contentType);
+				reconciler.setRepairer(dr, contentType);
+			}
+		}
+	}
+	
+	
 	public List<ISourceEditorAddon> getAddOns() {
 		return new ArrayList<ISourceEditorAddon>();
 	}
@@ -197,7 +230,7 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	
 	public ICharPairMatcher getPairMatcher() {
 		if (this.pairMatcher == null) {
-			this.pairMatcher = createPairMatcher();
+			this.pairMatcher= createPairMatcher();
 		}
 		return this.pairMatcher;
 	}
@@ -213,7 +246,7 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	
 	@Override
 	public int getTabWidth(final ISourceViewer sourceViewer) {
-		final IIndentSettings settings = getIndentSettings();
+		final IIndentSettings settings= getIndentSettings();
 		if (settings != null) {
 			return settings.getTabSize();
 		}
@@ -222,14 +255,14 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	
 	@Override
 	public String[] getIndentPrefixes(final ISourceViewer sourceViewer, final String contentType) {
-		final IIndentSettings settings = getIndentSettings();
+		final IIndentSettings settings= getIndentSettings();
 		if (settings != null) {
-			final String[] prefixes = getIndentPrefixesForTab(getTabWidth(sourceViewer));
+			final String[] prefixes= getIndentPrefixesForTab(getTabWidth(sourceViewer));
 			if (settings.getIndentDefaultType() == IIndentSettings.IndentationType.SPACES) {
-				for (int i = prefixes.length-2; i > 0; i--) {
-					prefixes[i] = prefixes[i-1];
+				for (int i= prefixes.length-2; i > 0; i--) {
+					prefixes[i]= prefixes[i-1];
 				}
-				prefixes[0] = new String(IndentUtil.repeat(' ', settings.getIndentSpacesCount()));
+				prefixes[0]= new String(IndentUtil.repeat(' ', settings.getIndentSpacesCount()));
 			}
 			return prefixes;
 		}
@@ -242,7 +275,7 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	@Override
 	public IContentAssistant getContentAssistant(final ISourceViewer sourceViewer) {
 		if (this.contentAssistant == null) {
-			this.contentAssistant = createContentAssistant(sourceViewer);
+			this.contentAssistant= createContentAssistant(sourceViewer);
 			if (this.contentAssistant != null) {
 				if (this.assistPreferences != null) {
 					this.assistPreferences.configure(this.contentAssistant);
@@ -263,7 +296,7 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	@Override
 	public IQuickAssistAssistant getQuickAssistAssistant(final ISourceViewer sourceViewer) {
 		if (this.quickAssistant == null) {
-			this.quickAssistant = createQuickAssistant(sourceViewer);
+			this.quickAssistant= createQuickAssistant(sourceViewer);
 			if (this.quickAssistant != null) {
 				if (this.assistPreferences != null) {
 					this.assistPreferences.configure(this.quickAssistant);
@@ -280,7 +313,7 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	
 	protected IInformationControlCreator getAssistInformationControlCreator(final ISourceViewer sourceViewer) {
 		if (ASSIST_INFO_CREATOR == null) {
-			ASSIST_INFO_CREATOR = new AssistInformationControlCreator();
+			ASSIST_INFO_CREATOR= new AssistInformationControlCreator();
 		}
 		return ASSIST_INFO_CREATOR;
 	}
@@ -288,11 +321,11 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	@Override
 	public int[] getConfiguredTextHoverStateMasks(final ISourceViewer sourceViewer, final String contentType) {
 		if (this.editor != null) {
-			final String[] partitioning = getConfiguredContentTypes(sourceViewer);
+			final String[] partitioning= getConfiguredContentTypes(sourceViewer);
 			if (partitioning != null && partitioning.length > 0 && partitioning[0].equals(contentType)) {
-				final InfoHoverRegistry registry = getInfoHoverRegistry();
+				final InfoHoverRegistry registry= getInfoHoverRegistry();
 				if (registry != null) {
-					this.effectiveHovers = registry.getEffectiveHoverDescriptors();
+					this.effectiveHovers= registry.getEffectiveHoverDescriptors();
 					if (this.effectiveHovers != null) {
 						return this.effectiveHovers.getStateMasks();
 					}
@@ -324,13 +357,13 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	
 	@Override
 	public IInformationPresenter getInformationPresenter(final ISourceViewer sourceViewer) {
-		final InformationPresenter presenter = new InformationPresenter(
+		final InformationPresenter presenter= new InformationPresenter(
 				DEFAULT_INFORMATION_CONTROL_CREATOR);
 		presenter.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
 		
 		// Register information provider
-		final IInformationProvider provider = getInformationProvider();
-		final String[] contentTypes = getConfiguredContentTypes(sourceViewer);
+		final IInformationProvider provider= getInformationProvider();
+		final String[] contentTypes= getConfiguredContentTypes(sourceViewer);
 		for (int i= 0; i < contentTypes.length; i++) {
 			presenter.setInformationProvider(provider, contentTypes[i]);
 		}
@@ -353,7 +386,7 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 		 * @param processor the template variable processor
 		 */
 		public TemplateVariableTextHover(final TemplateVariableProcessor processor) {
-			this.processor = processor;
+			this.processor= processor;
 		}
 		
 		@Override
@@ -363,7 +396,7 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 				final int offset= subject.getOffset();
 				if (offset >= 2 && "${".equals(doc.get(offset-2, 2))) {  //$NON-NLS-1$
 					final String varName= doc.get(offset, subject.getLength());
-					final TemplateContextType contextType = this.processor.getContextType();
+					final TemplateContextType contextType= this.processor.getContextType();
 					if (contextType != null) {
 						final Iterator iter= contextType.resolvers();
 						while (iter.hasNext()) {
@@ -390,7 +423,7 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	}
 	
 	protected ContentAssistant createTemplateVariableContentAssistant(final ISourceViewer sourceViewer, final TemplateVariableProcessor processor) {
-		final ContentAssistant assistant = new ContentAssistant();
+		final ContentAssistant assistant= new ContentAssistant();
 		assistant.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
 		
 		for (final String contentType : getConfiguredContentTypes(sourceViewer)) {
@@ -410,17 +443,17 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	
 	public IInformationPresenter getQuickPresenter(final ISourceViewer sourceViewer,
 			final int operation) {
-		final IInformationProvider provider = getQuickInformationProvider(sourceViewer, operation);
+		final IInformationProvider provider= getQuickInformationProvider(sourceViewer, operation);
 		if (provider == null) {
 			return null;
 		}
-		final InformationPresenter presenter = new InformationPresenter(((IInformationProviderExtension2) provider).getInformationPresenterControlCreator());
+		final InformationPresenter presenter= new InformationPresenter(((IInformationProviderExtension2) provider).getInformationPresenterControlCreator());
 		presenter.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
 		presenter.setAnchor(AbstractInformationControlManager.ANCHOR_GLOBAL);
 		presenter.setSizeConstraints(50, 20, true, false);
 		
-		final String[] contentTypes = getConfiguredContentTypes(sourceViewer);
-		for (int i = 0; i < contentTypes.length; i++) {
+		final String[] contentTypes= getConfiguredContentTypes(sourceViewer);
+		for (int i= 0; i < contentTypes.length; i++) {
 			presenter.setInformationProvider(provider, contentTypes[i]);
 		}
 		
