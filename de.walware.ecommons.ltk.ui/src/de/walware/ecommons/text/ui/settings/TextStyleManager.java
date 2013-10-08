@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007-2013 WalWare/StatET-Project (www.walware.de/goto/statet)
+ * Copyright (c) 2007-2013 Stephan Wahlbrink (www.walware.de/goto/opensource)
  * and others. All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,20 +33,20 @@ import de.walware.ecommons.ui.ColorManager;
 public class TextStyleManager {
 	
 	
-	protected ColorManager fColorManager;
-	protected IPreferenceStore fPreferenceStore;
-	protected String[] fTokenNames;
-	private String fStylesGroupId;
+	protected ColorManager colorManager;
+	protected IPreferenceStore preferenceStore;
+	protected String[] tokenNames;
+	private final String stylesGroupId;
 	
-	private final Map<String, Token> fTokenMap = new HashMap<String, Token>();
+	private final Map<String, Token> tokenMap = new HashMap<String, Token>();
 	
 	
 	public TextStyleManager(final ColorManager colorManager, final IPreferenceStore preferenceStore,
 			final String stylesGroupId) {
 		super();
-		fColorManager = colorManager;
-		fPreferenceStore = preferenceStore;
-		fStylesGroupId = stylesGroupId;
+		this.colorManager = colorManager;
+		this.preferenceStore = preferenceStore;
+		this.stylesGroupId = stylesGroupId;
 	}
 	
 	
@@ -57,10 +57,10 @@ public class TextStyleManager {
 	 * @return token with text style attribute
 	 */
 	public IToken getToken(final String key) {
-		Token token = fTokenMap.get(key);
+		Token token = this.tokenMap.get(key);
 		if (token == null) {
 			token = new Token(createTextAttribute(key));
-			fTokenMap.put(key, token);
+			this.tokenMap.put(key, token);
 		}
 		return token;
 	}
@@ -68,7 +68,7 @@ public class TextStyleManager {
 	protected String resolveUsedKey(final String key) {
 		String use = key;
 		while (true) {
-			final String test = fPreferenceStore.getString(use+ITextPresentationConstants.TEXTSTYLE_USE_SUFFIX);
+			final String test = this.preferenceStore.getString(use+ITextPresentationConstants.TEXTSTYLE_USE_SUFFIX);
 			if (test == null || test.equals("") || test.equals(use)) { //$NON-NLS-1$
 				return use;
 			}
@@ -79,32 +79,32 @@ public class TextStyleManager {
 	/**
 	 * Create a text attribute based on the given color, bold, italic, strikethrough and underline preference keys.
 	 * 
-	 * @param key the italic preference key
+	 * @param rootKey the italic preference key
 	 * @return the created text attribute
 	 * @since 3.0
 	 */
-	protected Object createTextAttribute(String key) {
-		key = resolveUsedKey(key);
+	protected Object createTextAttribute(String rootKey) {
+		rootKey = resolveUsedKey(rootKey);
 		
-		final RGB rgb = PreferenceConverter.getColor(fPreferenceStore, key + ITextPresentationConstants.TEXTSTYLE_COLOR_SUFFIX);
-		int style = fPreferenceStore.getBoolean(key + ITextPresentationConstants.TEXTSTYLE_BOLD_SUFFIX) ?
+		final RGB rgb = PreferenceConverter.getColor(this.preferenceStore, rootKey + ITextPresentationConstants.TEXTSTYLE_COLOR_SUFFIX);
+		int style = this.preferenceStore.getBoolean(rootKey + ITextPresentationConstants.TEXTSTYLE_BOLD_SUFFIX) ?
 				SWT.BOLD : SWT.NORMAL;
-		if (fPreferenceStore.getBoolean(key + ITextPresentationConstants.TEXTSTYLE_ITALIC_SUFFIX)) {
+		if (this.preferenceStore.getBoolean(rootKey + ITextPresentationConstants.TEXTSTYLE_ITALIC_SUFFIX)) {
 			style |= SWT.ITALIC;
 		}
-		if (fPreferenceStore.getBoolean(key + ITextPresentationConstants.TEXTSTYLE_STRIKETHROUGH_SUFFIX)) {
-			style |= TextAttribute.STRIKETHROUGH;
-		}
-		if (fPreferenceStore.getBoolean(key + ITextPresentationConstants.TEXTSTYLE_UNDERLINE_SUFFIX)) {
+		if (this.preferenceStore.getBoolean(rootKey + ITextPresentationConstants.TEXTSTYLE_UNDERLINE_SUFFIX)) {
 			style |= TextAttribute.UNDERLINE;
 		}
+		if (this.preferenceStore.getBoolean(rootKey + ITextPresentationConstants.TEXTSTYLE_STRIKETHROUGH_SUFFIX)) {
+			style |= TextAttribute.STRIKETHROUGH;
+		}
 		
-		return new TextAttribute(fColorManager.getColor(rgb), null, style);
+		return new TextAttribute(this.colorManager.getColor(rgb), null, style);
 	}
 	
 	public void handleSettingsChanged(final Set<String> groupIds, final Map<String, Object> options) {
-		if (groupIds.contains(fStylesGroupId)) {
-			for (final Map.Entry<String, Token> token : fTokenMap.entrySet()) {
+		if (groupIds.contains(this.stylesGroupId)) {
+			for (final Map.Entry<String, Token> token : this.tokenMap.entrySet()) {
 				token.getValue().setData(createTextAttribute(token.getKey()));
 			}
 			options.put(ITextPresentationConstants.SETTINGSCHANGE_AFFECTSPRESENTATION_KEY, Boolean.TRUE);
