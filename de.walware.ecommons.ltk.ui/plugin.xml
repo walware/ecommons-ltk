@@ -846,6 +846,12 @@
             label=""
             value="255,0,8">
       </colorDefinition>
+      <colorDefinition
+            id="de.walware.workbench.themes.Console2ndOutputColor"
+            isEditable="false"
+            label=""
+            value="127,127,135">
+      </colorDefinition>
       
       <colorDefinition
             id="de.walware.workbench.themes.MatchingBracketColor"
@@ -973,6 +979,10 @@
          <colorOverride
                id="de.walware.workbench.themes.ConsoleErrorColor"
                value="COLOR_LIST_SELECTION">
+         </colorOverride>
+         <colorOverride
+               id="de.walware.workbench.themes.Console2ndOutputColor"
+               value="COLOR_WIDGET_FOREGROUND">
          </colorOverride>
          
          <colorOverride

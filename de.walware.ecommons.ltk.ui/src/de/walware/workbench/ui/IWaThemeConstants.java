@@ -69,6 +69,8 @@ public interface IWaThemeConstants {
 	
 	String CONSOLE_ERROR_COLOR = "de.walware.workbench.themes.ConsoleErrorColor"; //$NON-NLS-1$
 	
+	String CONSOLE_2ND_OUTPUT_COLOR = "de.walware.workbench.themes.Console2ndOutputColor"; //$NON-NLS-1$
+	
 	
 	String MATCHING_BRACKET_COLOR = "de.walware.workbench.themes.MatchingBracketColor"; //$NON-NLS-1$
 	
