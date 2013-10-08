@@ -77,6 +77,32 @@ public class LTKUI {
 	public static final String SHOW_QUICK_ELEMENT_HIERARCHY_COMMAND_ID = "de.walware.ecommons.ltk.commands.ShowQuickElementHierarchy"; //$NON-NLS-1$
 	
 	
+	/**
+	 * ID of command to search for access (all occurrences) of an element.
+	 * 
+	 * Value: @value
+	 */
+	public static final String SEARCH_ALL_ELEMENT_ACCESS_COMMAND_ID = "de.walware.ecommons.ltk.commands.SearchAllElementAccess"; //$NON-NLS-1$
+	
+	/**
+	 * ID of command to search for write access of an element.
+	 * 
+	 * Value: @value
+	 */
+	public static final String SEARCH_WRITE_ELEMENT_ACCESS_COMMAND_ID = "de.walware.ecommons.ltk.commands.SearchWriteElementAccess"; //$NON-NLS-1$
+	
+	/**
+	 * Name of command parameter defining the scope of a search.
+	 * 
+	 * Value: @value
+	 */
+	public static final String SEARCH_SCOPE_PARAMETER_NAME = "scope"; //$NON-NLS-1$
+	
+	public static final String SEARCH_SCOPE_WORKSPACE_PARAMETER_VALUE = "workspace"; //$NON-NLS-1$
+	public static final String SEARCH_SCOPE_PROJECT_PARAMETER_VALUE = "project"; //$NON-NLS-1$
+	public static final String SEARCH_SCOPE_FILE_PARAMETER_VALUE = "file"; //$NON-NLS-1$
+	
+	
 	public static final String OBJ_TEXT_TEMPLATE_IMAGE_ID = LTKUIPlugin.PLUGIN_ID + "/image/obj/text.template"; //$NON-NLS-1$
 	public static final String OBJ_TEXT_AT_TAG_IMAGE_ID = LTKUIPlugin.PLUGIN_ID + "/image/obj/text.at_tag"; //$NON-NLS-1$
 	

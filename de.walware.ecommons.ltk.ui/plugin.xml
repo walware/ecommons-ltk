@@ -139,6 +139,52 @@
                optional="true">
          </commandParameter>
       </command>
+      <command
+            id="de.walware.ecommons.ltk.commands.SearchAllElementAccess"
+            categoryId="org.eclipse.search.ui.category.search"
+            name="%commands_SearchAllElementAccess_name"
+            description="%commands_SearchAllElementAccess_description">
+         <commandParameter
+               id="scope"
+               optional="false"
+               name="%commands_Search_ScopeParameter_name">
+            <values
+                  class="org.eclipse.ui.commands.ExtensionParameterValues">
+               <parameter
+                     name="%commands_Search_ScopeParameter_Workbench_name"
+                     value="workbench"/>
+               <parameter
+                     name="%commands_Search_ScopeParameter_Project_name"
+                     value="project"/>
+               <parameter
+                     name="%commands_Search_ScopeParameter_File_name"
+                     value="file"/>
+            </values>
+         </commandParameter>
+      </command>
+      <command
+            id="de.walware.ecommons.ltk.commands.SearchWriteElementAccess"
+            categoryId="org.eclipse.search.ui.category.search"
+            name="%commands_SearchWriteElementAccess_name"
+            description="%commands_SearchWriteElementAccess_description">
+         <commandParameter
+               id="scope"
+               optional="false"
+               name="%commands_Search_ScopeParameter_name">
+            <values
+                  class="org.eclipse.ui.commands.ExtensionParameterValues">
+               <parameter
+                     name="%commands_Search_ScopeParameter_Workbench_name"
+                     value="workbench"/>
+               <parameter
+                     name="%commands_Search_ScopeParameter_Project_name"
+                     value="project"/>
+               <parameter
+                     name="%commands_Search_ScopeParameter_File_name"
+                     value="file"/>
+            </values>
+         </commandParameter>
+      </command>
       
       <!-- source -->
       <category
@@ -460,6 +506,7 @@
    
    <extension
          point="org.eclipse.ui.menus">
+      <!-- edit -->
       <menuContribution
             locationURI="menu:edit?after=selectAll">
          <menu
@@ -492,7 +539,8 @@
             </visibleWhen>
          </menu>
       </menuContribution>
-
+      
+      <!-- source -->
       <menuContribution
             locationURI="menu:org.eclipse.ui.main.menu?after=edit">
          <menu
@@ -543,6 +591,8 @@
            </visibleWhen>
          </menu>
       </menuContribution>
+      
+      <!-- navigate -->
       <menuContribution
             locationURI="menu:navigate?after=open.ext">
          <command
@@ -556,7 +606,6 @@
             </visibleWhen>
          </command>
       </menuContribution>
-      
       <menuContribution locationURI="menu:goTo">
          <command
                commandId="de.walware.ecommons.text.commands.GotoMatchingBracket"
@@ -571,6 +620,34 @@
          </command>
       </menuContribution>
       
+      <!-- search -->
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu?after=navigate">
+         <!-- redefinition from search plugin -->
+         <menu
+               id="org.eclipse.search.menu"
+               label="Search"
+               mnemonic="a">
+            <separator
+                  name="internalDialogGroup"/><!-- not to be used by clients  -->
+            <separator
+                  name="dialogGroup"/>
+            <separator
+                  name="fileSearchContextMenuActionsGroup"
+                  visible="true"/>
+            <separator
+                  name="contextMenuActionsGroup"
+                  visible="true"/>
+            <separator
+                  name="occurencesActionsGroup"
+                  visible="true"/>
+            <separator
+                  name="extraSearchGroup"
+                  visible="true"/>
+         </menu>
+      </menuContribution>
+      
+      <!-- other -->
       <menuContribution
             locationURI="menu:window?after=newEditor">
          <dynamic
