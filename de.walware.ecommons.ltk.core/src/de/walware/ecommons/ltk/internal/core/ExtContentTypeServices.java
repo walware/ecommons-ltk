@@ -11,8 +11,11 @@
 
 package de.walware.ecommons.ltk.internal.core;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,6 +26,7 @@ import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
 
 import de.walware.ecommons.IDisposable;
+import de.walware.ecommons.collections.ConstList;
 
 import de.walware.ecommons.ltk.IExtContentTypeManager;
 
@@ -77,7 +81,8 @@ public class ExtContentTypeServices implements IExtContentTypeManager, IDisposab
 	
 	private Map<String, String[]> fPrimaryToSecondary;
 	private Map<String, String[]> fSecondaryToPrimary;
-	private Map<String, String> fPrimaryToModel;
+	private Map<String, String> primaryToModel;
+	private Map<String, ModelTypeDescriptor> modelDescriptors;
 	private final String[] NO_TYPES = new String[0];
 	
 	
@@ -88,6 +93,8 @@ public class ExtContentTypeServices implements IExtContentTypeManager, IDisposab
 	
 	private void load() {
 		final IExtensionRegistry extensionRegistry = Platform.getExtensionRegistry();
+		
+		final Map<String, ModelTypeDescriptor> modelTypes = new HashMap<String, ModelTypeDescriptor>();
 		
 		final Map<String, Set<String>> primaryToSecondary = new HashMap<String, Set<String>>();
 		final Map<String, Set<String>> secondaryToPrimary = new HashMap<String, Set<String>>();
@@ -112,6 +119,29 @@ public class ExtContentTypeServices implements IExtContentTypeManager, IDisposab
 		{	final IConfigurationElement[] elements = extensionRegistry
 					.getConfigurationElementsFor("de.walware.ecommons.ltk.modelTypes"); //$NON-NLS-1$
 			for (final IConfigurationElement element : elements) {
+				if (element.getName().equals("modelType")) { //$NON-NLS-1$
+					String id = element.getAttribute(CONFIG_ID_ATTRIBUTE_NAME); 
+					if (id != null && !id.isEmpty()) {
+						id = id.intern();
+						ModelTypeDescriptor descriptor = modelTypes.get(id);
+						if (descriptor == null) {
+							descriptor = new ModelTypeDescriptor(id);
+							modelTypes.put(id, descriptor);
+						}
+						final IConfigurationElement[] children = element.getChildren();
+						for (final IConfigurationElement child : children) {
+							if (child.getName().equals("secondaryType")) { //$NON-NLS-1$
+								String secondaryId = child.getAttribute(CONFIG_MODELTYPE_ID_ATTRIBUTE_NAME);
+								if (secondaryId != null && !secondaryId.isEmpty()) {
+									secondaryId = secondaryId.intern();
+									if (!descriptor.secondaryTypeIds.contains(secondaryId)) {
+										descriptor.secondaryTypeIds.add(secondaryId);
+									}
+								}
+							}
+						}
+					}
+				}
 				if (element.getName().equals(CONFIG_CONTENTTYPE_ELEMENT_NAME)) {
 					String contentTypeId = element.getAttribute(CONFIG_CONTENTTYPE_ID_ATTRIBUTE_NAME); 
 					String modelTypeId = element.getAttribute(CONFIG_MODELTYPE_ID_ATTRIBUTE_NAME); 
@@ -125,22 +155,42 @@ public class ExtContentTypeServices implements IExtContentTypeManager, IDisposab
 			}
 		}
 		
-		fPrimaryToSecondary = copy(primaryToSecondary, new HashMap<String, String[]>());
-		fSecondaryToPrimary = copy(secondaryToPrimary, new HashMap<String, String[]>());
-		fPrimaryToModel = primaryToModel;
+		checkModelTypes(modelTypes);
+		
+		this.fPrimaryToSecondary = copy(primaryToSecondary, new HashMap<String, String[]>());
+		this.fSecondaryToPrimary = copy(secondaryToPrimary, new HashMap<String, String[]>());
+		this.primaryToModel = primaryToModel;
+		this.modelDescriptors = modelTypes;
+	}
+	
+	private static void checkModelTypes(final Map<String, ModelTypeDescriptor> modelTypes) {
+		final List<String> temp = new ArrayList<String>();
+		for (final ModelTypeDescriptor descriptor : modelTypes.values()) {
+			synchronized (descriptor) {
+				temp.clear();
+				for (final String sId : descriptor.secondaryTypeIds) {
+					if (modelTypes.containsKey(sId)) {
+						temp.add(sId);
+					}
+				}
+				descriptor.checkedSecondaryTypeIds = (temp.isEmpty()) ?
+						Collections.<String>emptyList() :
+						new ConstList<String>(temp);
+			}
+		}
 	}
 	
 	
 	@Override
 	public String[] getSecondaryContentTypes(final String primaryContentType) {
-		final String[] types = fPrimaryToSecondary.get(primaryContentType);
-		return (types != null) ? types : NO_TYPES;
+		final String[] types = this.fPrimaryToSecondary.get(primaryContentType);
+		return (types != null) ? types : this.NO_TYPES;
 	}
 	
 	@Override
 	public String[] getPrimaryContentTypes(final String secondaryContentType) {
-		final String[] types = fSecondaryToPrimary.get(secondaryContentType);
-		return (types != null) ? types : NO_TYPES;
+		final String[] types = this.fSecondaryToPrimary.get(secondaryContentType);
+		return (types != null) ? types : this.NO_TYPES;
 	}
 	
 	@Override
@@ -164,16 +214,14 @@ public class ExtContentTypeServices implements IExtContentTypeManager, IDisposab
 	}
 	
 	@Override
-	public String getModelTypeForContentType(final String contentTypeId) {
-		return fPrimaryToModel.get(contentTypeId);
+	public ModelTypeDescriptor getModelTypeForContentType(final String contentTypeId) {
+		final String modelTypeId = this.primaryToModel.get(contentTypeId);
+		return (modelTypeId != null) ? this.modelDescriptors.get(modelTypeId) : null;
 	}
 	
 	
 	@Override
 	public void dispose() {
-		fSecondaryToPrimary.clear();
-		fPrimaryToSecondary.clear();
-		fPrimaryToModel.clear();
 	}
 	
 }

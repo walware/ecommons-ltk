@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2007-2013 Stephan Wahlbrink (WalWare.de) and others.
- * All rights reserved. This program and the accompanying materials
+ * Copyright (c) 2007-2013 (www.walware.de/goto/opensource)
+ * and others. All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
@@ -10,6 +10,8 @@
  *******************************************************************************/
 
 package de.walware.ecommons.ltk;
+
+import de.walware.ecommons.ltk.core.IModelTypeDescriptor;
 
 
 /**
@@ -25,6 +27,6 @@ public interface IExtContentTypeManager {
 	
 	boolean matchesActivatedContentType(String primaryContentTypeId, String secondaryContentTypeId, boolean self);
 	
-	String getModelTypeForContentType(String contentTypeId);
+	IModelTypeDescriptor getModelTypeForContentType(String contentTypeId);
 	
 }
