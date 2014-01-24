@@ -1,14 +1,14 @@
-/*******************************************************************************
- * Copyright (c) 2005-2013 WalWare/StatET-Project (www.walware.de/goto/statet)
- * and others. All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors:
- *     IBM Corporation - initial API and implementation
- *     Stephan Wahlbrink - adapted API and improvements
- *******************************************************************************/
+/*=============================================================================#
+ # Copyright (c) 2005-2014 Stephan Wahlbrink (WalWare.de) and others.
+ # All rights reserved. This program and the accompanying materials
+ # are made available under the terms of the Eclipse Public License v1.0
+ # which accompanies this distribution, and is available at
+ # http://www.eclipse.org/legal/epl-v10.html
+ # 
+ # Contributors:
+ #     IBM Corporation - initial API and implementation
+ #     Stephan Wahlbrink - adapted API and improvements
+ #=============================================================================*/
 
 package de.walware.ecommons.ltk.ui.sourceediting.assist;
 
@@ -336,7 +336,7 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 			final List<IContentAssistComputer> computers = category.getComputers(fPartition);
 			final SubMonitor computorsProgress = progress.newChild(1);
 			for (final IContentAssistComputer computer : computers) {
-				IStatus status = computer.computeCompletionProposals(context, mode, proposals, computorsProgress);
+				final IStatus status = computer.computeCompletionProposals(context, mode, proposals, computorsProgress);
 				if (status != null && status.getSeverity() >= IStatus.INFO
 						&& (fStatus == null || status.getSeverity() > fStatus.getSeverity()) ) {
 					fStatus = status;

@@ -1,13 +1,13 @@
-/*******************************************************************************
- * Copyright (c) 2007-2013 WalWare/StatET-Project (www.walware.de/goto/statet)
- * and others. All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors:
- *     Stephan Wahlbrink - initial API and implementation
- *******************************************************************************/
+/*=============================================================================#
+ # Copyright (c) 2007-2014 Stephan Wahlbrink (WalWare.de) and others.
+ # All rights reserved. This program and the accompanying materials
+ # are made available under the terms of the Eclipse Public License v1.0
+ # which accompanies this distribution, and is available at
+ # http://www.eclipse.org/legal/epl-v10.html
+ # 
+ # Contributors:
+ #     Stephan Wahlbrink - initial API and implementation
+ #=============================================================================*/
 
 package de.walware.ecommons.text.ui;
 
@@ -144,7 +144,7 @@ public class EcoReconciler implements IReconciler {
 	}
 	
 	/** Internal document and text input listener. */
-	private DocumentListener fDocumentListener = new DocumentListener();
+	private final DocumentListener fDocumentListener = new DocumentListener();
 	private VisibleListener fVisibleListener;
 	/** Job for scheduled background reconciling */
 	private ReconcileJob fJob;
@@ -162,7 +162,7 @@ public class EcoReconciler implements IReconciler {
 	/** Tells whether this reconciler's editor is active. */
 	private volatile boolean fIsEditorVisible;
 	
-	private FastList<StrategyEntry> fStrategies = new FastList<StrategyEntry>(StrategyEntry.class, ListenerList.EQUALITY);
+	private final FastList<StrategyEntry> fStrategies = new FastList<StrategyEntry>(StrategyEntry.class, ListenerList.EQUALITY);
 	
 	
 	/**

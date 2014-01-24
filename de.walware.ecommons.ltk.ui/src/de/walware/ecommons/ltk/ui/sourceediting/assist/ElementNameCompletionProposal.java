@@ -1,13 +1,13 @@
-/*******************************************************************************
- * Copyright (c) 2008-2013 WalWare/StatET-Project (www.walware.de/goto/statet)
- * and others. All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors:
- *     Stephan Wahlbrink - initial API and implementation
- *******************************************************************************/
+/*=============================================================================#
+ # Copyright (c) 2008-2014 Stephan Wahlbrink (WalWare.de) and others.
+ # All rights reserved. This program and the accompanying materials
+ # are made available under the terms of the Eclipse Public License v1.0
+ # which accompanies this distribution, and is available at
+ # http://www.eclipse.org/legal/epl-v10.html
+ # 
+ # Contributors:
+ #     Stephan Wahlbrink - initial API and implementation
+ #=============================================================================*/
 
 package de.walware.ecommons.ltk.ui.sourceediting.assist;
 
@@ -170,12 +170,12 @@ public abstract class ElementNameCompletionProposal extends CompletionProposalWi
 	
 	
 	@Override
-	public int getPrefixCompletionStart(IDocument document, int offset) {
+	public int getPrefixCompletionStart(final IDocument document, final int offset) {
 		return getReplacementOffset();
 	}
 	
 	@Override
-	public CharSequence getPrefixCompletionText(IDocument document, int offset) {
+	public CharSequence getPrefixCompletionText(final IDocument document, final int offset) {
 		return null;
 	}
 	

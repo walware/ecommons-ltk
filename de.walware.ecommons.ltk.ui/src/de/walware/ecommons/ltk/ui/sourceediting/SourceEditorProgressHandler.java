@@ -1,13 +1,13 @@
-/*******************************************************************************
- * Copyright (c) 2013 WalWare/StatET-Project (www.walware.de/goto/statet).
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors:
- *     Stephan Wahlbrink - initial API and implementation
- *******************************************************************************/
+/*=============================================================================#
+ # Copyright (c) 2013-2014 Stephan Wahlbrink (WalWare.de) and others.
+ # All rights reserved. This program and the accompanying materials
+ # are made available under the terms of the Eclipse Public License v1.0
+ # which accompanies this distribution, and is available at
+ # http://www.eclipse.org/legal/epl-v10.html
+ # 
+ # Contributors:
+ #     Stephan Wahlbrink - initial API and implementation
+ #=============================================================================*/
 
 package de.walware.ecommons.ltk.ui.sourceediting;
 
@@ -33,7 +33,7 @@ import de.walware.ecommons.ltk.internal.ui.LTKUIPlugin;
 public abstract class SourceEditorProgressHandler extends AbstractHandler {
 	
 	
-	private ISourceEditor fEditor;
+	private final ISourceEditor fEditor;
 	
 	
 	public SourceEditorProgressHandler(final ISourceEditor editor) {
