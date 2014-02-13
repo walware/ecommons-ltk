@@ -22,28 +22,37 @@ import org.eclipse.jface.text.BadLocationException;
 public interface ILineInformation {
 	
 	/**
-	 * Returns the number of lines
+	 * Returns the number of lines.
 	 * 
 	 * @return count
 	 */
 	int getNumberOfLines();
 	
 	/**
-	 * Returns the line of the specified offset
+	 * Returns the line of the specified offset.
 	 * 
 	 * @param offset 
-	 * @return the line
-	 * @throws BadLocationException if offset out of bounds
+	 * @return the line of the offset
+	 * @throws BadLocationException if offset is out of bounds
 	 */
 	int getLineOfOffset(int offset) throws BadLocationException;
 	
 	/**
-	 * Returns the offset of the specified line
+	 * Returns the offset of the specified line.
 	 * 
 	 * @param line
-	 * @return the offset or -1, if line out of bounds
-	 * @throws BadLocationException if line out of bounds
+	 * @return the offset of the line
+	 * @throws BadLocationException if line is out of bounds
 	 */
 	int getLineOffset(int line) throws BadLocationException;
+	
+	/**
+	 * Returns the length (including the line delimiters) of the specified line.
+	 * 
+	 * @param line
+	 * @return the offset of the line
+	 * @throws BadLocationException if line is out of bounds
+	 */
+	int getLineLength(int line) throws BadLocationException;
 	
 }

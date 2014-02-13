@@ -11,6 +11,9 @@
 
 package de.walware.ecommons.ltk;
 
+import de.walware.ecommons.text.ILineInformation;
+import de.walware.ecommons.text.LineInformationCreator;
+
 
 /**
  * Source code with time stamp.
@@ -18,13 +21,56 @@ package de.walware.ecommons.ltk;
 public class SourceContent {
 	
 	
+	private static final LineInformationCreator LINES_CREATOR= new LineInformationCreator();
+	
+	private static ILineInformation createLines(final String text) {
+		synchronized (LINES_CREATOR) {
+			return LINES_CREATOR.create(text);
+		}
+	}
+	
+	
 	public final long stamp;
+	
 	public final String text;
+	
+	private volatile ILineInformation lines;
 	
 	
 	public SourceContent(final long stamp, final String text) {
-		this.stamp = stamp;
-		this.text = text;
+		this(stamp, text, null);
+	}
+	
+	public SourceContent(final long stamp, final String text, final ILineInformation lines) {
+		this.stamp= stamp;
+		this.text= text;
+		this.lines= lines;
+	}
+	
+	
+	public final long getStamp() {
+		return this.stamp;
+	}
+	
+	public final String getText() {
+		return this.text;
+	}
+	
+	public final ILineInformation getLines() {
+		if (this.lines == null) {
+			synchronized (LINES_CREATOR) {
+				if (this.lines == null) {
+					this.lines= createLines(this.text);
+				}
+			}
+		}
+		return this.lines;
+	}
+	
+	
+	@Override
+	public String toString() {
+		return getText();
 	}
 	
 }

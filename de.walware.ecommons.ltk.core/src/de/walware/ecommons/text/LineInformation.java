@@ -17,40 +17,40 @@ import org.eclipse.jface.text.BadLocationException;
 public class LineInformation implements ILineInformation {
 	
 	
-	private final int[] fOffsets;
-	private final int fTextLength;
+	private final int[] offsets;
+	private final int textLength;
 	
 	
 	public LineInformation(final int[] offsets, final int textLength) {
-		fOffsets = offsets;
-		fTextLength = textLength;
+		this.offsets= offsets;
+		this.textLength= textLength;
 	}
 	
 	
 	@Override
 	public int getNumberOfLines() {
-		return 1+fOffsets.length;
+		return 1+this.offsets.length;
 	}
 	
 	@Override
 	public int getLineOfOffset(final int offset) throws BadLocationException {
-		if (offset < 0 || offset > fTextLength) {
-			throw new BadLocationException("offset " + offset);
+		if (offset < 0 || offset > this.textLength) {
+			throw new BadLocationException("offset= " + offset); //$NON-NLS-1$
 		}
-		if (fOffsets.length == 0) {
+		if (this.offsets.length == 0) {
 			return 0;
 		}
-		int low = 0;
-		int high = fOffsets.length-1;
+		int low= 0;
+		int high= this.offsets.length-1;
 		
 		while (low <= high) {
-			final int mid = (low + high) >> 1;
-			final int lineOffset = fOffsets[mid];
+			final int mid= (low + high) >> 1;
+			final int lineOffset= this.offsets[mid];
 			
 			if (lineOffset < offset) {
-				low = mid + 1;
+				low= mid + 1;
 			} else if (lineOffset > offset) {
-				high = mid - 1;
+				high= mid - 1;
 			} else {
 				return mid;
 			}
@@ -60,10 +60,20 @@ public class LineInformation implements ILineInformation {
 	
 	@Override
 	public int getLineOffset(final int line) throws BadLocationException {
-		if (line < 0 || line >= fOffsets.length) {
-			throw new BadLocationException("line " + line);
+		if (line < 0 || line >= this.offsets.length) {
+			throw new BadLocationException("line= " + line); //$NON-NLS-1$
 		}
-		return fOffsets[line];
+		return this.offsets[line];
+	}
+	
+	@Override
+	public int getLineLength(final int line) throws BadLocationException {
+		if (line < 0 || line >= this.offsets.length) {
+			throw new BadLocationException("line= " + line); //$NON-NLS-1$
+		}
+		return (line + 1 == this.offsets.length) ?
+				(this.textLength - this.offsets[line]) :
+				(this.offsets[line + 1] - this.offsets[line]);
 	}
 	
 }
