@@ -24,7 +24,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
-import de.walware.ecommons.collections.ConstList;
+import de.walware.ecommons.collections.ConstArrayList;
 
 import de.walware.ecommons.ltk.IModelElement;
 import de.walware.ecommons.ltk.ISourceStructElement;
@@ -72,7 +72,7 @@ public class ElementSet {
 	
 	
 	public ElementSet(final Object... elements) {
-		fInitialElements = new ConstList<Object>(elements);
+		fInitialElements = new ConstArrayList<Object>(elements);
 		init(elements);
 		
 		if (fModelElements == null) {

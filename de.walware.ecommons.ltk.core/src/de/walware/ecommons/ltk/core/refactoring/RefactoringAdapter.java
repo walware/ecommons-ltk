@@ -65,7 +65,7 @@ import org.eclipse.text.edits.DeleteEdit;
 import org.eclipse.text.edits.InsertEdit;
 import org.eclipse.text.edits.MultiTextEdit;
 
-import de.walware.ecommons.collections.ConstList;
+import de.walware.ecommons.collections.ConstArrayList;
 import de.walware.ecommons.io.FileUtil;
 import de.walware.ecommons.text.BasicHeuristicTokenScanner;
 import de.walware.ecommons.text.PartitioningConfiguration;
@@ -659,7 +659,7 @@ public abstract class RefactoringAdapter {
 			final SharableParticipants shared, final ReorgExecutionLog executionLog)
 			throws CoreException {
 		final String[] natures = ElementSet.getAffectedProjectNatures(
-				new ConstList<ElementSet>(elementsToMove, destination) );
+				new ConstArrayList<ElementSet>(elementsToMove, destination) );
 		final MoveArguments mArguments = new MoveArguments(destination.getModelElements().get(0),
 				false );
 //		for (final IResource resource : elementsToCopy.getResources()) {
@@ -686,7 +686,7 @@ public abstract class RefactoringAdapter {
 			final SharableParticipants shared, final ReorgExecutionLog executionLog)
 			throws CoreException {
 		final String[] natures = ElementSet.getAffectedProjectNatures(
-				new ConstList<ElementSet>(elementsToCopy, destination) );
+				new ConstArrayList<ElementSet>(elementsToCopy, destination) );
 		final CopyArguments mArguments = new CopyArguments(destination.getModelElements().get(0),
 				executionLog );
 //		for (final IResource resource : elementsToCopy.getResources()) {

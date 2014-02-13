@@ -69,7 +69,7 @@ import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
-import de.walware.ecommons.collections.ConstList;
+import de.walware.ecommons.collections.ConstArrayList;
 import de.walware.ecommons.preferences.Preference;
 import de.walware.ecommons.preferences.ui.ColorSelectorObservableValue;
 import de.walware.ecommons.preferences.ui.OverlayStoreConfigurationBlock;
@@ -273,7 +273,7 @@ public abstract class AbstractTextStylesConfigurationBlock extends OverlayStoreC
 			assert (availableStyles != null && availableStyles.length > 0);
 			this.fDescription= description;
 			this.fRootKey= rootKey;
-			this.fAvailableStyles= new ConstList<UseStyle>(availableStyles);
+			this.fAvailableStyles= new ConstArrayList<UseStyle>(availableStyles);
 			
 			final List<Object[]> prefs= new ArrayList<Object[]>();
 			if (this.fAvailableStyles.size() > 1) {

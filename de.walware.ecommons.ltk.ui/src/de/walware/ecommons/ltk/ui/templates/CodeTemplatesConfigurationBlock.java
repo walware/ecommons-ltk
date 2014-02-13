@@ -63,7 +63,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.statushandlers.StatusManager;
 
-import de.walware.ecommons.collections.ConstList;
+import de.walware.ecommons.collections.ConstArrayList;
 import de.walware.ecommons.preferences.Preference;
 import de.walware.ecommons.preferences.ui.ManagedConfigurationBlock;
 import de.walware.ecommons.templates.TemplateVariableProcessor;
@@ -509,7 +509,7 @@ public class CodeTemplatesConfigurationBlock extends ManagedConfigurationBlock
 	}
 	
 	protected List<TemplateGroup> getGroups() {
-		return new ConstList<TemplateGroup>(fTemplateGroups);
+		return new ConstArrayList<TemplateGroup>(fTemplateGroups);
 	}
 	
 	protected TemplateGroup getGroup(final String groupId) {
@@ -523,7 +523,7 @@ public class CodeTemplatesConfigurationBlock extends ManagedConfigurationBlock
 	
 	protected List<TemplateItem> getTemplates(final TemplateGroup group) {
 		final TemplateItem[] children = (TemplateItem[]) fContentProvider.getChildren(group);
-		return new ConstList<TemplateItem>(children);
+		return new ConstArrayList<TemplateItem>(children);
 	}
 	
 	@Override

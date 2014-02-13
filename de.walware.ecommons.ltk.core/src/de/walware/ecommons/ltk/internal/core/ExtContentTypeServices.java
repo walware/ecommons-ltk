@@ -12,7 +12,6 @@
 package de.walware.ecommons.ltk.internal.core;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -26,7 +25,7 @@ import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
 
 import de.walware.ecommons.IDisposable;
-import de.walware.ecommons.collections.ConstList;
+import de.walware.ecommons.collections.CollectionUtils;
 
 import de.walware.ecommons.ltk.IExtContentTypeManager;
 
@@ -173,9 +172,7 @@ public class ExtContentTypeServices implements IExtContentTypeManager, IDisposab
 						temp.add(sId);
 					}
 				}
-				descriptor.checkedSecondaryTypeIds = (temp.isEmpty()) ?
-						Collections.<String>emptyList() :
-						new ConstList<String>(temp);
+				descriptor.checkedSecondaryTypeIds = CollectionUtils.asConstList(temp);
 			}
 		}
 	}
