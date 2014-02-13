@@ -24,10 +24,17 @@ import de.walware.ecommons.ltk.LTKUtil;
 public class ElementComparator implements Comparator<IModelElement> {
 	
 	
-	private final Collator ID_COMPARATOR = Collator.getInstance();
+	private final Collator unitComparator;
+	private final Collator elementComparator;
 	
 	
 	public ElementComparator() {
+		this(Collator.getInstance());
+	}
+	
+	public ElementComparator(final Collator elementComparator) {
+		this.unitComparator= Collator.getInstance();
+		this.elementComparator= elementComparator;
 	}
 	
 	
@@ -38,22 +45,22 @@ public class ElementComparator implements Comparator<IModelElement> {
 		int result = 0;
 		if (u1 != null && u2 != null) {
 			if (u1 != u2) {
-				result = ID_COMPARATOR.compare(u1.getId(), u2.getId());
+				result = this.unitComparator.compare(u1.getId(), u2.getId());
 			}
 			if (result != 0) {
 				return result;
 			}
-			if (e1 instanceof ISourceUnit) {
-				if (e2 instanceof ISourceUnit) {
+			if (e1 instanceof ISourceElement) {
+				if (e2 instanceof ISourceElement) {
 					return compareSourceElementsInUnit((ISourceElement) e1, (ISourceElement) e2);
 				}
 				return -1000000;
 			}
-			else if (e2 instanceof ISourceUnit) { // && !(e1 instanceof ISourceUnit)
+			else if (e2 instanceof ISourceElement) { // && !(e1 instanceof ISourceUnit)
 				return 1000000;
 			}
 			else {
-				return ID_COMPARATOR.compare(e1.getId(), e2.getId());
+				return this.elementComparator.compare(e1.getId(), e2.getId());
 			}
 		}
 		if (u1 == null && u2 != null) {
