@@ -46,15 +46,15 @@ import de.walware.ecommons.ltk.internal.core.LTKCorePlugin;
 public class WorkingBuffer implements IWorkingBuffer {
 	
 	/** Mode for IFile (in workspace) */
-	protected static final int IFILE = 1;
+	protected static final int IFILE= 1;
 	/** Mode for IFileStore (URI) */
-	protected static final int FILESTORE = 2;
+	protected static final int FILESTORE= 2;
 	
 	
 	public static SourceContent createContentFromDocument(final IDocument doc) {
-		Object lock = null;
+		Object lock= null;
 		if (doc instanceof ISynchronizable) {
-			lock = ((ISynchronizable) doc).getLockObject();
+			lock= ((ISynchronizable) doc).getLockObject();
 		}
 		if (lock != null && doc instanceof IDocumentExtension4) {
 			synchronized (lock) {
@@ -69,8 +69,8 @@ public class WorkingBuffer implements IWorkingBuffer {
 	}
 	
 	
-	protected final ISourceUnit fUnit;
-	private AbstractDocument fDocument;
+	protected final ISourceUnit unit;
+	private AbstractDocument document;
 	
 	/**
 	 * Mode of this working buffer:<ul>
@@ -79,10 +79,10 @@ public class WorkingBuffer implements IWorkingBuffer {
 	 *   <li>> 0 - mode constant {@link #IFILE}, {@link #FILESTORE}</li>
 	 * </ul>
 	 */
-	private int fMode;
+	private int mode;
 	
 	public WorkingBuffer(final ISourceUnit unit) {
-		fUnit = unit;
+		this.unit= unit;
 	}
 	
 	
@@ -92,41 +92,41 @@ public class WorkingBuffer implements IWorkingBuffer {
 	 * @return <code>true</code> if valid mode, otherwise <code>false</code>
 	 */
 	protected final boolean detectMode() {
-		if (fMode == 0) {
-			final Object resource = fUnit.getResource();
+		if (this.mode == 0) {
+			final Object resource= this.unit.getResource();
 			if (resource instanceof IFile) {
-				fMode = IFILE;
+				this.mode= IFILE;
 			}
 			else if (resource instanceof IFileStore 
 					&& !((IFileStore) resource).fetchInfo().isDirectory() ) {
-				fMode = FILESTORE;
+				this.mode= FILESTORE;
 			}
-			if (fMode == 0) {
-				fMode = -1;
+			if (this.mode == 0) {
+				this.mode= -1;
 			}
 		}
-		return (fMode > 0);
+		return (this.mode > 0);
 	}
 	
 	protected final int getMode() {
-		return fMode;
+		return this.mode;
 	}
 	
 	@Override
 	public long getContentStamp(final IProgressMonitor monitor) {
-		{	final AbstractDocument doc = fDocument;
+		{	final AbstractDocument doc= this.document;
 			if (doc != null) {
 				return doc.getModificationStamp();
 			}
 		}
-		{	final ISourceUnit underlyingUnit = fUnit.getUnderlyingUnit();
+		{	final ISourceUnit underlyingUnit= this.unit.getUnderlyingUnit();
 			if (underlyingUnit != null) {
 				return underlyingUnit.getContentStamp(monitor);
 			}
 		}
 		if (detectMode()) {
 			if (getMode() == IFILE) {
-				final IFile resource = (IFile) fUnit.getResource();
+				final IFile resource= (IFile) this.unit.getResource();
 				if (resource != null) {
 					return resource.getModificationStamp();
 				}
@@ -140,13 +140,13 @@ public class WorkingBuffer implements IWorkingBuffer {
 	 */
 	@Override
 	public synchronized AbstractDocument getDocument(final IProgressMonitor monitor) {
-		if (fDocument == null) {
-			final SubMonitor progress = SubMonitor.convert(monitor);
-			final AbstractDocument doc = createDocument(progress);
+		if (this.document == null) {
+			final SubMonitor progress= SubMonitor.convert(monitor);
+			final AbstractDocument doc= createDocument(progress);
 			checkDocument(doc);
-			fDocument = doc;
+			this.document= doc;
 		}
-		return fDocument;
+		return this.document;
 	}
 	
 	/**
@@ -154,8 +154,8 @@ public class WorkingBuffer implements IWorkingBuffer {
 	 */
 	@Override
 	public SourceContent getContent(final IProgressMonitor monitor) {
-		final SubMonitor progress = SubMonitor.convert(monitor);
-		final IDocument doc = fDocument;
+		final SubMonitor progress= SubMonitor.convert(monitor);
+		final IDocument doc= this.document;
 		if (doc != null) {
 			return createContentFromDocument(doc);
 		}
@@ -168,18 +168,18 @@ public class WorkingBuffer implements IWorkingBuffer {
 	
 	@Override
 	public synchronized void releaseDocument(final IProgressMonitor monitor) {
-		fDocument = null;
+		this.document= null;
 	}
 	
 	@Override
 	public boolean checkState(final boolean validate, final IProgressMonitor monitor) {
-		final ISourceUnit underlyingUnit = fUnit.getUnderlyingUnit();
+		final ISourceUnit underlyingUnit= this.unit.getUnderlyingUnit();
 		if (underlyingUnit != null) {
 			return underlyingUnit.checkState(validate, monitor);
 		}
 		else if (detectMode()) {
 			if (getMode() == IFILE) {
-				final IFile resource = (IFile) fUnit.getResource();
+				final IFile resource= (IFile) this.unit.getResource();
 				if (!validate) {
 					return !resource.getResourceAttributes().isReadOnly();
 				}
@@ -188,7 +188,7 @@ public class WorkingBuffer implements IWorkingBuffer {
 				}
 			}
 			else if (getMode() == FILESTORE) {
-				final IFileStore store = (IFileStore) fUnit.getAdapter(IFileStore.class);
+				final IFileStore store= (IFileStore) this.unit.getAdapter(IFileStore.class);
 				try {
 					return !store.fetchInfo(EFS.NONE, monitor).getAttribute(EFS.ATTRIBUTE_READ_ONLY);
 				}
@@ -203,15 +203,15 @@ public class WorkingBuffer implements IWorkingBuffer {
 	
 	
 	protected AbstractDocument createDocument(final SubMonitor progress) {
-		final IDocument fileDoc = FileBuffers.getTextFileBufferManager().createEmptyDocument(null, null);
+		final IDocument fileDoc= FileBuffers.getTextFileBufferManager().createEmptyDocument(null, null);
 		if (!(fileDoc instanceof AbstractDocument)) {
 			return null;
 		}
-		final AbstractDocument document = (AbstractDocument) fileDoc;
+		final AbstractDocument document= (AbstractDocument) fileDoc;
 		
-		final ISourceUnit underlyingUnit = fUnit.getUnderlyingUnit();
+		final ISourceUnit underlyingUnit= this.unit.getUnderlyingUnit();
 		if (underlyingUnit != null) {
-			final SourceContent underlyingContent = underlyingUnit.getContent(progress);
+			final SourceContent underlyingContent= underlyingUnit.getContent(progress);
 //			if (document instanceof IDocumentExtension4) {
 			document.set(underlyingContent.text, underlyingContent.stamp);
 //			}
@@ -220,7 +220,7 @@ public class WorkingBuffer implements IWorkingBuffer {
 //			}
 		}
 		else {
-			final Object resource = fUnit.getResource();
+			final Object resource= this.unit.getResource();
 			if (resource instanceof IFile) {
 				loadDocumentFromFile((IFile) resource, document, progress);
 			}
@@ -243,10 +243,10 @@ public class WorkingBuffer implements IWorkingBuffer {
 			FileUtil.getFileUtil(file).createReadTextFileOp(new FileUtil.ReaderAction() {
 				@Override
 				public void run(final BufferedReader reader, final IProgressMonitor monitor) throws IOException {
-					final StringBuilder buffer = new StringBuilder();
-					final char[] readBuffer = new char[2048];
+					final StringBuilder buffer= new StringBuilder();
+					final char[] readBuffer= new char[2048];
 					int n;
-					while ((n = reader.read(readBuffer)) > 0) {
+					while ((n= reader.read(readBuffer)) > 0) {
 						buffer.append(readBuffer, 0, n);
 					}
 //					if (document instanceof IDocumentExtension4) {
@@ -266,13 +266,13 @@ public class WorkingBuffer implements IWorkingBuffer {
 	}
 	
 	protected SourceContent createContent(final SubMonitor progress) {
-		final ISourceUnit underlyingUnit = fUnit.getUnderlyingUnit();
+		final ISourceUnit underlyingUnit= this.unit.getUnderlyingUnit();
 		if (underlyingUnit != null) {
 			return underlyingUnit.getContent(progress);
 		}
 		else {
-			final Object resource = fUnit.getResource();
-			final AtomicReference<SourceContent> content = new AtomicReference<SourceContent>();
+			final Object resource= this.unit.getResource();
+			final AtomicReference<SourceContent> content= new AtomicReference<SourceContent>();
 			if (resource instanceof IFile) {
 				loadContentFromFile((IFile) resource, content, progress);
 			}
@@ -285,10 +285,10 @@ public class WorkingBuffer implements IWorkingBuffer {
 			FileUtil.getFileUtil(file).createReadTextFileOp(new FileUtil.ReaderAction() {
 				@Override
 				public void run(final BufferedReader reader, final IProgressMonitor monitor) throws IOException {
-					final StringBuilder buffer = new StringBuilder();
-					final char[] readBuffer = new char[2048];
+					final StringBuilder buffer= new StringBuilder();
+					final char[] readBuffer= new char[2048];
 					int n;
-					while ((n = reader.read(readBuffer)) >= 0) {
+					while ((n= reader.read(readBuffer)) >= 0) {
 						buffer.append(readBuffer, 0, n);
 					}
 					content.set(new SourceContent(file.getModificationStamp(), buffer.toString()));

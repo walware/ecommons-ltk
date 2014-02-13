@@ -24,16 +24,28 @@ package de.walware.ecommons.ltk;
 public final class WorkingContext {
 	
 	
-	private final String fKey;
+	private final String key;
 	
 	
 	public WorkingContext(final String key) {
-		fKey = key;
+		this.key= key;
 	}
 	
 	
 	public String getKey() {
-		return fKey;
+		return this.key;
+	}
+	
+	
+	@Override
+	public int hashCode() {
+		return this.key.hashCode();
+	}
+	
+	
+	@Override
+	public String toString() {
+		return this.key;
 	}
 	
 }
