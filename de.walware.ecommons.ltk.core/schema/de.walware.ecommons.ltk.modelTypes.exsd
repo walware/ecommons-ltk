@@ -61,9 +61,10 @@
          </documentation>
       </annotation>
       <complexType>
-         <choice minOccurs="0" maxOccurs="unbounded">
-            <element ref="secondaryType"/>
-         </choice>
+         <sequence>
+            <element ref="baseType" minOccurs="0" maxOccurs="1"/>
+            <element ref="secondaryType" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
@@ -135,6 +136,21 @@
             <annotation>
                <documentation>
                   The model type id to activate for the content type.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="de.walware.ecommons.ltk.modelTypes/modelType/@id"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="baseType">
+      <complexType>
+         <attribute name="modelTypeId" type="string">
+            <annotation>
+               <documentation>
+                  
                </documentation>
                <appinfo>
                   <meta.attribute kind="identifier" basedOn="de.walware.ecommons.ltk.modelTypes/modelType/@id"/>
