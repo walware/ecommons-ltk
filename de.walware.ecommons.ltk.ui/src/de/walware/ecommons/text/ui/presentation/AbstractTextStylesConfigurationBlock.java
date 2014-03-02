@@ -108,21 +108,21 @@ public abstract class AbstractTextStylesConfigurationBlock extends OverlayStoreC
 		
 		public static class UseStyle {
 			
-			private final String fLabel;
-			private final String fRefRootKey;
+			private final String label;
+			private final String refRootKey;
 			
 			public UseStyle(final String refRootKey, final String label) {
 				super();
-				this.fRefRootKey= refRootKey;
-				this.fLabel= label;
+				this.refRootKey= refRootKey;
+				this.label= label;
 			}
 			
 			public String getLabel() {
-				return this.fLabel;
+				return this.label;
 			}
 			
 			public String getRefRootKey() {
-				return this.fRefRootKey;
+				return this.refRootKey;
 			}
 			
 		}
@@ -258,9 +258,9 @@ public abstract class AbstractTextStylesConfigurationBlock extends OverlayStoreC
 			}
 		}
 		
-		private final String fDescription;
-		private final String fRootKey;
-		private final List<UseStyle> fAvailableStyles;
+		private final String description;
+		private final String rootKey;
+		private final List<UseStyle> availableStyles;
 		
 		/** tuple { pref : Preference, beanProperty : String } */
 		private final Object[][] fPreferences;
@@ -271,12 +271,12 @@ public abstract class AbstractTextStylesConfigurationBlock extends OverlayStoreC
 		public StyleNode(final String name, final String description, final String rootKey, final UseStyle[] availableStyles, final SyntaxNode[] children) {
 			super(name, children);
 			assert (availableStyles != null && availableStyles.length > 0);
-			this.fDescription= description;
-			this.fRootKey= rootKey;
-			this.fAvailableStyles= new ConstArrayList<UseStyle>(availableStyles);
+			this.description= description;
+			this.rootKey= rootKey;
+			this.availableStyles= new ConstArrayList<>(availableStyles);
 			
-			final List<Object[]> prefs= new ArrayList<Object[]>();
-			if (this.fAvailableStyles.size() > 1) {
+			final List<Object[]> prefs= new ArrayList<>();
+			if (this.availableStyles.size() > 1) {
 				prefs.add(new Object[] { new UseStylePref(null, getUseKey()), PROP_USE });
 			}
 			prefs.add(new Object[] { new RGBPref(null, getColorKey()), PROP_COLOR });
@@ -289,39 +289,39 @@ public abstract class AbstractTextStylesConfigurationBlock extends OverlayStoreC
 		
 		@Override
 		public String getDescription() {
-			return this.fDescription;
+			return this.description;
 		}
 		
 		
 		private String getUseKey() {
-			return this.fRootKey + ITextPresentationConstants.TEXTSTYLE_USE_SUFFIX;
+			return this.rootKey + ITextPresentationConstants.TEXTSTYLE_USE_SUFFIX;
 		}
 		private String getColorKey() {
-			return this.fRootKey + ITextPresentationConstants.TEXTSTYLE_COLOR_SUFFIX;
+			return this.rootKey + ITextPresentationConstants.TEXTSTYLE_COLOR_SUFFIX;
 		}
 		private String getBoldKey() {
-			return this.fRootKey + ITextPresentationConstants.TEXTSTYLE_BOLD_SUFFIX;
+			return this.rootKey + ITextPresentationConstants.TEXTSTYLE_BOLD_SUFFIX;
 		}
 		private String getItalicKey() {
-			return this.fRootKey + ITextPresentationConstants.TEXTSTYLE_ITALIC_SUFFIX;
+			return this.rootKey + ITextPresentationConstants.TEXTSTYLE_ITALIC_SUFFIX;
 		}
 		private String getUnderlineKey() {
-			return this.fRootKey + ITextPresentationConstants.TEXTSTYLE_UNDERLINE_SUFFIX;
+			return this.rootKey + ITextPresentationConstants.TEXTSTYLE_UNDERLINE_SUFFIX;
 		}
 		private String getStrikethroughKey() {
-			return this.fRootKey + ITextPresentationConstants.TEXTSTYLE_STRIKETHROUGH_SUFFIX;
+			return this.rootKey + ITextPresentationConstants.TEXTSTYLE_STRIKETHROUGH_SUFFIX;
 		}
 		
 		protected void gatherPreferenceKeys(final List<OverlayStorePreference> keys) {
 			for (final Object[] pref : this.fPreferences) {
-				keys.add(OverlayStorePreference.create((Preference) pref[0]));
+				keys.add(OverlayStorePreference.create((Preference<?>) pref[0]));
 			}
 		}
 		protected void connectPreferenceStore(final IPreferenceStore store) {
 			this.fPreferenceStore= store;
 			this.fBeanSupport= new PreferenceStoreBeanWrapper(store, this);
 			for (final Object[] pref : this.fPreferences) {
-				this.fBeanSupport.addPreference((String) pref[1], (Preference) pref[0]);
+				this.fBeanSupport.addPreference((String) pref[1], (Preference<?>) pref[0]);
 			}
 		}
 		
@@ -354,7 +354,7 @@ public abstract class AbstractTextStylesConfigurationBlock extends OverlayStoreC
 		/*-- Property-Access --*/
 		@Override
 		public List<UseStyle> getAvailableUseStyles() {
-			return this.fAvailableStyles;
+			return this.availableStyles;
 		}
 		
 		@Override
@@ -368,12 +368,12 @@ public abstract class AbstractTextStylesConfigurationBlock extends OverlayStoreC
 			return getUseStyle(this.fPreferenceStore.getString(getUseKey()));
 		}
 		private UseStyle getUseStyle(final String value) {
-			for (final UseStyle style : this.fAvailableStyles) {
+			for (final UseStyle style : this.availableStyles) {
 				if (style.getRefRootKey().equals(value)) {
 					return style;
 				}
 			}
-			return this.fAvailableStyles.get(0);
+			return this.availableStyles.get(0);
 		}
 		
 		@Override
@@ -500,9 +500,9 @@ public abstract class AbstractTextStylesConfigurationBlock extends OverlayStoreC
 		// Prepare model
 		this.rootNodes= createItems();
 		final String[] groupIds= getSettingsGroups();
-		this.groupIds= new HashSet<String>();
+		this.groupIds= new HashSet<>();
 		this.groupIds.addAll(Arrays.asList(groupIds));
-		final List<OverlayStorePreference> keys= new ArrayList<OverlayStorePreference>();
+		final List<OverlayStorePreference> keys= new ArrayList<>();
 		collectKeys(keys, this.rootNodes);
 		setupOverlayStore(keys.toArray(new OverlayStorePreference[keys.size()]));
 		connectStore(this.rootNodes);
@@ -741,7 +741,8 @@ public abstract class AbstractTextStylesConfigurationBlock extends OverlayStoreC
 		useStyle.addValueChangeListener(new IValueChangeListener() {
 			@Override
 			public void handleValueChange(final ValueChangeEvent event) {
-				final IStructuredSelection selection= (IStructuredSelection) AbstractTextStylesConfigurationBlock.this.selectionViewer.getSelection();
+				final IStructuredSelection selection= (IStructuredSelection) AbstractTextStylesConfigurationBlock.this
+						.selectionViewer.getSelection();
 				final UseStyle newUse= (UseStyle) event.diff.getNewValue();
 				updateEnablement((SyntaxNode) selection.getFirstElement(), newUse);
 			}
@@ -777,7 +778,7 @@ public abstract class AbstractTextStylesConfigurationBlock extends OverlayStoreC
 		boolean enableOptions;
 		if (node instanceof StyleNode) {
 			this.useControl.getControl().setEnabled(node.getAvailableUseStyles().size() > 1);
-			enableOptions= useStyle != null && useStyle.getRefRootKey().equals(""); 
+			enableOptions= useStyle != null && useStyle.getRefRootKey().equals(""); //$NON-NLS-1$
 		}
 		else {
 			this.useControl.getControl().setEnabled(false);
@@ -793,7 +794,7 @@ public abstract class AbstractTextStylesConfigurationBlock extends OverlayStoreC
 	@Override
 	protected void handlePropertyChange() {
 		if (UIAccess.isOkToUse(this.previewViewer)) {
-			final Map<String, Object> options= new HashMap<String, Object>();
+			final Map<String, Object> options= new HashMap<>();
 			this.configuration.handleSettingsChanged(this.groupIds, options);
 			this.previewViewer.invalidateTextPresentation();
 		}
@@ -819,7 +820,9 @@ public abstract class AbstractTextStylesConfigurationBlock extends OverlayStoreC
 			description.append("\n    ");  //$NON-NLS-1$
 			description.append(listItems[i]);
 		}
-		description.append("\n["+end+"/"+listItems.length+"]");  //$NON-NLS-1$
+		if (end < listItems.length) {
+			description.append("\n    ... (" + listItems.length + ')'); //$NON-NLS-1$
+		}
 		return MessageUtil.escapeForTooltip(description);
 	}
 	
