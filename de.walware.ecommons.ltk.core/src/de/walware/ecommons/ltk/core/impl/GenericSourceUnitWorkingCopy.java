@@ -31,10 +31,10 @@ import de.walware.ecommons.ltk.SourceContent;
 public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	
 	
-	protected final ISourceUnit fFrom;
-	private IWorkingBuffer fBuffer;
+	private final ISourceUnit from;
+	private IWorkingBuffer buffer;
 	
-	private int fCounter = 0;
+	private int counter= 0;
 	
 	
 	/**
@@ -43,21 +43,18 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	 * @param from the underlying unit to create a working copy from
 	 */
 	public GenericSourceUnitWorkingCopy(final ISourceUnit from) {
-		fFrom = from;
+		this.from= from;
 	}
 	
 	
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	public ISourceUnit getUnderlyingUnit() {
-		return fFrom;
+	public final ISourceUnit getUnderlyingUnit() {
+		return this.from;
 	}
 	
 	@Override
 	public boolean isSynchronized() {
-		return fBuffer.isSynchronized();
+		return this.buffer.isSynchronized();
 	}
 	
 	/**
@@ -65,12 +62,12 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	 */
 	@Override
 	public String getModelTypeId() {
-		return fFrom.getModelTypeId();
+		return this.from.getModelTypeId();
 	}
 	
 	@Override
 	public String getContentTypeId() {
-		return fFrom.getContentTypeId();
+		return this.from.getContentTypeId();
 	}
 	
 	/**
@@ -78,7 +75,7 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	 */
 	@Override
 	public int getElementType() {
-		return fFrom.getElementType();
+		return this.from.getElementType();
 	}
 	
 	/**
@@ -86,7 +83,7 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	 */
 	@Override
 	public IElementName getElementName() {
-		return fFrom.getElementName();
+		return this.from.getElementName();
 	}
 	
 	/**
@@ -94,7 +91,7 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	 */
 	@Override
 	public String getId() {
-		return fFrom.getId();
+		return this.from.getId();
 	}
 	
 	/**
@@ -102,7 +99,7 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	 */
 	@Override
 	public boolean exists() {
-		return fCounter > 0;
+		return this.counter > 0;
 	}
 	
 	/**
@@ -115,7 +112,7 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	
 	@Override
 	public boolean checkState(final boolean validate, final IProgressMonitor monitor) {
-		return fBuffer.checkState(validate, monitor);
+		return this.buffer.checkState(validate, monitor);
 	}
 	
 	/**
@@ -123,7 +120,7 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	 */
 	@Override
 	public Object getResource() {
-		return fFrom.getResource();
+		return this.from.getResource();
 	}
 	
 	
@@ -132,7 +129,7 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	 */
 	@Override
 	public AbstractDocument getDocument(final IProgressMonitor monitor) {
-		return fBuffer.getDocument(monitor);
+		return this.buffer.getDocument(monitor);
 	}
 	
 	/**
@@ -140,7 +137,7 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	 */
 	@Override
 	public long getContentStamp(final IProgressMonitor monitor) {
-		return fBuffer.getContentStamp(monitor);
+		return this.buffer.getContentStamp(monitor);
 	}
 	
 	/**
@@ -148,7 +145,7 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	 */
 	@Override
 	public SourceContent getContent(final IProgressMonitor monitor) {
-		return fBuffer.getContent(monitor);
+		return this.buffer.getContent(monitor);
 	}
 	
 	
@@ -198,15 +195,15 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	 */
 	@Override
 	public synchronized final void connect(final IProgressMonitor monitor) {
-		fCounter++;
-		if (fCounter == 1) {
-			final SubMonitor progress = SubMonitor.convert(monitor, 1);
-			if (fBuffer == null) {
+		this.counter++;
+		if (this.counter == 1) {
+			final SubMonitor progress= SubMonitor.convert(monitor, 1);
+			if (this.buffer == null) {
 				progress.setWorkRemaining(2);
-				fBuffer = createWorkingBuffer(progress.newChild(1));
+				this.buffer= createWorkingBuffer(progress.newChild(1));
 			}
 			register();
-			fFrom.connect(progress.newChild(1));
+			this.from.connect(progress.newChild(1));
 		}
 	}
 	
@@ -215,12 +212,12 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	 */
 	@Override
 	public synchronized final void disconnect(final IProgressMonitor monitor) {
-		fCounter--;
-		if (fCounter == 0) {
-			final SubMonitor progress = SubMonitor.convert(monitor, 2);
-			fBuffer.releaseDocument(progress.newChild(1));
+		this.counter--;
+		if (this.counter == 0) {
+			final SubMonitor progress= SubMonitor.convert(monitor, 2);
+			this.buffer.releaseDocument(progress.newChild(1));
 			unregister();
-			fFrom.disconnect(progress.newChild(1));
+			this.from.disconnect(progress.newChild(1));
 		}
 	}
 	
@@ -229,7 +226,7 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	 */
 	@Override
 	public synchronized boolean isConnected() {
-		return (fCounter > 0);
+		return (this.counter > 0);
 	}
 	
 	protected abstract IWorkingBuffer createWorkingBuffer(SubMonitor progress);
@@ -245,7 +242,7 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	 */
 	@Override
 	public Object getAdapter(final Class required) {
-		return fFrom.getAdapter(required);
+		return this.from.getAdapter(required);
 	}
 	
 }

@@ -45,22 +45,22 @@ public abstract class GenericResourceSourceUnit implements IWorkspaceSourceUnit 
 	}
 	
 	
-	private final String fId;
-	private final IElementName fName;
+	private final String id;
+	private final IElementName name;
 	
-	private final IFile fFile;
-	private IWorkingBuffer fBuffer;
+	private final IFile file;
+	private IWorkingBuffer buffer;
 	
-	private int fCounter = 0;
+	private int counter= 0;
 	
 	
 	public GenericResourceSourceUnit(final String id, final IFile file) {
 		if (file == null) {
 			throw new NullPointerException();
 		}
-		fId = id;
-		fFile = file;
-		fName = createElementName();
+		this.id= id;
+		this.file= file;
+		this.name= createElementName();
 	}
 	
 	protected IElementName createElementName() {
@@ -71,11 +71,11 @@ public abstract class GenericResourceSourceUnit implements IWorkspaceSourceUnit 
 			}
 			@Override
 			public String getDisplayName() {
-				return fFile.toString();
+				return GenericResourceSourceUnit.this.file.getName();
 			}
 			@Override
 			public String getSegmentName() {
-				return fId;
+				return GenericResourceSourceUnit.this.file.getName();
 			}
 			@Override
 			public IElementName getNextSegment() {
@@ -105,7 +105,7 @@ public abstract class GenericResourceSourceUnit implements IWorkspaceSourceUnit 
 	 */
 	@Override
 	public final String getId() {
-		return fId;
+		return this.id;
 	}
 	
 	/**
@@ -135,7 +135,7 @@ public abstract class GenericResourceSourceUnit implements IWorkspaceSourceUnit 
 	 */
 	@Override
 	public final IElementName getElementName() {
-		return fName;
+		return this.name;
 	}
 	
 	/**
@@ -163,7 +163,7 @@ public abstract class GenericResourceSourceUnit implements IWorkspaceSourceUnit 
 	 */
 	@Override
 	public final IResource getResource() {
-		return fFile;
+		return this.file;
 	}
 	
 	@Override
@@ -177,7 +177,7 @@ public abstract class GenericResourceSourceUnit implements IWorkspaceSourceUnit 
 	 */
 	@Override
 	public boolean checkState(final boolean validate, final IProgressMonitor monitor) {
-		return fBuffer.checkState(validate, monitor);
+		return this.buffer.checkState(validate, monitor);
 	}
 	
 	/**
@@ -185,7 +185,7 @@ public abstract class GenericResourceSourceUnit implements IWorkspaceSourceUnit 
 	 */
 	@Override
 	public AbstractDocument getDocument(final IProgressMonitor monitor) {
-		return fBuffer.getDocument(monitor);
+		return this.buffer.getDocument(monitor);
 	}
 	
 	/**
@@ -193,7 +193,7 @@ public abstract class GenericResourceSourceUnit implements IWorkspaceSourceUnit 
 	 */
 	@Override
 	public long getContentStamp(final IProgressMonitor monitor) {
-		return fBuffer.getContentStamp(monitor);
+		return this.buffer.getContentStamp(monitor);
 	}
 	
 	/**
@@ -201,7 +201,7 @@ public abstract class GenericResourceSourceUnit implements IWorkspaceSourceUnit 
 	 */
 	@Override
 	public SourceContent getContent(final IProgressMonitor monitor) {
-		return fBuffer.getContent(monitor);
+		return this.buffer.getContent(monitor);
 	}
 	
 	/**
@@ -270,10 +270,10 @@ public abstract class GenericResourceSourceUnit implements IWorkspaceSourceUnit 
 	 */
 	@Override
 	public synchronized final void connect(final IProgressMonitor monitor) {
-		fCounter++;
-		if (fCounter == 1) {
-			if (fBuffer == null) {
-				fBuffer = new WorkingBuffer(this);
+		this.counter++;
+		if (this.counter == 1) {
+			if (this.buffer == null) {
+				this.buffer= new WorkingBuffer(this);
 			}
 			register();
 		}
@@ -284,10 +284,10 @@ public abstract class GenericResourceSourceUnit implements IWorkspaceSourceUnit 
 	 */
 	@Override
 	public synchronized final void disconnect(final IProgressMonitor monitor) {
-		fCounter--;
-		if (fCounter == 0) {
-			final SubMonitor progress = SubMonitor.convert(monitor, 2);
-			fBuffer.releaseDocument(progress.newChild(1));
+		this.counter--;
+		if (this.counter == 0) {
+			final SubMonitor progress= SubMonitor.convert(monitor, 2);
+			this.buffer.releaseDocument(progress.newChild(1));
 			unregister();
 		}
 	}
@@ -297,7 +297,7 @@ public abstract class GenericResourceSourceUnit implements IWorkspaceSourceUnit 
 	 */
 	@Override
 	public synchronized boolean isConnected() {
-		return (fCounter > 0);
+		return (this.counter > 0);
 	}
 	
 	protected void register() {
@@ -309,7 +309,7 @@ public abstract class GenericResourceSourceUnit implements IWorkspaceSourceUnit 
 	
 	@Override
 	public int hashCode() {
-		return fId.hashCode();
+		return this.id.hashCode();
 	}
 	
 	@Override
@@ -317,11 +317,16 @@ public abstract class GenericResourceSourceUnit implements IWorkspaceSourceUnit 
 		if (!(obj instanceof ISourceUnit)) {
 			return false;
 		}
-		final ISourceUnit other = (ISourceUnit) obj;
+		final ISourceUnit other= (ISourceUnit) obj;
 		return (getElementType() == other.getElementType()
 				&& getWorkingContext() == other.getWorkingContext()
 				&& getId().equals(other.getId())
 				&& getModelTypeId().equals(other.getModelTypeId()) );
+	}
+	
+	@Override
+	public String toString() {
+		return getModelTypeId() + '/' + getWorkingContext() + ": " + getId(); //$NON-NLS-1$
 	}
 	
 }

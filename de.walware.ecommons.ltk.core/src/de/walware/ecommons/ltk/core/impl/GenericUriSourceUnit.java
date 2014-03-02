@@ -260,4 +260,10 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	protected void unregister() {
 	}
 	
+	
+	@Override
+	public String toString() {
+		return getModelTypeId() + '/' + getWorkingContext() + ": " + getId(); //$NON-NLS-1$
+	}
+	
 }

@@ -19,19 +19,23 @@ import org.eclipse.core.runtime.SubMonitor;
 import de.walware.ecommons.text.IMarkerPositionResolver;
 import de.walware.ecommons.text.ui.AnnotationMarkerPositionResolver;
 
+import de.walware.ecommons.ltk.ISourceUnit;
+import de.walware.ecommons.ltk.ISourceUnitModelInfo;
 import de.walware.ecommons.ltk.IWorkspaceSourceUnit;
 import de.walware.ecommons.ltk.LTK;
 import de.walware.ecommons.ltk.SourceDocumentRunnable;
 import de.walware.ecommons.ltk.WorkingContext;
-import de.walware.ecommons.ltk.core.impl.GenericSourceUnitWorkingCopy;
+import de.walware.ecommons.ltk.core.impl.GenericSourceUnitWorkingCopy2;
 import de.walware.ecommons.ltk.core.impl.IWorkingBuffer;
+import de.walware.ecommons.ltk.core.impl.SourceUnitModelContainer;
 
 
-public abstract class GenericEditorWorkspaceSourceUnitWorkingCopy
-		extends GenericSourceUnitWorkingCopy implements IWorkspaceSourceUnit {
+public abstract class GenericEditorWorkspaceSourceUnitWorkingCopy2<M extends SourceUnitModelContainer<? extends ISourceUnit, ? extends ISourceUnitModelInfo>>
+		extends GenericSourceUnitWorkingCopy2<M>
+		implements IWorkspaceSourceUnit {
 	
 	
-	public GenericEditorWorkspaceSourceUnitWorkingCopy(final IWorkspaceSourceUnit from) {
+	public GenericEditorWorkspaceSourceUnitWorkingCopy2(final IWorkspaceSourceUnit from) {
 		super(from);
 	}
 	
@@ -43,7 +47,7 @@ public abstract class GenericEditorWorkspaceSourceUnitWorkingCopy
 	
 	@Override
 	public IResource getResource() {
-		return ((IWorkspaceSourceUnit) fFrom).getResource();
+		return ((IWorkspaceSourceUnit) getUnderlyingUnit()).getResource();
 	}
 	
 	@Override

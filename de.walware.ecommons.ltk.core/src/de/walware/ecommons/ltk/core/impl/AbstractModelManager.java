@@ -34,11 +34,11 @@ public abstract class AbstractModelManager implements IModelManager {
 		
 		public final WorkingContext context;
 		
-		public final FastList<IElementChangedListener> listeners = new FastList<IElementChangedListener>(IElementChangedListener.class);
+		public final FastList<IElementChangedListener> listeners= new FastList<>(IElementChangedListener.class);
 		
 		
 		protected ContextItem(final WorkingContext context) {
-			this.context = context;
+			this.context= context;
 		}
 		
 		
@@ -54,12 +54,12 @@ public abstract class AbstractModelManager implements IModelManager {
 		
 	}
 	
-	private static final IElementChangedListener[] NO_LISTENERS = new IElementChangedListener[0];
+	private static final IElementChangedListener[] NO_LISTENERS= new IElementChangedListener[0];
 	
 	private class RefreshJob extends Job {
 		
 		
-		private final List<ISourceUnit> fList;
+		private final List<ISourceUnit> list;
 		
 		
 		public RefreshJob(final WorkingContext context) {
@@ -68,12 +68,12 @@ public abstract class AbstractModelManager implements IModelManager {
 			setSystem(true);
 			setPriority(DECORATE);
 			
-			fList = LTK.getSourceUnitManager().getOpenSourceUnits(fTypeId, context);
+			this.list= LTK.getSourceUnitManager().getOpenSourceUnits(AbstractModelManager.this.typeId, context);
 		}
 		
 		@Override
 		protected IStatus run(final IProgressMonitor monitor) {
-			for (final ISourceUnit su : fList) {
+			for (final ISourceUnit su : this.list) {
 				reconcile(su, (IModelManager.MODEL_FILE | IModelManager.RECONCILER), monitor);
 			}
 			return Status.OK_STATUS;
@@ -82,25 +82,24 @@ public abstract class AbstractModelManager implements IModelManager {
 	}
 	
 	
+	private final String typeId;
 	
-	private final String fTypeId;
-	
-	private final FastList<ContextItem> fContexts = new FastList<ContextItem>(ContextItem.class, FastList.IDENTITY);
+	private final FastList<ContextItem> contexts= new FastList<>(ContextItem.class, FastList.IDENTITY);
 	
 	
 	public AbstractModelManager(final String typeId) {
-		fTypeId = typeId;
+		this.typeId= typeId;
 	}
 	
 	
 	public String getModelTypeId() {
-		return fTypeId;
+		return this.typeId;
 	}
 	
 	protected ContextItem getContextItem(final WorkingContext context, final boolean create) {
 		while (true) {
-			final ContextItem[] contextItems = fContexts.toArray();
-			for (int i = 0; i < contextItems.length; i++) {
+			final ContextItem[] contextItems= this.contexts.toArray();
+			for (int i= 0; i < contextItems.length; i++) {
 				if (contextItems[i].context == context) {
 					return contextItems[i];
 				}
@@ -108,10 +107,10 @@ public abstract class AbstractModelManager implements IModelManager {
 			if (!create) {
 				return null;
 			}
-			synchronized (fContexts) {
-				if (contextItems == fContexts.toArray()) {
-					final ContextItem item = doCreateContextItem(context);
-					fContexts.add(item);
+			synchronized (this.contexts) {
+				if (contextItems == this.contexts.toArray()) {
+					final ContextItem item= doCreateContextItem(context);
+					this.contexts.add(item);
 					return item;
 				}
 			}
@@ -122,33 +121,25 @@ public abstract class AbstractModelManager implements IModelManager {
 		return new ContextItem(context);
 	}
 	
-	protected ContextItem getExistingContext(final WorkingContext context) {
-		final ContextItem[] contextItems = fContexts.toArray();
-		for (int i = 0; i < contextItems.length; i++) {
-			if (contextItems[i].context == context) {
-				return contextItems[i];
-			}
-		}
-		return null;
-	}
-	
 	@Override
-	public void addElementChangedListener(final IElementChangedListener listener, final WorkingContext context) {
-		final ContextItem contextItem = getContextItem(context, true);
+	public void addElementChangedListener(final IElementChangedListener listener,
+			final WorkingContext context) {
+		final ContextItem contextItem= getContextItem(context, true);
 		contextItem.listeners.add(listener);
 	}
 	
 	@Override
-	public void removeElementChangedListener(final IElementChangedListener listener, final WorkingContext context) {
-		final ContextItem contextItem = getContextItem(context, false);
+	public void removeElementChangedListener(final IElementChangedListener listener,
+			final WorkingContext context) {
+		final ContextItem contextItem= getContextItem(context, false);
 		if (contextItem != null) {
 			contextItem.listeners.remove(listener);
 		}
 	}
 	
 	protected IElementChangedListener[] getElementChangedListeners(final WorkingContext context) {
-		final ContextItem contextItem = getExistingContext(context);
-		if (context == null) {
+		final ContextItem contextItem= getContextItem(context, false);
+		if (contextItem == null) {
 			return NO_LISTENERS;
 		}
 		return contextItem.listeners.toArray();

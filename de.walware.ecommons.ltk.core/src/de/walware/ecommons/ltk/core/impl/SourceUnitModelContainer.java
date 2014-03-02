@@ -23,85 +23,94 @@ import de.walware.ecommons.ltk.LTK;
 import de.walware.ecommons.ltk.SourceContent;
 
 
-public abstract class SourceUnitModelContainer<SuType extends ISourceUnit, ModelType extends ISourceUnitModelInfo> {
+public abstract class SourceUnitModelContainer<U extends ISourceUnit, ModelType extends ISourceUnitModelInfo> {
 	
 	
-	private final int fMode;
-	
-	private final SuType fSourceUnit;
-	
-	private AstInfo fAstInfo;
-	
-	private ModelType fModelInfo;
+	private static final int MODE_PERSISTENCE= 1;
+	private static final int MODE_EDITOR= 2;
 	
 	
-	public SourceUnitModelContainer(final SuType su) {
-		fSourceUnit = su;
-		fMode = getMode(su);
+	private final int mode;
+	
+	private final U unit;
+	
+	private AstInfo astInfo;
+	
+	private ModelType modelInfo;
+	
+	
+	public SourceUnitModelContainer(final U unit) {
+		this.unit= unit;
+		this.mode= getMode(unit);
 	}
 	
 	
-	protected int getMode(final SuType su) {
+	public abstract boolean isContainerFor(String modelTypeId);
+	
+	public abstract Class<?> getAdapterClass();
+	
+	
+	protected int getMode(final U su) {
 		if (su instanceof IWorkspaceSourceUnit) {
 			if (su.getWorkingContext() == LTK.PERSISTENCE_CONTEXT) {
-				return 1;
+				return MODE_PERSISTENCE;
 			}
 			else if (su.getWorkingContext() == LTK.EDITOR_CONTEXT) {
-				return 2;
+				return MODE_EDITOR;
 			}
 		}
 		return 0;
 	}
 	
 	
-	public SuType getSourceUnit() {
-		return fSourceUnit;
+	public U getSourceUnit() {
+		return this.unit;
 	}
 	
 	public SourceContent getParseContent(final IProgressMonitor monitor) {
-		return fSourceUnit.getContent(monitor);
+		return this.unit.getContent(monitor);
 	}
 	
 	public AstInfo getAstInfo(final boolean ensureSync, final IProgressMonitor monitor) {
 		if (ensureSync) {
 			getModelManager().reconcile(this, IModelManager.AST, monitor);
 		}
-		return fAstInfo;
+		return this.astInfo;
 	}
 	
 	public ModelType getModelInfo(final int syncLevel, final IProgressMonitor monitor) {
 		if ((syncLevel & 0xf) >= IModelManager.MODEL_FILE) {
-			final ModelType currentModel = fModelInfo;
+			final ModelType currentModel= this.modelInfo;
 			if (currentModel == null
 					|| currentModel.getStamp() == 0
-					|| currentModel.getStamp() != fSourceUnit.getContentStamp(monitor)) {
+					|| currentModel.getStamp() != this.unit.getContentStamp(monitor)) {
 				getModelManager().reconcile(this, syncLevel, monitor);
 			}
 		}
-		return fModelInfo;
+		return this.modelInfo;
 	}
 	
 	protected abstract IModelManager getModelManager();
 	
 	
 	public void clear() {
-		fAstInfo = null;
-		fModelInfo = null;
+		this.astInfo= null;
+		this.modelInfo= null;
 	}
 	
 	public AstInfo getCurrentAst() {
-		if (fMode == 1) {
-			final ModelType model = getCurrentModel();
+		if (this.mode == MODE_PERSISTENCE) {
+			final ModelType model= getCurrentModel();
 			if (model != null) {
 				return model.getAst();
 			}
 			return null;
 		}
-		return fAstInfo;
+		return this.astInfo;
 	}
 	
 	public AstInfo getCurrentAst(final long stamp) {
-		final AstInfo ast = getCurrentAst();
+		final AstInfo ast= getCurrentAst();
 		if (ast != null && ast.stamp == stamp) {
 			return ast;
 		}
@@ -109,18 +118,18 @@ public abstract class SourceUnitModelContainer<SuType extends ISourceUnit, Model
 	}
 	
 	public void setAst(final AstInfo ast) {
-		if (fMode == 1) {
+		if (this.mode == MODE_PERSISTENCE) {
 			return;
 		}
-		fAstInfo = ast;
+		this.astInfo= ast;
 	}
 	
 	public ModelType getCurrentModel() {
-		return fModelInfo;
+		return this.modelInfo;
 	}
 	
 	public ModelType getCurrentModel(final long stamp) {
-		final ModelType model = getCurrentModel();
+		final ModelType model= getCurrentModel();
 		if (model != null && model.getStamp() == stamp) {
 			return model;
 		}
@@ -129,18 +138,25 @@ public abstract class SourceUnitModelContainer<SuType extends ISourceUnit, Model
 	
 	public void setModel(final ModelType modelInfo) {
 		if (modelInfo != null
-				&& (fAstInfo == null || fAstInfo.stamp == modelInfo.getStamp()) ) {
+				&& (this.astInfo == null || this.astInfo.stamp == modelInfo.getStamp()) ) {
 									// otherwise, the ast is probably newer
 			setAst(modelInfo.getAst());
 		}
-		fModelInfo = modelInfo;
+		this.modelInfo= modelInfo;
 	}
 	
 	
 	public IProblemRequestor createProblemRequestor(final long stamp) {
-		if (fMode == 2) {
+		switch (this.mode) {
+		case MODE_PERSISTENCE:
+			return createPersistenceContextProblemRequestor(stamp);
+		case MODE_EDITOR:
 			return createEditorContextProblemRequestor(stamp);
 		}
+		return null;
+	}
+	
+	protected IProblemRequestor createPersistenceContextProblemRequestor(final long stamp) {
 		return null;
 	}
 	

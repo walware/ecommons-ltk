@@ -37,7 +37,7 @@ public abstract class AbstractFilePersistenceSourceUnitFactory implements ISourc
 		if (file != null) {
 			final IPath path = file.getFullPath();
 			if (path != null) {
-				return IFILE_PREFIX+path.toPortableString(); // eclipse-platform-resource
+				return IFILE_PREFIX + path.toPortableString(); // eclipse-platform-resource
 			}
 		}
 		return null;
