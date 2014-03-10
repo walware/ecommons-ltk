@@ -11,9 +11,11 @@
 
 package de.walware.ecommons.ltk.ui.sourceediting;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.information.IInformationProvider;
 import org.eclipse.jface.text.information.IInformationProviderExtension;
 import org.eclipse.jface.text.information.IInformationProviderExtension2;
@@ -46,7 +48,7 @@ public abstract class QuickInformationProvider implements IInformationProvider,
 	
 	private final ISourceEditor editor;
 	
-	private final String modelType;
+	private final String modelTypeId;
 	
 	private final String commandId;
 	
@@ -60,9 +62,9 @@ public abstract class QuickInformationProvider implements IInformationProvider,
 	
 	public QuickInformationProvider(final ISourceEditor editor, final String modelType,
 			final String commandId) {
-		this.editor = editor;
-		this.modelType = modelType;
-		this.commandId = commandId;
+		this.editor= editor;
+		this.modelTypeId= modelType;
+		this.commandId= commandId;
 	}
 	
 	
@@ -74,10 +76,15 @@ public abstract class QuickInformationProvider implements IInformationProvider,
 		return this.commandId;
 	}
 	
-	public final String getModelType() {
-		return this.modelType;
+	public final String getModelTypeId() {
+		return this.modelTypeId;
 	}
 	
+	
+	@Override
+	public IRegion getSubject(final ITextViewer textViewer, final int offset) {
+		return new Region(offset, 0);
+	}
 	
 	@Override
 	public String getInformation(final ITextViewer textViewer, final IRegion subject) {
@@ -86,11 +93,12 @@ public abstract class QuickInformationProvider implements IInformationProvider,
 	
 	@Override
 	public Object getInformation2(final ITextViewer textViewer, final IRegion subject) {
-		final ISourceUnit su = this.editor.getSourceUnit();
+		final ISourceUnit su= this.editor.getSourceUnit();
 		if (su == null) {
 			return null;
 		}
-		final ISourceUnitModelInfo modelInfo = su.getModelInfo(this.modelType, IModelManager.MODEL_FILE, null);
+		final ISourceUnitModelInfo modelInfo= su.getModelInfo(getModelTypeId(), IModelManager.MODEL_FILE,
+				new NullProgressMonitor() ); // ?
 		if (modelInfo == null) {
 			return null;
 		}
@@ -100,7 +108,7 @@ public abstract class QuickInformationProvider implements IInformationProvider,
 	@Override
 	public IInformationControlCreator getInformationPresenterControlCreator() {
 		if (this.creator == null) {
-			this.creator = createInformationPresenterControlCreator();
+			this.creator= createInformationPresenterControlCreator();
 		}
 		return this.creator;
 	}

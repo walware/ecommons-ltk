@@ -11,8 +11,6 @@
 
 package de.walware.ecommons.ltk.ui.sourceediting;
 
-import java.util.List;
-
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
@@ -20,10 +18,8 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -67,64 +63,31 @@ public abstract class SourceEditor1OutlinePage extends AbstractEditorOutlinePage
 			IPostSelectionProvider, IModelElementInputListener {
 	
 	
-	protected class OutlineContentProvider implements ITreeContentProvider {
+	protected class OutlineContent implements OutlineContentProvider.IOutlineContent {
 		
-		public OutlineContentProvider() {
+		
+		public OutlineContent() {
 		}
 		
-		public long getStamp(final Object inputElement) {
-			final ISourceUnitModelInfo modelInfo = getModelInfo(inputElement);
-			if (modelInfo != null) {
-				return modelInfo.getStamp();
-			}
-			return ISourceUnit.UNKNOWN_MODIFICATION_STAMP;
-		}
 		
 		@Override
-		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
+		public ISourceUnitModelInfo getModelInfo(final Object input) {
+			return SourceEditor1OutlinePage.this.getModelInfo(input);
+		}
+		@Override
+		public Filter getContentFilter() {
+			return SourceEditor1OutlinePage.this.getContentFilter();
 		}
 		
-		@Override
-		public Object[] getElements(final Object inputElement) {
-			final ISourceUnitModelInfo modelInfo = getModelInfo(inputElement);
-			if (modelInfo != null) {
-				fCurrentModelStamp = modelInfo.getStamp();
-				final List<? extends ISourceStructElement> children = modelInfo.getSourceElement().getSourceChildren(getContentFilter());
-				return children.toArray(new ISourceStructElement[children.size()]);
-			}
-			return new ISourceStructElement[0];
-		}
-		
-		@Override
-		public void dispose() {
-		}
-		
-		@Override
-		public Object getParent(final Object element) {
-			final ISourceStructElement o = (ISourceStructElement) element;
-			return o.getSourceParent();
-		}
-		
-		@Override
-		public boolean hasChildren(final Object element) {
-			final ISourceStructElement o = (ISourceStructElement) element;
-			return o.hasSourceChildren(getContentFilter());
-		}
-		
-		@Override
-		public Object[] getChildren(final Object parentElement) {
-			final ISourceStructElement o = (ISourceStructElement) parentElement;
-			final List<? extends ISourceStructElement> children = o.getSourceChildren(getContentFilter());
-			return children.toArray(new ISourceStructElement[children.size()]);
-		}
 	}
 	
 	public class AstContentProvider extends OutlineContentProvider {
 		
 		
 		public AstContentProvider() {
-			super();
+			super(new OutlineContent());
 		}
+		
 		
 		@Override
 		public long getStamp(final Object inputElement) {
@@ -286,7 +249,7 @@ public abstract class SourceEditor1OutlinePage extends AbstractEditorOutlinePage
 	}
 	
 	protected OutlineContentProvider createContentProvider() {
-		return new OutlineContentProvider();
+		return new OutlineContentProvider(new OutlineContent());
 	}
 	
 	@Override
