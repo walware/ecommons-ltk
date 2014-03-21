@@ -26,9 +26,6 @@ public class EditingMessages extends NLS {
 	public static String ContentAssistProcessor_DefaultProposalCategory;
 	public static String ContentAssistProcessor_ContextSelection_label;
 	public static String ContentAssistProcessor_Empty_message;
-	public static String ContentAssistProcessor_ToggleAffordance_message;
-	public static String ContentAssistProcessor_ToggleAffordance_PressGesture_message;
-	public static String ContentAssistProcessor_ToggleAffordance_ClickGesture_message;
 	
 	public static String ContentAssistProcessor_ComputingProposals_task;
 	public static String ContentAssistProcessor_ComputingProposals_Sorting_task;

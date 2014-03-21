@@ -41,6 +41,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
 
 import de.walware.ecommons.FastList;
+import de.walware.ecommons.ui.SharedMessages;
 import de.walware.ecommons.workbench.ui.WorkbenchUIUtil;
 
 import de.walware.ecommons.ltk.internal.ui.EditingMessages;
@@ -555,7 +556,7 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 			return fAvailableCategories;
 		}
 		final int iteration = fRepetition % fCategoryIteration.size();
-		fAssistant.setStatusMessage(createIterationMessage(fRepetition));
+		fAssistant.setStatusMessage(createIterationMessage(iteration));
 		fAssistant.setEmptyMessage(createEmptyMessage());
 		fRepetition++;
 		if (fRepetition >= fCategoryIteration.size()) {
@@ -616,30 +617,36 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 				getCategoryName(fRepetition)});
 	}
 	
-	protected String createIterationMessage(final int repetition) {
-		if (repetition >= 0 && repetition == repetition % fCategoryIteration.size()) {
-			return getCategoryName(repetition);
+	protected String createIterationMessage(final int iterationPosition) {
+//		if (iterationPosition >= 0 && iterationPosition == iterationPosition % fCategoryIteration.size()) {
+//			return getCategoryName(iterationPosition);
+//		}
+		final StringBuilder sb= new StringBuilder(
+				getCategoryName(iterationPosition) );
+		if (this.fCategoryIteration.size() > 0) {
+			sb.append("\u2004\u2004"); //$NON-NLS-1$
+			sb.append(NLS.bind(SharedMessages.DoToShow_message,
+					this.fIterationGesture,
+					getCategoryName(iterationPosition + 1) ));
 		}
-		return NLS.bind(EditingMessages.ContentAssistProcessor_ToggleAffordance_message, new String[] { 
-				getCategoryName(repetition), fIterationGesture, getCategoryName(repetition + 1) });
+		return sb.toString();
 	}
 	
 	protected String getCategoryName(final int repetition) {
 		if (repetition < 0) {
 			return EditingMessages.ContentAssistProcessor_ContextSelection_label;
 		}
-		final int iteration = repetition % fCategoryIteration.size();
-		if (iteration == 0) {
+		final int iterationPosition = repetition % fCategoryIteration.size();
+		if (iterationPosition == 0) {
 			return EditingMessages.ContentAssistProcessor_DefaultProposalCategory;
 		}
-		return fCategoryIteration.get(iteration).get(0).getDisplayName();
+		return fCategoryIteration.get(iterationPosition).get(0).getDisplayName();
 	}
 	
 	private String createIterationGesture(final KeySequence binding) {
 		return (binding != null) ?
-				NLS.bind(EditingMessages.ContentAssistProcessor_ToggleAffordance_PressGesture_message,
-						new String[] { binding.format() }) :
-				EditingMessages.ContentAssistProcessor_ToggleAffordance_ClickGesture_message;
+				NLS.bind(SharedMessages.Affordance_Press_message, binding.format()) :
+				SharedMessages.Affordance_Click_message;
 	}
 	
 }
