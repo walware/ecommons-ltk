@@ -29,15 +29,15 @@ import de.walware.ecommons.ltk.internal.ui.LTKUIPlugin;
 public class InfoHoverDescriptor {
 	
 	
-	private final String fId;
+	private final String id;
 	
-	private final String fName;
+	private final String name;
 	
-	int fStateMask;
+	int stateMask;
 	
-	boolean fIsEnabled;
+	boolean isEnabled;
 	
-	private final IConfigurationElement fConfigurationElement;
+	private final IConfigurationElement configurationElement;
 	
 	
 	/**
@@ -46,19 +46,20 @@ public class InfoHoverDescriptor {
 	 *
 	 * @param element the configuration element
 	 */
-	InfoHoverDescriptor(final String id, final String name, final IConfigurationElement configurationElement) {
-		fId = id;
-		fName = name;
-		fConfigurationElement = configurationElement;
+	InfoHoverDescriptor(final String id, final String name,
+			final IConfigurationElement configurationElement) {
+		this.id= id;
+		this.name= name;
+		this.configurationElement= configurationElement;
 	}
 	
 	
 	public String getId() {
-		return fId;
+		return this.id;
 	}
 	
 	public String getName() {
-		return fName;
+		return this.name;
 	}
 	
 	
@@ -69,12 +70,12 @@ public class InfoHoverDescriptor {
 	 */
 	public IInfoHover createHover() {
 		try {
-			return (IInfoHover) fConfigurationElement.createExecutableExtension(
+			return (IInfoHover) this.configurationElement.createExecutableExtension(
 					AdvancedExtensionsInternal.CONFIG_CLASS_ATTRIBUTE_NAME);
 		}
 		catch (final CoreException e) {
 			StatusManager.getManager().handle(new Status(IStatus.ERROR, LTKUIPlugin.PLUGIN_ID, ICommonStatusConstants.INTERNAL_PLUGGED_IN,
-					"Could not create text hover '"+fName+"'.", e));
+					"Could not create text hover '"+this.name+"'.", e));
 		}
 		return null;
 	}
@@ -85,7 +86,7 @@ public class InfoHoverDescriptor {
 	 * @return the hover modifier stateMask or -1 if no hover is configured
 	 */
 	public int getStateMask() {
-		return fStateMask;
+		return this.stateMask;
 	}
 	
 	/**
@@ -94,19 +95,19 @@ public class InfoHoverDescriptor {
 	 * @return <code>true</code> if enabled
 	 */
 	public boolean isEnabled() {
-		return fIsEnabled;
+		return this.isEnabled;
 	}
 	
 	
 	@Override
 	public int hashCode() {
-		return fId.hashCode();
+		return this.id.hashCode();
 	}
 	
 	@Override
 	public boolean equals(final Object obj) {
 		return (obj != null && getClass().equals(obj.getClass())
-				&& fId.equals(((InfoHoverDescriptor) obj).getId()) );
+				&& this.id.equals(((InfoHoverDescriptor) obj).getId()) );
 	}
 	
 }

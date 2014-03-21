@@ -47,19 +47,19 @@ public class QuickAssistProcessor implements IQuickAssistProcessor {
 	private static class SpellingProposal implements IAssistCompletionProposal {
 		
 		
-		private final ICompletionProposal fProposal;
+		private final ICompletionProposal proposal;
 		
 		
 		public SpellingProposal(final ICompletionProposal proposal) {
-			fProposal = proposal;
+			this.proposal= proposal;
 		}
 		
 		
 		@Override
 		public int getRelevance() {
 			try {
-				final Method method = fProposal.getClass().getMethod("getRelevance");
-				final Object value = method.invoke(fProposal);
+				final Method method= this.proposal.getClass().getMethod("getRelevance"); //$NON-NLS-1$
+				final Object value= method.invoke(this.proposal);
 				if (value instanceof Integer) {
 					return ((Integer) value).intValue();
 				}
@@ -71,76 +71,77 @@ public class QuickAssistProcessor implements IQuickAssistProcessor {
 		
 		@Override
 		public String getSortingString() {
-			return "";
+			return ""; //$NON-NLS-1$
 		}
 		
 		@Override
 		public Image getImage() {
-			return fProposal.getImage();
+			return this.proposal.getImage();
 		}
 		
 		@Override
 		public String getDisplayString() {
-			return fProposal.getDisplayString();
+			return this.proposal.getDisplayString();
 		}
 		
 		@Override
 		public void selected(final ITextViewer viewer, final boolean smartToggle) {
-			if (fProposal instanceof ICompletionProposalExtension2) {
-				((ICompletionProposalExtension2) fProposal).selected(viewer, smartToggle);
+			if (this.proposal instanceof ICompletionProposalExtension2) {
+				((ICompletionProposalExtension2) this.proposal).selected(viewer, smartToggle);
 			}
 		}
 		
 		@Override
 		public void unselected(final ITextViewer viewer) {
-			if (fProposal instanceof ICompletionProposalExtension2) {
-				((ICompletionProposalExtension2) fProposal).unselected(viewer);
+			if (this.proposal instanceof ICompletionProposalExtension2) {
+				((ICompletionProposalExtension2) this.proposal).unselected(viewer);
 			}
 		}
 		
 		@Override
 		public boolean validate(final IDocument document, final int offset, final DocumentEvent event) {
-			if (fProposal instanceof ICompletionProposalExtension2) {
-				return ((ICompletionProposalExtension2) fProposal).validate(document, offset, event);
+			if (this.proposal instanceof ICompletionProposalExtension2) {
+				return ((ICompletionProposalExtension2) this.proposal).validate(document, offset, event);
 			}
 			return false;
 		}
 		
 		@Override
 		public String getAdditionalProposalInfo() {
-			return fProposal.getAdditionalProposalInfo();
+			return this.proposal.getAdditionalProposalInfo();
 		}
 		
 		@Override
 		public void apply(final IDocument document) {
-			fProposal.apply(document);
+			this.proposal.apply(document);
 		}
 		
 		@Override
 		public void apply(final ITextViewer viewer, final char trigger, final int stateMask, final int offset) {
-			if (fProposal instanceof ICompletionProposalExtension2) {
-				((ICompletionProposalExtension2) fProposal).apply(viewer, trigger, stateMask, offset);
+			if (this.proposal instanceof ICompletionProposalExtension2) {
+				((ICompletionProposalExtension2) this.proposal).apply(viewer, trigger, stateMask, offset);
 			}
 			else {
-				fProposal.apply(viewer.getDocument());
+				this.proposal.apply(viewer.getDocument());
 			}
 		}
 		
 		@Override
 		public Point getSelection(final IDocument document) {
-			return fProposal.getSelection(document);
+			return this.proposal.getSelection(document);
 		}
 		
 		@Override
 		public IContextInformation getContextInformation() {
-			return fProposal.getContextInformation();
+			return this.proposal.getContextInformation();
 		}
 		
 	}
 	
 	
-	private final ISourceEditor fEditor;
-	private String fErrorMessage;
+	private final ISourceEditor editor;
+	
+	private String errorMessage;
 	
 	
 	public QuickAssistProcessor() {
@@ -148,7 +149,7 @@ public class QuickAssistProcessor implements IQuickAssistProcessor {
 	}
 	
 	public QuickAssistProcessor(final ISourceEditor editor) {
-		fEditor = editor;
+		this.editor= editor;
 	}
 	
 	
@@ -156,7 +157,7 @@ public class QuickAssistProcessor implements IQuickAssistProcessor {
 	 * @return the editor
 	 */
 	public ISourceEditor getEditor() {
-		return fEditor;
+		return this.editor;
 	}
 	
 	
@@ -170,7 +171,7 @@ public class QuickAssistProcessor implements IQuickAssistProcessor {
 		if (annotation.isMarkedDeleted()) {
 			return false;
 		}
-		final String type = annotation.getType();
+		final String type= annotation.getType();
 		if (type.equals(SpellingAnnotation.TYPE)) {
 			return true;
 		}
@@ -194,21 +195,21 @@ public class QuickAssistProcessor implements IQuickAssistProcessor {
 	
 	@Override
 	public ICompletionProposal[] computeQuickAssistProposals(final IQuickAssistInvocationContext invocationContext) {
-		fErrorMessage = null;
-		final SubMonitor progress = SubMonitor.convert(null);
-		progress.beginTask("", 10);
+		this.errorMessage= null;
+		final SubMonitor progress= SubMonitor.convert(null);
+		progress.beginTask("", 10); //$NON-NLS-1$
 		
-		final AssistInvocationContext context = createContext(invocationContext, progress.newChild(3));
+		final AssistInvocationContext context= createContext(invocationContext, progress.newChild(3));
 		if (context == null) {
 			return null;
 		}
-		final ISourceViewer viewer = context.getSourceViewer();
+		final ISourceViewer viewer= context.getSourceViewer();
 		if (viewer == null) {
 			return null;
 		}
-		final AssistProposalCollector<IAssistCompletionProposal> proposals = new AssistProposalCollector<IAssistCompletionProposal>(IAssistCompletionProposal.class);
+		final AssistProposalCollector<IAssistCompletionProposal> proposals= new AssistProposalCollector<>(IAssistCompletionProposal.class);
 		
-		final IAnnotationModel model = viewer.getAnnotationModel();
+		final IAnnotationModel model= viewer.getAnnotationModel();
 		if (model != null) {
 			addAnnotationProposals(context, proposals, model);
 		}
@@ -234,7 +235,7 @@ public class QuickAssistProcessor implements IQuickAssistProcessor {
 	protected IAssistCompletionProposal[] filterAndSortCompletionProposals(
 			final AssistProposalCollector<IAssistCompletionProposal> proposals,
 			final AssistInvocationContext context, final IProgressMonitor monitor) {
-		final IAssistCompletionProposal[] array = proposals.toArray();
+		final IAssistCompletionProposal[] array= proposals.toArray();
 		if (array.length > 1) {
 			Arrays.sort(array, ContentAssistProcessor.PROPOSAL_COMPARATOR);
 		}
@@ -251,23 +252,23 @@ public class QuickAssistProcessor implements IQuickAssistProcessor {
 	private void addAnnotationProposals(final IQuickAssistInvocationContext invocationContext,
 			final AssistProposalCollector<IAssistCompletionProposal> proposals,
 			final IAnnotationModel model) {
-		final int offset = invocationContext.getOffset();
-		final Iterator<Annotation> iter = model.getAnnotationIterator();
+		final int offset= invocationContext.getOffset();
+		final Iterator<Annotation> iter= model.getAnnotationIterator();
 		while (iter.hasNext()) {
-			final Annotation annotation = iter.next();
+			final Annotation annotation= iter.next();
 			if (annotation.isMarkedDeleted()) {
 				continue;
 			}
-			final String type = annotation.getType();
+			final String type= annotation.getType();
 			if (type.equals(SpellingAnnotation.TYPE)) {
 				if (!isMatchingPosition(model.getPosition(annotation), offset)) {
 					continue;
 				}
 				if (annotation instanceof SpellingAnnotation) {
-					final SpellingProblem problem = ((SpellingAnnotation) annotation).getSpellingProblem();
-					final ICompletionProposal[] annotationProposals = problem.getProposals(invocationContext);
+					final SpellingProblem problem= ((SpellingAnnotation) annotation).getSpellingProblem();
+					final ICompletionProposal[] annotationProposals= problem.getProposals(invocationContext);
 					if (annotationProposals != null && annotationProposals.length > 0) {
-						for (int i = 0; i < annotationProposals.length; i++) {
+						for (int i= 0; i < annotationProposals.length; i++) {
 							proposals.add(new SpellingProposal(annotationProposals[i]));
 						}
 					}
@@ -283,7 +284,7 @@ public class QuickAssistProcessor implements IQuickAssistProcessor {
 	
 	@Override
 	public String getErrorMessage() {
-		return fErrorMessage;
+		return this.errorMessage;
 	}
 	
 }

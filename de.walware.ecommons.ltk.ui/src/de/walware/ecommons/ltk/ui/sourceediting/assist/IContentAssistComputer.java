@@ -26,9 +26,9 @@ import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditor;
 public interface IContentAssistComputer {
 	
 	
-	public static final int COMBINED_MODE = 0x1;
-	public static final int SPECIFIC_MODE = 0x2;
-	public static final int INFORMATION_MODE = 0x4;
+	int COMBINED_MODE=                                      0x1;
+	int SPECIFIC_MODE=                                      0x2;
+	int INFORMATION_MODE=                                   0x4;
 	
 	
 	/**
@@ -41,7 +41,7 @@ public interface IContentAssistComputer {
 	 * @param editor the source editor the session belong to
 	 * @param assist the content assistant of the editor starting the session
 	 */
-	public void sessionStarted(ISourceEditor editor, ContentAssist assist);
+	void sessionStarted(ISourceEditor editor, ContentAssist assist);
 	
 	/**
 	 * Returns a list of completion proposals valid at the given invocation context.
@@ -52,7 +52,7 @@ public interface IContentAssistComputer {
 	 * @param monitor a progress monitor to report progress. The monitor is private to this
 	 *     invocation, i.e. there is no need for the receiver to spawn a sub monitor.
 	 */
-	public IStatus computeCompletionProposals(AssistInvocationContext context, int mode, AssistProposalCollector<IAssistCompletionProposal> proposals, IProgressMonitor monitor);
+	IStatus computeCompletionProposals(AssistInvocationContext context, int mode, AssistProposalCollector<IAssistCompletionProposal> proposals, IProgressMonitor monitor);
 	
 	/**
 	 * Returns context information objects valid at the given invocation context.
@@ -62,7 +62,7 @@ public interface IContentAssistComputer {
 	 * @param monitor a progress monitor to report progress. The monitor is private to this
 	 *     invocation, i.e. there is no need for the receiver to spawn a sub monitor.
 	 */
-	public IStatus computeContextInformation(AssistInvocationContext context, AssistProposalCollector<IAssistInformationProposal> proposals, IProgressMonitor monitor);
+	IStatus computeContextInformation(AssistInvocationContext context, AssistProposalCollector<IAssistInformationProposal> proposals, IProgressMonitor monitor);
 	
 	/**
 	 * Informs the computer that a content assist session has ended. This call will always be after
@@ -71,6 +71,6 @@ public interface IContentAssistComputer {
 	 * and
 	 * {@linkplain #computeContextInformation(ContentAssistInvocationContext, IProgressMonitor) computeContextInformation}.
 	 */
-	public void sessionEnded();
+	void sessionEnded();
 	
 }

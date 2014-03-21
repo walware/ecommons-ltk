@@ -50,18 +50,18 @@ import de.walware.ecommons.ltk.internal.ui.AdvancedExtensionsInternal;
 public class ContentAssistComputerRegistry implements ManageListener, IDisposable {
 	
 	
-	public static String DEFAULT_DISABLED = "assist.default.disabled_categories.ids"; //$NON-NLS-1$
-	public static String CIRCLING_ORDERED = "assist.circling.ordered_categories.ids:enabled"; //$NON-NLS-1$
+	public static String DEFAULT_DISABLED= "assist.default.disabled_categories.ids"; //$NON-NLS-1$
+	public static String CIRCLING_ORDERED= "assist.circling.ordered_categories.ids:enabled"; //$NON-NLS-1$
 	
 	
 	public static final Bundle getBundle(final IConfigurationElement element) {
-		final String namespace = element.getDeclaringExtension().getContributor().getName();
-		final Bundle bundle = Platform.getBundle(namespace);
+		final String namespace= element.getDeclaringExtension().getContributor().getName();
+		final Bundle bundle= Platform.getBundle(namespace);
 		return bundle;
 	}
 	
 	protected static final Map<String, ContentAssistCategory> createCategoryByIdMap(final List<ContentAssistCategory> categories) {
-		final Map<String, ContentAssistCategory> map = new HashMap<String, ContentAssistCategory>();
+		final Map<String, ContentAssistCategory> map= new HashMap<>();
 		for (final ContentAssistCategory category : categories) {
 			map.put(category.getId(), category);
 		}
@@ -76,24 +76,27 @@ public class ContentAssistComputerRegistry implements ManageListener, IDisposabl
 		
 		
 		/** The identifier of the extension. */
-		private final String fId;
-		/** The class name of the provided <code>ICompletionProposalComputer</code>. */
-		private final Set<String> fPartitions;
+		private final String id;
+		
+		private final Set<String> partitions;
+		
 		/** The configuration element of this extension. */
-		private final IConfigurationElement fConfigurationElement;
+		private final IConfigurationElement configurationElement;
+		
 		/** The computer, if instantiated, <code>null</code> otherwise. */
-		private IContentAssistComputer fComputer;
+		private IContentAssistComputer computer;
+		
 		/** Tells whether we tried to load the computer. */
-		boolean fTriedLoadingComputer = false;
+		private boolean triedLoadingComputer= false;
 		
 		
 		/**
 		 * Creates a new descriptor with lazy loaded computer
 		 */
 		ComputerDescriptor(final String id, final Set<String> partitions, final IConfigurationElement configurationElement) {
-			fId = id;
-			fPartitions = partitions;
-			fConfigurationElement = configurationElement;
+			this.id= id;
+			this.partitions= partitions;
+			this.configurationElement= configurationElement;
 		}
 		
 		
@@ -103,7 +106,7 @@ public class ContentAssistComputerRegistry implements ManageListener, IDisposabl
 		 * @return Returns the id
 		 */
 		public String getId() {
-			return fId;
+			return this.id;
 		}
 		
 		/**
@@ -112,24 +115,26 @@ public class ContentAssistComputerRegistry implements ManageListener, IDisposabl
 		 * @return the set of partition types (element type: {@link String})
 		 */
 		public Set<String> getPartitions() {
-			return fPartitions;
+			return this.partitions;
 		}
 		
 		/**
 		 * Returns a cached instance of the computer
 		 */
 		public IContentAssistComputer getComputer() {
-			if (fComputer == null && !fTriedLoadingComputer && fConfigurationElement != null) {
-				fTriedLoadingComputer = true;
+			if (this.computer == null && !this.triedLoadingComputer && this.configurationElement != null) {
+				this.triedLoadingComputer= true;
 				try {
-					fComputer = (IContentAssistComputer) fConfigurationElement.createExecutableExtension(AdvancedExtensionsInternal.CONFIG_CLASS_ATTRIBUTE_NAME);
+					this.computer= (IContentAssistComputer) this.configurationElement.createExecutableExtension(AdvancedExtensionsInternal.CONFIG_CLASS_ATTRIBUTE_NAME);
 				}
 				catch (final CoreException e) {
 					StatusManager.getManager().handle(new Status(IStatus.ERROR, SharedUIResources.PLUGIN_ID, -1,
-							NLS.bind("Loading ICompletionProposalComputer with id ''{0}'' failed (contributed by = '' {1}'').", fId, fConfigurationElement.getDeclaringExtension().getContributor().getName()), e)); 
+							NLS.bind("Loading Content Assist Computer ''{0}'' failed (contributed by= '' {1}'').", //$NON-NLS-1$
+									this.id, this.configurationElement.getDeclaringExtension().getContributor().getName() ),
+							e )); 
 				}
 			}
-			return fComputer;
+			return this.computer;
 		}
 		
 	}
@@ -143,31 +148,31 @@ public class ContentAssistComputerRegistry implements ManageListener, IDisposabl
 		
 		
 		public CategoryPreferences(final List<ContentAssistCategory> categories) {
-			allCategories = categories;
-			defaultEnabledCategories = new ArrayList<ContentAssistCategory>(categories.size());
-			circlingOrderedCategories = new ArrayList<ContentAssistCategory>(categories.size());
-			circlingOrderedEnabledCategories = new ArrayList<ContentAssistCategory>(categories.size());
+			this.allCategories= categories;
+			this.defaultEnabledCategories= new ArrayList<>(categories.size());
+			this.circlingOrderedCategories= new ArrayList<>(categories.size());
+			this.circlingOrderedEnabledCategories= new ArrayList<>(categories.size());
 		}
 		
 	}
 	
 	
-	private final String fContentTypeId;
+	private final String contentTypeId;
 	
-	private final String fSettingsGroupId;
-	private final StringSetPref fPrefDisabledCategoryIds;
-	private final StringArrayPref fPrefOrderedCategoryIds;
+	private final String settingsGroupId;
+	private final StringSetPref prefDisabledCategoryIds;
+	private final StringArrayPref prefOrderedCategoryIds;
 	
-	private List<ContentAssistCategory> fCategories;
-	private String fSpecificModeId;
+	private List<ContentAssistCategory> categories;
+	private String specificModeId;
 	
 	
 	public ContentAssistComputerRegistry(final String contentTypeId, final String prefQualifier, 
 			final String settingsGroupId) {
-		fContentTypeId = contentTypeId;
-		fSettingsGroupId = settingsGroupId;
-		fPrefDisabledCategoryIds = new StringSetPref(prefQualifier, DEFAULT_DISABLED);
-		fPrefOrderedCategoryIds = new StringArrayPref(prefQualifier, CIRCLING_ORDERED);
+		this.contentTypeId= contentTypeId;
+		this.settingsGroupId= settingsGroupId;
+		this.prefDisabledCategoryIds= new StringSetPref(prefQualifier, DEFAULT_DISABLED);
+		this.prefOrderedCategoryIds= new StringArrayPref(prefQualifier, CIRCLING_ORDERED);
 		
 		PreferencesUtil.getSettingsChangeNotifier().addManageListener(this);
 	}
@@ -175,7 +180,7 @@ public class ContentAssistComputerRegistry implements ManageListener, IDisposabl
 	
 	@Override
 	public void dispose() {
-		final SettingsChangeNotifier notifier = PreferencesUtil.getSettingsChangeNotifier();
+		final SettingsChangeNotifier notifier= PreferencesUtil.getSettingsChangeNotifier();
 		if (notifier != null) {
 			notifier.removeManageListener(this);
 		}
@@ -183,24 +188,24 @@ public class ContentAssistComputerRegistry implements ManageListener, IDisposabl
 	
 	
 	String getSettingsGroupId() {
-		return fSettingsGroupId;
+		return this.settingsGroupId;
 	}
 	
 	StringSetPref getPrefDefaultDisabledCategoryIds() {
-		return fPrefDisabledCategoryIds;
+		return this.prefDisabledCategoryIds;
 	}
 	
 	StringArrayPref getPrefCirclingOrderedCategoryIds() {
-		return fPrefOrderedCategoryIds;
+		return this.prefOrderedCategoryIds;
 	}
 	
 	@Override
 	public void beforeSettingsChangeNotification(final Set<String> groupIds) {
-		if (fSettingsGroupId != null && groupIds.contains(fSettingsGroupId)) {
+		if (this.settingsGroupId != null && groupIds.contains(this.settingsGroupId)) {
 			synchronized (this) {
-				if (fCategories != null) {
-					fCategories = Collections.unmodifiableList(applyPreferences(
-							PreferencesUtil.getInstancePrefs(), fCategories));
+				if (this.categories != null) {
+					this.categories= Collections.unmodifiableList(applyPreferences(
+							PreferencesUtil.getInstancePrefs(), this.categories));
 				}
 			}
 		}
@@ -211,12 +216,12 @@ public class ContentAssistComputerRegistry implements ManageListener, IDisposabl
 	}
 	
 	private List<ContentAssistCategory> loadExtensions() {
-		final ArrayList<IConfigurationElement> categoryConfigs = new ArrayList<IConfigurationElement>(); // categories of all content types!
-		final Map<String, List<ComputerDescriptor>> computersByCategoryId = new HashMap<String, List<ComputerDescriptor>>();
+		final ArrayList<IConfigurationElement> categoryConfigs= new ArrayList<>(); // categories of all content types!
+		final Map<String, List<ComputerDescriptor>> computersByCategoryId= new HashMap<>();
 		
-		final IExtensionRegistry extensionRegistry = Platform.getExtensionRegistry();
+		final IExtensionRegistry extensionRegistry= Platform.getExtensionRegistry();
 		
-		final IConfigurationElement[] elements = extensionRegistry.getConfigurationElementsFor(
+		final IConfigurationElement[] elements= extensionRegistry.getConfigurationElementsFor(
 				AdvancedExtensionsInternal.CONTENTASSIST_EXTENSIONPOINT_ID);
 		for (final IConfigurationElement element : elements) {
 			if (element.getName().equals(AdvancedExtensionsInternal.CONFIG_CATEGORY_ELEMENT_NAME)) {
@@ -225,102 +230,106 @@ public class ContentAssistComputerRegistry implements ManageListener, IDisposabl
 			}
 			if (element.getName().equals(AdvancedExtensionsInternal.CONFIG_COMPUTER_ELEMENT_NAME)) {
 				// Create computer descriptor
-				String id = null;
+				String id= null;
 				try {
-					final String contentTypeId = AdvancedExtensionsInternal.getCheckedString(element, AdvancedExtensionsInternal.CONFIG_CONTENT_TYPE_ID_ATTRIBUTE_NAME);
-					if (!fContentTypeId.equals(contentTypeId)) {
+					final String contentTypeId= AdvancedExtensionsInternal.getCheckedString(element, AdvancedExtensionsInternal.CONFIG_CONTENT_TYPE_ID_ATTRIBUTE_NAME);
+					if (!this.contentTypeId.equals(contentTypeId)) {
 						continue;
 					}
-					id = AdvancedExtensionsInternal.getCheckedString(element, AdvancedExtensionsInternal.CONFIG_ID_ATTRIBUTE_NAME).intern();
-					final String categoryId = AdvancedExtensionsInternal.getCheckedString(element, AdvancedExtensionsInternal.CONFIG_CATEGORY_ID_ATTRIBUTE_NAME);
-					final Set<String> partitions = new HashSet<String>();
-					final IConfigurationElement[] partitionConfigs = element.getChildren(AdvancedExtensionsInternal.CONFIG_PARTITION_ELEMENT_NAME);
+					id= AdvancedExtensionsInternal.getCheckedString(element, AdvancedExtensionsInternal.CONFIG_ID_ATTRIBUTE_NAME).intern();
+					final String categoryId= AdvancedExtensionsInternal.getCheckedString(element, AdvancedExtensionsInternal.CONFIG_CATEGORY_ID_ATTRIBUTE_NAME);
+					final Set<String> partitions= new HashSet<>();
+					final IConfigurationElement[] partitionConfigs= element.getChildren(AdvancedExtensionsInternal.CONFIG_PARTITION_ELEMENT_NAME);
 					for (final IConfigurationElement partitionConfig : partitionConfigs) {
 						partitions.add(AdvancedExtensionsInternal.getCheckedString(partitionConfig, AdvancedExtensionsInternal.CONFIG_CONTENTTYPE_ID_ELEMENT_NAME).intern());
 					}
 					checkPartitions(partitions);
 					
-					final ComputerDescriptor comp = new ComputerDescriptor(id, partitions, element);
+					final ComputerDescriptor comp= new ComputerDescriptor(id, partitions, element);
 					
-					List<ComputerDescriptor> list = computersByCategoryId.get(categoryId);
+					List<ComputerDescriptor> list= computersByCategoryId.get(categoryId);
 					if (list == null) {
-						list = new ArrayList<ComputerDescriptor>(4);
+						list= new ArrayList<>(4);
 						computersByCategoryId.put(categoryId, list);
 					}
 					list.add(comp);
 				}
 				catch (final CoreException e) {
 					StatusManager.getManager().handle(new Status(IStatus.ERROR, SharedUIResources.PLUGIN_ID, ICommonStatusConstants.INTERNAL_PLUGGED_IN,
-							NLS.bind("Loading Completion Proposal Computer failed (id = ''{0}'', contributed by = ''{1}'')", (id != null) ? id : "", element.getDeclaringExtension().getContributor().getName()), e));
+							NLS.bind("Loading Completion Proposal Computer ''{0}'' failed (contributed by= ''{1}'')", //$NON-NLS-1$
+									(id != null) ? id : "", element.getDeclaringExtension().getContributor().getName() ), //$NON-NLS-1$
+							e ));
 				}
 			}
 		}
 		
-		final ArrayList<ContentAssistCategory> categories = new ArrayList<ContentAssistCategory>(8);
+		final ArrayList<ContentAssistCategory> categories= new ArrayList<>(8);
 		for (final IConfigurationElement catConfig : categoryConfigs) {
 			// Create category descriptor
-			String id = null;
+			String id= null;
 			try {
-				id = AdvancedExtensionsInternal.getCheckedString(catConfig, AdvancedExtensionsInternal.CONFIG_ID_ATTRIBUTE_NAME);
-				final List<ComputerDescriptor> descriptors = computersByCategoryId.get(id);
+				id= AdvancedExtensionsInternal.getCheckedString(catConfig, AdvancedExtensionsInternal.CONFIG_ID_ATTRIBUTE_NAME);
+				final List<ComputerDescriptor> descriptors= computersByCategoryId.get(id);
 				if (descriptors != null) {
-					final ImageDescriptor icon = AdvancedExtensionsInternal.getImageDescriptor(catConfig, AdvancedExtensionsInternal.CONFIG_ICON_ATTRIBUTE_NAME);
-					final String name = AdvancedExtensionsInternal.getCheckedString(catConfig, AdvancedExtensionsInternal.CONFIG_NAME_ATTRIBUTE_NAME);
-					final ContentAssistCategory cat = new ContentAssistCategory(id, name, icon, descriptors);
+					final ImageDescriptor icon= AdvancedExtensionsInternal.getImageDescriptor(catConfig, AdvancedExtensionsInternal.CONFIG_ICON_ATTRIBUTE_NAME);
+					final String name= AdvancedExtensionsInternal.getCheckedString(catConfig, AdvancedExtensionsInternal.CONFIG_NAME_ATTRIBUTE_NAME);
+					final ContentAssistCategory cat= new ContentAssistCategory(id, name, icon, descriptors);
 					categories.add(cat);
 				}
 			}
 			catch (final CoreException e) {
 				StatusManager.getManager().handle(new Status(IStatus.ERROR, SharedUIResources.PLUGIN_ID, ICommonStatusConstants.INTERNAL_PLUGGED_IN,
-						NLS.bind("Loading Completion Proposal Category failed (id = ''{0}'', contributed by = ''{1}'')", (id != null) ? id : "", catConfig.getDeclaringExtension().getContributor().getName()), e));
+						NLS.bind("Loading Completion Proposal Category ''{0}'' failed (contributed by= ''{1}'')", //$NON-NLS-1$
+								(id != null) ? id : "", catConfig.getDeclaringExtension().getContributor().getName() ), //$NON-NLS-1$
+						e ));
 			}
 		}
-		return (fCategories = Collections.unmodifiableList(applyPreferences(
+		return (this.categories= Collections.unmodifiableList(applyPreferences(
 				PreferencesUtil.getInstancePrefs(), categories)));
 	}
 	
 	List<ContentAssistCategory> applyPreferences(final IPreferenceAccess prefAccess, final List<ContentAssistCategory> categories) {
-		final Set<String> disabledIds = prefAccess.getPreferenceValue(getPrefDefaultDisabledCategoryIds());
+		final Set<String> disabledIds= prefAccess.getPreferenceValue(getPrefDefaultDisabledCategoryIds());
 		for (final ContentAssistCategory category : categories) {
-			final boolean enabled = disabledIds == null || !disabledIds.contains(category.getId());
-			category.fIsIncludedInDefault = enabled;
+			final boolean enabled= disabledIds == null || !disabledIds.contains(category.getId());
+			category.isIncludedInDefault= enabled;
 		}
 		
-		final Map<String, ContentAssistCategory> map = createCategoryByIdMap(categories);
-		final String[] orderPref = prefAccess.getPreferenceValue(getPrefCirclingOrderedCategoryIds());
-		final List<ContentAssistCategory> ordered = new ArrayList<ContentAssistCategory>(categories.size());
+		final Map<String, ContentAssistCategory> map= createCategoryByIdMap(categories);
+		final String[] orderPref= prefAccess.getPreferenceValue(getPrefCirclingOrderedCategoryIds());
+		final List<ContentAssistCategory> ordered= new ArrayList<>(categories.size());
 		for (final String value : orderPref) {
 			final String id;
 			final boolean enabled;
-			final int idx = value.lastIndexOf(':');
+			final int idx= value.lastIndexOf(':');
 			if (idx > 0) {
-				id = value.substring(0, idx);
-				enabled = Boolean.parseBoolean(value.substring(idx+1));
+				id= value.substring(0, idx);
+				enabled= Boolean.parseBoolean(value.substring(idx+1));
 			}
 			else { // fallback
-				id = value;
-				enabled = false;
+				id= value;
+				enabled= false;
 			}
-			final ContentAssistCategory category = map.remove(id);
+			final ContentAssistCategory category= map.remove(id);
 			if (category != null) {
 				ordered.add(category);
-				category.fIsEnabledAsSeparate = enabled;
+				category.isEnabledAsSeparate= enabled;
 			}
 		}
 		for (final ContentAssistCategory category : map.values()) {
 			ordered.add(category);
-			category.fIsEnabledAsSeparate = false;
+			category.isEnabledAsSeparate= false;
 		}
 		
 		return ordered;
 	}
 	
 	public synchronized List<ContentAssistCategory> getCopyOfCategories() {
-		List<ContentAssistCategory> categories = fCategories;
+		List<ContentAssistCategory> categories= this.categories;
 		if (categories == null) {
-			categories = loadExtensions();
+			categories= loadExtensions();
 		}
-		final List<ContentAssistCategory> copies = new ArrayList<ContentAssistCategory>(categories.size());
+		final List<ContentAssistCategory> copies= new ArrayList<>(categories.size());
 		for (final ContentAssistCategory category : categories) {
 			copies.add(new ContentAssistCategory(category));
 		}
@@ -328,19 +337,19 @@ public class ContentAssistComputerRegistry implements ManageListener, IDisposabl
 	}
 	
 	Map<Preference<?>, Object> createPreferences(final List<ContentAssistCategory> orderedCategories) {
-		final Set<String> disabledIds = new HashSet<String>();
-		final String[] orderedPref = new String[orderedCategories.size()];
+		final Set<String> disabledIds= new HashSet<>();
+		final String[] orderedPref= new String[orderedCategories.size()];
 		
-		for (int i = 0; i < orderedCategories.size(); i++) {
-			final ContentAssistCategory category = orderedCategories.get(i);
-			if (!category.fIsIncludedInDefault) {
+		for (int i= 0; i < orderedCategories.size(); i++) {
+			final ContentAssistCategory category= orderedCategories.get(i);
+			if (!category.isIncludedInDefault) {
 				disabledIds.add(category.getId());
 			}
-			orderedPref[i] = category.getId() +
-					(category.fIsEnabledAsSeparate ? ":true" : ":false");
+			orderedPref[i]= category.getId() +
+					(category.isEnabledAsSeparate ? ":true" : ":false"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		
-		final Map<Preference<?>, Object> prefMap = new HashMap<Preference<?>, Object>();
+		final Map<Preference<?>, Object> prefMap= new HashMap<>();
 		prefMap.put(getPrefDefaultDisabledCategoryIds(), disabledIds);
 		prefMap.put(getPrefCirclingOrderedCategoryIds(), orderedPref);
 		return prefMap;
@@ -352,15 +361,15 @@ public class ContentAssistComputerRegistry implements ManageListener, IDisposabl
 	
 	
 	public synchronized List<ContentAssistCategory> getCategories() {
-		List<ContentAssistCategory> categories = fCategories;
+		List<ContentAssistCategory> categories= this.categories;
 		if (categories == null) {
-			categories = loadExtensions();
+			categories= loadExtensions();
 		}
-		if (fSpecificModeId != null) {
+		if (this.specificModeId != null) {
 			for (final ContentAssistCategory category : categories) {
-				if (category.getId().equals(fSpecificModeId)) {
-					final ContentAssistCategory copy = new ContentAssistCategory(category);
-					copy.fIsIncludedInDefault = true;
+				if (category.getId().equals(this.specificModeId)) {
+					final ContentAssistCategory copy= new ContentAssistCategory(category);
+					copy.isIncludedInDefault= true;
 					return Collections.singletonList(copy);
 				}
 			}
@@ -370,15 +379,15 @@ public class ContentAssistComputerRegistry implements ManageListener, IDisposabl
 	}
 	
 	public synchronized void startSpecificMode(final String categoryId) {
-		fSpecificModeId = categoryId;
+		this.specificModeId= categoryId;
 	}
 	
 	public synchronized void stopSpecificMode() {
-		fSpecificModeId = null;
+		this.specificModeId= null;
 	}
 	
 	public synchronized boolean isInSpecificMode() {
-		return (fSpecificModeId != null);
+		return (this.specificModeId != null);
 	}
 	
 }

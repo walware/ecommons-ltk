@@ -27,10 +27,10 @@ import de.walware.ecommons.ui.util.InformationDispatchHandler;
 public interface IInfoHover {
 	
 	
-	int MODE_TOOLTIP = InformationDispatchHandler.MODE_TOOLTIP;
-	int MODE_PROPOSAL_INFO = InformationDispatchHandler.MODE_PROPOSAL_INFO;
+	int MODE_TOOLTIP= InformationDispatchHandler.MODE_TOOLTIP;
+	int MODE_PROPOSAL_INFO= InformationDispatchHandler.MODE_PROPOSAL_INFO;
 	
-	int MODE_FOCUS = InformationDispatchHandler.MODE_FOCUS;
+	int MODE_FOCUS= InformationDispatchHandler.MODE_FOCUS;
 	
 	
 	/**

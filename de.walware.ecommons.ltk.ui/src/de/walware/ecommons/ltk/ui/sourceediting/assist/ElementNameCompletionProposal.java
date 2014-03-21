@@ -31,36 +31,41 @@ import de.walware.ecommons.ltk.ui.IElementLabelProvider;
 /**
  * Proposal completing a given {@link IElementName} of a element.
  */
-public abstract class ElementNameCompletionProposal extends CompletionProposalWithOverwrite
+public abstract class ElementNameCompletionProposal<E extends IModelElement>
+		extends CompletionProposalWithOverwrite
 		implements ICompletionProposalExtension3, ICompletionProposalExtension6 {
 	
 	
-	protected final IElementName fReplacementName;
+	private final IElementName replacementName;
 	
-	protected final IModelElement fElement;
+	private final E element;
 	
-	private final int fRelevance;
+	private final int relevance;
 	
-	private final IElementLabelProvider fLabelProvider;
+	private final IElementLabelProvider labelProvider;
 	
 	/** The cursor position after this proposal has been applied. */
-	private int fCursorPosition = -1;
+	private int cursorPosition= -1;
 	
 	
 	public ElementNameCompletionProposal(final AssistInvocationContext context, 
 			final IElementName replacementName, final int replacementOffset,
-			final IModelElement element, final int relevance, 
+			final E element, final int relevance, 
 			final IElementLabelProvider labelProvider) {
 		super(context, replacementOffset);
-		fReplacementName = replacementName;
-		fElement = element;
-		fLabelProvider = labelProvider;
-		fRelevance = relevance;
+		this.replacementName= replacementName;
+		this.element= element;
+		this.labelProvider= labelProvider;
+		this.relevance= relevance;
 	}
 	
 	
+	public final E getElement() {
+		return this.element;
+	}
+	
 	protected IElementLabelProvider getLabelProvider() {
-		return fLabelProvider;
+		return this.labelProvider;
 	}
 	
 	/**
@@ -68,7 +73,7 @@ public abstract class ElementNameCompletionProposal extends CompletionProposalWi
 	 */
 	@Override
 	public Image getImage() {
-		return fLabelProvider.getImage(fElement);
+		return this.labelProvider.getImage(getElement());
 	}
 	
 	/**
@@ -76,7 +81,7 @@ public abstract class ElementNameCompletionProposal extends CompletionProposalWi
 	 */
 	@Override
 	public String getDisplayString() {
-		return fLabelProvider.getText(fElement);
+		return this.labelProvider.getText(getElement());
 	}
 	
 	/**
@@ -84,7 +89,7 @@ public abstract class ElementNameCompletionProposal extends CompletionProposalWi
 	 */
 	@Override
 	public StyledString getStyledDisplayString() {
-		return fLabelProvider.getStyledText(fElement);
+		return this.labelProvider.getStyledText(getElement());
 	}
 	
 	/**
@@ -100,12 +105,17 @@ public abstract class ElementNameCompletionProposal extends CompletionProposalWi
 	 */
 	@Override
 	public int getRelevance() {
-		return fRelevance;
+		return this.relevance;
+	}
+	
+	
+	public IElementName getReplacementName() {
+		return this.replacementName;
 	}
 	
 	@Override
 	public String getSortingString() {
-		return fReplacementName.getSegmentName();
+		return getReplacementName().getSegmentName();
 	}
 	
 	/**
@@ -114,8 +124,8 @@ public abstract class ElementNameCompletionProposal extends CompletionProposalWi
 	@Override
 	public boolean validate(final IDocument document, final int offset, final DocumentEvent event) {
 		try {
-			final String content = document.get(getReplacementOffset(), offset - getReplacementOffset());
-			if (fReplacementName.getSegmentName().regionMatches(true, 0, content, 0, content.length())) {
+			final String content= document.get(getReplacementOffset(), offset - getReplacementOffset());
+			if (this.getReplacementName().getSegmentName().regionMatches(true, 0, content, 0, content.length())) {
 				return true;
 			}
 		}
@@ -134,17 +144,20 @@ public abstract class ElementNameCompletionProposal extends CompletionProposalWi
 	}
 	
 	@Override
-	protected void doApply(final char trigger, final int stateMask, final int caretOffset, final int replacementOffset, final int replacementLength) throws BadLocationException {
-		final SourceViewer viewer = fContext.getSourceViewer();
-		final IDocument document = viewer.getDocument();
-		final StringBuilder replacement = new StringBuilder(fReplacementName.getDisplayName());
+	protected void doApply(final char trigger, final int stateMask, final int caretOffset,
+			final int replacementOffset, final int replacementLength) throws BadLocationException {
+		final AssistInvocationContext context= getInvocationContext();
+		final SourceViewer viewer= context.getSourceViewer();
+		final IDocument document= viewer.getDocument();
+		
+		final StringBuilder replacement= new StringBuilder(this.getReplacementName().getDisplayName());
 		document.replace(replacementOffset, replacementLength, replacement.toString());
 		setCursorPosition(replacementOffset + replacement.length());
 	}
 	
 	
 	protected void setCursorPosition(final int offset) {
-		fCursorPosition = offset;
+		this.cursorPosition= offset;
 	}
 	
 	/**
@@ -162,8 +175,8 @@ public abstract class ElementNameCompletionProposal extends CompletionProposalWi
 	 */
 	@Override
 	public Point getSelection(final IDocument document) {
-		if (fCursorPosition >= 0) {
-			return new Point(fCursorPosition, 0);
+		if (this.cursorPosition >= 0) {
+			return new Point(this.cursorPosition, 0);
 		}
 		return null;
 	}
@@ -187,7 +200,7 @@ public abstract class ElementNameCompletionProposal extends CompletionProposalWi
 	
 	@Override
 	public int hashCode() {
-		return getClass().hashCode() * ((fReplacementName != null) ? fReplacementName.hashCode() : 564);
+		return getClass().hashCode() * ((this.getReplacementName() != null) ? this.getReplacementName().hashCode() : 564);
 	}
 	
 	@Override
@@ -198,9 +211,9 @@ public abstract class ElementNameCompletionProposal extends CompletionProposalWi
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		final ElementNameCompletionProposal other = (ElementNameCompletionProposal) obj;
-		return (   ((fReplacementName != null) ? fReplacementName.equals(other.fReplacementName) : null == other.fReplacementName)
-				&& ((fElement != null) ? fElement.equals(other.fElement) : null == other.fElement) );
+		final ElementNameCompletionProposal<?> other= (ElementNameCompletionProposal<?>) obj;
+		return (   ((this.getReplacementName() != null) ? this.getReplacementName().equals(other.getReplacementName()) : null == other.getReplacementName())
+				&& ((this.element != null) ? this.element.equals(other.element) : null == other.element) );
 	}
 	
 }

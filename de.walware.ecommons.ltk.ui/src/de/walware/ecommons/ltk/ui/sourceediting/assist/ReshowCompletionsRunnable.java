@@ -46,15 +46,15 @@ public class ReshowCompletionsRunnable implements Runnable, Listener, ICompletio
 	
 	
 	public ReshowCompletionsRunnable(final ISourceEditor editor, final ContentAssist assist) {
-		this.editor = editor;
-		this.viewer = editor.getViewer();
-		this.su = editor.getSourceUnit();
-		this.document = (AbstractDocument) this.viewer.getDocument();
-		this.documentStamp = this.document.getModificationStamp();
-		this.selection = this.viewer.getSelectedRange();
+		this.editor= editor;
+		this.viewer= editor.getViewer();
+		this.su= editor.getSourceUnit();
+		this.document= (AbstractDocument) this.viewer.getDocument();
+		this.documentStamp= this.document.getModificationStamp();
+		this.selection= this.viewer.getSelectedRange();
 		
-		this.assist = assist;
-		this.display = this.viewer.getTextWidget().getDisplay();
+		this.assist= assist;
+		this.display= this.viewer.getTextWidget().getDisplay();
 		
 		this.display.addFilter(SWT.Verify, this);
 		this.display.addFilter(SWT.FocusOut, this);
@@ -122,7 +122,7 @@ public class ReshowCompletionsRunnable implements Runnable, Listener, ICompletio
 	@Override
 	public void selectionChanged(final ICompletionProposal proposal, final boolean smartToggle) {
 		if (!this.assistSelection) {
-			this.assistSelection = true;
+			this.assistSelection= true;
 			return;
 		}
 		cancel();

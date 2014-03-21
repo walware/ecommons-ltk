@@ -59,116 +59,116 @@ public class AdvancedInfoHoverConfigurationBlock extends ManagedConfigurationBlo
 		
 		@Override
 		public boolean isChecked(final Object element) {
-			final InfoHoverDescriptor descriptor = (InfoHoverDescriptor) element;
-			return descriptor.fIsEnabled;
+			final InfoHoverDescriptor descriptor= (InfoHoverDescriptor) element;
+			return descriptor.isEnabled;
 		}
 		
 		@Override
 		public void checkStateChanged(final CheckStateChangedEvent event) {
-			final InfoHoverDescriptor descriptor = (InfoHoverDescriptor) event.getElement();
-			descriptor.fIsEnabled = event.getChecked();
+			final InfoHoverDescriptor descriptor= (InfoHoverDescriptor) event.getElement();
+			descriptor.isEnabled= event.getChecked();
 			handleHoverListSelection();
 		}
 		
 	}
 	
 	
-	private final InfoHoverRegistry fRegistry;
+	private final InfoHoverRegistry registry;
 	
-	private List<InfoHoverDescriptor> fDescriptors;
+	private List<InfoHoverDescriptor> descriptors;
 	
-	private CheckboxTableViewer fHoverTableViewer;
+	private CheckboxTableViewer hoverTableViewer;
 	
-	private Text fModifierEditor;
+	private Text modifierEditor;
 	
 	
 	public AdvancedInfoHoverConfigurationBlock(final InfoHoverRegistry registry,
 			final IStatusChangeListener statusListener) {
 		super(null, statusListener);
-		fRegistry = registry;
+		this.registry= registry;
 	}
 	
 	
 	@Override
 	protected void createBlockArea(final Composite pageComposite) {
-		final Map<Preference<?>, String> prefs = new HashMap<Preference<?>, String>();
+		final Map<Preference<?>, String> prefs= new HashMap<>();
 		
-		prefs.put(fRegistry.getPrefSeparateSettings(), fRegistry.getSettingsGroupId());
+		prefs.put(this.registry.getPrefSeparateSettings(), this.registry.getSettingsGroupId());
 		
 		setupPreferenceManager(prefs);
 		
-		final Composite composite = new Composite(pageComposite, SWT.NONE);
+		final Composite composite= new Composite(pageComposite, SWT.NONE);
 		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		composite.setLayout(LayoutUtil.createCompositeGrid(2));
 		
-		final CheckboxTableComposite tableComposite = new CheckboxTableComposite(composite,
+		final CheckboxTableComposite tableComposite= new CheckboxTableComposite(composite,
 				SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION);
 		tableComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
-		fHoverTableViewer = tableComposite.viewer;
+		this.hoverTableViewer= tableComposite.viewer;
 		tableComposite.table.setHeaderVisible(true);
 		tableComposite.table.setLinesVisible(true);
 		
-		{	final TableViewerColumn column = tableComposite.addColumn("Hover Type",
+		{	final TableViewerColumn column= tableComposite.addColumn("Hover Type",
 					SWT.LEFT, new ColumnWeightData(1) );
 			column.setLabelProvider(new CellLabelProvider() {
 				@Override
 				public void update(final ViewerCell cell) {
-					final InfoHoverDescriptor descriptor = (InfoHoverDescriptor) cell.getElement();
+					final InfoHoverDescriptor descriptor= (InfoHoverDescriptor) cell.getElement();
 					cell.setText(descriptor.getName());
 				}
 			});
 		}
-		{	final TableViewerColumn column = tableComposite.addColumn("Modifier Keys",
+		{	final TableViewerColumn column= tableComposite.addColumn("Modifier Keys",
 					SWT.LEFT, new ColumnWeightData(1) );
 			column.setLabelProvider(new CellLabelProvider() {
 				@Override
 				public void update(final ViewerCell cell) {
-					final InfoHoverDescriptor descriptor = (InfoHoverDescriptor) cell.getElement();
+					final InfoHoverDescriptor descriptor= (InfoHoverDescriptor) cell.getElement();
 					cell.setText(MessageUtil.getModifierString(descriptor.getStateMask()));
 				}
 			});
 		}
 		
-		fHoverTableViewer.setUseHashlookup(true);
-		fHoverTableViewer.setContentProvider(new ArrayContentProvider());
-		fHoverTableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+		this.hoverTableViewer.setUseHashlookup(true);
+		this.hoverTableViewer.setContentProvider(new ArrayContentProvider());
+		this.hoverTableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				handleHoverListSelection();
 			}
 		});
-		final CheckProvider checkProvider = new CheckProvider();
-		fHoverTableViewer.setCheckStateProvider(checkProvider);
-		fHoverTableViewer.addCheckStateListener(checkProvider);
+		final CheckProvider checkProvider= new CheckProvider();
+		this.hoverTableViewer.setCheckStateProvider(checkProvider);
+		this.hoverTableViewer.addCheckStateListener(checkProvider);
 		
 		// Text field for modifier string
-		{	final Label label = new Label(composite, SWT.LEFT);
+		{	final Label label= new Label(composite, SWT.LEFT);
 			label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 			label.setText("&Modifier keys:");
 			
-			fModifierEditor = new Text(composite, SWT.BORDER);
-			fModifierEditor.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+			this.modifierEditor= new Text(composite, SWT.BORDER);
+			this.modifierEditor.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		}
-		fModifierEditor.addKeyListener(new KeyListener() {
+		this.modifierEditor.addKeyListener(new KeyListener() {
 			
 			@Override
 			public void keyPressed(final KeyEvent e) {
-				e.doit = false;
-				final InfoHoverDescriptor descriptor = getSelecteddescriptor();
+				e.doit= false;
+				final InfoHoverDescriptor descriptor= getSelecteddescriptor();
 				if (descriptor == null) {
 					return;
 				}
 				if (e.keyCode > 0 && e.character == 0) {
-					descriptor.fStateMask = ((e.stateMask | e.keyCode) & (SWT.CTRL | SWT.ALT | SWT.SHIFT | SWT.COMMAND));
+					descriptor.stateMask= ((e.stateMask | e.keyCode) & (SWT.CTRL | SWT.ALT | SWT.SHIFT | SWT.COMMAND));
 				}
 				else if (e.keyCode == SWT.DEL | e.keyCode == SWT.BS) {
-					descriptor.fStateMask = 0;
+					descriptor.stateMask= 0;
 				}
 				else {
 					return;
 				}
-				fModifierEditor.setText(MessageUtil.getModifierString(descriptor.getStateMask()));
-				fHoverTableViewer.refresh(descriptor);
+				AdvancedInfoHoverConfigurationBlock.this.modifierEditor.setText(MessageUtil.getModifierString(descriptor.getStateMask()));
+				AdvancedInfoHoverConfigurationBlock.this.hoverTableViewer.refresh(descriptor);
 			}
 			
 			@Override
@@ -179,26 +179,26 @@ public class AdvancedInfoHoverConfigurationBlock extends ManagedConfigurationBlo
 		
 		LayoutUtil.addSmallFiller(composite, true);
 		
-		fDescriptors = fRegistry.loadCurrent();
-		fHoverTableViewer.setInput(fDescriptors);
-		fHoverTableViewer.getTable().setSelection(0);
+		this.descriptors= this.registry.loadCurrent();
+		this.hoverTableViewer.setInput(this.descriptors);
+		this.hoverTableViewer.getTable().setSelection(0);
 		handleHoverListSelection();
 	}
 	
 	
 	private InfoHoverDescriptor getSelecteddescriptor() {
-		return (InfoHoverDescriptor) ((IStructuredSelection) fHoverTableViewer.getSelection()).getFirstElement();
+		return (InfoHoverDescriptor) ((IStructuredSelection) this.hoverTableViewer.getSelection()).getFirstElement();
 	}
 	
 	private void handleHoverListSelection() {
-		final InfoHoverDescriptor descriptor = getSelecteddescriptor();
+		final InfoHoverDescriptor descriptor= getSelecteddescriptor();
 		if (descriptor == null) {
-			fModifierEditor.setText(""); //$NON-NLS-1$
-			fModifierEditor.setEditable(false);
+			this.modifierEditor.setText(""); //$NON-NLS-1$
+			this.modifierEditor.setEditable(false);
 		}
 		else {
-			fModifierEditor.setText(MessageUtil.getModifierString(descriptor.fStateMask));
-			fModifierEditor.setEnabled(descriptor.fIsEnabled);
+			this.modifierEditor.setText(MessageUtil.getModifierString(descriptor.stateMask));
+			this.modifierEditor.setEnabled(descriptor.isEnabled);
 		}
 	}
 	
@@ -206,15 +206,15 @@ public class AdvancedInfoHoverConfigurationBlock extends ManagedConfigurationBlo
 	@Override
 	protected void updateControls() {
 		super.updateControls();
-		final List<InfoHoverDescriptor> updated = fRegistry.applyPreferences(this, fDescriptors);
-		fDescriptors.clear();
-		fDescriptors.addAll(updated);
-		fHoverTableViewer.refresh();
+		final List<InfoHoverDescriptor> updated= this.registry.applyPreferences(this, this.descriptors);
+		this.descriptors.clear();
+		this.descriptors.addAll(updated);
+		this.hoverTableViewer.refresh();
 	}
 	
 	@Override
 	protected void updatePreferences() {
-		setPrefValues(fRegistry.toPreferencesMap(fDescriptors));
+		setPrefValues(this.registry.toPreferencesMap(this.descriptors));
 		super.updatePreferences();
 	}
 	

@@ -59,17 +59,17 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 	
 	protected class ResourceProposal extends CompletionProposalWithOverwrite implements ICompletionProposalExtension3 {
 		
-		private final IFileStore fFileStore;
-		private final boolean fIsDirectory;
+		private final IFileStore fileStore;
+		private final boolean isDirectory;
 		/** The parent in the workspace, if in workspace */
-		private final IContainer fWorkspaceRef;
+		private final IContainer workspaceRef;
 		
-		private final String fName;
+		private final String name;
 		
 		/** Final completion string */
-		private String fCompletion;
+		private String completion;
 		
-		private IRegion fSelectionToSet;
+		private IRegion selectionToSet;
 		
 		
 		/**
@@ -84,17 +84,17 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 		public ResourceProposal(final AssistInvocationContext context, 
 				final int offset, final IFileStore fileStore, final String explicitName, final String prefix, final IContainer workspaceRef) {
 			super(context, offset);
-			fFileStore = fileStore;
-			fIsDirectory = fFileStore.fetchInfo().isDirectory();
-			fWorkspaceRef = workspaceRef;
-			final StringBuilder name = new StringBuilder((explicitName != null) ? explicitName : fFileStore.getName());
+			this.fileStore= fileStore;
+			this.isDirectory= this.fileStore.fetchInfo().isDirectory();
+			this.workspaceRef= workspaceRef;
+			final StringBuilder name= new StringBuilder((explicitName != null) ? explicitName : this.fileStore.getName());
 			if (prefix != null) {
 				name.insert(0, prefix);
 			}
-			if (fIsDirectory) {
-				name.append(fPathSeparator);
+			if (this.isDirectory) {
+				name.append(PathCompletionComputor.this.pathSeparator);
 			}
-			fName = name.toString();
+			this.name= name.toString();
 		}
 		
 		
@@ -110,7 +110,7 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 		
 		@Override
 		public String getSortingString() {
-			return fName;
+			return this.name;
 		}
 		
 		@Override
@@ -119,9 +119,9 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 		}
 		
 		private void createCompletion(final IDocument document) {
-			if (fCompletion == null) {
+			if (this.completion == null) {
 				try {
-					fCompletion = checkPathCompletion(document, getReplacementOffset(), fName);
+					this.completion= checkPathCompletion(document, getReplacementOffset(), this.name);
 				}
 				catch (final BadLocationException e) {
 					StatusManager.getManager().handle(new Status(IStatus.ERROR, SharedUIResources.PLUGIN_ID, -1,
@@ -132,12 +132,12 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 		
 		@Override
 		protected int computeReplacementLength(final int replacementOffset, final Point selection, final int caretOffset, final boolean overwrite) throws BadLocationException {
-			int end = Math.max(caretOffset, selection.x + selection.y);
+			int end= Math.max(caretOffset, selection.x + selection.y);
 			if (overwrite) {
-				final IDocument document = fContext.getSourceViewer().getDocument();
-				final int length = document.getLength();
+				final IDocument document= getInvocationContext().getSourceViewer().getDocument();
+				final int length= document.getLength();
 				while (end < length) {
-					final char c = document.getChar(end);
+					final char c= document.getChar(end);
 					if (Character.isLetterOrDigit(c) || c == '_' || c == '.') {
 						end++;
 					}
@@ -146,7 +146,7 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 					}
 				}
 				if (end >= length) {
-					end = length;
+					end= length;
 				}
 			}
 			return (end - replacementOffset);
@@ -157,16 +157,16 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 		 */
 		@Override
 		public Image getImage() {
-			Image image = null;
-			if (fWorkspaceRef != null) {
-				final IResource member = fWorkspaceRef.findMember(fFileStore.getName(), true);
+			Image image= null;
+			if (this.workspaceRef != null) {
+				final IResource member= this.workspaceRef.findMember(this.fileStore.getName(), true);
 				if (member != null) {
-					image = LTKUIPlugin.getDefault().getWorkbenchLabelProvider().getImage(member);
+					image= LTKUIPlugin.getDefault().getWorkbenchLabelProvider().getImage(member);
 				}
 			}
 			if (image == null) {
-				image = PlatformUI.getWorkbench().getSharedImages().getImage(
-					fIsDirectory ? ISharedImages.IMG_OBJ_FOLDER : ISharedImages.IMG_OBJ_FILE);
+				image= PlatformUI.getWorkbench().getSharedImages().getImage(
+					this.isDirectory ? ISharedImages.IMG_OBJ_FOLDER : ISharedImages.IMG_OBJ_FILE);
 			}
 			return image;
 		}
@@ -176,7 +176,7 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 		 */
 		@Override
 		public String getDisplayString() {
-			return fName;
+			return this.name;
 		}
 		
 		/**
@@ -208,13 +208,13 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 		 */
 		@Override
 		public boolean validate(final IDocument document, final int offset, final DocumentEvent event) {
-			final int replacementOffset = getReplacementOffset();
+			final int replacementOffset= getReplacementOffset();
 			if (offset < replacementOffset) {
 				return false;
 			}
 			try {
-				final String startsWith = document.get(replacementOffset, offset-replacementOffset);
-				return fName.regionMatches(true, 0, startsWith, 0, startsWith.length());
+				final String startsWith= document.get(replacementOffset, offset-replacementOffset);
+				return this.name.regionMatches(true, 0, startsWith, 0, startsWith.length());
 			}
 			catch (final BadLocationException e) {
 				return false;
@@ -227,15 +227,16 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 		@Override
 		protected void doApply(final char trigger, final int stateMask, final int caretOffset, final int replacementOffset, final int replacementLength)
 				throws BadLocationException {
-			final SourceViewer viewer = fContext.getSourceViewer();
-			final IDocument document = viewer.getDocument();
-			final Point selectedRange = viewer.getSelectedRange();
+			final AssistInvocationContext context= getInvocationContext();
+			final SourceViewer viewer= context.getSourceViewer();
+			final IDocument document= viewer.getDocument();
+//			final Point selectedRange= viewer.getSelectedRange();
 			createCompletion(document);
-			final Position newSelectionOffset = new Position(replacementOffset+replacementLength, 0);
+			final Position newSelectionOffset= new Position(replacementOffset + replacementLength, 0);
 			try {
 				document.addPosition(newSelectionOffset);
-				document.replace(replacementOffset, newSelectionOffset.getOffset()-replacementOffset, fCompletion);
-				fSelectionToSet = new Region(newSelectionOffset.getOffset(), 0);
+				document.replace(replacementOffset, newSelectionOffset.getOffset() - replacementOffset, this.completion);
+				this.selectionToSet= new Region(newSelectionOffset.getOffset(), 0);
 			}
 			catch (final BadLocationException e) {
 				StatusManager.getManager().handle(new Status(IStatus.ERROR, SharedUIResources.PLUGIN_ID, -1,
@@ -245,7 +246,7 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 			finally {
 				document.removePosition(newSelectionOffset);
 			}
-			if (fIsDirectory) {
+			if (this.isDirectory) {
 				reinvokeAssist(viewer);
 			}
 		}
@@ -255,8 +256,8 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 		 */
 		@Override
 		public Point getSelection(final IDocument document) {
-			if (fSelectionToSet != null) {
-				return new Point(fSelectionToSet.getOffset(), fSelectionToSet.getLength());
+			if (this.selectionToSet != null) {
+				return new Point(this.selectionToSet.getOffset(), this.selectionToSet.getLength());
 			}
 			return null;
 		}
@@ -275,16 +276,16 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 		@Override
 		public CharSequence getPrefixCompletionText(final IDocument document, final int completionOffset) {
 			createCompletion(document);
-			return fCompletion;
+			return this.completion;
 		}
 		
 	}
 	
 	
-	private String fPathSeparator;
-	private String fPathSeparatorBackup;
+	private String pathSeparator;
+	private String pathSeparatorBackup;
 	
-	private ISourceEditor fEditor;
+	private ISourceEditor editor;
 	
 	
 	public PathCompletionComputor() {
@@ -294,7 +295,7 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 	public abstract String getPluginId();
 	
 	protected ISourceEditor getEditor() {
-		return fEditor;
+		return this.editor;
 	}
 	
 	/**
@@ -302,8 +303,8 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 	 */
 	@Override
 	public void sessionStarted(final ISourceEditor editor, final ContentAssist assist) {
-		fEditor = editor;
-		fPathSeparator = getDefaultFileSeparator();
+		this.editor= editor;
+		this.pathSeparator= getDefaultFileSeparator();
 	}
 	
 	/**
@@ -311,7 +312,7 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 	 */
 	@Override
 	public void sessionEnded() {
-		fEditor = null;
+		this.editor= null;
 	}
 	
 	protected String getDefaultFileSeparator() {
@@ -320,7 +321,7 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 	}
 	
 	protected String getFileSeparator() {
-		return fPathSeparator;
+		return this.pathSeparator;
 	}
 	
 	public char[] getCompletionProposalAutoActivationCharacters() {
@@ -338,60 +339,60 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 	public IStatus computeCompletionProposals(final AssistInvocationContext context, final int mode,
 			final AssistProposalCollector<IAssistCompletionProposal> proposals, final IProgressMonitor monitor) {
 		try {
-			final int offset = context.getInvocationOffset();
-			final IRegion partition = getContentRange(context, mode);
+			final int offset= context.getInvocationOffset();
+			final IRegion partition= getContentRange(context, mode);
 			if (partition == null) {
 				return null;
 			}
 			
-			String prefix = checkPrefix(context.getSourceViewer().getDocument().get(
+			String prefix= checkPrefix(context.getSourceViewer().getDocument().get(
 					partition.getOffset(), offset-partition.getOffset() ));
 			
 			if (prefix == null) {
 				return null;
 			}
 			
-			boolean needSeparatorBeforeStart = false; // including virtual separator
-			String start = ""; //$NON-NLS-1$
-			IFileStore baseStore = null;
-			IPath path = null;
+			boolean needSeparatorBeforeStart= false; // including virtual separator
+			String start= ""; //$NON-NLS-1$
+			IFileStore baseStore= null;
+			IPath path= null;
 			
-			final char lastChar = (prefix.length() > 0) ? prefix.charAt(prefix.length()-1) : 0;
+			final char lastChar= (prefix.length() > 0) ? prefix.charAt(prefix.length()-1) : 0;
 			switch (lastChar) {
 			case ':':
-				prefix = prefix+fPathSeparator;
+				prefix= prefix+this.pathSeparator;
 				if (Path.ROOT.isValidPath(prefix)) {
-					path = new Path(prefix);
-					needSeparatorBeforeStart = true;
+					path= new Path(prefix);
+					needSeparatorBeforeStart= true;
 				}
 				break;
 			case '.':
 				// prevent that path segments '.' and '..' at end are resolved
 				if (prefix.equals(".") || prefix.endsWith("\\.") || prefix.endsWith("/.")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					prefix = prefix.substring(0, prefix.length()-1);
+					prefix= prefix.substring(0, prefix.length()-1);
 					if (Path.ROOT.isValidPath(prefix)) {
-						start = "."; //$NON-NLS-1$
-						path = new Path(prefix);
+						start= "."; //$NON-NLS-1$
+						path= new Path(prefix);
 					}
 					break;
 				}
 				else if (prefix.equals("..") || prefix.endsWith("\\..") || prefix.endsWith("/..")) { // //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					prefix = prefix.substring(0, prefix.length()-2);
+					prefix= prefix.substring(0, prefix.length()-2);
 					if (Path.ROOT.isValidPath(prefix)) {
-						start = ".."; //$NON-NLS-1$
-						path = new Path(prefix);
+						start= ".."; //$NON-NLS-1$
+						path= new Path(prefix);
 					}
 					break;
 				}
 				//$FALL-THROUGH$
 			default:
 				if (Path.ROOT.isValidPath(prefix)) {
-					path = new Path(prefix);
+					path= new Path(prefix);
 					if (path.segmentCount() > 0 && lastChar != '\\' && lastChar != '/') {
-						start = path.lastSegment();
-						path = path.removeLastSegments(1);
+						start= path.lastSegment();
+						path= path.removeLastSegments(1);
 						if (path == null) {
-							path = new Path(""); //$NON-NLS-1$
+							path= new Path(""); //$NON-NLS-1$
 						}
 					}
 				}
@@ -401,37 +402,40 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 			if (path != null) {
 				// on Windows, path starting with path separator are relative to the device of current directory
 				if (path.isAbsolute() && isWin() && path.getDevice() == null && !path.isUNC()) { 
-					final IPath workspace = getRelativeBasePath();
+					final IPath workspace= getRelativeBasePath();
 					if (workspace != null) {
-						path = path.setDevice(workspace.getDevice());
+						path= path.setDevice(workspace.getDevice());
 					}
 				}
-				baseStore = resolveStore(path);
+				baseStore= resolveStore(path);
 			}
 			
 			updatePathSeparator(prefix);
 			
-			String completionPrefix = (needSeparatorBeforeStart) ? fPathSeparator : null;
+			String completionPrefix= (needSeparatorBeforeStart) ? this.pathSeparator : null;
 			
 			if (baseStore == null || !baseStore.fetchInfo().exists()) {
 				if (path != null) {
-					return tryAlternative(context, proposals, path, offset-start.length(), start, prefix, completionPrefix);
+					return tryAlternative(context, proposals, path, offset - start.length(), start,
+							prefix, completionPrefix );
 				}
 				return null;
 			}
 			
-			doAddChildren(context, proposals, baseStore, offset-start.length(), start, completionPrefix);
+			doAddChildren(context, proposals, baseStore, offset - start.length(), start,
+					completionPrefix );
 			if (start != null && start.length() > 0 && !start.equals(".")) { //$NON-NLS-1$
-				baseStore = baseStore.getChild(start);
+				baseStore= baseStore.getChild(start);
 				if (baseStore.fetchInfo().exists()) {
-					final StringBuilder prefixBuilder = new StringBuilder();
+					final StringBuilder prefixBuilder= new StringBuilder();
 					if (completionPrefix != null) {
 						prefixBuilder.append(completionPrefix);
 					}
 					prefixBuilder.append(baseStore.getName());
-					prefixBuilder.append(fPathSeparator);
-					completionPrefix = prefixBuilder.toString();
-					doAddChildren(context, proposals, baseStore, offset-start.length(), null, completionPrefix);
+					prefixBuilder.append(this.pathSeparator);
+					completionPrefix= prefixBuilder.toString();
+					doAddChildren(context, proposals, baseStore, offset - start.length(),
+							null, completionPrefix );
 				}
 			}
 			return Status.OK_STATUS;
@@ -453,8 +457,8 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 	 * @return the prefix, if valid, otherwise <code>null</code>
 	 */
 	protected String checkPrefix(final String prefix) {
-		final char[] breakingChars = "\n\r+<>|?*\"".toCharArray(); //$NON-NLS-1$
-		for (int i = 0; i < breakingChars.length; i++) {
+		final char[] breakingChars= "\n\r+<>|?*\"".toCharArray(); //$NON-NLS-1$
+		for (int i= 0; i < breakingChars.length; i++) {
 			if (prefix.indexOf(breakingChars[i]) >= 0) {
 				return null;
 			}
@@ -463,32 +467,32 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 	}
 	
 	private void updatePathSeparator(final String prefix) {
-		final int lastBack = prefix.lastIndexOf('\\');
-		final int lastForw = prefix.lastIndexOf('/');
+		final int lastBack= prefix.lastIndexOf('\\');
+		final int lastForw= prefix.lastIndexOf('/');
 		if (lastBack > lastForw) {
-			fPathSeparatorBackup = fPathSeparator;
-			fPathSeparator = "\\"; //$NON-NLS-1$
+			this.pathSeparatorBackup= this.pathSeparator;
+			this.pathSeparator= "\\"; //$NON-NLS-1$
 		}
 		else if (lastForw > lastBack) {
-			fPathSeparatorBackup = fPathSeparator;
-			fPathSeparator = "/"; //$NON-NLS-1$
+			this.pathSeparatorBackup= this.pathSeparator;
+			this.pathSeparator= "/"; //$NON-NLS-1$
 		}
 		// else -1 == -1
 	}
 	
 	private void restorePathSeparator() {
-		if (fPathSeparatorBackup != null) {
-			fPathSeparator = fPathSeparatorBackup;
-			fPathSeparatorBackup = null;
+		if (this.pathSeparatorBackup != null) {
+			this.pathSeparator= this.pathSeparatorBackup;
+			this.pathSeparatorBackup= null;
 		}
 	}
 	
 	protected void doAddChildren(final AssistInvocationContext context, final AssistProposalCollector<IAssistCompletionProposal> proposals,
 			final IFileStore baseStore,
 			final int startOffset, final String startsWith, final String prefix) throws CoreException {
-		final IContainer[] workspaceRefs = ResourcesPlugin.getWorkspace().getRoot().findContainersForLocationURI(baseStore.toURI());
-		final IContainer workspaceRef = (workspaceRefs.length > 0) ? workspaceRefs[0] : null;
-		final String[] names = baseStore.childNames(EFS.NONE, new NullProgressMonitor());
+		final IContainer[] workspaceRefs= ResourcesPlugin.getWorkspace().getRoot().findContainersForLocationURI(baseStore.toURI());
+		final IContainer workspaceRef= (workspaceRefs.length > 0) ? workspaceRefs[0] : null;
+		final String[] names= baseStore.childNames(EFS.NONE, new NullProgressMonitor());
 		Arrays.sort(names, Collator.getInstance());
 		for (final String name : names) {
 			if (startsWith == null || name.regionMatches(true, 0, startsWith, 0, startsWith.length())) {
@@ -520,7 +524,7 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 	
 	protected IFileStore resolveStore(final IPath path) throws CoreException {
 		if (!path.isAbsolute()) {
-			final IFileStore base = getRelativeBaseStore();
+			final IFileStore base= getRelativeBaseStore();
 			if (base != null) {
 				return base.getFileStore(path);
 			}

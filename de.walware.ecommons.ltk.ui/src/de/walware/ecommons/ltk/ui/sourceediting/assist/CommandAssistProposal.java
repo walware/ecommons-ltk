@@ -34,7 +34,7 @@ public abstract class CommandAssistProposal implements IAssistCompletionProposal
 	
 	
 	public static StyledString addAcceleratorStyled(final String message, final KeySequence binding) {
-		final StyledString styledString = new StyledString(message);
+		final StyledString styledString= new StyledString(message);
 		if (binding != null) {
 			styledString.append(" (", StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
 			styledString.append(binding.format(), StyledString.QUALIFIER_STYLER);
@@ -44,26 +44,52 @@ public abstract class CommandAssistProposal implements IAssistCompletionProposal
 	}
 	
 	
-	protected final AssistInvocationContext fContext;
+	private final AssistInvocationContext context;
 	
-	protected final String fCommandId;
+	private final String commandId;
 	
-	protected String fLabel;
-	protected String fDescription;
+	private String label;
+	private String description;
 	
-	protected int fRelevance;
+	private int relevance;
 	
 	
 	public CommandAssistProposal(final AssistInvocationContext invocationContext,
 			final String commandId) {
-		fContext = invocationContext;
-		fCommandId = commandId;
+		this.context= invocationContext;
+		this.commandId= commandId;
+	}
+	
+	public CommandAssistProposal(final AssistInvocationContext invocationContext,
+			final String commandId,
+			final String label, final String description) {
+		this(invocationContext, commandId);
+		
+		this.label= label;
+		this.description= description;
 	}
 	
 	
 	@Override
 	public final String getCommandId() {
-		return fCommandId;
+		return this.commandId;
+	}
+	
+	protected AssistInvocationContext getInvocationContext() {
+		return this.context;
+	}
+	
+	
+	protected void setLabel(final String label) {
+		this.label= label;
+	}
+	
+	protected void setDescription(final String description) {
+		this.description= description;
+	}
+	
+	protected void setRelevance(final int relevance) {
+		this.relevance= relevance;
 	}
 	
 	
@@ -94,22 +120,22 @@ public abstract class CommandAssistProposal implements IAssistCompletionProposal
 	
 	@Override
 	public int getRelevance() {
-		return fRelevance;
+		return this.relevance;
 	}
 	
 	@Override
 	public String getSortingString() {
-		return fLabel;
+		return this.label;
 	}
 	
 	@Override
 	public String getDisplayString() {
-		return fLabel;
+		return this.label;
 	}
 	
 	@Override
 	public StyledString getStyledDisplayString() {
-		return addAcceleratorStyled(getDisplayString(), WorkbenchUIUtil.getBestKeyBinding(fCommandId));
+		return addAcceleratorStyled(getDisplayString(), WorkbenchUIUtil.getBestKeyBinding(this.commandId));
 	}
 	
 	@Override
@@ -119,12 +145,12 @@ public abstract class CommandAssistProposal implements IAssistCompletionProposal
 	
 	@Override
 	public String getAdditionalProposalInfo() {
-		return fDescription;
+		return this.description;
 	}
 	
 	@Override
 	public Object getAdditionalProposalInfo(final IProgressMonitor monitor) {
-		return new DefaultBrowserInformationInput(null, getDisplayString(), fDescription, 
+		return new DefaultBrowserInformationInput(null, getDisplayString(), this.description, 
 				DefaultBrowserInformationInput.FORMAT_TEXT_INPUT);
 	}
 	

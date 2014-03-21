@@ -75,30 +75,33 @@ public class TemplateProposal implements IAssistCompletionProposal,
 	
 	public static class TemplateComparator implements Comparator<TemplateProposal> {
 		
-		private final Collator fgCollator = Collator.getInstance();
+		private final Collator collator= Collator.getInstance();
 		
 		@Override
 		public int compare(final TemplateProposal arg0, final TemplateProposal arg1) {
-			final int result = fgCollator.compare(arg0.getTemplate().getName(), arg1.getTemplate().getName());
+			final int result= this.collator.compare(arg0.getTemplate().getName(), arg1.getTemplate().getName());
 			if (result != 0) {
 				return result;
 			}
-			return fgCollator.compare(arg0.getDisplayString(), arg1.getDisplayString());
+			return this.collator.compare(arg0.getDisplayString(), arg1.getDisplayString());
 		}
 		
 	}
 	
 	
-	private final Template fTemplate;
-	private final TemplateContext fContext;
-	private final int fRelevance;
-	private final Image fImage;
-	private StyledString fDisplayString;
-	private IRegion fRegion;
+	private final Template template;
+	private final TemplateContext context;
 	
-	private IRegion fSelectionToSet; // initialized by apply()
-	private InclusivePositionUpdater fUpdater;
-	private String fId;
+	private final int relevance;
+	
+	private final Image image;
+	
+	private StyledString displayString;
+	
+	private IRegion region;
+	
+	private IRegion selectionToSet; // initialized by apply()
+	private InclusivePositionUpdater updater;
 	
 	
 	public TemplateProposal(final Template template, final TemplateContext context,
@@ -107,14 +110,14 @@ public class TemplateProposal implements IAssistCompletionProposal,
 		assert (context != null);
 		assert (region != null);
 		
-		fTemplate = template;
-		fContext = context;
-		fImage = image;
-		fRegion = region;
+		this.template= template;
+		this.context= context;
+		this.image= image;
+		this.region= region;
 		
-		fDisplayString = null;
+		this.displayString= null;
 		
-		fRelevance = relevance;
+		this.relevance= relevance;
 	}
 	
 	/**
@@ -137,10 +140,10 @@ public class TemplateProposal implements IAssistCompletionProposal,
 	@Override
 	public boolean validate(final IDocument document, final int offset, final DocumentEvent event) {
 		try {
-			final int replaceOffset = getReplaceOffset();
+			final int replaceOffset= getReplaceOffset();
 			if (offset >= replaceOffset) {
-				final String content = document.get(replaceOffset, offset - replaceOffset);
-				return fTemplate.getName().regionMatches(true, 0, content, 0, content.length());
+				final String content= document.get(replaceOffset, offset - replaceOffset);
+				return this.template.getName().regionMatches(true, 0, content, 0, content.length());
 			}
 		} catch (final BadLocationException e) {
 			// concurrent modification - ignore
@@ -150,11 +153,11 @@ public class TemplateProposal implements IAssistCompletionProposal,
 	
 	
 	protected TemplateContext getContext() {
-		return fContext;
+		return this.context;
 	}
 	
 	protected Template getTemplate() {
-		return fTemplate;
+		return this.template;
 	}
 	
 	@Override
@@ -179,17 +182,17 @@ public class TemplateProposal implements IAssistCompletionProposal,
 	 */
 	@Override
 	public int getRelevance() {
-		return fRelevance;
+		return this.relevance;
 	}
 	
 	@Override
 	public String getSortingString() {
-		return fTemplate.getName();
+		return this.template.getName();
 	}
 	
 	@Override
 	public boolean isAutoInsertable() {
-		return fTemplate.isAutoInsertable();
+		return this.template.isAutoInsertable();
 	}
 	
 	/**
@@ -205,17 +208,17 @@ public class TemplateProposal implements IAssistCompletionProposal,
 	 */
 	@Override
 	public StyledString getStyledDisplayString() {
-		if (fDisplayString == null) {
-			final StyledString s = new StyledString(fTemplate.getName());
-			s.append(" – " + fTemplate.getDescription(), StyledString.QUALIFIER_STYLER);
-			fDisplayString = s;
+		if (this.displayString == null) {
+			final StyledString s= new StyledString(this.template.getName());
+			s.append(" – " + this.template.getDescription(), StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
+			this.displayString= s;
 		}
-		return fDisplayString;
+		return this.displayString;
 	}
 	
 	@Override
 	public Image getImage() {
-		return fImage;
+		return this.image;
 	}
 	
 	@Override
@@ -231,7 +234,7 @@ public class TemplateProposal implements IAssistCompletionProposal,
 	@Override
 	public Object getAdditionalProposalInfo(final IProgressMonitor monitor) {
 		try {
-			final TemplateContext context = getContext();
+			final TemplateContext context= getContext();
 			context.setReadOnly(true);
 			if (context instanceof IWorkbenchTemplateContext) {
 				return new DefaultBrowserInformationInput(
@@ -239,7 +242,7 @@ public class TemplateProposal implements IAssistCompletionProposal,
 						DefaultBrowserInformationInput.FORMAT_SOURCE_INPUT);
 			}
 				
-			final TemplateBuffer templateBuffer = context.evaluate(getTemplate());
+			final TemplateBuffer templateBuffer= context.evaluate(getTemplate());
 			if (templateBuffer != null) {
 				return new DefaultBrowserInformationInput(
 						null, getDisplayString(), templateBuffer.toString(), 
@@ -266,56 +269,56 @@ public class TemplateProposal implements IAssistCompletionProposal,
 	 */
 	@Override
 	public void apply(final ITextViewer viewer, final char trigger, final int stateMask, final int offset) {
-		final IDocument document = viewer.getDocument();
-		final Position regionPosition = new Position(fRegion.getOffset(), fRegion.getLength());
-		final Position offsetPosition = new Position(offset, 0);
+		final IDocument document= viewer.getDocument();
+		final Position regionPosition= new Position(this.region.getOffset(), this.region.getLength());
+		final Position offsetPosition= new Position(offset, 0);
 		try {
 			document.addPosition(regionPosition);
 			document.addPosition(offsetPosition);
-			fContext.setReadOnly(false);
+			this.context.setReadOnly(false);
 			TemplateBuffer templateBuffer;
 			try {
-				templateBuffer = fContext.evaluate(fTemplate);
+				templateBuffer= this.context.evaluate(this.template);
 			}
 			catch (final TemplateException e1) {
-				fSelectionToSet = new Region(fRegion.getOffset(), fRegion.getLength());
+				this.selectionToSet= new Region(this.region.getOffset(), this.region.getLength());
 				return;
 			}
 			
-			fRegion = new Region(regionPosition.getOffset(), regionPosition.getLength());
-			final int start = getReplaceOffset();
-			final int end = Math.max(getReplaceEndOffset(), offsetPosition.getOffset());
+			this.region= new Region(regionPosition.getOffset(), regionPosition.getLength());
+			final int start= getReplaceOffset();
+			final int end= Math.max(getReplaceEndOffset(), offsetPosition.getOffset());
 			
 			// insert template string
-			final String templateString = templateBuffer.getString();
+			final String templateString= templateBuffer.getString();
 			document.replace(start, end - start, templateString);
 			
 			// translate positions
-			final LinkedModeModel model = new LinkedModeModel();
-			final TemplateVariable[] variables = templateBuffer.getVariables();
-			boolean hasPositions = false;
-			for (int i = 0; i != variables.length; i++) {
-				final TemplateVariable variable = variables[i];
+			final LinkedModeModel model= new LinkedModeModel();
+			final TemplateVariable[] variables= templateBuffer.getVariables();
+			boolean hasPositions= false;
+			for (int i= 0; i != variables.length; i++) {
+				final TemplateVariable variable= variables[i];
 				
 				if (variable.isUnambiguous()) {
 					continue;
 				}
 				
-				final LinkedPositionGroup group = new LinkedPositionGroup();
+				final LinkedPositionGroup group= new LinkedPositionGroup();
 				
-				final int[] offsets = variable.getOffsets();
-				final int length = variable.getLength();
+				final int[] offsets= variable.getOffsets();
+				final int length= variable.getLength();
 				
-				final String[] values = variable.getValues();
-				final ICompletionProposal[] proposals = new ICompletionProposal[values.length];
-				for (int j = 0; j < values.length; j++) {
+				final String[] values= variable.getValues();
+				final ICompletionProposal[] proposals= new ICompletionProposal[values.length];
+				for (int j= 0; j < values.length; j++) {
 					ensurePositionCategoryInstalled(document, model);
-					final Position pos = new Position(offsets[0] + start, length);
+					final Position pos= new Position(offsets[0] + start, length);
 					document.addPosition(getCategory(), pos);
-					proposals[j] = new PositionBasedCompletionProposal(values[j], pos, length);
+					proposals[j]= new PositionBasedCompletionProposal(values[j], pos, length);
 				}
 				
-				for (int j = 0; j < offsets.length; j++) {
+				for (int j= 0; j < offsets.length; j++) {
 					if (j == 0 && proposals.length > 1) {
 						group.addPosition(new ProposalPosition(document, offsets[j] + start, length, proposals));
 					} else {
@@ -324,27 +327,27 @@ public class TemplateProposal implements IAssistCompletionProposal,
 				}
 				
 				model.addGroup(group);
-				hasPositions = true;
+				hasPositions= true;
 			}
 			
 			if (hasPositions) {
 				model.forceInstall();
 				
-				if (fContext instanceof IWorkbenchTemplateContext) {
-					final ISourceEditor editor = ((IWorkbenchTemplateContext) fContext).getEditor();
+				if (this.context instanceof IWorkbenchTemplateContext) {
+					final ISourceEditor editor= ((IWorkbenchTemplateContext) this.context).getEditor();
 					if (editor.getTextEditToolSynchronizer() != null) {
 						editor.getTextEditToolSynchronizer().install(model);
 					}
 				}
 				
-				final LinkedModeUI ui = new LinkedModeUI(model, viewer);
+				final LinkedModeUI ui= new LinkedModeUI(model, viewer);
 				ui.setExitPosition(viewer, getCaretOffset(templateBuffer) + start, 0, Integer.MAX_VALUE);
 				ui.enter();
 				
-				fSelectionToSet = ui.getSelectedRegion();
+				this.selectionToSet= ui.getSelectedRegion();
 			} else {
 				ensurePositionCategoryRemoved(document);
-				fSelectionToSet = new Region(getCaretOffset(templateBuffer) + start, 0);
+				this.selectionToSet= new Region(getCaretOffset(templateBuffer) + start, 0);
 			}
 			
 		}
@@ -364,7 +367,7 @@ public class TemplateProposal implements IAssistCompletionProposal,
 	private void handleError(final Exception e) {
 		StatusManager.getManager().handle(new Status(IStatus.ERROR, SharedUIResources.PLUGIN_ID,
 				ICommonStatusConstants.INTERNAL_TEMPLATE, "Template Evaluation Error", e));
-		fSelectionToSet = fRegion;
+		this.selectionToSet= this.region;
 	}
 	
 	private String getCategory() {
@@ -374,8 +377,8 @@ public class TemplateProposal implements IAssistCompletionProposal,
 	private void ensurePositionCategoryInstalled(final IDocument document, final LinkedModeModel model) {
 		if (!document.containsPositionCategory(getCategory())) {
 			document.addPositionCategory(getCategory());
-			fUpdater = new InclusivePositionUpdater(getCategory());
-			document.addPositionUpdater(fUpdater);
+			this.updater= new InclusivePositionUpdater(getCategory());
+			document.addPositionUpdater(this.updater);
 			
 			model.addLinkingListener(new ILinkedModeListener() {
 				
@@ -399,14 +402,14 @@ public class TemplateProposal implements IAssistCompletionProposal,
 			} catch (final BadPositionCategoryException e) {
 				// ignore
 			}
-			document.removePositionUpdater(fUpdater);
+			document.removePositionUpdater(this.updater);
 		}
 	}
 	
 	private int getCaretOffset(final TemplateBuffer buffer) {
-		final TemplateVariable[] variables = buffer.getVariables();
-		for (int i = 0; i != variables.length; i++) {
-			final TemplateVariable variable = variables[i];
+		final TemplateVariable[] variables= buffer.getVariables();
+		for (int i= 0; i != variables.length; i++) {
+			final TemplateVariable variable= variables[i];
 			if (variable.getType().equals(GlobalTemplateVariables.Cursor.NAME)) {
 				return variable.getOffsets()[0];
 			}
@@ -423,11 +426,11 @@ public class TemplateProposal implements IAssistCompletionProposal,
 	 */
 	protected final int getReplaceOffset() {
 		int start;
-		if (fContext instanceof DocumentTemplateContext) {
-			final DocumentTemplateContext docContext = (DocumentTemplateContext) fContext;
-			start = docContext.getStart();
+		if (this.context instanceof DocumentTemplateContext) {
+			final DocumentTemplateContext docContext= (DocumentTemplateContext) this.context;
+			start= docContext.getStart();
 		} else {
-			start = fRegion.getOffset();
+			start= this.region.getOffset();
 		}
 		return start;
 	}
@@ -441,11 +444,11 @@ public class TemplateProposal implements IAssistCompletionProposal,
 	 */
 	protected final int getReplaceEndOffset() {
 		int end;
-		if (fContext instanceof DocumentTemplateContext) {
-			final DocumentTemplateContext docContext = (DocumentTemplateContext) fContext;
-			end = docContext.getEnd();
+		if (this.context instanceof DocumentTemplateContext) {
+			final DocumentTemplateContext docContext= (DocumentTemplateContext) this.context;
+			end= docContext.getEnd();
 		} else {
-			end = fRegion.getOffset() + fRegion.getLength();
+			end= this.region.getOffset() + this.region.getLength();
 		}
 		return end;
 	}
@@ -455,7 +458,7 @@ public class TemplateProposal implements IAssistCompletionProposal,
 	 */
 	@Override
 	public CharSequence getPrefixCompletionText(final IDocument document, final int completionOffset) {
-		return fTemplate.getName();
+		return this.template.getName();
 	}
 	
 	/**
@@ -471,8 +474,8 @@ public class TemplateProposal implements IAssistCompletionProposal,
 	 */
 	@Override
 	public Point getSelection(final IDocument document) {
-		if (fSelectionToSet != null) {
-			return new Point(fSelectionToSet.getOffset(), fSelectionToSet.getLength());
+		if (this.selectionToSet != null) {
+			return new Point(this.selectionToSet.getOffset(), this.selectionToSet.getLength());
 		}
 		return null;
 	}
@@ -482,7 +485,7 @@ public class TemplateProposal implements IAssistCompletionProposal,
 	 */
 	@Override
 	public int getContextInformationPosition() {
-		return fRegion.getOffset();
+		return this.region.getOffset();
 	}
 	
 	/**

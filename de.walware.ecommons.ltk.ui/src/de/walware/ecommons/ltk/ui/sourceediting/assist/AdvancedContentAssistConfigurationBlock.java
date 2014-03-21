@@ -69,8 +69,8 @@ public class AdvancedContentAssistConfigurationBlock extends ManagedConfiguratio
 	private class CategoryKindLabelProvider extends CellLabelProvider {
 		@Override
 		public void update(final ViewerCell cell) {
-			final ContentAssistCategory category = (ContentAssistCategory) cell.getElement();
-			cell.setImage(AdvancedContentAssistConfigurationBlock.this.getImage(category.getImageDescriptor()));
+			final ContentAssistCategory category= (ContentAssistCategory) cell.getElement();
+			cell.setImage(getImage(category.getImageDescriptor()));
 			cell.setText(category.getDisplayName());
 		}
 	}
@@ -79,44 +79,44 @@ public class AdvancedContentAssistConfigurationBlock extends ManagedConfiguratio
 	private static BindingManager gLocalBindingManager;
 	
 	
-	private CheckboxTableViewer fDefaultList;
-	private CheckboxTableViewer fCirclingList;
-	private final Map<Object, Image> fImages = new HashMap<Object, Image>();
+	private CheckboxTableViewer defaultList;
+	private CheckboxTableViewer circlingList;
+	private final Map<Object, Image> images= new HashMap<>();
 	
-	private final ContentAssistComputerRegistry fRegistry;
+	private final ContentAssistComputerRegistry registry;
 	
-	private WritableList fOrderedCategories;
-	private ButtonGroup<ContentAssistCategory> fOrderButtons;
+	private WritableList orderedCategories;
+	private ButtonGroup<ContentAssistCategory> orderButtons;
 	
-	private Command fSpecificCommand;
-	private IParameter fSpecificParam;
+	private Command specificCommand;
+	private IParameter specificParam;
 	
 	
 	public AdvancedContentAssistConfigurationBlock(final ContentAssistComputerRegistry registry,
 			final IStatusChangeListener statusListener) {
 		super(null, statusListener);
-		fRegistry = registry;
+		this.registry= registry;
 		
-		final ICommandService commandSvc = (ICommandService) PlatformUI.getWorkbench().getAdapter(ICommandService.class);
-		fSpecificCommand = commandSvc.getCommand(ISourceEditorCommandIds.SPECIFIC_CONTENT_ASSIST_COMMAND_ID);
+		final ICommandService commandSvc= (ICommandService) PlatformUI.getWorkbench().getAdapter(ICommandService.class);
+		this.specificCommand= commandSvc.getCommand(ISourceEditorCommandIds.SPECIFIC_CONTENT_ASSIST_COMMAND_ID);
 	}
 	
 	private void prepareKeybindingInfo() {
-		if (fSpecificCommand == null) {
+		if (this.specificCommand == null) {
 			return;
 		}
 		if (gLocalBindingManager == null) {
-			gLocalBindingManager = new BindingManager(new ContextManager(), new CommandManager());
-			final IBindingService bindingService = (IBindingService) PlatformUI.getWorkbench().getService(IBindingService.class);
+			gLocalBindingManager= new BindingManager(new ContextManager(), new CommandManager());
+			final IBindingService bindingService= (IBindingService) PlatformUI.getWorkbench().getService(IBindingService.class);
 			gLocalBindingManager.setLocale(bindingService.getLocale());
 			gLocalBindingManager.setPlatform(bindingService.getPlatform());
 			
-			final Scheme[] definedSchemes = bindingService.getDefinedSchemes();
+			final Scheme[] definedSchemes= bindingService.getDefinedSchemes();
 			if (definedSchemes != null) {
 				try {
-					for (int i = 0; i < definedSchemes.length; i++) {
+					for (int i= 0; i < definedSchemes.length; i++) {
 						final Scheme scheme= definedSchemes[i];
-						final Scheme copy = gLocalBindingManager.getScheme(scheme.getId());
+						final Scheme copy= gLocalBindingManager.getScheme(scheme.getId());
 						copy.define(scheme.getName(), scheme.getDescription(), scheme.getParentId());
 					}
 				}
@@ -125,27 +125,27 @@ public class AdvancedContentAssistConfigurationBlock extends ManagedConfiguratio
 			}
 		}
 		try {
-			fSpecificParam = fSpecificCommand.getParameters()[0];
+			this.specificParam= this.specificCommand.getParameters()[0];
 		}
 		catch (final Exception x) {
-			fSpecificCommand = null;
-			fSpecificParam = null;
+			this.specificCommand= null;
+			this.specificParam= null;
 		}
 	}
 	
 	private String getDefaultKeybindingAsString() {
 		final ICommandService commandSvc= (ICommandService) PlatformUI.getWorkbench().getAdapter(ICommandService.class);
-		final Command command = commandSvc.getCommand(ITextEditorActionDefinitionIds.CONTENT_ASSIST_PROPOSALS);
+		final Command command= commandSvc.getCommand(ITextEditorActionDefinitionIds.CONTENT_ASSIST_PROPOSALS);
 		final ParameterizedCommand pCmd= new ParameterizedCommand(command, null);
-		final String key = getKeybindingAsString(pCmd);
+		final String key= getKeybindingAsString(pCmd);
 		return key;
 	}
 	private String getSpecificKeybindingAsString(final ContentAssistCategory category) {
 		if (gLocalBindingManager == null || category == null) {
 			return null;
 		}
-		final Parameterization[] params = { new Parameterization(fSpecificParam, category.getId()) };
-		final ParameterizedCommand pCmd = new ParameterizedCommand(fSpecificCommand, params);
+		final Parameterization[] params= { new Parameterization(this.specificParam, category.getId()) };
+		final ParameterizedCommand pCmd= new ParameterizedCommand(this.specificCommand, params);
 		return getKeybindingAsString(pCmd);
 	}
 	
@@ -153,15 +153,15 @@ public class AdvancedContentAssistConfigurationBlock extends ManagedConfiguratio
 		if (gLocalBindingManager == null) {
 			return null;
 		}
-		final IBindingService bindingService = (IBindingService) PlatformUI.getWorkbench().getService(IBindingService.class);
+		final IBindingService bindingService= (IBindingService) PlatformUI.getWorkbench().getService(IBindingService.class);
 		try {
 			gLocalBindingManager.setBindings(bindingService.getBindings());
-			final Scheme activeScheme = bindingService.getActiveScheme();
+			final Scheme activeScheme= bindingService.getActiveScheme();
 			if (activeScheme != null) {
 				gLocalBindingManager.setActiveScheme(activeScheme);
 			}
 			
-			final TriggerSequence[] binding = gLocalBindingManager.getActiveBindingsDisregardingContextFor(command);
+			final TriggerSequence[] binding= gLocalBindingManager.getActiveBindingsDisregardingContextFor(command);
 			if (binding.length > 0) {
 				return binding[0].format();
 			}
@@ -174,92 +174,92 @@ public class AdvancedContentAssistConfigurationBlock extends ManagedConfiguratio
 	
 	@Override
 	protected void createBlockArea(final Composite pageComposite) {
-		final Map<Preference<?>, String> prefs = new HashMap<Preference<?>, String>();
+		final Map<Preference<?>, String> prefs= new HashMap<>();
 		
-		prefs.put(fRegistry.getPrefDefaultDisabledCategoryIds(), fRegistry.getSettingsGroupId());
-		prefs.put(fRegistry.getPrefCirclingOrderedCategoryIds(), fRegistry.getSettingsGroupId());
+		prefs.put(this.registry.getPrefDefaultDisabledCategoryIds(), this.registry.getSettingsGroupId());
+		prefs.put(this.registry.getPrefCirclingOrderedCategoryIds(), this.registry.getSettingsGroupId());
 		
 		setupPreferenceManager(prefs);
 		
 		prepareKeybindingInfo();
 		
-		final Composite composite = new Composite(pageComposite, SWT.NONE);
+		final Composite composite= new Composite(pageComposite, SWT.NONE);
 		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		composite.setLayout(LayoutUtil.createCompositeGrid(1));
-//		final Composite composite = pageComposite;
+//		final Composite composite= pageComposite;
 		
-		final String keybinding = getDefaultKeybindingAsString();
-		final String message = ((keybinding != null) ? 
+		final String keybinding= getDefaultKeybindingAsString();
+		final String message= ((keybinding != null) ? 
 				NLS.bind(EditingMessages.ContentAssistAdvancedConfig_message_DefaultKeyBinding, keybinding) :
 				EditingMessages.ContentAssistAdvancedConfig_message_NoDefaultKeyBinding) + ' ' +
 				EditingMessages.ContentAssistAdvancedConfig_message_KeyBindingHint;
-		final Link control = addLinkControl(composite, message);
+		final Link control= addLinkControl(composite, message);
 		control.setLayoutData(applyWrapWidth(new GridData(SWT.FILL, SWT.FILL, true, false)));
 		
 		{	// Default
-			final Group group = new Group(composite, SWT.NONE);
+			final Group group= new Group(composite, SWT.NONE);
 			group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 			group.setLayout(LayoutUtil.createGroupGrid(1));
 			group.setText(EditingMessages.ContentAssistAdvancedConfig_Default_label);
 			
-			final Label label = new Label(group, SWT.NONE);
+			final Label label= new Label(group, SWT.NONE);
 			label.setText(EditingMessages.ContentAssistAdvancedConfig_DefaultTable_label);
 			label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 			
-			final Composite table = createDefaultTable(group);
+			final Composite table= createDefaultTable(group);
 			table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		}
 		
 		{	// Default
-			final Group group = new Group(composite, SWT.NONE);
+			final Group group= new Group(composite, SWT.NONE);
 			group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 			group.setLayout(LayoutUtil.createGroupGrid(2));
 			group.setText(EditingMessages.ContentAssistAdvancedConfig_Cicling_label);
 			
-			final Label label = new Label(group, SWT.WRAP);
+			final Label label= new Label(group, SWT.WRAP);
 			label.setText(EditingMessages.ContentAssistAdvancedConfig_CiclingTable_label);
 			label.setLayoutData(applyWrapWidth(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1)));
 			
-			final Composite table = createCirclingTable(group);
+			final Composite table= createCirclingTable(group);
 			table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 			
-			fOrderButtons = new ButtonGroup<ContentAssistCategory>(group);
-			fOrderButtons.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
-			fOrderButtons.addUpButton(null);
-			fOrderButtons.addDownButton(null);
+			this.orderButtons= new ButtonGroup<>(group);
+			this.orderButtons.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
+			this.orderButtons.addUpButton(null);
+			this.orderButtons.addDownButton(null);
 		}
 		
-		fOrderedCategories = new WritableList();
-		fCirclingList.setInput(fOrderedCategories);
-		fOrderButtons.connectTo(fCirclingList, fOrderedCategories, null);
-		ViewerUtil.scheduleStandardSelection(fCirclingList);
+		this.orderedCategories= new WritableList();
+		this.circlingList.setInput(this.orderedCategories);
+		this.orderButtons.connectTo(this.circlingList, this.orderedCategories, null);
+		ViewerUtil.scheduleStandardSelection(this.circlingList);
 		
-		ViewerUtil.scheduleStandardSelection(fDefaultList);
+		ViewerUtil.scheduleStandardSelection(this.defaultList);
 		
 		updateControls();
 	}
 	
 	protected Composite createDefaultTable(final Composite parent) {
-		final CheckboxTableComposite composite = new ViewerUtil.CheckboxTableComposite(parent, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION);
-		fDefaultList = composite.viewer;
+		final CheckboxTableComposite composite= new ViewerUtil.CheckboxTableComposite(parent, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION);
+		this.defaultList= composite.viewer;
 		composite.table.setHeaderVisible(true);
 		composite.table.setLinesVisible(true);
 		composite.viewer.setContentProvider(new ArrayContentProvider());
 		
-		{	final TableViewerColumn column = new TableViewerColumn(composite.viewer, SWT.NONE);
+		{	final TableViewerColumn column= new TableViewerColumn(composite.viewer, SWT.NONE);
 			composite.layout.setColumnData(column.getColumn(), new ColumnWeightData(3));
 			column.getColumn().setText(EditingMessages.ContentAssistAdvancedConfig_ProposalKinds_label);
 			column.setLabelProvider(new CategoryKindLabelProvider());
 		}
 		
-		{	final TableViewerColumn column = new TableViewerColumn(composite.viewer, SWT.NONE);
+		{	final TableViewerColumn column= new TableViewerColumn(composite.viewer, SWT.NONE);
 			composite.layout.setColumnData(column.getColumn(), new ColumnWeightData(1));
 			column.getColumn().setText(EditingMessages.ContentAssistAdvancedConfig_KeyBinding_label);
 			column.setLabelProvider(new CellLabelProvider() {
 				@Override
 				public void update(final ViewerCell cell) {
-					final ContentAssistCategory category = (ContentAssistCategory) cell.getElement();
-					final String keybindingAsString = getSpecificKeybindingAsString(category);
+					final ContentAssistCategory category= (ContentAssistCategory) cell.getElement();
+					final String keybindingAsString= getSpecificKeybindingAsString(category);
 					cell.setText((keybindingAsString != null) ? keybindingAsString : ""); //$NON-NLS-1$
 				}
 			});
@@ -269,13 +269,13 @@ public class AdvancedContentAssistConfigurationBlock extends ManagedConfiguratio
 	}
 	
 	protected Composite createCirclingTable(final Composite parent) {
-		final CheckboxTableComposite composite = new ViewerUtil.CheckboxTableComposite(parent, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION);
-		fCirclingList = composite.viewer;
+		final CheckboxTableComposite composite= new ViewerUtil.CheckboxTableComposite(parent, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION);
+		this.circlingList= composite.viewer;
 		composite.table.setHeaderVisible(true);
 		composite.table.setLinesVisible(true);
 		composite.viewer.setContentProvider(new ArrayContentProvider());
 		
-		{	final TableViewerColumn column = new TableViewerColumn(composite.viewer, SWT.NONE);
+		{	final TableViewerColumn column= new TableViewerColumn(composite.viewer, SWT.NONE);
 			composite.layout.setColumnData(column.getColumn(), new ColumnWeightData(1));
 			column.getColumn().setText(EditingMessages.ContentAssistAdvancedConfig_ProposalKinds_label);
 			column.setLabelProvider(new CategoryKindLabelProvider());
@@ -287,10 +287,10 @@ public class AdvancedContentAssistConfigurationBlock extends ManagedConfiguratio
 		if (imgDesc == null) {
 			return null;
 		}
-		Image img = fImages.get(imgDesc);
+		Image img= this.images.get(imgDesc);
 		if (img == null) {
-			img = imgDesc.createImage(false);
-			fImages.put(imgDesc, img);
+			img= imgDesc.createImage(false);
+			this.images.put(imgDesc, img);
 		}
 		return img;
 	}
@@ -299,47 +299,47 @@ public class AdvancedContentAssistConfigurationBlock extends ManagedConfiguratio
 	public void dispose() {
 		super.dispose();
 		
-		for (final Image img : fImages.values()) {
+		for (final Image img : this.images.values()) {
 			img.dispose();
 		}
-		fImages.clear();
+		this.images.clear();
 	}
 	
 	
 	@Override
 	protected void updateControls() {
-		final List<ContentAssistCategory> orderedCategories = fRegistry.applyPreferences(this, fRegistry.getCopyOfCategories());
+		final List<ContentAssistCategory> orderedCategories= this.registry.applyPreferences(this, this.registry.getCopyOfCategories());
 		
-		final List<ContentAssistCategory> defaultCategories = new ArrayList<ContentAssistCategory>(orderedCategories);
+		final List<ContentAssistCategory> defaultCategories= new ArrayList<>(orderedCategories);
 		Collections.sort(defaultCategories, new Comparator<ContentAssistCategory>() {
-			private final Collator NAMES_COLLARTOR = Collator.getInstance();
+			private final Collator NAMES_COLLARTOR= Collator.getInstance();
 			@Override
 			public int compare(final ContentAssistCategory o1, final ContentAssistCategory o2) {
-				return NAMES_COLLARTOR.compare(o1.getDisplayName(), o2.getDisplayName());
+				return this.NAMES_COLLARTOR.compare(o1.getDisplayName(), o2.getDisplayName());
 			}
 		});
-		fDefaultList.setInput(defaultCategories);
+		this.defaultList.setInput(defaultCategories);
 		for (final ContentAssistCategory category : defaultCategories) {
-			fDefaultList.setChecked(category, category.fIsIncludedInDefault);
+			this.defaultList.setChecked(category, category.isIncludedInDefault);
 		}
 		
-		fOrderedCategories.clear();
-		fOrderedCategories.addAll(orderedCategories);
-		fCirclingList.refresh();
+		this.orderedCategories.clear();
+		this.orderedCategories.addAll(orderedCategories);
+		this.circlingList.refresh();
 		for (final ContentAssistCategory category : orderedCategories) {
-			fCirclingList.setChecked(category, category.fIsEnabledAsSeparate);
+			this.circlingList.setChecked(category, category.isEnabledAsSeparate);
 		}
 	}
 	
 	@Override
 	protected void updatePreferences() {
-		final List<ContentAssistCategory> orderedCategories = new ArrayList<ContentAssistCategory>(fOrderedCategories);
+		final List<ContentAssistCategory> orderedCategories= new ArrayList<>(this.orderedCategories);
 		for (final ContentAssistCategory category : orderedCategories) {
-			category.fIsIncludedInDefault = fDefaultList.getChecked(category);
-			category.fIsEnabledAsSeparate = fCirclingList.getChecked(category);
+			category.isIncludedInDefault= this.defaultList.getChecked(category);
+			category.isEnabledAsSeparate= this.circlingList.getChecked(category);
 		}
 		
-		final Map<Preference<?>, Object> preferences = fRegistry.createPreferences(orderedCategories);
+		final Map<Preference<?>, Object> preferences= this.registry.createPreferences(orderedCategories);
 		setPrefValues(preferences);
 	}
 	

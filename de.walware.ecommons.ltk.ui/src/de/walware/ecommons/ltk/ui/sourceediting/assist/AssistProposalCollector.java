@@ -19,29 +19,29 @@ import java.util.Map;
 public class AssistProposalCollector<T> {
 	
 	
-	private final Class<T> fType;
+	private final Class<T> type;
 	
-	protected final Map<T, T> fProposals;
+	protected final Map<T, T> proposals;
 	
 	
 	public AssistProposalCollector(final Class<T> type) {
-		fType = type;
-		fProposals = new HashMap<T, T>();
+		this.type= type;
+		this.proposals= new HashMap<>();
 	}
 	
 	
 	public void add(final T proposal) {
-		fProposals.put(proposal, proposal);
+		this.proposals.put(proposal, proposal);
 	}
 	
 	public int getCount() {
-		return fProposals.size();
+		return this.proposals.size();
 	}
 	
 	public T[] toArray() {
 		@SuppressWarnings("unchecked")
-		final T[] array = (T[]) Array.newInstance(fType, fProposals.size());
-		fProposals.values().toArray(array);
+		final T[] array= (T[]) Array.newInstance(this.type, this.proposals.size());
+		this.proposals.values().toArray(array);
 		return array;
 	}
 	

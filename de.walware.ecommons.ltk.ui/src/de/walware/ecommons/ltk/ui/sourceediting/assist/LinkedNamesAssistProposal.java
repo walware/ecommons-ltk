@@ -51,10 +51,10 @@ public abstract class LinkedNamesAssistProposal implements IAssistCompletionProp
 	 */
 	public static class DeleteBlockingExitPolicy implements IExitPolicy {
 		
-		private final IDocument fDocument;
+		private final IDocument document;
 		
 		public DeleteBlockingExitPolicy(final IDocument document) {
-			fDocument = document;
+			this.document= document;
 		}
 		
 		@Override
@@ -63,19 +63,19 @@ public abstract class LinkedNamesAssistProposal implements IAssistCompletionProp
 			switch (event.character) {
 			case SWT.BS:
 				{	//skip backspace at beginning of linked position
-					final LinkedPosition position = model.findPosition(new LinkedPosition(
-							fDocument, offset, 0, LinkedPositionGroup.NO_STOP));
+					final LinkedPosition position= model.findPosition(new LinkedPosition(
+							this.document, offset, 0, LinkedPositionGroup.NO_STOP));
 					if (position != null && offset <= position.getOffset() && length == 0) {
-						event.doit = false;
+						event.doit= false;
 					}
 					return null;
 				}
 			case SWT.DEL:
 				{	//skip delete at end of linked position
-					final LinkedPosition position = model.findPosition(new LinkedPosition(
-							fDocument, offset, 0, LinkedPositionGroup.NO_STOP));
+					final LinkedPosition position= model.findPosition(new LinkedPosition(
+							this.document, offset, 0, LinkedPositionGroup.NO_STOP));
 					if (position != null && offset >= position.getOffset()+position.getLength() && length == 0) {
-						event.doit = false;
+						event.doit= false;
 					}
 					return null;
 				}
@@ -85,24 +85,24 @@ public abstract class LinkedNamesAssistProposal implements IAssistCompletionProp
 	}
 	
 	
-	protected final AssistInvocationContext fContext;
+	private final AssistInvocationContext context;
 	
-	private String fLabel;
-	private String fDescription;
-	private int fRelevance;
+	private String label;
+	private String description;
+	private int relevance;
 	
-	protected String fValueSuggestion;
+	private String valueSuggestion;
 	
 	
 	public LinkedNamesAssistProposal(final AssistInvocationContext invocationContext) {
-		fContext = invocationContext;
+		this.context= invocationContext;
 	}
 	
 	
 	protected void init(final String label, final String description, final int relevance) {
-		fLabel = label;
-		fDescription = description;
-		fRelevance = relevance;
+		this.label= label;
+		this.description= description;
+		this.relevance= relevance;
 	}
 	
 	/**
@@ -133,12 +133,12 @@ public abstract class LinkedNamesAssistProposal implements IAssistCompletionProp
 	@Override
 	public void apply(final ITextViewer viewer, final char trigger, final int stateMask, final int offset) {
 		try {
-			Point seletion = viewer.getSelectedRange();
-			final IDocument document = viewer.getDocument();
+			Point seletion= viewer.getSelectedRange();
+			final IDocument document= viewer.getDocument();
 			
-			final LinkedModeModel model = new LinkedModeModel();
+			final LinkedModeModel model= new LinkedModeModel();
 			
-			final LinkedPositionGroup group = new LinkedPositionGroup();
+			final LinkedPositionGroup group= new LinkedPositionGroup();
 			collectPositions(document, group);
 			if (group.isEmpty()) {
 				return;
@@ -146,21 +146,21 @@ public abstract class LinkedNamesAssistProposal implements IAssistCompletionProp
 			model.addGroup(group);
 			
 			model.forceInstall();
-			{	final ISourceEditor editor = fContext.getEditor();
+			{	final ISourceEditor editor= this.context.getEditor();
 				if (editor != null && editor.getTextEditToolSynchronizer() != null) {
 					editor.getTextEditToolSynchronizer().install(model);
 				}
 			}
 			
-			final LinkedModeUI ui = new EditorLinkedModeUI(model, viewer);
+			final LinkedModeUI ui= new EditorLinkedModeUI(model, viewer);
 			ui.setExitPolicy(new DeleteBlockingExitPolicy(document));
 			ui.setExitPosition(viewer, offset, 0, LinkedPositionGroup.NO_STOP);
 			ui.enter();
 			
-			if (fValueSuggestion != null) {
-				final Position position = group.getPositions()[0];
-				document.replace(position.getOffset(), position.getLength(), fValueSuggestion);
-				seletion = new Point(position.getOffset(), fValueSuggestion.length());
+			if (this.valueSuggestion != null) {
+				final Position position= group.getPositions()[0];
+				document.replace(position.getOffset(), position.getLength(), this.valueSuggestion);
+				seletion= new Point(position.getOffset(), this.valueSuggestion.length());
 			}
 			
 			viewer.setSelectedRange(seletion.x, seletion.y); // by default full word is selected, restore original selection
@@ -198,12 +198,12 @@ public abstract class LinkedNamesAssistProposal implements IAssistCompletionProp
 	
 	@Override
 	public int getRelevance() {
-		return fRelevance;
+		return this.relevance;
 	}
 	
 	@Override
 	public String getSortingString() {
-		return fLabel;
+		return this.label;
 	}
 	
 	/**
@@ -211,7 +211,7 @@ public abstract class LinkedNamesAssistProposal implements IAssistCompletionProp
 	 */
 	@Override
 	public String getDisplayString() {
-		return fLabel;
+		return this.label;
 	}
 	
 	/**
@@ -227,7 +227,7 @@ public abstract class LinkedNamesAssistProposal implements IAssistCompletionProp
 	 */
 	@Override
 	public String getAdditionalProposalInfo() {
-		return fDescription;
+		return this.description;
 	}
 	
 	/**
@@ -235,7 +235,7 @@ public abstract class LinkedNamesAssistProposal implements IAssistCompletionProp
 	 */
 	@Override
 	public Object getAdditionalProposalInfo(final IProgressMonitor monitor) {
-		return new DefaultBrowserInformationInput(null, getDisplayString(), fDescription, 
+		return new DefaultBrowserInformationInput(null, getDisplayString(), this.description, 
 				DefaultBrowserInformationInput.FORMAT_TEXT_INPUT);
 	}
 	

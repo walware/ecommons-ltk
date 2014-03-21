@@ -45,30 +45,30 @@ import de.walware.ecommons.ltk.internal.ui.AdvancedExtensionsInternal;
 public class InfoHoverRegistry implements ManageListener, IDisposable {
 	
 	
-	public static final String TYPE_SETTINGS = "hover.type_settings.ids:setting"; //$NON-NLS-1$
+	public static final String TYPE_SETTINGS= "hover.type_settings.ids:setting"; //$NON-NLS-1$
 	
 	
 	public static final class EffectiveHovers {
 		
-		private final int[] fStateMasks;
-		private final List<InfoHoverDescriptor> fStateMaskDescriptors;
-		private final List<InfoHoverDescriptor> fCombinedDescriptors;
+		private final int[] stateMasks;
+		private final List<InfoHoverDescriptor> stateMaskDescriptors;
+		private final List<InfoHoverDescriptor> combinedDescriptors;
 		
 		
 		public EffectiveHovers(final int[] stateMasks, final List<InfoHoverDescriptor> effectiveDescriptors,
 				final List<InfoHoverDescriptor> combinedDescriptors) {
-			fStateMasks = stateMasks;
-			fStateMaskDescriptors = effectiveDescriptors;
-			fCombinedDescriptors = combinedDescriptors;
+			this.stateMasks= stateMasks;
+			this.stateMaskDescriptors= effectiveDescriptors;
+			this.combinedDescriptors= combinedDescriptors;
 		}
 		
 		
 		public int[] getStateMasks() {
-			return fStateMasks;
+			return this.stateMasks;
 		}
 		
 		public InfoHoverDescriptor getDescriptor(final int stateMask) {
-			for (final InfoHoverDescriptor descriptor : fStateMaskDescriptors) {
+			for (final InfoHoverDescriptor descriptor : this.stateMaskDescriptors) {
 				if (descriptor.getStateMask() == stateMask) {
 					return descriptor;
 				}
@@ -77,34 +77,34 @@ public class InfoHoverRegistry implements ManageListener, IDisposable {
 		}
 		
 		public List<InfoHoverDescriptor> getDescriptorsForCombined() {
-			return fCombinedDescriptors;
+			return this.combinedDescriptors;
 		}
 		
 	}
 	
 	
-	private final String fContentTypeId;
+	private final String contentTypeId;
 	
-	private final String fSettingsGroupId;
-	private final StringArrayPref fPrefTypeSettings;
+	private final String settingsGroupId;
+	private final StringArrayPref prefTypeSettings;
 	
-	private List<InfoHoverDescriptor> fDescriptors;
-	private EffectiveHovers fEffectiveHovers;
+	private List<InfoHoverDescriptor> descriptors;
+	private EffectiveHovers effectiveHovers;
 	
 	
 	public InfoHoverRegistry(final String contentTypeId, final String prefQualifier,
 			final String settingsGroupId) {
-		fContentTypeId = contentTypeId;
-		fSettingsGroupId = settingsGroupId;
+		this.contentTypeId= contentTypeId;
+		this.settingsGroupId= settingsGroupId;
 		
-		fPrefTypeSettings = new StringArrayPref(prefQualifier, TYPE_SETTINGS);
+		this.prefTypeSettings= new StringArrayPref(prefQualifier, TYPE_SETTINGS);
 		PreferencesUtil.getSettingsChangeNotifier().addManageListener(this);
 	}
 	
 	
 	@Override
 	public void dispose() {
-		final SettingsChangeNotifier notifier = PreferencesUtil.getSettingsChangeNotifier();
+		final SettingsChangeNotifier notifier= PreferencesUtil.getSettingsChangeNotifier();
 		if (notifier != null) {
 			notifier.removeManageListener(this);
 		}
@@ -113,11 +113,11 @@ public class InfoHoverRegistry implements ManageListener, IDisposable {
 	
 	@Override
 	public void beforeSettingsChangeNotification(final Set<String> groupIds) {
-		if (fSettingsGroupId != null && groupIds.contains(fSettingsGroupId)) {
+		if (this.settingsGroupId != null && groupIds.contains(this.settingsGroupId)) {
 			synchronized (this) {
-				fDescriptors = applyPreferences(PreferencesUtil.getInstancePrefs(),
-						new ArrayList<InfoHoverDescriptor>(fDescriptors));
-				fEffectiveHovers = null;
+				this.descriptors= applyPreferences(PreferencesUtil.getInstancePrefs(),
+						new ArrayList<>(this.descriptors));
+				this.effectiveHovers= null;
 			}
 		}
 	}
@@ -127,40 +127,40 @@ public class InfoHoverRegistry implements ManageListener, IDisposable {
 	}
 	
 	String getSettingsGroupId() {
-		return fSettingsGroupId;
+		return this.settingsGroupId;
 	}
 	
 	StringArrayPref getPrefSeparateSettings() {
-		return fPrefTypeSettings;
+		return this.prefTypeSettings;
 	}
 	
 	List<InfoHoverDescriptor> loadCurrent() {
-		final IExtensionRegistry extensionRegistry = Platform.getExtensionRegistry();
-		final IConfigurationElement[] elements = extensionRegistry.getConfigurationElementsFor(
+		final IExtensionRegistry extensionRegistry= Platform.getExtensionRegistry();
+		final IConfigurationElement[] elements= extensionRegistry.getConfigurationElementsFor(
 				AdvancedExtensionsInternal.INFOHOVER_EXTENSIONPOINT_ID);
-		final List<InfoHoverDescriptor> descriptors = new ArrayList<InfoHoverDescriptor>();
+		final List<InfoHoverDescriptor> descriptors= new ArrayList<>();
 		
 		for (final IConfigurationElement element : elements) {
-			String id = null;
+			String id= null;
 			try {
-				final String contentTypeId = AdvancedExtensionsInternal.getCheckedString(element,
+				final String contentTypeId= AdvancedExtensionsInternal.getCheckedString(element,
 						AdvancedExtensionsInternal.CONFIG_CONTENT_TYPE_ID_ATTRIBUTE_NAME);
-				if (!fContentTypeId.equals(contentTypeId)) {
+				if (!this.contentTypeId.equals(contentTypeId)) {
 					continue;
 				}
-				id = AdvancedExtensionsInternal.getCheckedString(element,
+				id= AdvancedExtensionsInternal.getCheckedString(element,
 						AdvancedExtensionsInternal.CONFIG_ID_ATTRIBUTE_NAME).intern();
-				final String name = AdvancedExtensionsInternal.getCheckedString(element,
+				final String name= AdvancedExtensionsInternal.getCheckedString(element,
 						AdvancedExtensionsInternal.CONFIG_NAME_ATTRIBUTE_NAME);
 				
-				final InfoHoverDescriptor descriptor = new InfoHoverDescriptor(id,
+				final InfoHoverDescriptor descriptor= new InfoHoverDescriptor(id,
 						name, element);
 				descriptors.add(descriptor);
 			}
 			catch (final CoreException e) {
 				StatusManager.getManager().handle(new Status(IStatus.ERROR, SharedUIResources.PLUGIN_ID, ICommonStatusConstants.INTERNAL_PLUGGED_IN,
-						NLS.bind("Loading Text Hover failed (id = ''{0}'', contributed by = ''{1}'')",
-								(id != null) ? id : "", element.getDeclaringExtension().getContributor().getName()), e));
+						NLS.bind("Loading Text Hover failed (id= ''{0}'', contributed by= ''{1}'')", //$NON-NLS-1$
+								(id != null) ? id : "", element.getDeclaringExtension().getContributor().getName()), e)); //$NON-NLS-1$
 			}
 		}
 		
@@ -168,20 +168,20 @@ public class InfoHoverRegistry implements ManageListener, IDisposable {
 	}
 	
 	List<InfoHoverDescriptor> applyPreferences(final IPreferenceAccess prefAccess, final List<InfoHoverDescriptor> descriptors) {
-		final String[] settings = prefAccess.getPreferenceValue(getPrefSeparateSettings());
+		final String[] settings= prefAccess.getPreferenceValue(getPrefSeparateSettings());
 		
-		final List<InfoHoverDescriptor> sortedDescriptors = new ArrayList<InfoHoverDescriptor>(descriptors.size());
+		final List<InfoHoverDescriptor> sortedDescriptors= new ArrayList<>(descriptors.size());
 		for (final String setting : settings) {
-			final int idx1 = setting.indexOf(':');
+			final int idx1= setting.indexOf(':');
 			if (idx1 >= 0) {
-				final int idx2 = setting.indexOf(';', idx1+1);
+				final int idx2= setting.indexOf(';', idx1+1);
 				if (idx2 >= 0) {
-					final String id = setting.substring(0, idx1);
+					final String id= setting.substring(0, idx1);
 					for (final InfoHoverDescriptor descriptor : descriptors) {
 						if (descriptor.getId().equals(id)) {
 							descriptors.remove(descriptor);
-							descriptor.fIsEnabled = Boolean.parseBoolean(setting.substring(idx1+1, idx2));
-							descriptor.fStateMask = AdvancedExtensionsInternal.computeStateMask(setting.substring(idx2+1));
+							descriptor.isEnabled= Boolean.parseBoolean(setting.substring(idx1+1, idx2));
+							descriptor.stateMask= AdvancedExtensionsInternal.computeStateMask(setting.substring(idx2+1));
 							sortedDescriptors.add(descriptor);
 							break;
 						}
@@ -190,34 +190,34 @@ public class InfoHoverRegistry implements ManageListener, IDisposable {
 			}
 		}
 		for (final InfoHoverDescriptor descriptor : descriptors) {
-			descriptor.fIsEnabled = false;
-			descriptor.fStateMask = 0;
+			descriptor.isEnabled= false;
+			descriptor.stateMask= 0;
 			sortedDescriptors.add(descriptor);
 		}
 		return sortedDescriptors;
 	}
 	
 	Map<Preference<?>, Object> toPreferencesMap(final List<InfoHoverDescriptor> descriptors) {
-		final Map<Preference<?>, Object> map = new HashMap<Preference<?>, Object>();
-		final String[] settings = new String[descriptors.size()];
-		for (int i = 0; i < settings.length; i++) {
-			final InfoHoverDescriptor descriptor = descriptors.get(i);
-			settings[i] = descriptor.getId() + ':' + descriptor.isEnabled() + ';' + 
+		final Map<Preference<?>, Object> map= new HashMap<>();
+		final String[] settings= new String[descriptors.size()];
+		for (int i= 0; i < settings.length; i++) {
+			final InfoHoverDescriptor descriptor= descriptors.get(i);
+			settings[i]= descriptor.getId() + ':' + descriptor.isEnabled() + ';' + 
 					AdvancedExtensionsInternal.createUnifiedStateMaskString(descriptor.getStateMask());
 		}
-		map.put(fPrefTypeSettings, settings);
+		map.put(this.prefTypeSettings, settings);
 		return map;
 	}
 	
 	
 	public String getContentTypeId() {
-		return fContentTypeId;
+		return this.contentTypeId;
 	}
 	
 	public synchronized InfoHoverDescriptor getHoverDescriptor(final int stateMask) {
-		List<InfoHoverDescriptor> descriptors = fDescriptors;
+		List<InfoHoverDescriptor> descriptors= this.descriptors;
 		if (descriptors == null) {
-			fDescriptors = descriptors = loadCurrent();
+			this.descriptors= descriptors= loadCurrent();
 		}
 		for (final InfoHoverDescriptor descriptor : descriptors) {
 			if (descriptor.isEnabled() && descriptor.getStateMask() == stateMask) {
@@ -228,44 +228,44 @@ public class InfoHoverRegistry implements ManageListener, IDisposable {
 	}
 	
 	public synchronized EffectiveHovers getEffectiveHoverDescriptors() {
-		if (fEffectiveHovers == null) {
+		if (this.effectiveHovers == null) {
 			updateEffectiveHovers();
 		}
-		return fEffectiveHovers;
+		return this.effectiveHovers;
 	}
 	
 	private void updateEffectiveHovers() {
-		List<InfoHoverDescriptor> descriptors = fDescriptors;
+		List<InfoHoverDescriptor> descriptors= this.descriptors;
 		if (descriptors == null) {
-			fDescriptors = descriptors = loadCurrent();
+			this.descriptors= descriptors= loadCurrent();
 		}
-		int[] stateMasks = new int[descriptors.size()];
-		final List<InfoHoverDescriptor> effectiveDescriptors = new ArrayList<InfoHoverDescriptor>(descriptors.size());
-		final List<InfoHoverDescriptor> combinedDescriptors = new ArrayList<InfoHoverDescriptor>(descriptors.size());
+		int[] stateMasks= new int[descriptors.size()];
+		final List<InfoHoverDescriptor> effectiveDescriptors= new ArrayList<>(descriptors.size());
+		final List<InfoHoverDescriptor> combinedDescriptors= new ArrayList<>(descriptors.size());
 		for (final InfoHoverDescriptor descriptor : descriptors) {
-			if (!descriptor.getId().endsWith("CombinedHover")) {
+			if (!descriptor.getId().endsWith("CombinedHover")) { //$NON-NLS-1$
 				combinedDescriptors.add(descriptor);
 			}
 			if (descriptor.isEnabled()) {
-				final int stateMask = descriptor.getStateMask();
+				final int stateMask= descriptor.getStateMask();
 				if (stateMask == -1) {
 					continue;
 				}
-				for (int i = 0; i < effectiveDescriptors.size(); i++) {
+				for (int i= 0; i < effectiveDescriptors.size(); i++) {
 					if (stateMasks[i] == stateMask) {
 						continue;
 					}
 				}
-				stateMasks[effectiveDescriptors.size()] = stateMask;
+				stateMasks[effectiveDescriptors.size()]= stateMask;
 				effectiveDescriptors.add(descriptor);
 			}
 		}
 		if (stateMasks.length != effectiveDescriptors.size()) {
-			final int[] fittedMasks = new int[effectiveDescriptors.size()];
+			final int[] fittedMasks= new int[effectiveDescriptors.size()];
 			System.arraycopy(stateMasks, 0, fittedMasks, 0, effectiveDescriptors.size());
-			stateMasks = fittedMasks;
+			stateMasks= fittedMasks;
 		}
-		fEffectiveHovers = new EffectiveHovers(stateMasks, effectiveDescriptors, combinedDescriptors);
+		this.effectiveHovers= new EffectiveHovers(stateMasks, effectiveDescriptors, combinedDescriptors);
 	}
 	
 }

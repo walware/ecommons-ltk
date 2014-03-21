@@ -28,24 +28,24 @@ public abstract class SimpleCompletionProposal extends CompletionProposalWithOve
 	
 	
 	/** The replacement string. */
-	private final String fReplacementString;
+	private final String replacementString;
 	
 	/** The cursor position after this proposal has been applied. */
-	private int fCursorPosition = -1;
+	private int cursorPosition= -1;
 	
 	
 	public SimpleCompletionProposal(final AssistInvocationContext context, final String replacementString, final int replacementOffset) {
 		super(context, replacementOffset);
-		fReplacementString = replacementString;
+		this.replacementString= replacementString;
 	}
 	
 	
 	protected final String getReplacementString() {
-		return fReplacementString;
+		return this.replacementString;
 	}
 	
 	protected final void setCursorPosition(final int offset) {
-		fCursorPosition = offset;
+		this.cursorPosition= offset;
 	}
 	
 	/**
@@ -83,7 +83,7 @@ public abstract class SimpleCompletionProposal extends CompletionProposalWithOve
 	
 	@Override
 	public String getSortingString() {
-		return fReplacementString;
+		return this.replacementString;
 	}
 	
 	/**
@@ -92,9 +92,9 @@ public abstract class SimpleCompletionProposal extends CompletionProposalWithOve
 	@Override
 	public boolean validate(final IDocument document, final int offset, final DocumentEvent event) {
 		try {
-			final int replacementOffset = getReplacementOffset();
-			final String content = document.get(replacementOffset, offset - replacementOffset);
-			if (fReplacementString.regionMatches(true, 0, content, 0, content.length())) {
+			final int replacementOffset= getReplacementOffset();
+			final String content= document.get(replacementOffset, offset - replacementOffset);
+			if (this.replacementString.regionMatches(true, 0, content, 0, content.length())) {
 				return true;
 			}
 		}
@@ -115,10 +115,11 @@ public abstract class SimpleCompletionProposal extends CompletionProposalWithOve
 	@Override
 	protected void doApply(final char trigger, final int stateMask,
 			final int caretOffset, final int replacementOffset, final int replacementLength) throws BadLocationException {
+		final AssistInvocationContext context= getInvocationContext();
+		final SourceViewer viewer= context.getSourceViewer();
+		final IDocument document= viewer.getDocument();
 		try {
-			final SourceViewer viewer = fContext.getSourceViewer();
-			final IDocument document = viewer.getDocument();
-			final String replacementString = getReplacementString();
+			final String replacementString= getReplacementString();
 			document.replace(replacementOffset, replacementLength, replacementString);
 			setCursorPosition(replacementOffset + replacementString.length());
 		}
@@ -131,8 +132,8 @@ public abstract class SimpleCompletionProposal extends CompletionProposalWithOve
 	 */
 	@Override
 	public Point getSelection(final IDocument document) {
-		if (fCursorPosition >= 0) {
-			return new Point(fCursorPosition, 0);
+		if (this.cursorPosition >= 0) {
+			return new Point(this.cursorPosition, 0);
 		}
 		return null;
 	}

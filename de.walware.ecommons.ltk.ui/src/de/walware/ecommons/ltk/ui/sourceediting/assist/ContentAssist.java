@@ -20,8 +20,8 @@ import org.eclipse.jface.text.contentassist.ContentAssistant;
 public class ContentAssist extends ContentAssistant {
 	
 	
-	private boolean fIsAutoInsertEnabled;
-	private boolean fIsAutoInsertOverwritten;
+	private boolean isAutoInsertEnabled;
+	private boolean isAutoInsertOverwritten;
 	
 	
 	public ContentAssist() {
@@ -43,7 +43,7 @@ public class ContentAssist extends ContentAssistant {
 	public void showPossibleCompletions(final boolean restart, final boolean autostart) {
 		class AutoAssist extends AutoAssistListener {
 			
-			public static final int SHOW_PROPOSALS = 1;
+			public static final int SHOW_PROPOSALS= 1;
 			
 			@Override
 			public void start(final int showStyle) {
@@ -65,8 +65,8 @@ public class ContentAssist extends ContentAssistant {
 	
 	@Override
 	public void enableAutoInsert(final boolean enabled) {
-		fIsAutoInsertEnabled = enabled;
-		if (!fIsAutoInsertOverwritten) {
+		this.isAutoInsertEnabled= enabled;
+		if (!this.isAutoInsertOverwritten) {
 			super.enableAutoInsert(enabled);
 		}
 	}
@@ -78,7 +78,7 @@ public class ContentAssist extends ContentAssistant {
 	 * @see #enableAutoInsert(boolean)
 	 */
 	void enableAutoInsertTemporarily() {
-		fIsAutoInsertOverwritten = true;
+		this.isAutoInsertOverwritten= true;
 		super.enableAutoInsert(true);
 	}
 	
@@ -89,9 +89,9 @@ public class ContentAssist extends ContentAssistant {
 	 * @see #enableAutoInsert(boolean)
 	 */
 	void enableAutoInsertSetting() {
-		if (fIsAutoInsertOverwritten) {
-			fIsAutoInsertOverwritten = false;
-			super.enableAutoInsert(fIsAutoInsertEnabled);
+		if (this.isAutoInsertOverwritten) {
+			this.isAutoInsertOverwritten= false;
+			super.enableAutoInsert(this.isAutoInsertEnabled);
 		}
 	}
 	

@@ -65,15 +65,15 @@ import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditor;
 public class ContentAssistProcessor implements IContentAssistProcessor {
 	
 	
-	private static final boolean DEBUG = "true".equalsIgnoreCase(Platform.getDebugOption("de.walware.ecommons.ui/debug/ResultCollector")); //$NON-NLS-1$ //$NON-NLS-2$
+	private static final boolean DEBUG= "true".equalsIgnoreCase(Platform.getDebugOption("de.walware.ecommons.ui/debug/ResultCollector")); //$NON-NLS-1$ //$NON-NLS-2$
 	
-	private static final Collator NAME_COLLATOR = Collator.getInstance();
+	private static final Collator NAME_COLLATOR= Collator.getInstance();
 	
-	static final Comparator<IAssistCompletionProposal> PROPOSAL_COMPARATOR = new Comparator<IAssistCompletionProposal>() {
+	static final Comparator<IAssistCompletionProposal> PROPOSAL_COMPARATOR= new Comparator<IAssistCompletionProposal>() {
 		
 		@Override
 		public int compare(final IAssistCompletionProposal proposal1, final IAssistCompletionProposal proposal2) {
-			final int diff = proposal2.getRelevance() - proposal1.getRelevance();
+			final int diff= proposal2.getRelevance() - proposal1.getRelevance();
 			if (diff != 0) {
 				return diff; // reverse
 			}
@@ -82,7 +82,7 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 		
 	};
 	
-	private static final long INFO_ITER_SPAN = 3L * 1000000000L;
+	private static final long INFO_ITER_SPAN= 3L * 1000000000L;
 	
 	
 	/**
@@ -92,68 +92,68 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 		
 		@Override
 		public void assistSessionStarted(final ContentAssistEvent event) {
-			if (event.processor != ContentAssistProcessor.this || event.assistant != fAssistant) {
+			if (event.processor != ContentAssistProcessor.this || event.assistant != ContentAssistProcessor.this.assistant) {
 				return;
 			}
 			
-			final KeySequence binding = WorkbenchUIUtil.getBestKeyBinding(
+			final KeySequence binding= WorkbenchUIUtil.getBestKeyBinding(
 					ITextEditorActionDefinitionIds.CONTENT_ASSIST_PROPOSALS );
-			fAvailableCategories = fComputerRegistry.getCategories();
-			fIterationGesture = createIterationGesture(binding);
-			fCategoryIteration = createCategoryIteration();
+			ContentAssistProcessor.this.availableCategories= ContentAssistProcessor.this.computerRegistry.getCategories();
+			ContentAssistProcessor.this.iterationGesture= createIterationGesture(binding);
+			ContentAssistProcessor.this.categoryIteration= createCategoryIteration();
 			
-			for (final ContentAssistCategory category : fAvailableCategories) {
-				final List<IContentAssistComputer> computers = category.getComputers(fPartition);
+			for (final ContentAssistCategory category : ContentAssistProcessor.this.availableCategories) {
+				final List<IContentAssistComputer> computers= category.getComputers(ContentAssistProcessor.this.partition);
 				for (final IContentAssistComputer computer : computers) {
-					computer.sessionStarted(fEditor, fAssistant);
+					computer.sessionStarted(ContentAssistProcessor.this.editor, ContentAssistProcessor.this.assistant);
 				}
 			}
 			
-			fRepetition = 0;
+			ContentAssistProcessor.this.repetition= 0;
 			
-			if (fAssistant instanceof IContentAssistantExtension3) {
-				final IContentAssistantExtension3 ext3= fAssistant;
+			if (ContentAssistProcessor.this.assistant instanceof IContentAssistantExtension3) {
+				final IContentAssistantExtension3 ext3= ContentAssistProcessor.this.assistant;
 				((ContentAssistant) ext3).setRepeatedInvocationTrigger(binding);
 			}
-			if (fCategoryIteration.size() == 1) {
-				fAssistant.setRepeatedInvocationMode(false);
-				fAssistant.setShowEmptyList(false);
+			if (ContentAssistProcessor.this.categoryIteration.size() == 1) {
+				ContentAssistProcessor.this.assistant.setRepeatedInvocationMode(false);
+				ContentAssistProcessor.this.assistant.setShowEmptyList(false);
 			}
 			else {
-				fAssistant.setRepeatedInvocationMode(true);
-				fAssistant.setShowEmptyList(true);
+				ContentAssistProcessor.this.assistant.setRepeatedInvocationMode(true);
+				ContentAssistProcessor.this.assistant.setShowEmptyList(true);
 				
-				fAssistant.setStatusLineVisible(true);
-				fAssistant.setStatusMessage(createIterationMessage(0));
+				ContentAssistProcessor.this.assistant.setStatusLineVisible(true);
+				ContentAssistProcessor.this.assistant.setStatusMessage(createIterationMessage(0));
 			}
 		}
 		
 		@Override
 		public void assistSessionEnded(final ContentAssistEvent event) {
-			if (event.processor != ContentAssistProcessor.this || event.assistant != fAssistant) {
+			if (event.processor != ContentAssistProcessor.this || event.assistant != ContentAssistProcessor.this.assistant) {
 				return;
 			}
 			
-			if (fAvailableCategories != null) {
-				for (final ContentAssistCategory category : fAvailableCategories) {
-					final List<IContentAssistComputer> computers = category.getComputers(fPartition);
+			if (ContentAssistProcessor.this.availableCategories != null) {
+				for (final ContentAssistCategory category : ContentAssistProcessor.this.availableCategories) {
+					final List<IContentAssistComputer> computers= category.getComputers(ContentAssistProcessor.this.partition);
 					for (final IContentAssistComputer computer : computers) {
 						computer.sessionEnded();
 					}
 				}
 			}
-			fAvailableCategories = null;
-			fCategoryIteration = null;
-			fRepetition = -1;
-			fIterationGesture = null;
+			ContentAssistProcessor.this.availableCategories= null;
+			ContentAssistProcessor.this.categoryIteration= null;
+			ContentAssistProcessor.this.repetition= -1;
+			ContentAssistProcessor.this.iterationGesture= null;
 			
-			fAssistant.setRepeatedInvocationMode(false);
-			fAssistant.setShowEmptyList(false);
-			fAssistant.enableAutoInsertSetting();
+			ContentAssistProcessor.this.assistant.setRepeatedInvocationMode(false);
+			ContentAssistProcessor.this.assistant.setShowEmptyList(false);
+			ContentAssistProcessor.this.assistant.enableAutoInsertSetting();
 			
-			fAssistant.setStatusLineVisible(false);
-			if (fAssistant instanceof IContentAssistantExtension3) {
-				final IContentAssistantExtension3 ext3 = fAssistant;
+			ContentAssistProcessor.this.assistant.setStatusLineVisible(false);
+			if (ContentAssistProcessor.this.assistant instanceof IContentAssistantExtension3) {
+				final IContentAssistantExtension3 ext3= ContentAssistProcessor.this.assistant;
 				((ContentAssistant) ext3).setRepeatedInvocationTrigger(null);
 			}
 		}
@@ -164,7 +164,7 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 		
 		@Override
 		public void assistSessionRestarted(final ContentAssistEvent event) {
-			fRepetition = 0;
+			ContentAssistProcessor.this.repetition= 0;
 		}
 		
 	}
@@ -173,29 +173,29 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	/**
 	 * The completion proposal registry.
 	 */
-	private final ContentAssistComputerRegistry fComputerRegistry;
+	private final ContentAssistComputerRegistry computerRegistry;
 	
-	private final String fPartition;
-	private final ContentAssist fAssistant;
-	private final ISourceEditor fEditor;
+	private final String partition;
+	private final ContentAssist assistant;
+	private final ISourceEditor editor;
 	
-	private char[] fCompletionAutoActivationCharacters;
+	private char[] completionAutoActivationCharacters;
 	
 	/* cycling stuff */
-	private int fRepetition = -1;
-	private final FastList<ContentAssistCategory> fExpliciteCategories = new FastList<ContentAssistCategory>(ContentAssistCategory.class);
-	private List<ContentAssistCategory> fAvailableCategories;
-	private List<List<ContentAssistCategory>> fCategoryIteration;
-	private String fIterationGesture = null;
-	private int fNumberOfComputedResults = 0;
-	private IStatus fStatus;
+	private int repetition= -1;
+	private final FastList<ContentAssistCategory> expliciteCategories= new FastList<>(ContentAssistCategory.class);
+	private List<ContentAssistCategory> availableCategories;
+	private List<List<ContentAssistCategory>> categoryIteration;
+	private String iterationGesture= null;
+	private int numberOfComputedResults= 0;
+	private IStatus status;
 	
-	private IContextInformationValidator fContextInformationValidator;
+	private IContextInformationValidator contextInformationValidator;
 	
 	/* for detection if information mode is valid */
-	private long fInformationModeTimestamp;
-	private long fInformationModeModificationStamp;
-	private int fInformationModeOffset;
+	private long informationModeTimestamp;
+	private long informationModeModificationStamp;
+	private int informationModeOffset;
 	
 	
 	public ContentAssistProcessor(final ContentAssist assistant, final String partition, final ContentAssistComputerRegistry registry, final ISourceEditor editor) {
@@ -204,25 +204,25 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 		assert(registry != null);
 		assert(editor != null);
 		
-		fPartition = partition;
-		fComputerRegistry = registry;
-		fEditor = editor;
-		fAssistant = assistant;
-		fAssistant.enableColoredLabels(true);
-		fAssistant.addCompletionListener(new CompletionListener());
+		this.partition= partition;
+		this.computerRegistry= registry;
+		this.editor= editor;
+		this.assistant= assistant;
+		this.assistant.enableColoredLabels(true);
+		this.assistant.addCompletionListener(new CompletionListener());
 	}
 	
 	
 	public String getPartition() {
-		return fPartition;
+		return this.partition;
 	}
 	
 	protected ISourceEditor getEditor() {
-		return fEditor;
+		return this.editor;
 	}
 	
 	public void addCategory(final ContentAssistCategory category) {
-		fExpliciteCategories.add(category);
+		this.expliciteCategories.add(category);
 	}
 	
 	/**
@@ -230,50 +230,50 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	 */
 	@Override
 	public final ICompletionProposal[] computeCompletionProposals(final ITextViewer viewer, final int offset) {
-		final long start = System.nanoTime();
+		final long start= System.nanoTime();
 		
 		clearState();
 		
-		final SubMonitor progress = SubMonitor.convert(createProgressMonitor());
+		final SubMonitor progress= SubMonitor.convert(createProgressMonitor());
 		progress.beginTask(EditingMessages.ContentAssistProcessor_ComputingProposals_task, 10);
 		
-		final AssistInvocationContext context = createCompletionProposalContext(offset, progress.newChild(3));
+		final AssistInvocationContext context= createCompletionProposalContext(offset, progress.newChild(3));
 		
-		final long setup = DEBUG ? System.nanoTime() : 0L;
+		final long setup= DEBUG ? System.nanoTime() : 0L;
 		
-		final long modificationStamp = ((AbstractDocument) context.getSourceViewer().getDocument()).getModificationStamp();
+		final long modificationStamp= ((AbstractDocument) context.getSourceViewer().getDocument()).getModificationStamp();
 		final int mode;
-		if (fComputerRegistry.isInSpecificMode()) {
-			mode = IContentAssistComputer.SPECIFIC_MODE;
+		if (this.computerRegistry.isInSpecificMode()) {
+			mode= IContentAssistComputer.SPECIFIC_MODE;
 		}
-		else if (!fAssistant.isProposalPopupActive1()
-				&& (   start-fInformationModeTimestamp > INFO_ITER_SPAN
-					|| offset != fInformationModeOffset
-					|| !fAssistant.isContextInfoPopupActive1()
-					|| modificationStamp != fInformationModeModificationStamp)
+		else if (!this.assistant.isProposalPopupActive1()
+				&& (   start-this.informationModeTimestamp > INFO_ITER_SPAN
+					|| offset != this.informationModeOffset
+					|| !this.assistant.isContextInfoPopupActive1()
+					|| modificationStamp != this.informationModeModificationStamp)
 				&& forceContextInformation(context)) {
-			mode = IContentAssistComputer.INFORMATION_MODE;
+			mode= IContentAssistComputer.INFORMATION_MODE;
 			
-			fAssistant.setRepeatedInvocationMode(true);
-			fAssistant.setShowEmptyList(true);
-			fAssistant.enableAutoInsertTemporarily();
+			this.assistant.setRepeatedInvocationMode(true);
+			this.assistant.setShowEmptyList(true);
+			this.assistant.enableAutoInsertTemporarily();
 			
-			fAssistant.setStatusLineVisible(true);
+			this.assistant.setStatusLineVisible(true);
 //			fAssistant.setStatusMessage(createIterationMessage(-1));
-			fAssistant.setStatusMessage(EditingMessages.ContentAssistProcessor_ContextSelection_label);
+			this.assistant.setStatusMessage(EditingMessages.ContentAssistProcessor_ContextSelection_label);
 		}
-		else if (fRepetition > 0) {
-			mode = IContentAssistComputer.SPECIFIC_MODE;
+		else if (this.repetition > 0) {
+			mode= IContentAssistComputer.SPECIFIC_MODE;
 			
-			fAssistant.enableAutoInsertSetting();
+			this.assistant.enableAutoInsertSetting();
 		}
 		else {
-			mode = IContentAssistComputer.COMBINED_MODE;
+			mode= IContentAssistComputer.COMBINED_MODE;
 			
-			fAssistant.enableAutoInsertSetting();
+			this.assistant.enableAutoInsertSetting();
 		}
 		
-		final List<ContentAssistCategory> categories = (mode != IContentAssistComputer.INFORMATION_MODE) ?
+		final List<ContentAssistCategory> categories= (mode != IContentAssistComputer.INFORMATION_MODE) ?
 				getCurrentCategories() : getInformationCategories();
 		
 		progress.setWorkRemaining(categories.size() + 1);
@@ -283,40 +283,42 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 		final AssistProposalCollector<IAssistCompletionProposal> proposals =
 				createCompletionProposalCollector();
 		collectCompletionProposals(context, mode, categories, proposals, progress);
-		final long collect = DEBUG ? System.nanoTime() : 0L;
+		final long collect= DEBUG ? System.nanoTime() : 0L;
 		
 		progress.subTask((mode != IContentAssistComputer.INFORMATION_MODE) ?
 				EditingMessages.ContentAssistProcessor_ComputingProposals_Sorting_task :
 				EditingMessages.ContentAssistProcessor_ComputingContexts_Sorting_task);
-		final IAssistCompletionProposal[] result = filterAndSortCompletionProposals(proposals, context, progress);
-		final long filter = DEBUG ? System.nanoTime() : 0L;
+		final IAssistCompletionProposal[] result= filterAndSortCompletionProposals(proposals, context, progress);
+		final long filter= DEBUG ? System.nanoTime() : 0L;
 		
-		fNumberOfComputedResults = result.length;
+		this.numberOfComputedResults= result.length;
 		progress.done();
 		
 		if (mode == IContentAssistComputer.INFORMATION_MODE) {
-			if (result.length > 1 && fAssistant.isContextInfoPopupActive1()
-					&& !fAssistant.isProposalPopupActive1()) {
-				fAssistant.hidePopups();
+			if (result.length > 1 && this.assistant.isContextInfoPopupActive1()
+					&& !this.assistant.isProposalPopupActive1()) {
+				this.assistant.hidePopups();
 			}
-			fInformationModeOffset = offset;
-			fInformationModeTimestamp = System.nanoTime();
-			fInformationModeModificationStamp = modificationStamp;
+			this.informationModeOffset= offset;
+			this.informationModeTimestamp= System.nanoTime();
+			this.informationModeModificationStamp= modificationStamp;
 		}
 		
 		if (DEBUG) {
-			System.err.println("Code Assist Stats (" + result.length + " proposals)"); //$NON-NLS-1$ 
-			System.err.println("Code Assist (setup):\t" + (setup - start) ); 
-			System.err.println("Code Assist (collect):\t" + (collect - setup) ); 
-			System.err.println("Code Assist (sort):\t" + (filter - collect) ); 
+			final StringBuilder sb= new StringBuilder("Code Assist Stats"); //$NON-NLS-1$
+			sb.append(" (").append(result.length).append(" proposals)"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append("\n\t" + "setup=   ").append((setup - start)); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append("\n\t" + "collect= ").append((collect - setup)); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append("\n\t" + "sort=    ").append((filter - collect)); //$NON-NLS-1$ //$NON-NLS-2$
+			System.out.println(sb);
 		}
 		
 		return result;
 	}
 	
 	private void clearState() {
-		fStatus = null;
-		fNumberOfComputedResults = 0;
+		this.status= null;
+		this.numberOfComputedResults= 0;
 	}
 	
 	/**
@@ -334,13 +336,13 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 			final List<ContentAssistCategory> categories,
 			final AssistProposalCollector<IAssistCompletionProposal> proposals, final SubMonitor progress) {
 		for (final ContentAssistCategory category : categories) {
-			final List<IContentAssistComputer> computers = category.getComputers(fPartition);
-			final SubMonitor computorsProgress = progress.newChild(1);
+			final List<IContentAssistComputer> computers= category.getComputers(this.partition);
+			final SubMonitor computorsProgress= progress.newChild(1);
 			for (final IContentAssistComputer computer : computers) {
-				final IStatus status = computer.computeCompletionProposals(context, mode, proposals, computorsProgress);
+				final IStatus status= computer.computeCompletionProposals(context, mode, proposals, computorsProgress);
 				if (status != null && status.getSeverity() >= IStatus.INFO
-						&& (fStatus == null || status.getSeverity() > fStatus.getSeverity()) ) {
-					fStatus = status;
+						&& (this.status == null || status.getSeverity() > this.status.getSeverity()) ) {
+					this.status= status;
 				}
 			}
 		}
@@ -351,9 +353,9 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 		return new AssistProposalCollector<IAssistCompletionProposal>(IAssistCompletionProposal.class) {
 			@Override
 			public void add(final IAssistCompletionProposal proposal) {
-				final IAssistCompletionProposal existing = fProposals.put(proposal, proposal);
+				final IAssistCompletionProposal existing= this.proposals.put(proposal, proposal);
 				if (existing != null && existing.getRelevance() > proposal.getRelevance()) {
-					fProposals.put(existing, existing);
+					this.proposals.put(existing, existing);
 				}
 			}
 		};
@@ -371,7 +373,7 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	protected IAssistCompletionProposal[] filterAndSortCompletionProposals(
 			final AssistProposalCollector<IAssistCompletionProposal> proposals,
 			final AssistInvocationContext context, final IProgressMonitor monitor) {
-		final IAssistCompletionProposal[] array = proposals.toArray();
+		final IAssistCompletionProposal[] array= proposals.toArray();
 		if (array.length > 1) {
 			Arrays.sort(array, PROPOSAL_COMPARATOR);
 		}
@@ -384,19 +386,19 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	 */
 	@Override
 	public IContextInformation[] computeContextInformation(final ITextViewer viewer, final int offset) {
-		fNumberOfComputedResults = 0;
-		IContextInformation[] result = null;
+		this.numberOfComputedResults= 0;
+		IContextInformation[] result= null;
 		
 		clearState();
 		
-		final SubMonitor progress = SubMonitor.convert(createProgressMonitor());
+		final SubMonitor progress= SubMonitor.convert(createProgressMonitor());
 		progress.beginTask(EditingMessages.ContentAssistProcessor_ComputingContexts_task, 10);
 		
-		final AssistInvocationContext context = createContextInformationContext(offset, progress.newChild(3));
+		final AssistInvocationContext context= createContextInformationContext(offset, progress.newChild(3));
 		
-		final List<ContentAssistCategory> available = fComputerRegistry.getCategories();
-		final List<ContentAssistCategory> defaultGroup = new ArrayList<ContentAssistCategory>();
-		final List<ContentAssistCategory> otherGroup = new ArrayList<ContentAssistCategory>();
+		final List<ContentAssistCategory> available= this.computerRegistry.getCategories();
+		final List<ContentAssistCategory> defaultGroup= new ArrayList<>();
+		final List<ContentAssistCategory> otherGroup= new ArrayList<>();
 		for (final ContentAssistCategory category : otherGroup) {
 			if (category.isEnabledInDefault()) {
 				defaultGroup.add(category);
@@ -414,8 +416,8 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 			if (proposals.getCount() <= 0) {
 				if (collectSingleInformationProposals(context, otherGroup, proposals, progress)) {
 					if (proposals.getCount() == 1) {
-						fNumberOfComputedResults = 1;
-						result = proposals.toArray();
+						this.numberOfComputedResults= 1;
+						result= proposals.toArray();
 					}
 				}
 			}
@@ -433,13 +435,13 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 			final List<ContentAssistCategory> categories,
 			final AssistProposalCollector<IAssistInformationProposal> proposals, final SubMonitor progress) {
 		for (final ContentAssistCategory category : categories) {
-			final List<IContentAssistComputer> computers = category.getComputers(fPartition);
-			final SubMonitor computersProgress = progress.newChild(1);
+			final List<IContentAssistComputer> computers= category.getComputers(this.partition);
+			final SubMonitor computersProgress= progress.newChild(1);
 			for (final IContentAssistComputer computer : computers) {
-				computer.sessionStarted(context.getEditor(), fAssistant);
+				computer.sessionStarted(context.getEditor(), this.assistant);
 				final IStatus status;
 				try {
-					status = computer.computeContextInformation(context, proposals, computersProgress);
+					status= computer.computeContextInformation(context, proposals, computersProgress);
 				}
 				finally {
 					computer.sessionEnded();
@@ -454,7 +456,7 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	}
 	
 	protected AssistProposalCollector<IAssistInformationProposal> createInformationProposalCollector() {
-		return new AssistProposalCollector<IAssistInformationProposal>(IAssistInformationProposal.class);
+		return new AssistProposalCollector<>(IAssistInformationProposal.class);
 	}
 	
 	/**
@@ -464,7 +466,7 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	 * @param activationSet the activation set
 	 */
 	public final void setCompletionProposalAutoActivationCharacters(final char[] activationSet) {
-		fCompletionAutoActivationCharacters = activationSet;
+		this.completionAutoActivationCharacters= activationSet;
 	}
 	
 	/**
@@ -472,7 +474,7 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	 */
 	@Override
 	public final char[] getCompletionProposalAutoActivationCharacters() {
-		return fCompletionAutoActivationCharacters;
+		return this.completionAutoActivationCharacters;
 	}
 	
 	/**
@@ -488,7 +490,7 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	 */
 	@Override
 	public String getErrorMessage() {
-		final IStatus status = fStatus;
+		final IStatus status= this.status;
 		return (status != null && status.getSeverity() == IStatus.ERROR) ? status.getMessage() : null;
 	}
 	
@@ -500,10 +502,10 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	 */
 	@Override
 	public final IContextInformationValidator getContextInformationValidator() {
-		if (fContextInformationValidator == null) {
-			fContextInformationValidator = createContextInformationValidator();
+		if (this.contextInformationValidator == null) {
+			this.contextInformationValidator= createContextInformationValidator();
 		}
-		return fContextInformationValidator;
+		return this.contextInformationValidator;
 	}
 	
 	protected IContextInformationValidator createContextInformationValidator() {
@@ -552,23 +554,23 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	}
 	
 	private List<ContentAssistCategory> getCurrentCategories() {
-		if (fCategoryIteration == null) {
-			return fAvailableCategories;
+		if (this.categoryIteration == null) {
+			return this.availableCategories;
 		}
-		final int iteration = fRepetition % fCategoryIteration.size();
-		fAssistant.setStatusMessage(createIterationMessage(iteration));
-		fAssistant.setEmptyMessage(createEmptyMessage());
-		fRepetition++;
-		if (fRepetition >= fCategoryIteration.size()) {
-			fRepetition = 0;
+		final int iteration= this.repetition % this.categoryIteration.size();
+		this.assistant.setStatusMessage(createIterationMessage(iteration));
+		this.assistant.setEmptyMessage(createEmptyMessage());
+		this.repetition++;
+		if (this.repetition >= this.categoryIteration.size()) {
+			this.repetition= 0;
 		}
 		
-		return fCategoryIteration.get(iteration);
+		return this.categoryIteration.get(iteration);
 	}
 	
 	private List<ContentAssistCategory> getInformationCategories() {
-		final List<ContentAssistCategory> categories = new ArrayList<ContentAssistCategory>(fAvailableCategories.size());
-		for (final ContentAssistCategory category : fAvailableCategories) {
+		final List<ContentAssistCategory> categories= new ArrayList<>(this.availableCategories.size());
+		for (final ContentAssistCategory category : this.availableCategories) {
 			if (category.isEnabledInDefault() || category.isEnabledInCircling()) {
 				categories.add(category);
 			}
@@ -577,7 +579,7 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	}
 	
 	private List<List<ContentAssistCategory>> createCategoryIteration() {
-		final List<List<ContentAssistCategory>> sequence = new ArrayList<List<ContentAssistCategory>>(fAvailableCategories.size());
+		final List<List<ContentAssistCategory>> sequence= new ArrayList<>(this.availableCategories.size());
 		sequence.add(createDefaultCategories());
 		for (final ContentAssistCategory category : createSeparateCategories()) {
 			sequence.add(Collections.singletonList(category));
@@ -586,16 +588,16 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	}
 	
 	private List<ContentAssistCategory> createDefaultCategories() {
-		final List<ContentAssistCategory> included = new ArrayList<ContentAssistCategory>(fAvailableCategories.size());
-		for (final ContentAssistCategory category : fAvailableCategories) {
-			if (category.isEnabledInDefault() && category.hasComputers(fPartition)) {
+		final List<ContentAssistCategory> included= new ArrayList<>(this.availableCategories.size());
+		for (final ContentAssistCategory category : this.availableCategories) {
+			if (category.isEnabledInDefault() && category.hasComputers(this.partition)) {
 				included.add(category);
 			}
 		}
-		final ContentAssistCategory[] exclicite = fExpliciteCategories.toArray();
-		for (int i = 0; i < exclicite.length; i++) {
-			final ContentAssistCategory category = exclicite[i];
-			if (category.isEnabledInDefault() && category.hasComputers(fPartition)) {
+		final ContentAssistCategory[] exclicite= this.expliciteCategories.toArray();
+		for (int i= 0; i < exclicite.length; i++) {
+			final ContentAssistCategory category= exclicite[i];
+			if (category.isEnabledInDefault() && category.hasComputers(this.partition)) {
 				included.add(category);
 			}
 		}
@@ -603,9 +605,9 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	}
 	
 	private List<ContentAssistCategory> createSeparateCategories() {
-		final ArrayList<ContentAssistCategory> sorted = new ArrayList<ContentAssistCategory>(fAvailableCategories.size());
-		for (final ContentAssistCategory category : fAvailableCategories) {
-			if (category.isEnabledInCircling() && category.hasComputers(fPartition)) {
+		final ArrayList<ContentAssistCategory> sorted= new ArrayList<>(this.availableCategories.size());
+		for (final ContentAssistCategory category : this.availableCategories) {
+			if (category.isEnabledInCircling() && category.hasComputers(this.partition)) {
 				sorted.add(category);
 			}
 		}
@@ -614,7 +616,7 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 	
 	protected String createEmptyMessage() {
 		return NLS.bind(EditingMessages.ContentAssistProcessor_Empty_message, new String[] { 
-				getCategoryName(fRepetition)});
+				getCategoryName(this.repetition)});
 	}
 	
 	protected String createIterationMessage(final int iterationPosition) {
@@ -623,10 +625,10 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 //		}
 		final StringBuilder sb= new StringBuilder(
 				getCategoryName(iterationPosition) );
-		if (this.fCategoryIteration.size() > 0) {
+		if (this.categoryIteration.size() > 0) {
 			sb.append("\u2004\u2004"); //$NON-NLS-1$
 			sb.append(NLS.bind(SharedMessages.DoToShow_message,
-					this.fIterationGesture,
+					this.iterationGesture,
 					getCategoryName(iterationPosition + 1) ));
 		}
 		return sb.toString();
@@ -636,11 +638,11 @@ public class ContentAssistProcessor implements IContentAssistProcessor {
 		if (repetition < 0) {
 			return EditingMessages.ContentAssistProcessor_ContextSelection_label;
 		}
-		final int iterationPosition = repetition % fCategoryIteration.size();
+		final int iterationPosition= repetition % this.categoryIteration.size();
 		if (iterationPosition == 0) {
 			return EditingMessages.ContentAssistProcessor_DefaultProposalCategory;
 		}
-		return fCategoryIteration.get(iterationPosition).get(0).getDisplayName();
+		return this.categoryIteration.get(iterationPosition).get(0).getDisplayName();
 	}
 	
 	private String createIterationGesture(final KeySequence binding) {

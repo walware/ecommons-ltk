@@ -29,31 +29,35 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.statushandlers.StatusManager;
 
 
-public abstract class CompletionProposalWithOverwrite implements IAssistCompletionProposal,
-		ICompletionProposalExtension4 {
+public abstract class CompletionProposalWithOverwrite
+		implements IAssistCompletionProposal, ICompletionProposalExtension4 {
 	
 	
-	protected final AssistInvocationContext fContext;
+	private final AssistInvocationContext context;
 	
 	/** The replacement offset. */
-	private final int fReplacementOffset;
+	private final int replacementOffset;
 	
 //	private StyleRange fRememberedStyleRange;
-	private Annotation fRememberedOverwriteAnnotation;
+	private Annotation rememberedOverwriteAnnotation;
 	
 	
 	protected CompletionProposalWithOverwrite(final AssistInvocationContext context, final int startOffset) {
-		fContext = context;
-		fReplacementOffset = startOffset;
+		this.context= context;
+		this.replacementOffset= startOffset;
 	}
 	
 	
+	public final AssistInvocationContext getInvocationContext() {
+		return this.context;
+	}
+	
 	public final int getReplacementOffset() {
-		return fReplacementOffset;
+		return this.replacementOffset;
 	}
 	
 	protected int computeReplacementLength(final int replacementOffset, final Point selection, final int caretOffset, final boolean overwrite) throws BadLocationException {
-		final int end = Math.max(caretOffset, selection.x + selection.y);
+		final int end= Math.max(caretOffset, selection.x + selection.y);
 		return (end - replacementOffset);
 	}
 	
@@ -90,12 +94,12 @@ public abstract class CompletionProposalWithOverwrite implements IAssistCompleti
 	 */
 	@Override
 	public final void apply(final ITextViewer viewer, final char trigger, final int stateMask, final int offset) {
-		assert (fContext.getSourceViewer() == viewer);
+		assert (this.context.getSourceViewer() == viewer);
 		
-		final boolean smartToggle = (stateMask & SWT.CTRL) != 0;
+		final boolean smartToggle= (stateMask & SWT.CTRL) != 0;
 		try {
-			final int replacementOffset = getReplacementOffset();
-			final int replacementLength = computeReplacementLength(replacementOffset, viewer.getSelectedRange(), offset, isInOverwriteMode(smartToggle));
+			final int replacementOffset= getReplacementOffset();
+			final int replacementLength= computeReplacementLength(replacementOffset, viewer.getSelectedRange(), offset, isInOverwriteMode(smartToggle));
 			
 			if (validate(viewer.getDocument(), offset, null)) {
 				doApply(trigger, stateMask, offset, replacementOffset, replacementLength);
@@ -114,7 +118,7 @@ public abstract class CompletionProposalWithOverwrite implements IAssistCompleti
 	
 	protected void reinvokeAssist(final ITextViewer viewer) {
 		if (viewer instanceof ITextOperationTarget) {
-			final ITextOperationTarget target = (ITextOperationTarget) viewer;
+			final ITextOperationTarget target= (ITextOperationTarget) viewer;
 			Display.getCurrent().asyncExec(new Runnable() {
 				@Override
 				public void run() {
@@ -128,72 +132,72 @@ public abstract class CompletionProposalWithOverwrite implements IAssistCompleti
 	
 	
 	private void addOverwriteStyle() {
-		final SourceViewer viewer = fContext.getSourceViewer();
-		final StyledText text = viewer.getTextWidget();
+		final SourceViewer viewer= this.context.getSourceViewer();
+		final StyledText text= viewer.getTextWidget();
 		if (text == null || text.isDisposed()) {
 			return;
 		}
 		
-		final int widgetCaret = viewer.getTextWidget().getCaretOffset();
-		final int modelCaret = viewer.widgetOffset2ModelOffset(widgetCaret);
-		final int replacementOffset = getReplacementOffset();
+		final int widgetCaret= viewer.getTextWidget().getCaretOffset();
+		final int modelCaret= viewer.widgetOffset2ModelOffset(widgetCaret);
+		final int replacementOffset= getReplacementOffset();
 		int replacementLength;
 		try {
-			replacementLength = computeReplacementLength(replacementOffset, viewer.getSelectedRange(), modelCaret, true);
+			replacementLength= computeReplacementLength(replacementOffset, viewer.getSelectedRange(), modelCaret, true);
 		}
 		catch (final BadLocationException e) {
-			replacementLength = -1;
+			replacementLength= -1;
 		}
 		if (replacementLength < 0 || modelCaret >= replacementOffset + replacementLength) {
 			repairPresentation();
 			return;
 		}
 		
-		final int offset = widgetCaret;
-		final int length = replacementOffset + replacementLength - modelCaret;
+		final int offset= widgetCaret;
+		final int length= replacementOffset + replacementLength - modelCaret;
 		
 		repairPresentation();
-		fRememberedOverwriteAnnotation = new Annotation("de.walware.ecommons.text.editorAnnotations.ContentAssistOverwrite", false, "");
-		viewer.getAnnotationModel().addAnnotation(fRememberedOverwriteAnnotation, new Position(offset, length));
+		this.rememberedOverwriteAnnotation= new Annotation("de.walware.ecommons.text.editorAnnotations.ContentAssistOverwrite", false, "");
+		viewer.getAnnotationModel().addAnnotation(this.rememberedOverwriteAnnotation, new Position(offset, length));
 		
-//		final Color background = getOverwriteBackgroundColor();
-//		final Color foreground = getOverwriteForegroundColor();
+//		final Color background= getOverwriteBackgroundColor();
+//		final Color foreground= getOverwriteForegroundColor();
 //		if (foreground == null && background == null) {
 //			repairPresentation();
 //			return;
 //		}
 //		
-//		final StyleRange currentStyle = text.getStyleRangeAtOffset(offset);
+//		final StyleRange currentStyle= text.getStyleRangeAtOffset(offset);
 //		
-//		final StyleRange style = new StyleRange(offset, length, foreground, background);
+//		final StyleRange style= new StyleRange(offset, length, foreground, background);
 //		if (currentStyle != null) {
-//			style.fontStyle = currentStyle.fontStyle;
-//			style.strikeout = currentStyle.strikeout;
-//			style.underline = currentStyle.underline;
+//			style.fontStyle= currentStyle.fontStyle;
+//			style.strikeout= currentStyle.strikeout;
+//			style.underline= currentStyle.underline;
 //		}
 //		
 //		repairPresentation();
 //		// http://dev.eclipse.org/bugs/show_bug.cgi?id=34754
 //		try {
 //			text.setStyleRange(style);
-//			fRememberedStyleRange = style;
+//			fRememberedStyleRange= style;
 //		}
 //		catch (final IllegalArgumentException x) {
 //		}
 	}
 	
 	private void repairPresentation() {
-		final SourceViewer viewer = fContext.getSourceViewer();
-		if (fRememberedOverwriteAnnotation != null) {
-			viewer.getAnnotationModel().removeAnnotation(fRememberedOverwriteAnnotation);
-			fRememberedOverwriteAnnotation = null;
+		final SourceViewer viewer= this.context.getSourceViewer();
+		if (this.rememberedOverwriteAnnotation != null) {
+			viewer.getAnnotationModel().removeAnnotation(this.rememberedOverwriteAnnotation);
+			this.rememberedOverwriteAnnotation= null;
 		}
 //		if (fRememberedStyleRange != null) {
-//			final IRegion modelRange = viewer.widgetRange2ModelRange(new Region(fRememberedStyleRange.start, fRememberedStyleRange.length));
+//			final IRegion modelRange= viewer.widgetRange2ModelRange(new Region(fRememberedStyleRange.start, fRememberedStyleRange.length));
 //			if (modelRange != null) {
 //				viewer.invalidateTextPresentation(modelRange.getOffset(), modelRange.getLength());
 //			}
-//			fRememberedStyleRange = null;
+//			fRememberedStyleRange= null;
 //		}
 	}
 	

@@ -30,50 +30,51 @@ import de.walware.ecommons.ui.util.MessageUtil;
 public final class ContentAssistCategory {
 	
 	
-	private static final List<IContentAssistComputer> NO_COMPUTERS = Collections.emptyList();
+	private static final List<IContentAssistComputer> NO_COMPUTERS= Collections.emptyList();
 	
-	private final String fId;
 	
-	private final String fName;
+	private final String id;
+	
+	private final String name;
 	
 	/** The image descriptor for this category, or <code>null</code> if none specified. */
-	private final ImageDescriptor fImage;
+	private final ImageDescriptor image;
 	
-	boolean fIsEnabledAsSeparate = false;
+	boolean isEnabledAsSeparate= false;
 	
-	boolean fIsIncludedInDefault = false;
+	boolean isIncludedInDefault= false;
 	
-	private final int fSortOrder = 0x10000;
+	private final int sortOrder= 0x10000;
 	
-	private final List<ContentAssistComputerRegistry.ComputerDescriptor> fComputerDescriptors;
-	private final Map<String, List<IContentAssistComputer>> fComputersByPartition;
+	private final List<ContentAssistComputerRegistry.ComputerDescriptor> computerDescriptors;
+	private final Map<String, List<IContentAssistComputer>> computersByPartition;
 	
 	
 	public ContentAssistCategory(final String partitionId, final List<IContentAssistComputer> computers) {
-		fId = "explicite"+partitionId;
-		fName = null;
-		fImage = null;
-		fComputerDescriptors = Collections.emptyList();
-		fComputersByPartition = new HashMap<String, List<IContentAssistComputer>>();
-		fComputersByPartition.put(partitionId, computers);
-		fIsIncludedInDefault = true;
+		this.id= "explicite:" + partitionId; //$NON-NLS-1$
+		this.name= null;
+		this.image= null;
+		this.computerDescriptors= Collections.emptyList();
+		this.computersByPartition= new HashMap<>();
+		this.computersByPartition.put(partitionId, computers);
+		this.isIncludedInDefault= true;
 	}
 	
 	ContentAssistCategory(final String id, final String name, final ImageDescriptor imageDsrc,
 			final List<ContentAssistComputerRegistry.ComputerDescriptor> computers) {
-		fId = id;
-		fName = name;
-		fImage = imageDsrc;
-		fComputerDescriptors = computers;
-		fComputersByPartition = new HashMap<String, List<IContentAssistComputer>>();
+		this.id= id;
+		this.name= name;
+		this.image= imageDsrc;
+		this.computerDescriptors= computers;
+		this.computersByPartition= new HashMap<>();
 	}
 	
 	ContentAssistCategory(final ContentAssistCategory template) {
-		fId = template.fId;
-		fName = template.fName;
-		fImage = template.fImage;
-		fComputerDescriptors = template.fComputerDescriptors;
-		fComputersByPartition = template.fComputersByPartition;
+		this.id= template.id;
+		this.name= template.name;
+		this.image= template.image;
+		this.computerDescriptors= template.computerDescriptors;
+		this.computersByPartition= template.computersByPartition;
 	}
 	
 	/**
@@ -82,7 +83,7 @@ public final class ContentAssistCategory {
 	 * @return Returns the id
 	 */
 	public String getId() {
-		return fId;
+		return this.id;
 	}
 	
 	/**
@@ -91,7 +92,7 @@ public final class ContentAssistCategory {
 	 * @return Returns the name
 	 */
 	public String getName() {
-		return fName;
+		return this.name;
 	}
 	
 	/**
@@ -102,7 +103,7 @@ public final class ContentAssistCategory {
 	 * @return Returns the name
 	 */
 	public String getDisplayName() {
-		return MessageUtil.removeMnemonics(fName);
+		return MessageUtil.removeMnemonics(this.name);
 	}
 	
 	/**
@@ -111,15 +112,15 @@ public final class ContentAssistCategory {
 	 * @return the image descriptor of the described category
 	 */
 	public ImageDescriptor getImageDescriptor() {
-		return fImage;
+		return this.image;
 	}
 	
 	public boolean isEnabledInDefault() {
-		return fIsIncludedInDefault;
+		return this.isIncludedInDefault;
 	}
 	
 	public boolean isEnabledInCircling() {
-		return fIsEnabledAsSeparate;
+		return this.isEnabledAsSeparate;
 	}
 	
 //	public int getSortOrder() {
@@ -127,14 +128,14 @@ public final class ContentAssistCategory {
 //	}
 //	
 	public boolean hasComputers(final String contentTypeId) {
-		final List<IContentAssistComputer> computers = fComputersByPartition.get(contentTypeId);
+		final List<IContentAssistComputer> computers= this.computersByPartition.get(contentTypeId);
 		if (computers == null) {
-			for (final ContentAssistComputerRegistry.ComputerDescriptor dscr : fComputerDescriptors) {
+			for (final ContentAssistComputerRegistry.ComputerDescriptor dscr : this.computerDescriptors) {
 				if (dscr.getPartitions().contains(contentTypeId)) {
 					return true;
 				}
 			}
-			fComputersByPartition.put(contentTypeId, NO_COMPUTERS);
+			this.computersByPartition.put(contentTypeId, NO_COMPUTERS);
 			return false;
 		}
 		else {
@@ -143,24 +144,24 @@ public final class ContentAssistCategory {
 	}
 	
 	public List<IContentAssistComputer> getComputers(final String contentTypeId) {
-		List<IContentAssistComputer> computers = fComputersByPartition.get(contentTypeId);
+		List<IContentAssistComputer> computers= this.computersByPartition.get(contentTypeId);
 		if (computers == null) {
-			computers = initComputers(contentTypeId);
+			computers= initComputers(contentTypeId);
 		}
 		return computers;
 	}
 	
 	private List<IContentAssistComputer> initComputers(final String contentTypeId) {
-		final List<IContentAssistComputer> computers = new ArrayList<IContentAssistComputer>();
-		for (final ContentAssistComputerRegistry.ComputerDescriptor dscr : fComputerDescriptors) {
+		final List<IContentAssistComputer> computers= new ArrayList<>();
+		for (final ContentAssistComputerRegistry.ComputerDescriptor dscr : this.computerDescriptors) {
 			if (dscr.getPartitions().contains(contentTypeId)) {
-				final IContentAssistComputer computer = dscr.getComputer();
+				final IContentAssistComputer computer= dscr.getComputer();
 				if (computer != null) {
 					computers.add(computer);
 				}
 			}
 		}
-		fComputersByPartition.put(contentTypeId, computers);
+		this.computersByPartition.put(contentTypeId, computers);
 		return computers;
 	}
 	

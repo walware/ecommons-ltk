@@ -27,34 +27,34 @@ import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditor;
 public class AssistInvocationContext implements IQuickAssistInvocationContext, IRegion {
 	
 	
-	private final ISourceEditor fEditor;
-	private final SourceViewer fSourceViewer;
+	private final ISourceEditor editor;
+	private final SourceViewer sourceViewer;
 	
-	private final ISourceUnit fSourceUnit;
-	private AstInfo fAstInfo;
-	private ISourceUnitModelInfo fModelInfo;
+	private final ISourceUnit sourceUnit;
+	private AstInfo astInfo;
+	private ISourceUnitModelInfo modelInfo;
 	
-	private AstSelection fInvocationAstSelection;
-	private AstSelection fAstSelection;
+	private AstSelection invocationAstSelection;
+	private AstSelection astSelection;
 	
-	private final int fInvocationOffset;
-	private final int fSelectionOffset;
-	private final int fSelectionLength;
+	private final int invocationOffset;
+	private final int selectionOffset;
+	private final int selectionLength;
 	
-	private String fPrefix;
+	private String prefix;
 	
 	
 	public AssistInvocationContext(final ISourceEditor editor, final int offset,
 			final int synch, final IProgressMonitor monitor) {
-		fEditor = editor;
+		this.editor= editor;
 		
-		fSourceViewer = editor.getViewer();
-		fSourceUnit = editor.getSourceUnit();
+		this.sourceViewer= editor.getViewer();
+		this.sourceUnit= editor.getSourceUnit();
 		
-		fInvocationOffset = offset;
-		final Point selectedRange = fSourceViewer.getSelectedRange();
-		fSelectionOffset = selectedRange.x;
-		fSelectionLength = selectedRange.y;
+		this.invocationOffset= offset;
+		final Point selectedRange= this.sourceViewer.getSelectedRange();
+		this.selectionOffset= selectedRange.x;
+		this.selectionLength= selectedRange.y;
 		
 		init(synch, monitor);
 	}
@@ -62,26 +62,26 @@ public class AssistInvocationContext implements IQuickAssistInvocationContext, I
 	public AssistInvocationContext(final ISourceEditor editor, final IRegion region,
 			final int synch, final IProgressMonitor monitor) {
 		if (region.getOffset() < 0 || region.getLength() < 0) {
-			throw new IllegalArgumentException("region");
+			throw new IllegalArgumentException("region"); //$NON-NLS-1$
 		}
-		fEditor = editor;
+		this.editor= editor;
 		
-		fSourceViewer = editor.getViewer();
-		fSourceUnit = editor.getSourceUnit();
+		this.sourceViewer= editor.getViewer();
+		this.sourceUnit= editor.getSourceUnit();
 		
-		fInvocationOffset = region.getOffset();
-		fSelectionOffset = region.getOffset();
-		fSelectionLength = region.getLength();
+		this.invocationOffset= region.getOffset();
+		this.selectionOffset= region.getOffset();
+		this.selectionLength= region.getLength();
 		
 		init(synch, monitor);
 	}
 	
 	private void init(final int synch, final IProgressMonitor monitor) {
-		if (fSourceUnit != null) {
-			final String type = getModelTypeId();
+		if (this.sourceUnit != null) {
+			final String type= getModelTypeId();
 			// TODO check if/how we can reduce model requirement in content assistant
-			fModelInfo = fSourceUnit.getModelInfo(type, synch, monitor);
-			fAstInfo = fModelInfo != null ? fModelInfo.getAst() : fSourceUnit.getAstInfo(type, true, monitor);
+			this.modelInfo= this.sourceUnit.getModelInfo(type, synch, monitor);
+			this.astInfo= this.modelInfo != null ? this.modelInfo.getAst() : this.sourceUnit.getAstInfo(type, true, monitor);
 		}
 	}
 	
@@ -96,16 +96,16 @@ public class AssistInvocationContext implements IQuickAssistInvocationContext, I
 	 * @return the invocation offset
 	 */
 	public final int getInvocationOffset() {
-		return fInvocationOffset;
+		return this.invocationOffset;
 	}
 	
 	public ISourceEditor getEditor() {
-		return fEditor;
+		return this.editor;
 	}
 	
 	@Override
 	public SourceViewer getSourceViewer() {
-		return fSourceViewer;
+		return this.sourceViewer;
 	}
 	
 	/**
@@ -115,7 +115,7 @@ public class AssistInvocationContext implements IQuickAssistInvocationContext, I
 	 */
 	@Override
 	public int getOffset() {
-		return fSelectionOffset;
+		return this.selectionOffset;
 	}
 	
 	/**
@@ -125,47 +125,48 @@ public class AssistInvocationContext implements IQuickAssistInvocationContext, I
 	 */
 	@Override
 	public int getLength() {
-		return fSelectionLength;
+		return this.selectionLength;
 	}
 	
 	
 	public ISourceUnit getSourceUnit() {
-		return fSourceUnit;
+		return this.sourceUnit;
 	}
 	
 	public AstInfo getAstInfo() {
-		return fAstInfo;
+		return this.astInfo;
 	}
 	
 	public ISourceUnitModelInfo getModelInfo() {
-		return fModelInfo;
+		return this.modelInfo;
 	}
 	
 	public AstSelection getInvocationAstSelection() {
-		if (fInvocationAstSelection == null && fAstInfo != null && fAstInfo.root != null) {
-			fInvocationAstSelection = AstSelection.search(fAstInfo.root,
+		if (this.invocationAstSelection == null && this.astInfo != null && this.astInfo.root != null) {
+			this.invocationAstSelection= AstSelection.search(this.astInfo.root,
 					getInvocationOffset(), getInvocationOffset(), AstSelection.MODE_COVERING_SAME_LAST );
 		}
-		return fInvocationAstSelection;
+		return this.invocationAstSelection;
 	}
 	
 	public AstSelection getAstSelection() {
-		if (fAstSelection == null && fAstInfo != null && fAstInfo.root != null) {
-			fAstSelection = AstSelection.search(fAstInfo.root,
+		if (this.astSelection == null && this.astInfo != null && this.astInfo.root != null) {
+			this.astSelection= AstSelection.search(this.astInfo.root,
 					getOffset(), getOffset() + getLength(), AstSelection.MODE_COVERING_SAME_LAST );
 		}
-		return fAstSelection;
+		return this.astSelection;
 	}
 	
 	public String getIdentifierPrefix() {
-		if (fPrefix == null) {
-			fPrefix = computeIdentifierPrefix(getInvocationOffset());
-			if (fPrefix == null) {
-				fPrefix = ""; // prevent recomputing //$NON-NLS-1$
+		if (this.prefix == null) {
+			this.prefix= computeIdentifierPrefix(getInvocationOffset());
+			if (this.prefix == null) {
+				this.prefix= ""; // prevent recomputing //$NON-NLS-1$
 			}
 		}
-		return fPrefix;
+		return this.prefix;
 	}
+	
 	/**
 	 * Computes the identifier (as specified by {@link Character#isJavaIdentifierPart(char)}) that
 	 * immediately precedes the invocation offset.

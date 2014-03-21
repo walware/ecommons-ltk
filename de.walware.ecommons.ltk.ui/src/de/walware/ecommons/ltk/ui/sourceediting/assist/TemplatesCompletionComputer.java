@@ -42,18 +42,29 @@ import de.walware.ecommons.ltk.ui.templates.SourceEditorTemplateContext;
 public abstract class TemplatesCompletionComputer implements IContentAssistComputer {
 	
 	
-	private static final TemplateComparator fgTemplateComparator = new TemplateProposal.TemplateComparator();
+	private static final TemplateComparator fgTemplateComparator= new TemplateProposal.TemplateComparator();
 	
-	private static final String LINE_SELECTION = "{" + GlobalTemplateVariables.LineSelection.NAME + "}"; //$NON-NLS-1$ //$NON-NLS-2$
-	private static final String WORD_SELECTION = "{" + GlobalTemplateVariables.WordSelection.NAME + "}"; //$NON-NLS-1$ //$NON-NLS-2$
+	private static final String LINE_SELECTION= "{" + GlobalTemplateVariables.LineSelection.NAME + "}"; //$NON-NLS-1$ //$NON-NLS-2$
+	private static final String WORD_SELECTION= "{" + GlobalTemplateVariables.WordSelection.NAME + "}"; //$NON-NLS-1$ //$NON-NLS-2$
 	
-	protected final TemplateStore fTemplateStore;
-	protected final ContextTypeRegistry fTypeRegistry;
+	
+	protected final TemplateStore templateStore;
+	
+	protected final ContextTypeRegistry typeRegistry;
 	
 	
 	public TemplatesCompletionComputer(final TemplateStore templateStore, final ContextTypeRegistry contextTypes) {
-		fTemplateStore = templateStore;
-		fTypeRegistry = contextTypes;
+		this.templateStore= templateStore;
+		this.typeRegistry= contextTypes;
+	}
+	
+	
+	protected final TemplateStore getTemplateStore() {
+		return this.templateStore;
+	}
+	
+	protected final ContextTypeRegistry getTypeRegistry() {
+		return this.typeRegistry;
 	}
 	
 	
@@ -74,44 +85,44 @@ public abstract class TemplatesCompletionComputer implements IContentAssistCompu
 	@Override
 	public IStatus computeCompletionProposals(final AssistInvocationContext context,
 			final int mode, final AssistProposalCollector<IAssistCompletionProposal> tenders, final IProgressMonitor monitor) {
-		final ISourceViewer viewer = context.getSourceViewer();
+		final ISourceViewer viewer= context.getSourceViewer();
 		
-		String prefix = extractPrefix(context);
+		String prefix= extractPrefix(context);
 		if (prefix == null
 				|| (prefix.length() == 0 && mode != IContentAssistComputer.SPECIFIC_MODE) ) {
 			return null;
 		}
 		IRegion region;
 		if (context.getLength() == 0) {
-			region = new Region(context.getInvocationOffset() - prefix.length(), prefix.length());
+			region= new Region(context.getInvocationOffset() - prefix.length(), prefix.length());
 		}
 		else {
-			region = new Region(context.getOffset(), context.getLength());
+			region= new Region(context.getOffset(), context.getLength());
 		}
-		DocumentTemplateContext templateContext = createTemplateContext(context, region);
+		DocumentTemplateContext templateContext= createTemplateContext(context, region);
 		if (templateContext == null) {
 			return null;
 		}
 		
-		int count = 0;
+		int count= 0;
 		if (context.getLength() > 0) {
 			if (prefix.length() == context.getLength()) {
-				count = doComputeProposals(tenders, templateContext, prefix, 0, region);
+				count= doComputeProposals(tenders, templateContext, prefix, 0, region);
 			}
-			prefix = ""; // wenn erfolglos, dann ohne prefix //$NON-NLS-1$
+			prefix= ""; // wenn erfolglos, dann ohne prefix //$NON-NLS-1$
 			if (count != 0) {
-				templateContext = createTemplateContext(context, region);
+				templateContext= createTemplateContext(context, region);
 			}
 		}
 		try {
-			final IDocument document = viewer.getDocument();
-			final String text = document.get(context.getOffset(), context.getLength());
+			final IDocument document= viewer.getDocument();
+			final String text= document.get(context.getOffset(), context.getLength());
 			int selectionType;
 			if (context.getLength() > 0) {
-				selectionType = 1;
+				selectionType= 1;
 			}
 			else {
-				selectionType = 0;
+				selectionType= 0;
 			}
 			templateContext.setVariable("selection", text); // name of the selection variables {line, word}_selection //$NON-NLS-1$
 			doComputeProposals(tenders, templateContext, prefix, selectionType, region);
@@ -125,12 +136,12 @@ public abstract class TemplatesCompletionComputer implements IContentAssistCompu
 			final DocumentTemplateContext context, final String prefix, final int selectionType,
 			final IRegion replacementRegion) {
 		// Add Templates
-		final int count = 0;
-		final Template[] templates = getTemplates(context.getContextType().getId());
-		for (int i = 0; i < templates.length; i++) {
-			final Template template = templates[i];
+		final int count= 0;
+		final Template[] templates= getTemplates(context.getContextType().getId());
+		for (int i= 0; i < templates.length; i++) {
+			final Template template= templates[i];
 			if (include(template, prefix)) { // Change <-> super
-				final String pattern = template.getPattern();
+				final String pattern= template.getPattern();
 				if (selectionType > 0 && !isSelectionTemplate(pattern)) {
 					continue;
 				}
@@ -149,9 +160,9 @@ public abstract class TemplatesCompletionComputer implements IContentAssistCompu
 	}
 	
 	private boolean isSelectionTemplate(final String pattern) {
-		int offset = 0;
+		int offset= 0;
 		while (true) {
-			offset = pattern.indexOf('$', offset) + 1;
+			offset= pattern.indexOf('$', offset) + 1;
 			if (offset <= 0 && offset + 2 < pattern.length()) {
 				return false;
 			}
@@ -179,16 +190,16 @@ public abstract class TemplatesCompletionComputer implements IContentAssistCompu
 	}
 	
 	protected Template[] getTemplates(final String contextTypeId) {
-		return fTemplateStore.getTemplates(contextTypeId);
+		return this.templateStore.getTemplates(contextTypeId);
 	}
 	
 	protected abstract TemplateContextType getContextType(final AssistInvocationContext context, final IRegion region);
 	
 	protected DocumentTemplateContext createTemplateContext(final AssistInvocationContext context, final IRegion region) {
-		final ISourceViewer viewer = context.getSourceViewer();
-		final TemplateContextType contextType = getContextType(context, region);
+		final ISourceViewer viewer= context.getSourceViewer();
+		final TemplateContextType contextType= getContextType(context, region);
 		if (contextType != null) {
-			final IDocument document = viewer.getDocument();
+			final IDocument document= viewer.getDocument();
 			return new SourceEditorTemplateContext(contextType, document, region.getOffset(), region.getLength(), context.getEditor());
 		}
 		return null;

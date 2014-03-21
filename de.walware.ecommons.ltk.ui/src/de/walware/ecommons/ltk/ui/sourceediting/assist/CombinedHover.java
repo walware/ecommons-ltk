@@ -23,10 +23,10 @@ import org.eclipse.jface.text.IInformationControlCreator;
 public class CombinedHover implements IInfoHover {
 	
 	
-	private List<InfoHoverDescriptor> fDescriptors;
-	private List<IInfoHover> fInstantiatedHovers;
+	private List<InfoHoverDescriptor> descriptors;
+	private List<IInfoHover> instantiatedHovers;
 	
-	private IInfoHover fBestHover;
+	private IInfoHover bestHover;
 	
 	
 	public CombinedHover() {
@@ -34,27 +34,27 @@ public class CombinedHover implements IInfoHover {
 	
 	
 	public void setHovers(final List<InfoHoverDescriptor> descriptors) {
-		fDescriptors = descriptors;
-		fInstantiatedHovers = new ArrayList<IInfoHover>(descriptors.size());
+		this.descriptors= descriptors;
+		this.instantiatedHovers= new ArrayList<>(descriptors.size());
 	}
 	
 	
 	@Override
 	public Object getHoverInfo(final AssistInvocationContext context) {
-		fBestHover = null;
-		if (fDescriptors == null) {
+		this.bestHover= null;
+		if (this.descriptors == null) {
 			return null;
 		}
 		
-		for (int i = 0; i < fDescriptors.size(); i++) {
-			if (i == fInstantiatedHovers.size()) {
-				fInstantiatedHovers.add(fDescriptors.get(i).createHover());
+		for (int i= 0; i < this.descriptors.size(); i++) {
+			if (i == this.instantiatedHovers.size()) {
+				this.instantiatedHovers.add(this.descriptors.get(i).createHover());
 			}
-			final IInfoHover hover = fInstantiatedHovers.get(i);
+			final IInfoHover hover= this.instantiatedHovers.get(i);
 			if (hover != null) {
-				final Object info = hover.getHoverInfo(context);
+				final Object info= hover.getHoverInfo(context);
 				if (info != null) {
-					fBestHover = hover;
+					this.bestHover= hover;
 					return info;
 				}
 			}
@@ -64,8 +64,8 @@ public class CombinedHover implements IInfoHover {
 	
 	@Override
 	public IInformationControlCreator getHoverControlCreator() {
-		if (fBestHover != null) {
-			return fBestHover.getHoverControlCreator();
+		if (this.bestHover != null) {
+			return this.bestHover.getHoverControlCreator();
 		}
 		return null;
 	}
