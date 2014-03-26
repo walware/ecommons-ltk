@@ -21,22 +21,19 @@ import de.walware.ecommons.ltk.ISourceUnitModelInfo;
 import de.walware.ecommons.ltk.IWorkspaceSourceUnit;
 import de.walware.ecommons.ltk.LTK;
 import de.walware.ecommons.ltk.SourceContent;
+import de.walware.ecommons.ltk.WorkingContext;
 
 
-public abstract class SourceUnitModelContainer<U extends ISourceUnit, ModelType extends ISourceUnitModelInfo> {
+public abstract class SourceUnitModelContainer<U extends ISourceUnit, M extends ISourceUnitModelInfo> {
 	
 	
-	private static final int MODE_PERSISTENCE= 1;
-	private static final int MODE_EDITOR= 2;
-	
-	
-	private final int mode;
+	private final WorkingContext mode;
 	
 	private final U unit;
 	
 	private AstInfo astInfo;
 	
-	private ModelType modelInfo;
+	private M modelInfo;
 	
 	
 	public SourceUnitModelContainer(final U unit) {
@@ -50,16 +47,15 @@ public abstract class SourceUnitModelContainer<U extends ISourceUnit, ModelType 
 	public abstract Class<?> getAdapterClass();
 	
 	
-	protected int getMode(final U su) {
+	protected WorkingContext getMode(final U su) {
 		if (su instanceof IWorkspaceSourceUnit) {
-			if (su.getWorkingContext() == LTK.PERSISTENCE_CONTEXT) {
-				return MODE_PERSISTENCE;
-			}
-			else if (su.getWorkingContext() == LTK.EDITOR_CONTEXT) {
-				return MODE_EDITOR;
-			}
+			return su.getWorkingContext();
 		}
-		return 0;
+		return null;
+	}
+	
+	protected final WorkingContext getMode() {
+		return this.mode;
 	}
 	
 	
@@ -78,9 +74,9 @@ public abstract class SourceUnitModelContainer<U extends ISourceUnit, ModelType 
 		return this.astInfo;
 	}
 	
-	public ModelType getModelInfo(final int syncLevel, final IProgressMonitor monitor) {
+	public M getModelInfo(final int syncLevel, final IProgressMonitor monitor) {
 		if ((syncLevel & 0xf) >= IModelManager.MODEL_FILE) {
-			final ModelType currentModel= this.modelInfo;
+			final M currentModel= this.modelInfo;
 			if (currentModel == null
 					|| currentModel.getStamp() == 0
 					|| currentModel.getStamp() != this.unit.getContentStamp(monitor)) {
@@ -99,8 +95,8 @@ public abstract class SourceUnitModelContainer<U extends ISourceUnit, ModelType 
 	}
 	
 	public AstInfo getCurrentAst() {
-		if (this.mode == MODE_PERSISTENCE) {
-			final ModelType model= getCurrentModel();
+		if (this.mode == LTK.PERSISTENCE_CONTEXT) {
+			final M model= getCurrentModel();
 			if (model != null) {
 				return model.getAst();
 			}
@@ -118,25 +114,25 @@ public abstract class SourceUnitModelContainer<U extends ISourceUnit, ModelType 
 	}
 	
 	public void setAst(final AstInfo ast) {
-		if (this.mode == MODE_PERSISTENCE) {
+		if (this.mode == LTK.PERSISTENCE_CONTEXT) {
 			return;
 		}
 		this.astInfo= ast;
 	}
 	
-	public ModelType getCurrentModel() {
+	public M getCurrentModel() {
 		return this.modelInfo;
 	}
 	
-	public ModelType getCurrentModel(final long stamp) {
-		final ModelType model= getCurrentModel();
+	public M getCurrentModel(final long stamp) {
+		final M model= getCurrentModel();
 		if (model != null && model.getStamp() == stamp) {
 			return model;
 		}
 		return null;
 	}
 	
-	public void setModel(final ModelType modelInfo) {
+	public void setModel(final M modelInfo) {
 		if (modelInfo != null
 				&& (this.astInfo == null || this.astInfo.stamp == modelInfo.getStamp()) ) {
 									// otherwise, the ast is probably newer
@@ -147,20 +143,6 @@ public abstract class SourceUnitModelContainer<U extends ISourceUnit, ModelType 
 	
 	
 	public IProblemRequestor createProblemRequestor(final long stamp) {
-		switch (this.mode) {
-		case MODE_PERSISTENCE:
-			return createPersistenceContextProblemRequestor(stamp);
-		case MODE_EDITOR:
-			return createEditorContextProblemRequestor(stamp);
-		}
-		return null;
-	}
-	
-	protected IProblemRequestor createPersistenceContextProblemRequestor(final long stamp) {
-		return null;
-	}
-	
-	protected IProblemRequestor createEditorContextProblemRequestor(final long stamp) {
 		return null;
 	}
 	
