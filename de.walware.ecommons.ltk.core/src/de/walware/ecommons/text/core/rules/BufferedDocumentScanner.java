@@ -9,7 +9,7 @@
  #     IBM Corporation - initial API and implementation
  #=============================================================================*/
 
-package de.walware.ecommons.text.ui;
+package de.walware.ecommons.text.core.rules;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.text.BadLocationException;

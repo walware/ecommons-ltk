@@ -26,4 +26,5 @@ Export-Package: de.walware.ecommons.ltk,
  de.walware.ecommons.ltk.core.refactoring,
  de.walware.ecommons.ltk.core.util,
  de.walware.ecommons.tasklist,
- de.walware.ecommons.text
+ de.walware.ecommons.text,
+ de.walware.ecommons.text.core.rules
