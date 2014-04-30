@@ -41,6 +41,7 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ISynchronizable;
 import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.text.ITextViewerExtension5;
 import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.TextUtilities;
@@ -265,8 +266,8 @@ public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 		}
 		
 		private void configure() {
-			final SourceViewerConfiguration configuration = SourceEditor1.this.getSourceViewerConfiguration();
-			final ISourceViewer sourceViewer = SourceEditor1.this.getSourceViewer();
+			final SourceViewerConfiguration configuration = getSourceViewerConfiguration();
+			final ISourceViewer sourceViewer = getSourceViewer();
 			
 			final String[] types = configuration.getConfiguredContentTypes(sourceViewer);
 			fPrefixesMap = new HashMap<String, String[]>(types.length);
@@ -300,13 +301,13 @@ public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 		
 		@Override
 		public void setEnabled(final Object evaluationContext) {
-			if (!SourceEditor1.this.isEditorInputModifiable()) {
+			if (!isEditorInputModifiable()) {
 				setBaseEnabled(false);
 				return;
 			}
 			
 			if (fOperationTarget == null) {
-				fOperationTarget = (ITextOperationTarget) SourceEditor1.this.getAdapter(ITextOperationTarget.class);
+				fOperationTarget = (ITextOperationTarget) getAdapter(ITextOperationTarget.class);
 			}
 			setBaseEnabled(fOperationTarget != null
 					&& fOperationTarget.canDoOperation(ITextOperationTarget.PREFIX)
@@ -315,18 +316,18 @@ public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 		
 		@Override
 		public Object execute(final ExecutionEvent event) throws ExecutionException {
-			final ISourceViewer sourceViewer = SourceEditor1.this.getSourceViewer();
+			final ISourceViewer sourceViewer = getSourceViewer();
 			
-			if (!SourceEditor1.this.validateEditorInputState() || !isEnabled()) {
+			if (!validateEditorInputState() || !isEnabled()) {
 				return null;
 			}
 			
-			final int operationCode = (isSelectionCommented(SourceEditor1.this.getSelectionProvider().getSelection())) ?
+			final int operationCode = (isSelectionCommented(getSelectionProvider().getSelection())) ?
 				ITextOperationTarget.STRIP_PREFIX : ITextOperationTarget.PREFIX;
 			
-			final Shell shell = SourceEditor1.this.getSite().getShell();
+			final Shell shell = getSite().getShell();
 			if (!fOperationTarget.canDoOperation(operationCode)) {
-				SourceEditor1.this.setStatusLineErrorMessage(EditingMessages.ToggleCommentAction_error);
+				setStatusLineErrorMessage(EditingMessages.ToggleCommentAction_error);
 				sourceViewer.getTextWidget().getDisplay().beep();
 				return null;
 			}
@@ -361,7 +362,7 @@ public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 				return false;
 			}
 			
-			final IDocument document = SourceEditor1.this.getDocumentProvider().getDocument(SourceEditor1.this.getEditorInput());
+			final IDocument document = getDocumentProvider().getDocument(getEditorInput());
 			try {
 				final IRegion block = getTextBlockFromSelection(textSelection, document);
 				final ITypedRegion[] regions = TextUtilities.computePartitioning(document, fDocumentPartitioning, block.getOffset(), block.getLength(), false);
@@ -827,32 +828,21 @@ public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 		return viewer;
 	}
 	
+	protected IRegion getRangeToReveal(final ISourceUnitModelInfo modelInfo, final ISourceStructElement element) {
+		return null;
+	}
+	
 	protected IRegion getRangeToHighlight(final LTKInputData state) {
 		final ISourceUnitModelInfo info = state.getInputInfo();
 		if (info == null) {
 			return null;
 		}
-		ISourceStructElement element = state.getModelSelection();
-		TRY_MODEL: while (element != null) {
-			switch (element.getElementType() & IModelElement.MASK_C1) {
-			case IModelElement.C1_CLASS:
-			case IModelElement.C1_METHOD:
-				return TextUtil.expand(element.getSourceRange(), element.getDocumentationRange());
-			case IModelElement.C1_SOURCE:
-				if ((element.getElementType() & IModelElement.MASK_C2) == IModelElement.C2_SOURCE_CHUNK) {
-					return TextUtil.expand(element.getSourceRange(), element.getDocumentationRange());
-				}
-				break TRY_MODEL;
-			case IModelElement.C1_VARIABLE:
-				if ((element.getSourceParent().getElementType() & IModelElement.MASK_C2) == IModelElement.C2_SOURCE_FILE) {
-					return TextUtil.expand(element.getSourceRange(), element.getDocumentationRange());
-				}
-				//$FALL-THROUGH$
-			default:
-				element = element.getSourceParent();
-				continue TRY_MODEL;
-			}
+		
+		final IRegion region= getRangeToHighlight(info, state.getModelSelection());
+		if (region != null) {
+			return region;
 		}
+		
 		final IAstNode root = info.getAst().root;
 		TRY_AST: if (root != null) {
 			final ITextSelection selection = (ITextSelection) state.getSelection();
@@ -867,6 +857,30 @@ public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 				else {
 					break TRY_AST;
 				}
+			}
+		}
+		return null;
+	}
+	
+	protected IRegion getRangeToHighlight(final ISourceUnitModelInfo info, ISourceStructElement element) {
+		while (element != null) {
+			switch (element.getElementType() & IModelElement.MASK_C1) {
+			case IModelElement.C1_CLASS:
+			case IModelElement.C1_METHOD:
+				return TextUtil.expand(element.getSourceRange(), element.getDocumentationRange());
+			case IModelElement.C1_SOURCE:
+				if ((element.getElementType() & IModelElement.MASK_C2) == IModelElement.C2_SOURCE_CHUNK) {
+					return TextUtil.expand(element.getSourceRange(), element.getDocumentationRange());
+				}
+				return null;
+			case IModelElement.C1_VARIABLE:
+				if ((element.getSourceParent().getElementType() & IModelElement.MASK_C2) == IModelElement.C2_SOURCE_FILE) {
+					return TextUtil.expand(element.getSourceRange(), element.getDocumentationRange());
+				}
+				//$FALL-THROUGH$
+			default:
+				element = element.getSourceParent();
+				continue;
 			}
 		}
 		return null;
@@ -1201,17 +1215,22 @@ public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 	
 	@Override
 	public void selectAndReveal(final int start, final int length) {
+		selectAndReveal(start, length, start, length);
+	}
+	
+	@Override
+	protected void selectAndReveal(final int selectionStart, final int selectionLength, final int revealStart, final int revealLength) {
 		if (fModelPostSelection != null) {
 			fModelPostSelection.setUpdateOnSelection(true);
 			try {
-				super.selectAndReveal(start, length);
+				super.selectAndReveal(selectionStart, selectionLength, revealStart, revealLength);
 			}
 			finally {
 				fModelPostSelection.setUpdateOnSelection(false);
 			}
 		}
 		else {
-			super.selectAndReveal(start, length);
+			super.selectAndReveal(selectionStart, selectionLength, revealStart, revealLength);
 		}
 	}
 	
@@ -1229,18 +1248,36 @@ public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 	@Override
 	protected void doSetSelection(final ISelection selection) {
 		if (selection instanceof IStructuredSelection) {
-			final IStructuredSelection structured = (IStructuredSelection) selection;
+			final IStructuredSelection structured= (IStructuredSelection) selection;
 			if (!structured.isEmpty()) {
-				final Object first = structured.getFirstElement();
-				IRegion region = null;
+				final Object first= structured.getFirstElement();
+				IRegion region= null;
 				if (first instanceof ISourceStructElement) {
-					region = ((ISourceStructElement) first).getNameSourceRange();
+					final ISourceStructElement sourceElement= (ISourceStructElement) first;
+					region= sourceElement.getNameSourceRange();
 					if (region == null) {
-						region = new Region(((ISourceStructElement) first).getSourceRange().getOffset(), 0);
+						region= sourceElement.getSourceRange();
+					}
+					
+					final ISourceUnit sourceUnit= sourceElement.getSourceUnit();
+					final ISourceUnitModelInfo modelInfo= sourceUnit.getModelInfo(getModelTypeId(), 0, null);
+					if (modelInfo != null) {
+						final IRegion toReveal= getRangeToReveal(modelInfo, sourceElement);
+						if (toReveal != null) {
+							SourceViewer viewer= getViewer();
+							if (viewer instanceof ITextViewerExtension5) {
+								((ITextViewerExtension5) viewer).exposeModelRange(toReveal);
+							}
+							getViewer().revealRange(toReveal.getOffset(), toReveal.getLength());
+						}
+						final IRegion toHighlight= getRangeToHighlight(modelInfo, sourceElement);
+						if (toHighlight != null) {
+							setHighlightRange(toHighlight.getOffset(), toHighlight.getLength(), true);
+						}
 					}
 				}
 				if (region == null && first instanceof IRegion) {
-					region = (IRegion) first;
+					region= (IRegion) first;
 				}
 				if (region != null) {
 					selectAndReveal(region.getOffset(), region.getLength());
