@@ -20,17 +20,17 @@ import java.lang.reflect.InvocationTargetException;
 public class AstSelection {
 	
 	/** Selects the node, greater than the selected range */
-	public final static int MODE_COVERING_GREATER = 1;
+	public static final int MODE_COVERING_GREATER=          1;
 	/** Selects the outermost node, greater or equal than the selected range */
-	public final static int MODE_COVERING_SAME_FIRST = 2;
+	public static final int MODE_COVERING_SAME_FIRST=       2;
 	/** Selects the innermost node, greater or equal than the selected range */
-	public final static int MODE_COVERING_SAME_LAST = 3;
+	public static final int MODE_COVERING_SAME_LAST=        3;
 	
 	
-	private final static int SEARCH_STATE_BEFORE = -1;
-	private final static int SEARCH_STATE_MATCH = 0;
-	private final static int SEARCH_STATE_MATCHED = 1;
-	private final static int SEARCH_STATE_BEHIND = 2;
+	private static final int SEARCH_STATE_BEFORE= -1;
+	private static final int SEARCH_STATE_MATCH=   0;
+	private static final int SEARCH_STATE_MATCHED= 1;
+	private static final int SEARCH_STATE_BEHIND=  2;
 	
 	private int fStart;
 	private int fStop;

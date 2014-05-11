@@ -234,7 +234,7 @@ public class TextUtil {
 	 * @return a region for the block
 	 * @throws BadLocationException
 	 */
-	public final static IRegion getBlock(final IDocument document, final int position1, final int position2) throws BadLocationException {
+	public static final IRegion getBlock(final IDocument document, final int position1, final int position2) throws BadLocationException {
 		final int line1 = document.getLineOfOffset(position1);
 		int line2 = document.getLineOfOffset(position2);
 		if (line1 < line2 && document.getLineOffset(line2) == position2) {
@@ -245,7 +245,7 @@ public class TextUtil {
 		return new Region(start, length);
 	}
 	
-	public final static IRegion expand(final IRegion region1, final IRegion region2) {
+	public static final IRegion expand(final IRegion region1, final IRegion region2) {
 		if (region2 == null) {
 			return region1;
 		}
@@ -255,7 +255,7 @@ public class TextUtil {
 						- offset);
 	}
 	
-	public final static int getColumn(final IDocument document, final int offset, int line, int tabWidth)
+	public static final int getColumn(final IDocument document, final int offset, int line, int tabWidth)
 			throws BadLocationException {
 		if (offset > document.getLength()) {
 			return -1;
@@ -285,7 +285,7 @@ public class TextUtil {
 		return currentColumn;
 	}
 	
-	public final static int getColumn(final String text, final int offset, int tabWidth) {
+	public static final int getColumn(final String text, final int offset, int tabWidth) {
 		if (offset > text.length()) {
 			return -1;
 		}

@@ -272,6 +272,15 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	}
 	
 	
+	public boolean isSmartInsertSupported() {
+		return false;
+	}
+	
+	public boolean isSmartInsertByDefault() {
+		return true;
+	}
+	
+	
 	@Override
 	public IContentAssistant getContentAssistant(final ISourceViewer sourceViewer) {
 		if (this.contentAssistant == null) {
@@ -430,14 +439,6 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 			assistant.setContentAssistProcessor(processor, contentType);
 		}
 		return assistant;
-	}
-	
-	public boolean isSmartInsertSupported() {
-		return false;
-	}
-	
-	public boolean isSmartInsertByDefault() {
-		return true;
 	}
 	
 	

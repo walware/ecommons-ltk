@@ -24,9 +24,9 @@ package de.walware.ecommons.text;
 public abstract class SourceParseInput {
 	
 	
-	public final static int EOF = -1;
+	public static final int EOF = -1;
 	
-	protected final static char[] NO_INPUT = new char[0];
+	protected static final char[] NO_INPUT = new char[0];
 	
 	
 	protected final CharArrayString fTmpCharString = new CharArrayString();

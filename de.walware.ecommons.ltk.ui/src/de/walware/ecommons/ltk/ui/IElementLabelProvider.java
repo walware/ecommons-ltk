@@ -26,7 +26,7 @@ import de.walware.ecommons.ltk.IModelElement;
 public interface IElementLabelProvider {
 	
 	
-	public final static StyledString.Styler TITLE_STYLER = new StyledString.Styler() {
+	public static final StyledString.Styler TITLE_STYLER = new StyledString.Styler() {
 		@Override
 		public void applyStyles(final TextStyle style) {
 			((StyleRange) style).fontStyle = SWT.BOLD;

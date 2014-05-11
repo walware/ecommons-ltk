@@ -17,7 +17,7 @@ import org.eclipse.jface.text.BadLocationException;
 public abstract class CharCodepointIterator implements ICodepointIterator {
 	
 	
-	private final static byte PREPARE_STEPBACK = (PREPARE_BACKWARD | PREPARE_FIX);
+	private static final byte PREPARE_STEPBACK = (PREPARE_BACKWARD | PREPARE_FIX);
 	
 	
 	private static class StringIterator extends CharCodepointIterator {

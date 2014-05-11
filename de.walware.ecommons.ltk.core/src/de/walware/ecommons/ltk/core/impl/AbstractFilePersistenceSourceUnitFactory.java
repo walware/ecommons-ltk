@@ -30,7 +30,7 @@ import de.walware.ecommons.ltk.LTK;
 public abstract class AbstractFilePersistenceSourceUnitFactory implements ISourceUnitFactory {
 	
 	
-	private final static String IFILE_PREFIX = "platform:/resource"; //$NON-NLS-1$
+	private static final String IFILE_PREFIX = "platform:/resource"; //$NON-NLS-1$
 	
 	
 	public static String createResourceId(final IResource file) {
