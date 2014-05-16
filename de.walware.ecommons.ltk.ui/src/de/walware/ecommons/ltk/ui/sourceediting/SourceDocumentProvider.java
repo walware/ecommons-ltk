@@ -31,6 +31,7 @@ import de.walware.ecommons.ltk.IDocumentModelProvider;
 import de.walware.ecommons.ltk.IProblemRequestor;
 import de.walware.ecommons.ltk.ISourceUnit;
 import de.walware.ecommons.ltk.ISourceUnitManager;
+import de.walware.ecommons.ltk.IWorkspaceSourceUnit;
 import de.walware.ecommons.ltk.LTK;
 
 
@@ -148,8 +149,8 @@ public class SourceDocumentProvider<T extends ISourceUnit> extends TextFileDocum
 	
 	@Override
 	public IAnnotationModel getAnnotationModel(Object element) {
-		if (element instanceof ISourceUnit) {
-			element = new FileEditorInput((IFile) ((ISourceUnit) element).getResource());
+		if (element instanceof IWorkspaceSourceUnit) {
+			element = new FileEditorInput((IFile) ((IWorkspaceSourceUnit) element).getResource());
 		}
 		return super.getAnnotationModel(element);
 	}
