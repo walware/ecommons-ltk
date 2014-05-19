@@ -24,7 +24,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 
 import de.walware.ecommons.ltk.IElementName;
-import de.walware.ecommons.ltk.IModelElement;
+import de.walware.ecommons.ltk.core.model.IModelElement;
 import de.walware.ecommons.ltk.ui.IElementLabelProvider;
 
 

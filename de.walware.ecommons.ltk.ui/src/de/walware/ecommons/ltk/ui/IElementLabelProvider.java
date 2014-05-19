@@ -17,7 +17,7 @@ import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.TextStyle;
 
-import de.walware.ecommons.ltk.IModelElement;
+import de.walware.ecommons.ltk.core.model.IModelElement;
 
 
 /**

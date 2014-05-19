@@ -32,8 +32,8 @@ import org.eclipse.ltk.core.refactoring.participants.ResourceChangeChecker;
 import org.eclipse.ltk.core.refactoring.participants.SharableParticipants;
 import org.eclipse.osgi.util.NLS;
 
-import de.walware.ecommons.ltk.IModelElement;
 import de.walware.ecommons.ltk.core.ElementSet;
+import de.walware.ecommons.ltk.core.model.IModelElement;
 import de.walware.ecommons.ltk.internal.core.refactoring.Messages;
 
 

@@ -41,7 +41,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.progress.IProgressService;
 
-import de.walware.ecommons.ltk.ISourceUnit;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
 import de.walware.ecommons.ltk.core.refactoring.IScheduledRefactoring;
 import de.walware.ecommons.ltk.core.refactoring.SourceUnitChange;
 import de.walware.ecommons.ltk.internal.ui.refactoring.Messages;

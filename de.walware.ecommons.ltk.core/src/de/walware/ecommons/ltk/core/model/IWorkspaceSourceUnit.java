@@ -9,7 +9,7 @@
  #     Stephan Wahlbrink - initial API and implementation
  #=============================================================================*/
 
-package de.walware.ecommons.ltk;
+package de.walware.ecommons.ltk.core.model;
 
 import org.eclipse.core.resources.IResource;
 

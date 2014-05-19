@@ -15,10 +15,10 @@ import java.util.Comparator;
 
 import com.ibm.icu.text.Collator;
 
-import de.walware.ecommons.ltk.IModelElement;
-import de.walware.ecommons.ltk.ISourceElement;
-import de.walware.ecommons.ltk.ISourceUnit;
 import de.walware.ecommons.ltk.LTKUtil;
+import de.walware.ecommons.ltk.core.model.IModelElement;
+import de.walware.ecommons.ltk.core.model.ISourceElement;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
 
 
 public class ElementComparator implements Comparator<IModelElement> {

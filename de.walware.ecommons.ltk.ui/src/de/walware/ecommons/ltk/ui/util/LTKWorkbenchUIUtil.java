@@ -41,7 +41,7 @@ import org.eclipse.ui.texteditor.IEditorStatusLine;
 
 import de.walware.ecommons.ui.SharedUIResources;
 
-import de.walware.ecommons.ltk.ISourceUnit;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
 import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditor;
 
 

@@ -9,7 +9,7 @@
  #     Stephan Wahlbrink - initial API and implementation
  #=============================================================================*/
 
-package de.walware.ecommons.ltk;
+package de.walware.ecommons.ltk.core.model;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -18,6 +18,12 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.AbstractDocument;
 import org.eclipse.jface.text.IDocumentExtension4;
 import org.eclipse.jface.text.ISynchronizable;
+
+import de.walware.ecommons.ltk.AstInfo;
+import de.walware.ecommons.ltk.ISourceUnitManager;
+import de.walware.ecommons.ltk.SourceContent;
+import de.walware.ecommons.ltk.SourceDocumentRunnable;
+import de.walware.ecommons.ltk.WorkingContext;
 
 
 /**

@@ -32,7 +32,7 @@ import org.eclipse.text.edits.TextEdit;
 
 import de.walware.ecommons.text.TextUtil;
 
-import de.walware.ecommons.ltk.ISourceUnit;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
 import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditor;
 
 

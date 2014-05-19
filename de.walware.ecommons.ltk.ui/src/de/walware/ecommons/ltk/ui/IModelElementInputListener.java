@@ -11,8 +11,8 @@
 
 package de.walware.ecommons.ltk.ui;
 
-import de.walware.ecommons.ltk.IModelElement;
 import de.walware.ecommons.ltk.IModelElementDelta;
+import de.walware.ecommons.ltk.core.model.IModelElement;
 
 
 /**

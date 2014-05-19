@@ -12,7 +12,7 @@
 package de.walware.ecommons.ltk.core.impl;
 
 import de.walware.ecommons.ltk.IProblem;
-import de.walware.ecommons.ltk.ISourceUnit;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
 
 
 /**

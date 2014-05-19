@@ -42,12 +42,12 @@ import de.walware.ecommons.ui.util.UIAccess;
 import de.walware.ecommons.ui.workbench.AbstractEditorOutlinePage;
 
 import de.walware.ecommons.ltk.AstInfo;
-import de.walware.ecommons.ltk.IModelElement;
-import de.walware.ecommons.ltk.IModelElement.Filter;
 import de.walware.ecommons.ltk.IModelElementDelta;
-import de.walware.ecommons.ltk.ISourceStructElement;
-import de.walware.ecommons.ltk.ISourceUnit;
-import de.walware.ecommons.ltk.ISourceUnitModelInfo;
+import de.walware.ecommons.ltk.core.model.IModelElement;
+import de.walware.ecommons.ltk.core.model.ISourceStructElement;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
+import de.walware.ecommons.ltk.core.model.ISourceUnitModelInfo;
+import de.walware.ecommons.ltk.core.model.IModelElement.Filter;
 import de.walware.ecommons.ltk.internal.ui.EditingMessages;
 import de.walware.ecommons.ltk.ui.IModelElementInputListener;
 import de.walware.ecommons.ltk.ui.ISelectionWithElementInfoListener;

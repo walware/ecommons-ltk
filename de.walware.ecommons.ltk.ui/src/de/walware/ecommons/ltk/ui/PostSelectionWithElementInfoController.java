@@ -26,9 +26,9 @@ import org.eclipse.ui.statushandlers.StatusManager;
 import de.walware.ecommons.FastList;
 import de.walware.ecommons.ICommonStatusConstants;
 
-import de.walware.ecommons.ltk.IModelElement;
 import de.walware.ecommons.ltk.IModelElementDelta;
-import de.walware.ecommons.ltk.ISourceUnit;
+import de.walware.ecommons.ltk.core.model.IModelElement;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
 import de.walware.ecommons.ltk.internal.ui.LTKUIPlugin;
 
 

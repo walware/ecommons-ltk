@@ -29,10 +29,10 @@ import de.walware.ecommons.text.PartitionerDocumentSetupParticipant;
 
 import de.walware.ecommons.ltk.IDocumentModelProvider;
 import de.walware.ecommons.ltk.IProblemRequestor;
-import de.walware.ecommons.ltk.ISourceUnit;
 import de.walware.ecommons.ltk.ISourceUnitManager;
-import de.walware.ecommons.ltk.IWorkspaceSourceUnit;
 import de.walware.ecommons.ltk.LTK;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
+import de.walware.ecommons.ltk.core.model.IWorkspaceSourceUnit;
 
 
 public class SourceDocumentProvider<T extends ISourceUnit> extends TextFileDocumentProvider

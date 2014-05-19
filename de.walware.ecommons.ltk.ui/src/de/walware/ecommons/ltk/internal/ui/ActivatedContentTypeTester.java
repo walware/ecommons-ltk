@@ -22,8 +22,8 @@ import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 
-import de.walware.ecommons.ltk.ISourceUnit;
 import de.walware.ecommons.ltk.LTK;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
 import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditor;
 
 

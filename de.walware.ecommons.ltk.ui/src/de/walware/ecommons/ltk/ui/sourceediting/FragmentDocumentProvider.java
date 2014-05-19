@@ -14,8 +14,8 @@ import de.walware.ecommons.text.ISourceFragment;
 import de.walware.ecommons.text.PartitionerDocumentSetupParticipant;
 
 import de.walware.ecommons.ltk.IDocumentModelProvider;
-import de.walware.ecommons.ltk.ISourceUnit;
 import de.walware.ecommons.ltk.LTK;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
 
 
 public class FragmentDocumentProvider extends AbstractDocumentProvider

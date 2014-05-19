@@ -1,5 +1,5 @@
 /*=============================================================================#
- # Copyright (c) 2007-2014 Stephan Wahlbrink (WalWare.de) and others.
+ # Copyright (c) 2009-2014 Stephan Wahlbrink (WalWare.de) and others.
  # All rights reserved. This program and the accompanying materials
  # are made available under the terms of the Eclipse Public License v1.0
  # which accompanies this distribution, and is available at
@@ -9,20 +9,23 @@
  #     Stephan Wahlbrink - initial API and implementation
  #=============================================================================*/
 
-package de.walware.ecommons.ltk.ui;
+package de.walware.ecommons.ltk.core.model;
 
-import de.walware.ecommons.ltk.core.model.ISourceUnit;
+import org.eclipse.jface.text.IRegion;
 
 
 /**
- * Object having an {@link ISourceUnit} as input.
+ * A element in a {@link ISourceUnit}.
  */
-public interface IModelElementInputProvider {
+public interface ISourceElement extends IModelElement {
 	
 	
-	public abstract ISourceUnit getInput();
+	ISourceUnit getSourceUnit();
 	
-	public abstract void addListener(IModelElementInputListener listener);
-	public abstract void removeListener(IModelElementInputListener listener);
+	IRegion getNameSourceRange();
+	
+	IRegion getSourceRange();
+	
+	IRegion getDocumentationRange();
 	
 }

@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Listener;
 
 import de.walware.ecommons.ui.util.UIAccess;
 
-import de.walware.ecommons.ltk.ISourceUnit;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
 import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditor;
 
 

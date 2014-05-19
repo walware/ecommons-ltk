@@ -9,7 +9,7 @@
  #     Stephan Wahlbrink - initial API and implementation
  #=============================================================================*/
 
-package de.walware.ecommons.ltk;
+package de.walware.ecommons.ltk.core.impl;
 
 import java.util.List;
 
@@ -17,42 +17,45 @@ import de.walware.ecommons.collections.CollectionUtils;
 import de.walware.ecommons.collections.ConstArrayList;
 import de.walware.ecommons.collections.ConstList;
 
+import de.walware.ecommons.ltk.AstInfo;
+import de.walware.ecommons.ltk.core.model.ISourceUnitModelInfo;
+
 
 public abstract class AbstractSourceModelInfo implements ISourceUnitModelInfo {
 	
 	
-	private static final ConstList<Object> NO_ATTACHMENTS = CollectionUtils.emptyConstList(); 
+	private static final ConstList<Object> NO_ATTACHMENTS= CollectionUtils.emptyConstList();
 	
 	
-	private final AstInfo fAst;
+	private final AstInfo ast;
 	
-	private ConstList<Object> fAttachments = NO_ATTACHMENTS;
+	private ConstList<Object> attachments= NO_ATTACHMENTS;
 	
 	
 	public AbstractSourceModelInfo(final AstInfo ast) {
-		fAst = ast;
+		this.ast= ast;
 	}
 	
 	
 	@Override
 	public long getStamp() {
-		return fAst.stamp;
+		return this.ast.stamp;
 	}
 	
 	@Override
 	public AstInfo getAst() {
-		return fAst;
+		return this.ast;
 	}
 	
 	
 	@Override
 	public void addAttachment(final Object data) {
-		fAttachments = ConstArrayList.concat(fAttachments, data);
+		this.attachments= ConstArrayList.concat(this.attachments, data);
 	}
 	
 	@Override
 	public List<Object> getAttachments() {
-		return fAttachments;
+		return this.attachments;
 	}
 	
 }

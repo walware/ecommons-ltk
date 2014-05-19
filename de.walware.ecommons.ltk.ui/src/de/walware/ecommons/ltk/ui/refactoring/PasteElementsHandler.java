@@ -36,8 +36,8 @@ import org.eclipse.ui.statushandlers.StatusManager;
 import de.walware.ecommons.workbench.ui.WorkbenchUIUtil;
 
 import de.walware.ecommons.ltk.IModelManager;
-import de.walware.ecommons.ltk.ISourceUnit;
-import de.walware.ecommons.ltk.ISourceUnitModelInfo;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
+import de.walware.ecommons.ltk.core.model.ISourceUnitModelInfo;
 import de.walware.ecommons.ltk.core.refactoring.CommonRefactoringFactory;
 import de.walware.ecommons.ltk.core.refactoring.RefactoringAdapter;
 import de.walware.ecommons.ltk.core.refactoring.RefactoringDestination;

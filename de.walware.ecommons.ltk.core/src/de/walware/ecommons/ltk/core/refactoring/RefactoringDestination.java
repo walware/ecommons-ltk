@@ -11,8 +11,8 @@
 
 package de.walware.ecommons.ltk.core.refactoring;
 
-import de.walware.ecommons.ltk.ISourceElement;
 import de.walware.ecommons.ltk.core.ElementSet;
+import de.walware.ecommons.ltk.core.model.ISourceElement;
 
 
 public class RefactoringDestination extends ElementSet {

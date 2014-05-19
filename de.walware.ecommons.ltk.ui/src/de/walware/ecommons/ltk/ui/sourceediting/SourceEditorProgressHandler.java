@@ -25,7 +25,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.statushandlers.StatusManager;
 
-import de.walware.ecommons.ltk.ISourceUnit;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
 import de.walware.ecommons.ltk.internal.ui.EditingMessages;
 import de.walware.ecommons.ltk.internal.ui.LTKUIPlugin;
 

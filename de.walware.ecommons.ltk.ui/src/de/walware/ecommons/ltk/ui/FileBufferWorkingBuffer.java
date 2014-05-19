@@ -24,8 +24,8 @@ import org.eclipse.jface.text.ISynchronizable;
 
 import de.walware.ecommons.ui.util.UIAccess;
 
-import de.walware.ecommons.ltk.ISourceUnit;
 import de.walware.ecommons.ltk.SourceDocumentRunnable;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
 import de.walware.ecommons.ltk.internal.ui.LTKUIPlugin;
 
 

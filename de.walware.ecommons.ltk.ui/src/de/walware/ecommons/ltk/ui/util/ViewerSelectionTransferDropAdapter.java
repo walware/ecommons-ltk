@@ -41,10 +41,10 @@ import org.eclipse.ui.statushandlers.StatusManager;
 
 import de.walware.ecommons.ui.util.UIAccess;
 
-import de.walware.ecommons.ltk.ISourceElement;
-import de.walware.ecommons.ltk.ISourceStructElement;
-import de.walware.ecommons.ltk.ISourceUnit;
 import de.walware.ecommons.ltk.core.ElementSet;
+import de.walware.ecommons.ltk.core.model.ISourceElement;
+import de.walware.ecommons.ltk.core.model.ISourceStructElement;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
 import de.walware.ecommons.ltk.core.refactoring.CommonRefactoringFactory;
 import de.walware.ecommons.ltk.core.refactoring.RefactoringAdapter;
 import de.walware.ecommons.ltk.core.refactoring.RefactoringDestination;

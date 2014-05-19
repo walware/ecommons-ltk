@@ -22,10 +22,10 @@ import de.walware.ecommons.text.ISourceFragment;
 
 import de.walware.ecommons.ltk.AstInfo;
 import de.walware.ecommons.ltk.IElementName;
-import de.walware.ecommons.ltk.IModelElement;
-import de.walware.ecommons.ltk.ISourceUnit;
-import de.walware.ecommons.ltk.ISourceUnitModelInfo;
 import de.walware.ecommons.ltk.SourceContent;
+import de.walware.ecommons.ltk.core.model.IModelElement;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
+import de.walware.ecommons.ltk.core.model.ISourceUnitModelInfo;
 
 
 public abstract class GenericFragmentSourceUnit implements ISourceUnit {

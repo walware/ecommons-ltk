@@ -18,9 +18,9 @@ import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.swt.graphics.Point;
 
 import de.walware.ecommons.ltk.AstInfo;
-import de.walware.ecommons.ltk.ISourceUnit;
-import de.walware.ecommons.ltk.ISourceUnitModelInfo;
 import de.walware.ecommons.ltk.ast.AstSelection;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
+import de.walware.ecommons.ltk.core.model.ISourceUnitModelInfo;
 import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditor;
 
 

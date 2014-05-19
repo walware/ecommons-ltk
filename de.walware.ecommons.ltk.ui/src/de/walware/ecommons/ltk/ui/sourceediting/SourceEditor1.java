@@ -98,13 +98,13 @@ import de.walware.ecommons.ui.SharedUIResources;
 import de.walware.ecommons.ui.util.UIAccess;
 
 import de.walware.ecommons.ltk.IDocumentModelProvider;
-import de.walware.ecommons.ltk.IModelElement;
 import de.walware.ecommons.ltk.IModelManager;
-import de.walware.ecommons.ltk.ISourceStructElement;
-import de.walware.ecommons.ltk.ISourceUnit;
-import de.walware.ecommons.ltk.ISourceUnitModelInfo;
 import de.walware.ecommons.ltk.LTK;
 import de.walware.ecommons.ltk.ast.IAstNode;
+import de.walware.ecommons.ltk.core.model.IModelElement;
+import de.walware.ecommons.ltk.core.model.ISourceStructElement;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
+import de.walware.ecommons.ltk.core.model.ISourceUnitModelInfo;
 import de.walware.ecommons.ltk.internal.ui.EditingMessages;
 import de.walware.ecommons.ltk.ui.ElementInfoController;
 import de.walware.ecommons.ltk.ui.IModelElementInputProvider;

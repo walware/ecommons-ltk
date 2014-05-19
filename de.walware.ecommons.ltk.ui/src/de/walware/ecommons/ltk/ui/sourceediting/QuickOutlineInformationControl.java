@@ -22,11 +22,11 @@ import org.eclipse.swt.widgets.Shell;
 import de.walware.ecommons.ui.dialogs.QuickTreeInformationControl;
 import de.walware.ecommons.ui.util.DialogUtil;
 
-import de.walware.ecommons.ltk.IModelElement;
-import de.walware.ecommons.ltk.IModelElement.Filter;
-import de.walware.ecommons.ltk.ISourceElement;
-import de.walware.ecommons.ltk.ISourceUnit;
-import de.walware.ecommons.ltk.ISourceUnitModelInfo;
+import de.walware.ecommons.ltk.core.model.IModelElement;
+import de.walware.ecommons.ltk.core.model.IModelElement.Filter;
+import de.walware.ecommons.ltk.core.model.ISourceElement;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
+import de.walware.ecommons.ltk.core.model.ISourceUnitModelInfo;
 import de.walware.ecommons.ltk.internal.ui.LTKUIPlugin;
 import de.walware.ecommons.ltk.ui.LTKUI;
 import de.walware.ecommons.ltk.ui.sourceediting.actions.OpenDeclaration;

@@ -16,6 +16,8 @@ import java.lang.reflect.InvocationTargetException;
 import org.eclipse.jface.text.AbstractDocument;
 import org.eclipse.jface.text.DocumentRewriteSessionType;
 
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
+
 
 /**
  * Runnable to execute a document operation in a special context.
@@ -25,33 +27,33 @@ import org.eclipse.jface.text.DocumentRewriteSessionType;
 public abstract class SourceDocumentRunnable {
 	
 	
-	private AbstractDocument fDocument;
-	private long fStamp;
-	private final DocumentRewriteSessionType fRewriteSessionType;
+	private AbstractDocument document;
+	private long stamp;
+	private final DocumentRewriteSessionType rewriteSessionType;
 	
 	
 	public SourceDocumentRunnable(final AbstractDocument document, final long assertedStamp, final DocumentRewriteSessionType rewriteSessionType) {
-		fDocument = document;
-		fStamp = assertedStamp;
-		fRewriteSessionType = rewriteSessionType;
+		this.document= document;
+		this.stamp= assertedStamp;
+		this.rewriteSessionType= rewriteSessionType;
 	}
 	
 	
 	public final DocumentRewriteSessionType getRewriteSessionType() {
-		return fRewriteSessionType;
+		return this.rewriteSessionType;
 	}
 	
 	public final void setNext(final AbstractDocument document, final long assertedStamp) {
-		fDocument = document;
-		fStamp = assertedStamp;
+		this.document= document;
+		this.stamp= assertedStamp;
 	}
 	
 	public final AbstractDocument getDocument() {
-		return fDocument;
+		return this.document;
 	}
 	
 	public final long getStampAssertion() {
-		return fStamp;
+		return this.stamp;
 	}
 	
 	

@@ -33,8 +33,8 @@ import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
 import de.walware.ecommons.ltk.IElementName;
-import de.walware.ecommons.ltk.ISourceUnit;
-import de.walware.ecommons.ltk.IWorkspaceSourceUnit;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
+import de.walware.ecommons.ltk.core.model.IWorkspaceSourceUnit;
 import de.walware.ecommons.ltk.internal.ui.TemplatesMessages;
 
 

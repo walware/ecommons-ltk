@@ -26,8 +26,8 @@ import de.walware.ecommons.ltk.ElementChangedEvent;
 import de.walware.ecommons.ltk.IElementChangedListener;
 import de.walware.ecommons.ltk.IModelElementDelta;
 import de.walware.ecommons.ltk.IModelManager;
-import de.walware.ecommons.ltk.ISourceUnit;
 import de.walware.ecommons.ltk.WorkingContext;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
 
 
 /**

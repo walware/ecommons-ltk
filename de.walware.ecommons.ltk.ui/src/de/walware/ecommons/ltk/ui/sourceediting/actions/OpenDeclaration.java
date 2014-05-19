@@ -34,9 +34,9 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import de.walware.ecommons.ui.util.UIAccess;
 
-import de.walware.ecommons.ltk.ISourceElement;
-import de.walware.ecommons.ltk.ISourceUnit;
-import de.walware.ecommons.ltk.IWorkspaceSourceUnit;
+import de.walware.ecommons.ltk.core.model.ISourceElement;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
+import de.walware.ecommons.ltk.core.model.IWorkspaceSourceUnit;
 
 
 public class OpenDeclaration {

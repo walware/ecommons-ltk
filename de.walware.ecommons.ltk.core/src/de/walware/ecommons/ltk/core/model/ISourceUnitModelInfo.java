@@ -9,11 +9,13 @@
  #     Stephan Wahlbrink - initial API and implementation
  #=============================================================================*/
 
-package de.walware.ecommons.ltk;
+package de.walware.ecommons.ltk.core.model;
 
 import java.util.List;
 
 import org.eclipse.jface.text.IDocumentExtension4;
+
+import de.walware.ecommons.ltk.AstInfo;
 
 
 /**

@@ -30,9 +30,9 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import de.walware.ecommons.text.IPartitionConstraint;
 
 import de.walware.ecommons.ltk.IModelManager;
-import de.walware.ecommons.ltk.ISourceUnit;
-import de.walware.ecommons.ltk.ISourceUnitModelInfo;
 import de.walware.ecommons.ltk.ast.AstSelection;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
+import de.walware.ecommons.ltk.core.model.ISourceUnitModelInfo;
 import de.walware.ecommons.ltk.ui.ISelectionWithElementInfoListener;
 import de.walware.ecommons.ltk.ui.LTKInputData;
 

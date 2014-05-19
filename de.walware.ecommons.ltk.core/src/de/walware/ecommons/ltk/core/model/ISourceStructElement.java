@@ -1,5 +1,5 @@
 /*=============================================================================#
- # Copyright (c) 2009-2014 Stephan Wahlbrink (WalWare.de) and others.
+ # Copyright (c) 2008-2014 Stephan Wahlbrink (WalWare.de) and others.
  # All rights reserved. This program and the accompanying materials
  # are made available under the terms of the Eclipse Public License v1.0
  # which accompanies this distribution, and is available at
@@ -9,20 +9,19 @@
  #     Stephan Wahlbrink - initial API and implementation
  #=============================================================================*/
 
-package de.walware.ecommons.ltk;
+package de.walware.ecommons.ltk.core.model;
 
-import org.eclipse.jface.text.IRegion;
+import java.util.List;
 
 
 /**
- * A element in a {@link ISourceUnit}.
+ * Represents Source structure instead of model structure
  */
-public interface ISourceElement extends IModelElement {
+public interface ISourceStructElement extends ISourceElement {
 	
 	
-	ISourceUnit getSourceUnit();
-	IRegion getNameSourceRange();
-	IRegion getSourceRange();
-	IRegion getDocumentationRange();
+	ISourceStructElement getSourceParent();
+	boolean hasSourceChildren(IModelElement.Filter filter);
+	List<? extends ISourceStructElement> getSourceChildren(IModelElement.Filter filter);
 	
 }

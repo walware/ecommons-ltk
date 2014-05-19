@@ -11,6 +11,8 @@
 
 package de.walware.ecommons.ltk;
 
+import de.walware.ecommons.ltk.core.model.IModelElement;
+
 
 public interface IModelElementDelta {
 	

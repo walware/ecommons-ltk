@@ -41,12 +41,12 @@ import de.walware.ecommons.preferences.SettingsChangeNotifier.ChangeListener;
 import de.walware.ecommons.text.TextUtil;
 
 import de.walware.ecommons.ltk.AstInfo;
-import de.walware.ecommons.ltk.IModelElement;
 import de.walware.ecommons.ltk.IModelElementDelta;
 import de.walware.ecommons.ltk.IModelManager;
-import de.walware.ecommons.ltk.ISourceUnit;
-import de.walware.ecommons.ltk.ISourceUnitModelInfo;
-import de.walware.ecommons.ltk.IWorkspaceSourceUnit;
+import de.walware.ecommons.ltk.core.model.IModelElement;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
+import de.walware.ecommons.ltk.core.model.ISourceUnitModelInfo;
+import de.walware.ecommons.ltk.core.model.IWorkspaceSourceUnit;
 import de.walware.ecommons.ltk.internal.ui.LTKUIPlugin;
 import de.walware.ecommons.ltk.ui.IModelElementInputListener;
 import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditor;

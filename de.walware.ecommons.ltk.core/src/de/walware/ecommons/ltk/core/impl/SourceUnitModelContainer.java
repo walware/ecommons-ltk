@@ -16,12 +16,12 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import de.walware.ecommons.ltk.AstInfo;
 import de.walware.ecommons.ltk.IModelManager;
 import de.walware.ecommons.ltk.IProblemRequestor;
-import de.walware.ecommons.ltk.ISourceUnit;
-import de.walware.ecommons.ltk.ISourceUnitModelInfo;
-import de.walware.ecommons.ltk.IWorkspaceSourceUnit;
 import de.walware.ecommons.ltk.LTK;
 import de.walware.ecommons.ltk.SourceContent;
 import de.walware.ecommons.ltk.WorkingContext;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
+import de.walware.ecommons.ltk.core.model.ISourceUnitModelInfo;
+import de.walware.ecommons.ltk.core.model.IWorkspaceSourceUnit;
 
 
 public abstract class SourceUnitModelContainer<U extends ISourceUnit, M extends ISourceUnitModelInfo> {

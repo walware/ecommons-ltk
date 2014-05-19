@@ -15,6 +15,8 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
+
 
 /**
  * Manages shared instances of source units.

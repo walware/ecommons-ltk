@@ -13,6 +13,8 @@ package de.walware.ecommons.ltk;
 
 import java.util.List;
 
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
+
 
 /**
  * Accept problems by a problem checker.

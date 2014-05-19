@@ -19,15 +19,15 @@ import org.eclipse.core.runtime.SubMonitor;
 import de.walware.ecommons.text.IMarkerPositionResolver;
 import de.walware.ecommons.text.ui.AnnotationMarkerPositionResolver;
 
-import de.walware.ecommons.ltk.ISourceUnit;
-import de.walware.ecommons.ltk.ISourceUnitModelInfo;
-import de.walware.ecommons.ltk.IWorkspaceSourceUnit;
 import de.walware.ecommons.ltk.LTK;
 import de.walware.ecommons.ltk.SourceDocumentRunnable;
 import de.walware.ecommons.ltk.WorkingContext;
 import de.walware.ecommons.ltk.core.impl.GenericSourceUnitWorkingCopy2;
 import de.walware.ecommons.ltk.core.impl.IWorkingBuffer;
 import de.walware.ecommons.ltk.core.impl.SourceUnitModelContainer;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
+import de.walware.ecommons.ltk.core.model.ISourceUnitModelInfo;
+import de.walware.ecommons.ltk.core.model.IWorkspaceSourceUnit;
 
 
 public abstract class GenericEditorWorkspaceSourceUnitWorkingCopy2<M extends SourceUnitModelContainer<? extends ISourceUnit, ? extends ISourceUnitModelInfo>>

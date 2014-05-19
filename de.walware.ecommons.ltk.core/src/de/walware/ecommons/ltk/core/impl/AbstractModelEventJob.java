@@ -23,13 +23,13 @@ import org.eclipse.core.runtime.jobs.Job;
 
 import de.walware.ecommons.ltk.ElementChangedEvent;
 import de.walware.ecommons.ltk.IElementChangedListener;
-import de.walware.ecommons.ltk.IModelElement;
 import de.walware.ecommons.ltk.IModelElementDelta;
-import de.walware.ecommons.ltk.ISourceUnit;
-import de.walware.ecommons.ltk.ISourceUnitModelInfo;
 import de.walware.ecommons.ltk.LTK;
 import de.walware.ecommons.ltk.LTKUtil;
 import de.walware.ecommons.ltk.WorkingContext;
+import de.walware.ecommons.ltk.core.model.IModelElement;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
+import de.walware.ecommons.ltk.core.model.ISourceUnitModelInfo;
 import de.walware.ecommons.ltk.internal.core.LTKCorePlugin;
 
 

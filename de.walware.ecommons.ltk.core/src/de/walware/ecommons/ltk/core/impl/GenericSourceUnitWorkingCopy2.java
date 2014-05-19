@@ -14,8 +14,8 @@ package de.walware.ecommons.ltk.core.impl;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import de.walware.ecommons.ltk.AstInfo;
-import de.walware.ecommons.ltk.ISourceUnit;
-import de.walware.ecommons.ltk.ISourceUnitModelInfo;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
+import de.walware.ecommons.ltk.core.model.ISourceUnitModelInfo;
 
 
 /**

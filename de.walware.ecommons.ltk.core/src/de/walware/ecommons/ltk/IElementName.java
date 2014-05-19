@@ -11,6 +11,8 @@
 
 package de.walware.ecommons.ltk;
 
+import de.walware.ecommons.ltk.core.model.IModelElement;
+
 
 /**
  * Name of an element like an {@link IModelElement}.

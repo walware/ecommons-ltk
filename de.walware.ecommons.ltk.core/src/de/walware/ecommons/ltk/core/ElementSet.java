@@ -26,11 +26,11 @@ import org.eclipse.core.runtime.CoreException;
 
 import de.walware.ecommons.collections.ConstArrayList;
 
-import de.walware.ecommons.ltk.IModelElement;
-import de.walware.ecommons.ltk.ISourceStructElement;
-import de.walware.ecommons.ltk.ISourceUnit;
-import de.walware.ecommons.ltk.IWorkspaceSourceUnit;
 import de.walware.ecommons.ltk.LTKUtil;
+import de.walware.ecommons.ltk.core.model.IModelElement;
+import de.walware.ecommons.ltk.core.model.ISourceStructElement;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
+import de.walware.ecommons.ltk.core.model.IWorkspaceSourceUnit;
 
 
 public class ElementSet {

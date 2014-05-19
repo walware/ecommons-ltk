@@ -31,12 +31,12 @@ import de.walware.ecommons.FastList;
 import de.walware.ecommons.ICommonStatusConstants;
 import de.walware.ecommons.IDisposable;
 
-import de.walware.ecommons.ltk.IModelElement;
-import de.walware.ecommons.ltk.ISourceUnit;
 import de.walware.ecommons.ltk.ISourceUnitFactory;
 import de.walware.ecommons.ltk.ISourceUnitManager;
 import de.walware.ecommons.ltk.LTK;
 import de.walware.ecommons.ltk.WorkingContext;
+import de.walware.ecommons.ltk.core.model.IModelElement;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
 
 
 public class SourceUnitManager implements ISourceUnitManager, IDisposable {

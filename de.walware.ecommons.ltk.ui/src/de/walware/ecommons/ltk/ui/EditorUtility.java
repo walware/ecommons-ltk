@@ -30,9 +30,9 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.MultiEditorInput;
 
-import de.walware.ecommons.ltk.ISourceUnit;
 import de.walware.ecommons.ltk.ISourceUnitManager;
 import de.walware.ecommons.ltk.LTK;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
 
 
 /**

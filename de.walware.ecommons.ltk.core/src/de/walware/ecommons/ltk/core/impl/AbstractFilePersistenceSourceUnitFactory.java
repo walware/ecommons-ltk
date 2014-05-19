@@ -19,9 +19,9 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
-import de.walware.ecommons.ltk.ISourceUnit;
 import de.walware.ecommons.ltk.ISourceUnitFactory;
 import de.walware.ecommons.ltk.LTK;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
 
 
 /**

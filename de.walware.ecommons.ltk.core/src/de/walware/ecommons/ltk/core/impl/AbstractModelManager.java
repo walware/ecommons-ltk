@@ -22,9 +22,9 @@ import de.walware.ecommons.FastList;
 
 import de.walware.ecommons.ltk.IElementChangedListener;
 import de.walware.ecommons.ltk.IModelManager;
-import de.walware.ecommons.ltk.ISourceUnit;
 import de.walware.ecommons.ltk.LTK;
 import de.walware.ecommons.ltk.WorkingContext;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
 
 
 public abstract class AbstractModelManager implements IModelManager {

@@ -14,7 +14,7 @@ package de.walware.ecommons.ltk.ui.templates;
 import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateVariableResolver;
 
-import de.walware.ecommons.ltk.ISourceUnit;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
 import de.walware.ecommons.ltk.internal.ui.TemplatesMessages;
 
 

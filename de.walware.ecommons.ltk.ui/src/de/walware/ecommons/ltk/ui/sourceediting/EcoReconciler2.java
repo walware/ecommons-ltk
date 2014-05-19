@@ -35,7 +35,7 @@ import org.eclipse.swt.widgets.Listener;
 
 import de.walware.ecommons.FastList;
 
-import de.walware.ecommons.ltk.ISourceUnit;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
 
 
 /**

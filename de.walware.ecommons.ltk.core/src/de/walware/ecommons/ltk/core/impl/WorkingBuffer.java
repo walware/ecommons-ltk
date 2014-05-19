@@ -34,8 +34,8 @@ import org.eclipse.jface.text.ISynchronizable;
 import de.walware.ecommons.ICommonStatusConstants;
 import de.walware.ecommons.io.FileUtil;
 
-import de.walware.ecommons.ltk.ISourceUnit;
 import de.walware.ecommons.ltk.SourceContent;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
 import de.walware.ecommons.ltk.internal.core.LTKCorePlugin;
 
 

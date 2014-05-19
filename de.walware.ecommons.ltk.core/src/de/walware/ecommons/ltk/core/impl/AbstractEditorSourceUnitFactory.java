@@ -15,10 +15,10 @@ import org.eclipse.core.filesystem.IFileStore;
 
 import de.walware.ecommons.text.ISourceFragment;
 
-import de.walware.ecommons.ltk.ISourceUnit;
 import de.walware.ecommons.ltk.ISourceUnitFactory;
-import de.walware.ecommons.ltk.IWorkspaceSourceUnit;
 import de.walware.ecommons.ltk.LTK;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
+import de.walware.ecommons.ltk.core.model.IWorkspaceSourceUnit;
 
 
 /**

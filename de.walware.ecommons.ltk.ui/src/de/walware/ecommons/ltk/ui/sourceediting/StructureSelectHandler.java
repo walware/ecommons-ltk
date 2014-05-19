@@ -20,9 +20,9 @@ import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.Region;
 
 import de.walware.ecommons.ltk.AstInfo;
-import de.walware.ecommons.ltk.ISourceUnit;
 import de.walware.ecommons.ltk.ast.AstSelection;
 import de.walware.ecommons.ltk.ast.IAstNode;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
 
 
 /**

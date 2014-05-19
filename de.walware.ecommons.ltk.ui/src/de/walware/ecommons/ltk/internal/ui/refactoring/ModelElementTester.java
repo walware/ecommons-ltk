@@ -16,9 +16,9 @@ import java.util.Iterator;
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.jface.viewers.IStructuredSelection;
 
-import de.walware.ecommons.ltk.IModelElement;
-import de.walware.ecommons.ltk.ISourceUnit;
 import de.walware.ecommons.ltk.LTKUtil;
+import de.walware.ecommons.ltk.core.model.IModelElement;
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
 
 
 public class ModelElementTester extends PropertyTester {

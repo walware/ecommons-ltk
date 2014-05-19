@@ -13,6 +13,8 @@ package de.walware.ecommons.ltk;
 
 import org.eclipse.core.resources.IMarker;
 
+import de.walware.ecommons.ltk.core.model.ISourceUnit;
+
 
 /**
  * Problem
