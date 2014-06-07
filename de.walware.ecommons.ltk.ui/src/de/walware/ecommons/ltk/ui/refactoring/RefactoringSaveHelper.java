@@ -46,7 +46,7 @@ import de.walware.ecommons.ui.util.UIAccess;
 import de.walware.ecommons.ltk.internal.ui.LTKUIPlugin;
 import de.walware.ecommons.ltk.internal.ui.refactoring.ECommonsRefactoring;
 import de.walware.ecommons.ltk.internal.ui.refactoring.Messages;
-import de.walware.ecommons.ltk.ui.EditorUtility;
+import de.walware.ecommons.ltk.ui.EditorUtil;
 
 
 /**
@@ -108,11 +108,11 @@ public class RefactoringSaveHelper {
 		final List<IEditorPart> dirtyEditors;
 		switch (fSaveMode & 0xf) {
 			case SAVE_ALL:
-				dirtyEditors = EditorUtility.getDirtyEditors(true);
+				dirtyEditors = EditorUtil.getDirtyEditors(true);
 				break;
 			case SAVE_REFACTORING:
 //				dirtyEditors = EditorUtility.getDirtyEditorsToSave(false); // see https://bugs.eclipse.org/bugs/show_bug.cgi?id=175495
-				dirtyEditors = EditorUtility.getDirtyEditors(true);
+				dirtyEditors = EditorUtil.getDirtyEditors(true);
 				break;
 			case SAVE_NOTHING:
 				return true;

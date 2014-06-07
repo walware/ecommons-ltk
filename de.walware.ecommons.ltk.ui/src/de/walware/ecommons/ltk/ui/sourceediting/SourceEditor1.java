@@ -18,9 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler2;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectNature;
@@ -33,37 +30,29 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ISynchronizable;
-import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewerExtension5;
-import org.eclipse.jface.text.ITypedRegion;
-import org.eclipse.jface.text.Region;
-import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.text.link.ILinkedModeListener;
 import org.eclipse.jface.text.link.LinkedModeModel;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.SourceViewer;
-import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.text.source.projection.IProjectionListener;
 import org.eclipse.jface.text.source.projection.ProjectionSupport;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
@@ -121,6 +110,7 @@ import de.walware.ecommons.ltk.ui.sourceediting.actions.GotoNextWordHandler;
 import de.walware.ecommons.ltk.ui.sourceediting.actions.GotoPreviousWordHandler;
 import de.walware.ecommons.ltk.ui.sourceediting.actions.SelectNextWordHandler;
 import de.walware.ecommons.ltk.ui.sourceediting.actions.SelectPreviousWordHandler;
+import de.walware.ecommons.ltk.ui.sourceediting.actions.ToggleCommentHandler;
 
 
 /**
@@ -166,56 +156,6 @@ public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 		return annotationModel;
 	}
 	
-	/**
-	 * Creates a region describing the text block (something that starts at
-	 * the beginning of a line) completely containing the current selection.
-	 * 
-	 * @param selection The selection to use
-	 * @param document The document
-	 * @return the region describing the text block comprising the given selection
-	 */
-	protected static IRegion getTextBlockFromSelection(final ITextSelection selection, final IDocument document) {
-		try {
-			final int firstLine = document.getLineOfOffset(selection.getOffset());
-			int lastLine = document.getLineOfOffset(selection.getOffset()+selection.getLength());
-			final int offset = document.getLineOffset(firstLine);
-			int lastLineOffset = document.getLineOffset(lastLine);
-			if (firstLine != lastLine && lastLineOffset == selection.getOffset()+selection.getLength()) {
-				lastLine--;
-				lastLineOffset = document.getLineOffset(lastLine);
-			}
-			return new Region(offset, lastLineOffset+document.getLineLength(lastLine)-offset);
-		}
-		catch (final BadLocationException e) {
-			logUnexpectedError(e);
-		}
-		return null;
-	}
-	
-	/**
-	 * Returns the index of the first line whose start offset is in the given text range.
-	 * 
-	 * @param region the text range in characters where to find the line
-	 * @param document The document
-	 * @return the first line whose start index is in the given range, -1 if there is no such line
-	 */
-	protected static int getFirstCompleteLineOfRegion(final IRegion region, final IDocument document) {
-		try {
-			final int startLine = document.getLineOfOffset(region.getOffset());
-			
-			int offset = document.getLineOffset(startLine);
-			if (offset >= region.getOffset()) {
-				return startLine;
-			}
-			offset = document.getLineOffset(startLine + 1);
-			return (offset > region.getOffset() + region.getLength() ? -1 : startLine + 1);
-		}
-		catch (final BadLocationException e) {
-			logUnexpectedError(e);
-		}
-		return -1;
-	}
-	
 	private static void logUnexpectedError(final Throwable e) {
 		StatusManager.getManager().handle(new Status(IStatus.ERROR, SharedUIResources.PLUGIN_ID,
 				ICommonStatusConstants.INTERNAL_ERROR, "Internal Error in source editor (Unexpected Exeption)", e), StatusManager.LOG);
@@ -249,197 +189,6 @@ public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 				}
 			}
 		}
-	}
-	
-	protected class ToggleCommentHandler extends AbstractHandler {
-		
-		/** The text operation target */
-		private ITextOperationTarget fOperationTarget;
-		/** The document partitioning */
-		private String fDocumentPartitioning;
-		/** The comment prefixes */
-		private Map<String, String[]> fPrefixesMap;
-		
-		public ToggleCommentHandler() {
-			configure();
-			setBaseEnabled(false);
-		}
-		
-		private void configure() {
-			final SourceViewerConfiguration configuration = getSourceViewerConfiguration();
-			final ISourceViewer sourceViewer = getSourceViewer();
-			
-			final String[] types = configuration.getConfiguredContentTypes(sourceViewer);
-			fPrefixesMap = new HashMap<String, String[]>(types.length);
-			for (int i= 0; i < types.length; i++) {
-				final String type = types[i];
-				String[] prefixes = configuration.getDefaultPrefixes(sourceViewer, type);
-				if (prefixes != null && prefixes.length > 0) {
-					int emptyPrefixes = 0;
-					for (int j= 0; j < prefixes.length; j++) {
-						if (prefixes[j].length() == 0) {
-							emptyPrefixes++;
-						}
-					}
-					
-					if (emptyPrefixes > 0) {
-						final String[] nonemptyPrefixes = new String[prefixes.length - emptyPrefixes];
-						for (int j = 0, k = 0; j < prefixes.length; j++) {
-							final String prefix = prefixes[j];
-							if (prefix.length() != 0) {
-								nonemptyPrefixes[k]= prefix;
-								k++;
-							}
-						}
-						prefixes = nonemptyPrefixes;
-					}
-					fPrefixesMap.put(type, prefixes);
-				}
-			}
-			fDocumentPartitioning = configuration.getConfiguredDocumentPartitioning(sourceViewer);
-		}
-		
-		@Override
-		public void setEnabled(final Object evaluationContext) {
-			if (!isEditorInputModifiable()) {
-				setBaseEnabled(false);
-				return;
-			}
-			
-			if (fOperationTarget == null) {
-				fOperationTarget = (ITextOperationTarget) getAdapter(ITextOperationTarget.class);
-			}
-			setBaseEnabled(fOperationTarget != null
-					&& fOperationTarget.canDoOperation(ITextOperationTarget.PREFIX)
-					&& fOperationTarget.canDoOperation(ITextOperationTarget.STRIP_PREFIX) );
-		}
-		
-		@Override
-		public Object execute(final ExecutionEvent event) throws ExecutionException {
-			final ISourceViewer sourceViewer = getSourceViewer();
-			
-			if (!validateEditorInputState() || !isEnabled()) {
-				return null;
-			}
-			
-			final int operationCode = (isSelectionCommented(getSelectionProvider().getSelection())) ?
-				ITextOperationTarget.STRIP_PREFIX : ITextOperationTarget.PREFIX;
-			
-			final Shell shell = getSite().getShell();
-			if (!fOperationTarget.canDoOperation(operationCode)) {
-				setStatusLineErrorMessage(EditingMessages.ToggleCommentAction_error);
-				sourceViewer.getTextWidget().getDisplay().beep();
-				return null;
-			}
-			
-			Display display = null;
-			if (shell != null && !shell.isDisposed()) {
-				display = shell.getDisplay();
-			}
-			
-			BusyIndicator.showWhile(display, new Runnable() {
-				@Override
-				public void run() {
-					fOperationTarget.doOperation(operationCode);
-				}
-			});
-			return null;
-		}
-		
-		/**
-		 * Is the given selection single-line commented?
-		 * 
-		 * @param selection Selection to check
-		 * @return <code>true</code> iff all selected lines are commented
-		 */
-		private boolean isSelectionCommented(final ISelection selection) {
-			if (!(selection instanceof ITextSelection)) {
-				return false;
-			}
-			
-			final ITextSelection textSelection = (ITextSelection) selection;
-			if (textSelection.getStartLine() < 0 || textSelection.getEndLine() < 0) {
-				return false;
-			}
-			
-			final IDocument document = getDocumentProvider().getDocument(getEditorInput());
-			try {
-				final IRegion block = getTextBlockFromSelection(textSelection, document);
-				final ITypedRegion[] regions = TextUtilities.computePartitioning(document, fDocumentPartitioning, block.getOffset(), block.getLength(), false);
-				
-				final int[] lines = new int[regions.length * 2]; // [startline, endline, startline, endline, ...]
-				for (int i = 0, j = 0; i < regions.length; i++, j+= 2) {
-					// start line of region
-					lines[j] = getFirstCompleteLineOfRegion(regions[i], document);
-					// end line of region
-					final int length = regions[i].getLength();
-					int offset = regions[i].getOffset() + length;
-					if (length > 0) {
-						offset--;
-					}
-					lines[j+1]= (lines[j] == -1) ? -1 : document.getLineOfOffset(offset);
-				}
-				
-				// Perform the check
-				for (int i = 0, j = 0; i < regions.length; i++, j+=2) {
-					final String[] prefixes = fPrefixesMap.get(regions[i].getType());
-					if (prefixes != null && prefixes.length > 0 && lines[j] >= 0 && lines[j + 1] >= 0) {
-						if (!isBlockCommented(lines[j], lines[j + 1], prefixes, document)) {
-							return false;
-						}
-					}
-				}
-				return true;
-			}
-			catch (final BadLocationException e) {
-				logUnexpectedError(e);
-			}
-			return false;
-		}
-		
-		/**
-		 * Determines whether each line is prefixed by one of the prefixes.
-		 * 
-		 * @param startLine Start line in document
-		 * @param endLine End line in document
-		 * @param prefixes Possible comment prefixes
-		 * @param document The document
-		 * @return <code>true</code> iff each line from <code>startLine</code>
-		 *     to and including <code>endLine</code> is prepended by one
-		 *     of the <code>prefixes</code>, ignoring whitespace at the
-		 *     begin of line
-		 */
-		private boolean isBlockCommented(final int startLine, final int endLine, final String[] prefixes, final IDocument document) {
-			try {
-				// check for occurrences of prefixes in the given lines
-				for (int i = startLine; i <= endLine; i++) {
-					
-					final IRegion line = document.getLineInformation(i);
-					final String text = document.get(line.getOffset(), line.getLength());
-					
-					final int[] found = TextUtilities.indexOf(prefixes, text, 0);
-					
-					if (found[0] == -1) {
-						// found a line which is not commented
-						return false;
-					}
-					
-					String s = document.get(line.getOffset(), found[0]);
-					s = s.trim();
-					if (s.length() != 0) {
-						// found a line which is not commented
-						return false;
-					}
-				}
-				return true;
-				
-			}
-			catch (final BadLocationException e) {
-				logUnexpectedError(e);
-			}
-			return false;
-		}
-		
 	}
 	
 	private class EffectSynchonizer implements ITextEditToolSynchronizer, ILinkedModeListener {
@@ -499,8 +248,8 @@ public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 	private EffectSynchonizer fEffectSynchronizer;
 	private int fEffectSynchonizerCounter;
 	
-	private final FastList<IUpdate> fContentUpdateables = new FastList<IUpdate>(IUpdate.class);
-	private final FastList<IHandler2> fStateUpdateables = new FastList<IHandler2>(IHandler2.class);
+	private final FastList<IUpdate> fContentUpdateables = new FastList<>(IUpdate.class);
+	private final FastList<IHandler2> fStateUpdateables = new FastList<>(IHandler2.class);
 	
 	private boolean fInputChange;
 	private int fInputUpdate = Integer.MAX_VALUE;
@@ -585,7 +334,7 @@ public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 	
 	@Override
 	protected String[] collectContextMenuPreferencePages() {
-		final List<String> list = new ArrayList<String>();
+		final List<String> list = new ArrayList<>();
 		collectContextMenuPreferencePages(list);
 		list.addAll(Arrays.asList(super.collectContextMenuPreferencePages()));
 		return list.toArray(new String[list.size()]);
@@ -1044,7 +793,7 @@ public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 	}
 	
 	protected IHandler2 createToggleCommentHandler() {
-		final IHandler2 commentHandler = new ToggleCommentHandler();
+		final IHandler2 commentHandler = new ToggleCommentHandler(this);
 		markAsStateDependentHandler(commentHandler, true);
 		return commentHandler;
 	}
@@ -1144,7 +893,7 @@ public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 	
 	@Override
 	public void settingsChanged(final Set<String> groupIds) {
-		final Map<String, Object> options = new HashMap<String, Object>();
+		final Map<String, Object> options = new HashMap<>();
 		UIAccess.getDisplay().syncExec(new Runnable() {
 			@Override
 			public void run() {

@@ -66,7 +66,7 @@ public class SourceEditorViewer extends ProjectionViewer {
 			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				final ITextSelection selection= (ITextSelection) event.getSelection();
-				if (lastSentSelection.x != selection.getOffset() || lastSentSelection.y != selection.getLength()) {
+				if (SourceEditorViewer.this.lastSentSelection.x != selection.getOffset() || SourceEditorViewer.this.lastSentSelection.y != selection.getLength()) {
 					final Point currentSelection= getSelectedRange();
 					if (currentSelection.x == selection.getOffset() && currentSelection.y == selection.getLength()) {
 						fireSelectionChanged(currentSelection.x, currentSelection.y);
@@ -78,10 +78,10 @@ public class SourceEditorViewer extends ProjectionViewer {
 	
 	
 	@Override
-	protected void fireSelectionChanged(SelectionChangedEvent event) {
+	protected void fireSelectionChanged(final SelectionChangedEvent event) {
 		final ITextSelection selection= (ITextSelection) event.getSelection();
-		lastSentSelection.x= selection.getOffset();
-		lastSentSelection.y= selection.getLength();
+		this.lastSentSelection.x= selection.getOffset();
+		this.lastSentSelection.y= selection.getLength();
 		
 		super.fireSelectionChanged(event);
 	}
@@ -174,6 +174,12 @@ public class SourceEditorViewer extends ProjectionViewer {
 		}
 		
 		super.unconfigure();
+	}
+	
+	public String[] getDefaultPrefixes(final String contentType) {
+		return (this.fDefaultPrefixChars != null) ?
+				(String[]) this.fDefaultPrefixChars.get(contentType) :
+				null;
 	}
 	
 }

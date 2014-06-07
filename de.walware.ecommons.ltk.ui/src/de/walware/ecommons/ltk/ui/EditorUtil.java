@@ -21,6 +21,10 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.Region;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IURIEditorInput;
@@ -38,7 +42,7 @@ import de.walware.ecommons.ltk.core.model.ISourceUnit;
 /**
  * A number of routines for working with editors.
  */
-public class EditorUtility {
+public class EditorUtil {
 	
 	
 	/**
@@ -114,6 +118,29 @@ public class EditorUtility {
 			return false;
 		}
 		return false;
+	}
+	
+	/**
+	 * Creates a region describing the text block (complete lines) of the selection.
+	 * 
+	 * @param document The document
+	 * @param offset offset of the selection
+	 * @param length length of the selection
+	 * @return the region describing the text block comprising the given selection
+	 * @throws BadLocationException 
+	 */
+	public static IRegion getTextBlockFromSelection(final IDocument document,
+			int offset, final int length) throws BadLocationException {
+		final int endOffset= offset + length;
+		final int firstLine= document.getLineOfOffset(offset);
+		int lastLine= document.getLineOfOffset(endOffset);
+		offset= document.getLineOffset(firstLine);
+		int lastLineOffset = document.getLineOffset(lastLine);
+		if (firstLine != lastLine && lastLineOffset == endOffset) {
+			lastLine--;
+			lastLineOffset= document.getLineOffset(lastLine);
+		}
+		return new Region(offset, lastLineOffset + document.getLineLength(lastLine) - offset);
 	}
 	
 }
