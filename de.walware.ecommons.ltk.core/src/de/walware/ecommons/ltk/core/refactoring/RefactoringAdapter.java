@@ -65,7 +65,7 @@ import org.eclipse.text.edits.DeleteEdit;
 import org.eclipse.text.edits.InsertEdit;
 import org.eclipse.text.edits.MultiTextEdit;
 
-import de.walware.ecommons.collections.ConstArrayList;
+import de.walware.ecommons.collections.ImCollections;
 import de.walware.ecommons.io.FileUtil;
 import de.walware.ecommons.text.BasicHeuristicTokenScanner;
 import de.walware.ecommons.text.PartitioningConfiguration;
@@ -134,7 +134,7 @@ public abstract class RefactoringAdapter {
 		ISourceStructElement last = elements[0];
 		ISourceUnit unitOfLast = last.getSourceUnit();
 		int endOfLast = last.getSourceRange().getOffset()+last.getSourceRange().getLength();
-		final List<ISourceStructElement> checked = new ArrayList<ISourceStructElement>(elements.length);
+		final List<ISourceStructElement> checked = new ArrayList<>(elements.length);
 		for (final ISourceStructElement element : elements) {
 			final ISourceUnit unit = element.getSourceUnit();
 			final int end = last.getSourceRange().getOffset()+last.getSourceRange().getLength();
@@ -220,7 +220,7 @@ public abstract class RefactoringAdapter {
 	
 	public String getSourceCodeStringedTogether(final ISourceStructElement[] sourceElements,
 			final IProgressMonitor monitor) throws CoreException {
-		return getSourceCodeStringedTogether(new ElementSet(sourceElements), monitor);
+		return getSourceCodeStringedTogether(new ElementSet((Object[]) sourceElements), monitor);
 	}
 	
 	public String getSourceCodeStringedTogether(final ElementSet sourceElements,
@@ -238,7 +238,7 @@ public abstract class RefactoringAdapter {
 			int todo = modelElements.size();
 			
 			final StringBuilder sb = new StringBuilder(todo*100);
-			final List<String> codeFragments = new ArrayList<String>();
+			final List<String> codeFragments = new ArrayList<>();
 			for (final IModelElement element : modelElements) {
 				final ISourceUnit su = LTKUtil.getSourceUnit(element);
 				if (su != lastUnit) {
@@ -474,7 +474,7 @@ public abstract class RefactoringAdapter {
 	
 	
 	public void checkInitialToModify(final RefactoringStatus result, final ElementSet elements) {
-		final Set<IResource> resources = new HashSet<IResource>();
+		final Set<IResource> resources = new HashSet<>();
 		resources.addAll(elements.getResources());
 		for(final IModelElement element : elements.getModelElements()) {
 			final ISourceUnit su = LTKUtil.getSourceUnit(element);
@@ -659,7 +659,7 @@ public abstract class RefactoringAdapter {
 			final SharableParticipants shared, final ReorgExecutionLog executionLog)
 			throws CoreException {
 		final String[] natures = ElementSet.getAffectedProjectNatures(
-				new ConstArrayList<ElementSet>(elementsToMove, destination) );
+				ImCollections.newList(elementsToMove, destination) );
 		final MoveArguments mArguments = new MoveArguments(destination.getModelElements().get(0),
 				false );
 //		for (final IResource resource : elementsToCopy.getResources()) {
@@ -686,7 +686,7 @@ public abstract class RefactoringAdapter {
 			final SharableParticipants shared, final ReorgExecutionLog executionLog)
 			throws CoreException {
 		final String[] natures = ElementSet.getAffectedProjectNatures(
-				new ConstArrayList<ElementSet>(elementsToCopy, destination) );
+				ImCollections.newList(elementsToCopy, destination) );
 		final CopyArguments mArguments = new CopyArguments(destination.getModelElements().get(0),
 				executionLog );
 //		for (final IResource resource : elementsToCopy.getResources()) {
@@ -805,7 +805,7 @@ public abstract class RefactoringAdapter {
 		for (final IResource resource : elements.getResources()) {
 			result.add(createChangeToDelete(elements, resource));
 		}
-		final Map<ISourceUnit, List<IModelElement>> suSubChanges = new HashMap<ISourceUnit, List<IModelElement>>();
+		final Map<ISourceUnit, List<IModelElement>> suSubChanges = new HashMap<>();
 		for (final IModelElement element : elements.getModelElements()) {
 			final IResource resource = elements.getOwningResource(element);
 			if (resource != null) {
@@ -815,7 +815,7 @@ public abstract class RefactoringAdapter {
 				final ISourceUnit su = LTKUtil.getSourceUnit(element);
 				List<IModelElement> list = suSubChanges.get(su);
 				if (list == null) {
-					list = new ArrayList<IModelElement>(1);
+					list = new ArrayList<>(1);
 					suSubChanges.put(su, list);
 				}
 				list.add(element);

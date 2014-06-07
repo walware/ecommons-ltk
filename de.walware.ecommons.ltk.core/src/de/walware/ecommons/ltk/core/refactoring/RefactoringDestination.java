@@ -37,12 +37,12 @@ public class RefactoringDestination extends ElementSet {
 	}
 	
 	public RefactoringDestination(final Object element, final Position pos) {
-		super(new Object[] { element });
+		super(element);
 		fPosition = pos;
 	}
 	
 	public RefactoringDestination(final ISourceElement element, final int offset) {
-		super(new Object[] { element });
+		super(element);
 		fPosition = Position.AT;
 		fOffset = offset;
 	}

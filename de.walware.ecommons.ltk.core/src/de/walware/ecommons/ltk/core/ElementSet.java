@@ -24,7 +24,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
-import de.walware.ecommons.collections.ConstArrayList;
+import de.walware.ecommons.collections.ImCollections;
+import de.walware.ecommons.collections.ImList;
 
 import de.walware.ecommons.ltk.LTKUtil;
 import de.walware.ecommons.ltk.core.model.IModelElement;
@@ -43,11 +44,11 @@ public class ElementSet {
 	
 	public static String[] getAffectedProjectNatures(final List<ElementSet> sets)
 			throws CoreException {
-		final Set<String> natureIds = new HashSet<String>();
+		final Set<String> natureIds= new HashSet<>();
 		for (final ElementSet set : sets) {
-			final Set<IProject> affectedProjects = set.getAffectedProjects();
+			final Set<IProject> affectedProjects= set.getAffectedProjects();
 			for (final IProject project : affectedProjects) {
-				final String[] ids = project.getDescription().getNatureIds();
+				final String[] ids= project.getDescription().getNatureIds();
 				for (final String id : ids) {
 					natureIds.add(id);
 				}
@@ -57,40 +58,44 @@ public class ElementSet {
 	}
 	
 	
-	private static final int POST_INIT =    0x10000;
-	private static final int POST_PROCESS = 0x70000;
+	private static final int POST_INIT=    0x10000;
+	private static final int POST_PROCESS= 0x70000;
 	
 	
-	protected List<Object> fInitialElements;
+	protected ImList<Object> initialElements;
 	
-	private List<IModelElement> fModelElements;
-	private List<IResource> fResources;
+	private List<IModelElement> modelElements;
+	private List<IResource> resources;
 	
-	private int fProcessState = 0;
+	private int processState= 0;
 	private List<IResource> fResourcesOwnedByElements;
 	private List<IFile> fFilesContainingElements;
 	
 	
-	public ElementSet(final Object... elements) {
-		fInitialElements = new ConstArrayList<Object>(elements);
+	public ElementSet(final List<Object> elements) {
+		this.initialElements= ImCollections.toList(elements);
 		init(elements);
 		
-		if (fModelElements == null) {
-			fModelElements = new ArrayList<IModelElement>(0);
+		if (this.modelElements == null) {
+			this.modelElements= new ArrayList<>(0);
 		}
-		if (fResources == null) {
-			fResources = new ArrayList<IResource>(0);
+		if (this.resources == null) {
+			this.resources= new ArrayList<>(0);
 		}
-		if (countElements() == fInitialElements.size()) {
-			fProcessState = POST_INIT;
+		if (countElements() == this.initialElements.size()) {
+			this.processState= POST_INIT;
 		}
 		else {
-			fProcessState = -POST_INIT;
+			this.processState= -POST_INIT;
 		}
 	}
 	
+	public ElementSet(final Object... elements) {
+		this(ImCollections.newList(elements));
+	}
 	
-	protected void init(final Object[] elements) {
+	
+	protected void init(final List<Object> elements) {
 		for (final Object o : elements) {
 			add(o);
 		}
@@ -98,24 +103,24 @@ public class ElementSet {
 	
 	protected void add(final Object o) {
 		if (o instanceof IModelElement) {
-			if (fModelElements == null) {
-				fModelElements = new ArrayList<IModelElement>();
+			if (this.modelElements == null) {
+				this.modelElements= new ArrayList<>();
 			}
-			fModelElements.add((IModelElement) o);
+			this.modelElements.add((IModelElement) o);
 			return;
 		}
 		if (o instanceof IResource) {
-			if (fResources == null) {
-				fResources = new ArrayList<IResource>();
+			if (this.resources == null) {
+				this.resources= new ArrayList<>();
 			}
-			fResources.add((IResource) o);
+			this.resources.add((IResource) o);
 			return;
 		}
 	}
 	
 	
 	protected int countElements() {
-		return fResources.size() + fModelElements.size();
+		return this.resources.size() + this.modelElements.size();
 	}
 	
 	public int getElementCount() {
@@ -123,40 +128,40 @@ public class ElementSet {
 	}
 	
 	public boolean isOK() {
-		return (fProcessState > 0);
+		return (this.processState > 0);
 	}
 	
 	public List<Object> getInitialObjects() {
-		return fInitialElements;
+		return this.initialElements;
 	}
 	
 	public List<IResource> getResources() {
-		return fResources;
+		return this.resources;
 	}
 	
 	public List<IModelElement> getModelElements() {
-		return fModelElements;
+		return this.modelElements;
 	}
 	
 	public List<IResource> getResourcesOwnedByElements() {
-		return fResourcesOwnedByElements;
+		return this.fResourcesOwnedByElements;
 	}
 	
 	public List<IFile> getFilesContainingElements() {
-		return fFilesContainingElements;
+		return this.fFilesContainingElements;
 	}
 	
 	public IResource getOwningResource(final IModelElement element) {
 		if ((element.getElementType() & IModelElement.MASK_C2) < IModelElement.C2_SOURCE_CHUNK) {
 			IResource resource;
-			resource = (IResource) element.getAdapter(IResource.class);
+			resource= (IResource) element.getAdapter(IResource.class);
 			return resource;
 		}
 		return null;
 	}
 	
 	public IResource getResource(final IModelElement element) {
-		final ISourceUnit su = LTKUtil.getSourceUnit(element);
+		final ISourceUnit su= LTKUtil.getSourceUnit(element);
 		if (su instanceof IWorkspaceSourceUnit) {
 			return ((IWorkspaceSourceUnit) su).getResource();
 		}
@@ -164,25 +169,25 @@ public class ElementSet {
 	}
 	
 	public IProject getSingleProject() {
-		IProject project = null;
-		for (final IResource resource : fResources) {
-			final IProject p = resource.getProject();
+		IProject project= null;
+		for (final IResource resource : this.resources) {
+			final IProject p= resource.getProject();
 			if (project == null) {
-				project = p;
+				project= p;
 				continue;
 			}
 			if (!project.equals(p)) {
 				return null;
 			}
 		}
-		for (final IModelElement element : fModelElements) {
-			final IResource resource = getResource(element);
+		for (final IModelElement element : this.modelElements) {
+			final IResource resource= getResource(element);
 			if (resource == null) {
 				continue;
 			}
-			final IProject p = resource.getProject();
+			final IProject p= resource.getProject();
 			if (project == null) {
-				project = p;
+				project= p;
 				continue;
 			}
 			if (!project.equals(p)) {
@@ -193,12 +198,12 @@ public class ElementSet {
 	}
 	
 	public Set<IProject> getProjects() {
-		final Set<IProject> projects = new HashSet<IProject>();
-		for (final IResource resource : fResources) {
+		final Set<IProject> projects= new HashSet<>();
+		for (final IResource resource : this.resources) {
 			projects.add(resource.getProject());
 		}
-		for (final IModelElement element : fModelElements) {
-			final IResource resource = getResource(element);
+		for (final IModelElement element : this.modelElements) {
+			final IResource resource= getResource(element);
 			if (resource != null) {
 				projects.add(resource.getProject());
 			}
@@ -207,10 +212,10 @@ public class ElementSet {
 	}
 	
 	public Set<IProject> getAffectedProjects() {
-		final Set<IProject> projects = getProjects();
-		final IProject[] array = projects.toArray(new IProject[projects.size()]);
-		for (int i = 0; i < array.length; i++) {
-			final IProject[] referencingProjects = array[i].getReferencingProjects();
+		final Set<IProject> projects= getProjects();
+		final IProject[] array= projects.toArray(new IProject[projects.size()]);
+		for (int i= 0; i < array.length; i++) {
+			final IProject[] referencingProjects= array[i].getReferencingProjects();
 			if (referencingProjects.length > 0) {
 				addAffectedProjects(referencingProjects, projects);
 			}
@@ -219,9 +224,9 @@ public class ElementSet {
 	}
 	
 	private void addAffectedProjects(final IProject[] projectToAdd, final Set<IProject> projects) {
-		for (int i = 0; i < projectToAdd.length; i++) {
+		for (int i= 0; i < projectToAdd.length; i++) {
 			if (projects.add(projectToAdd[i])) {
-				final IProject[] referencingProjects = projectToAdd[i].getReferencingProjects();
+				final IProject[] referencingProjects= projectToAdd[i].getReferencingProjects();
 				if (referencingProjects.length > 0) {
 					addAffectedProjects(referencingProjects, projects);
 				}
@@ -231,19 +236,19 @@ public class ElementSet {
 	
 	
 	public void removeElementsWithAncestorsOnList() {
-		if ((fProcessState & 0x10) == 0) {
+		if ((this.processState & 0x10) == 0) {
 			removeResourcesDescendantsOfResources();
 			removeResourcesDescendantsOfModelElements();
 			removeModelElementsDescendantsOfModelElements();
-			fProcessState |= 0x10;
+			this.processState |= 0x10;
 		}
 	}
 	
 	private void removeResourcesDescendantsOfResources() {
-		final Iterator<IResource> iter = fResources.iterator();
+		final Iterator<IResource> iter= this.resources.iterator();
 		ITER_RESOURCE : while (iter.hasNext()) {
-			final IResource subResource = iter.next();
-			for (final IResource superResource : fResources) {
+			final IResource subResource= iter.next();
+			for (final IResource superResource : this.resources) {
 				if (isDescendantOf(subResource, superResource)) {
 					iter.remove();
 					continue ITER_RESOURCE;
@@ -253,10 +258,10 @@ public class ElementSet {
 	}
 	
 	private void removeResourcesDescendantsOfModelElements() {
-		final Iterator<IResource> iter = fResources.iterator();
+		final Iterator<IResource> iter= this.resources.iterator();
 		ITER_RESOURCE : while (iter.hasNext()) {
-			final IResource subResource = iter.next();
-			for (final IModelElement superElement : fModelElements) {
+			final IResource subResource= iter.next();
+			for (final IModelElement superElement : this.modelElements) {
 				if (isDescendantOf(subResource, superElement)) {
 					iter.remove();
 					continue ITER_RESOURCE;
@@ -266,10 +271,10 @@ public class ElementSet {
 	}
 	
 	private void removeModelElementsDescendantsOfModelElements() {
-		final Iterator<IModelElement> iter = fModelElements.iterator();
+		final Iterator<IModelElement> iter= this.modelElements.iterator();
 		ITER_ELEMENT : while (iter.hasNext()) {
-			final IModelElement subElement = iter.next();
-			for (final IModelElement superElement : fModelElements) {
+			final IModelElement subElement= iter.next();
+			for (final IModelElement superElement : this.modelElements) {
 				if (isDescendantOf(subElement, superElement)) {
 					iter.remove();
 					continue ITER_ELEMENT;
@@ -279,10 +284,10 @@ public class ElementSet {
 	}
 	
 	public boolean includes(final IModelElement element) {
-		if (fModelElements.contains(element)) {
+		if (this.modelElements.contains(element)) {
 			return true;
 		}
-		for (final IModelElement e : fModelElements) {
+		for (final IModelElement e : this.modelElements) {
 			if (isDescendantOf(element, e)) {
 				return true;
 			}
@@ -296,7 +301,7 @@ public class ElementSet {
 	}
 	
 	protected boolean isDescendantOf(final IResource subResource, final IModelElement superElement) {
-		final IResource superResource = getOwningResource(superElement);
+		final IResource superResource= getOwningResource(superElement);
 		if (superResource != null) {
 			return isDescendantOf(subResource, superResource);
 		}
@@ -308,45 +313,45 @@ public class ElementSet {
 				|| !(subElement instanceof ISourceStructElement)) {
 			return false;
 		}
-		ISourceStructElement parent = ((ISourceStructElement) subElement).getSourceParent();
+		ISourceStructElement parent= ((ISourceStructElement) subElement).getSourceParent();
 		while (parent != null){
 			if (parent.equals(superElement)) {
 				return true;
 			}
-			parent = parent.getSourceParent();
+			parent= parent.getSourceParent();
 		}
 		return false;
 	}
 	
 	protected void setModelElements(final List<IModelElement> newElements) {
-		if (fProcessState >= POST_PROCESS) {
+		if (this.processState >= POST_PROCESS) {
 			throw new IllegalSelectorException();
 		}
-		fModelElements = newElements;
+		this.modelElements= newElements;
 	}
 	
 	public void postProcess() {
-		if (fProcessState < 0) {
+		if (this.processState < 0) {
 			throw new IllegalStateException();
 		}
-		if (fProcessState < POST_PROCESS) {
-			fResourcesOwnedByElements = new ArrayList<IResource>(1);
-			fFilesContainingElements = new ArrayList<IFile>(1);
-			for (final IModelElement element : fModelElements) {
+		if (this.processState < POST_PROCESS) {
+			this.fResourcesOwnedByElements= new ArrayList<>(1);
+			this.fFilesContainingElements= new ArrayList<>(1);
+			for (final IModelElement element : this.modelElements) {
 				IResource resource;
-				resource = getOwningResource(element);
+				resource= getOwningResource(element);
 				if (resource != null) {
-					fResourcesOwnedByElements.add(resource);
+					this.fResourcesOwnedByElements.add(resource);
 					continue;
 				}
-				resource = getResource(element);
+				resource= getResource(element);
 				if (resource != null && resource.getType() == IResource.FILE) {
-					fFilesContainingElements.add((IFile) resource);
+					this.fFilesContainingElements.add((IFile) resource);
 					continue;
 				}
 			}
 		}
-		fProcessState = POST_PROCESS | (fProcessState & 0xffff);
+		this.processState= POST_PROCESS | (this.processState & 0xffff);
 	}
 	
 }

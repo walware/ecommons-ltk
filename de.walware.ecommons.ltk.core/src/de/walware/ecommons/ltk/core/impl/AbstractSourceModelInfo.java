@@ -13,9 +13,8 @@ package de.walware.ecommons.ltk.core.impl;
 
 import java.util.List;
 
-import de.walware.ecommons.collections.CollectionUtils;
-import de.walware.ecommons.collections.ConstArrayList;
-import de.walware.ecommons.collections.ConstList;
+import de.walware.ecommons.collections.ImCollections;
+import de.walware.ecommons.collections.ImList;
 
 import de.walware.ecommons.ltk.AstInfo;
 import de.walware.ecommons.ltk.core.model.ISourceUnitModelInfo;
@@ -24,12 +23,12 @@ import de.walware.ecommons.ltk.core.model.ISourceUnitModelInfo;
 public abstract class AbstractSourceModelInfo implements ISourceUnitModelInfo {
 	
 	
-	private static final ConstList<Object> NO_ATTACHMENTS= CollectionUtils.emptyConstList();
+	private static final ImList<Object> NO_ATTACHMENTS= ImCollections.emptyList();
 	
 	
 	private final AstInfo ast;
 	
-	private ConstList<Object> attachments= NO_ATTACHMENTS;
+	private ImList<Object> attachments= NO_ATTACHMENTS;
 	
 	
 	public AbstractSourceModelInfo(final AstInfo ast) {
@@ -50,7 +49,7 @@ public abstract class AbstractSourceModelInfo implements ISourceUnitModelInfo {
 	
 	@Override
 	public void addAttachment(final Object data) {
-		this.attachments= ConstArrayList.concat(this.attachments, data);
+		this.attachments= ImCollections.concatList(this.attachments, data);
 	}
 	
 	@Override

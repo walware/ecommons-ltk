@@ -25,7 +25,7 @@ import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
 
 import de.walware.ecommons.IDisposable;
-import de.walware.ecommons.collections.CollectionUtils;
+import de.walware.ecommons.collections.ImCollections;
 
 import de.walware.ecommons.ltk.IExtContentTypeManager;
 
@@ -163,7 +163,7 @@ public class ExtContentTypeServices implements IExtContentTypeManager, IDisposab
 	}
 	
 	private static void checkModelTypes(final Map<String, ModelTypeDescriptor> modelTypes) {
-		final List<String> temp = new ArrayList<String>();
+		final List<String> temp= new ArrayList<>();
 		for (final ModelTypeDescriptor descriptor : modelTypes.values()) {
 			synchronized (descriptor) {
 				temp.clear();
@@ -172,7 +172,7 @@ public class ExtContentTypeServices implements IExtContentTypeManager, IDisposab
 						temp.add(sId);
 					}
 				}
-				descriptor.checkedSecondaryTypeIds = CollectionUtils.asConstList(temp);
+				descriptor.checkedSecondaryTypeIds= ImCollections.toList(temp);
 			}
 		}
 	}

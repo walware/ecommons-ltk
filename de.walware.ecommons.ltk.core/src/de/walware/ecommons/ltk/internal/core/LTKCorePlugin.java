@@ -14,13 +14,10 @@ package de.walware.ecommons.ltk.internal.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
 
-import de.walware.ecommons.ECommons;
-import de.walware.ecommons.ECommons.IAppEnvironment;
 import de.walware.ecommons.IDisposable;
 
 import de.walware.ecommons.ltk.IExtContentTypeManager;
@@ -30,14 +27,14 @@ import de.walware.ecommons.ltk.ISourceUnitManager;
 /**
  * The activator class controls the plug-in life cycle
  */
-public final class LTKCorePlugin extends Plugin implements IAppEnvironment {
+public final class LTKCorePlugin extends Plugin {
 	
 	
-	public static final String PLUGIN_ID = "de.walware.ecommons.base.core"; //$NON-NLS-1$
+	public static final String PLUGIN_ID= "de.walware.ecommons.ltk.core"; //$NON-NLS-1$
 	
 	
 	/** The shared instance. */
-	private static LTKCorePlugin gPlugin;
+	private static LTKCorePlugin instance;
 	private static LTKCorePlugin gSafe;
 	
 	/**
@@ -47,6 +44,22 @@ public final class LTKCorePlugin extends Plugin implements IAppEnvironment {
 	 */
 	public static LTKCorePlugin getSafe() {
 		return gSafe;
+	}
+	
+	/**
+	 * Returns the shared plug-in instance
+	 * 
+	 * @return the shared instance
+	 */
+	public static LTKCorePlugin getInstance() {
+		return instance;
+	}
+	
+	public static void log(final IStatus status) {
+		final LTKCorePlugin plugin= getInstance();
+		if (plugin != null) {
+			plugin.getLog().log(status);
+		}
 	}
 	
 	
@@ -64,8 +77,8 @@ public final class LTKCorePlugin extends Plugin implements IAppEnvironment {
 	 * The default constructor
 	 */
 	public LTKCorePlugin() {
-		gPlugin = this;
-		gSafe = this;
+		instance= this;
+		gSafe= this;
 	}
 	
 	/**
@@ -73,7 +86,6 @@ public final class LTKCorePlugin extends Plugin implements IAppEnvironment {
 	 */
 	@Override
 	public void start(final BundleContext context) throws Exception {
-		ECommons.init(PLUGIN_ID, this);
 		super.start(context);
 		
 		synchronized (this) {
@@ -109,21 +121,12 @@ public final class LTKCorePlugin extends Plugin implements IAppEnvironment {
 			}
 		}
 		finally {
-			gPlugin = null;
+			instance= null;
 			super.stop(context);
 		}
 	}
 	
 	
-	@Override
-	public void log(final IStatus status) {
-		final ILog log = getLog();
-		if (log != null) {
-			log.log(status);
-		}
-	}
-	
-	@Override
 	public void addStoppingListener(final IDisposable listener) {
 		if (listener == null) {
 			throw new NullPointerException();
@@ -134,11 +137,6 @@ public final class LTKCorePlugin extends Plugin implements IAppEnvironment {
 			}
 			fDisposables.add(listener);
 		}
-	}
-	
-	@Override
-	public void removeStoppingListener(final IDisposable listener) {
-		fDisposables.remove(listener);
 	}
 	
 	public IExtContentTypeManager getContentTypeServices() {

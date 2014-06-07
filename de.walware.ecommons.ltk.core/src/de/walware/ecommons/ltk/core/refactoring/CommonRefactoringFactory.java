@@ -57,7 +57,7 @@ public class CommonRefactoringFactory {
 		if (elements instanceof Object[]) {
 			return new ElementSet((Object[]) elements);
 		}
-		return new ElementSet(new Object[] { elements });
+		return new ElementSet(elements);
 	}
 	
 }

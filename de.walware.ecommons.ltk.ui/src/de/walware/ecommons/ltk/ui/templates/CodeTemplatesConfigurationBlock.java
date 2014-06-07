@@ -63,7 +63,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.statushandlers.StatusManager;
 
-import de.walware.ecommons.collections.ConstArrayList;
+import de.walware.ecommons.collections.ImCollections;
 import de.walware.ecommons.preferences.Preference;
 import de.walware.ecommons.preferences.ui.ManagedConfigurationBlock;
 import de.walware.ecommons.templates.TemplateVariableProcessor;
@@ -100,7 +100,7 @@ public class CodeTemplatesConfigurationBlock extends ManagedConfigurationBlock
 		
 		private final Image fItemImage;
 		
-		private final Set<String> fItemNames = new HashSet<String>();
+		private final Set<String> fItemNames = new HashSet<>();
 		
 		
 		public TemplateGroup(final String id,
@@ -324,7 +324,7 @@ public class CodeTemplatesConfigurationBlock extends ManagedConfigurationBlock
 		public Object[] getChildren(final Object parentElement) {
 			if (parentElement instanceof TemplateGroup) {
 				final TemplateGroup group = (TemplateGroup) parentElement;
-				final List<TemplateItem> items = new ArrayList<TemplateItem>();
+				final List<TemplateItem> items = new ArrayList<>();
 				for (final ITemplateContribution contrib : fTemplateContributions) {
 					final TemplatePersistenceData[] templates = contrib.getTemplates(group.fId);
 					if (templates != null) {
@@ -509,7 +509,7 @@ public class CodeTemplatesConfigurationBlock extends ManagedConfigurationBlock
 	}
 	
 	protected List<TemplateGroup> getGroups() {
-		return new ConstArrayList<TemplateGroup>(fTemplateGroups);
+		return ImCollections.newList(fTemplateGroups);
 	}
 	
 	protected TemplateGroup getGroup(final String groupId) {
@@ -523,7 +523,7 @@ public class CodeTemplatesConfigurationBlock extends ManagedConfigurationBlock
 	
 	protected List<TemplateItem> getTemplates(final TemplateGroup group) {
 		final TemplateItem[] children = (TemplateItem[]) fContentProvider.getChildren(group);
-		return new ConstArrayList<TemplateItem>(children);
+		return ImCollections.newList(children);
 	}
 	
 	@Override
@@ -543,7 +543,7 @@ public class CodeTemplatesConfigurationBlock extends ManagedConfigurationBlock
 	
 	@Override
 	protected void createBlockArea(final Composite pageComposite) {
-		final Map<Preference<?>, String> prefs = new HashMap<Preference<?>, String>();
+		final Map<Preference<?>, String> prefs = new HashMap<>();
 		
 		if (fDefaultPref != null) {
 			prefs.put(fDefaultPref, null);
@@ -563,7 +563,7 @@ public class CodeTemplatesConfigurationBlock extends ManagedConfigurationBlock
 			fTreeViewer = createTreeViewer(composite);
 			fTreeViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 			
-			fButtonGroup = new ButtonGroup<TemplateItem>(composite, this, false);
+			fButtonGroup = new ButtonGroup<>(composite, this, false);
 			fButtonGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
 			
 			if (fEnableAdd) {
@@ -639,7 +639,7 @@ public class CodeTemplatesConfigurationBlock extends ManagedConfigurationBlock
 	
 	private Image getDefaultImage(final Image image) {
 		if (fDefaultImages == null) {
-			fDefaultImages = new HashMap<Image, Image>();
+			fDefaultImages = new HashMap<>();
 		}
 		Image defaultImage = fDefaultImages.get(image);
 		if (defaultImage == null) {
