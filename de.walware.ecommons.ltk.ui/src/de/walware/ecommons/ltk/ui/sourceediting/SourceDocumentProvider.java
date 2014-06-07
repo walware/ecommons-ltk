@@ -41,18 +41,21 @@ public class SourceDocumentProvider<T extends ISourceUnit> extends TextFileDocum
 	
 	public static class SourceFileInfo extends FileInfo {
 		
-		public ISourceUnit fWorkingCopy;
+		private ISourceUnit workingCopy;
 		
 	}
 	
 	
-	private final String fModelTypeId;
-	private final PartitionerDocumentSetupParticipant fDocumentSetupParticipant;
+	private final String modelTypeId;
+	private final PartitionerDocumentSetupParticipant documentSetupParticipant;
 	
 	
 	public SourceDocumentProvider(final String modelTypeId, final PartitionerDocumentSetupParticipant documentSetupParticipant) {
-		fModelTypeId = modelTypeId;
-		fDocumentSetupParticipant = documentSetupParticipant;
+		if (modelTypeId == null) {
+			throw new NullPointerException("modelTypeId"); //$NON-NLS-1$
+		}
+		this.modelTypeId = modelTypeId;
+		this.documentSetupParticipant = documentSetupParticipant;
 //		final IDocumentProvider provider = new ForwardingDocumentProvider(documentSetupParticipant.getPartitioningId(),
 //				fDocumentSetupParticipant, new TextFileDocumentProvider());
 //		setParentDocumentProvider(provider);
@@ -69,14 +72,14 @@ public class SourceDocumentProvider<T extends ISourceUnit> extends TextFileDocum
 		final FileInfo info = getFileInfo(element);
 		if (info instanceof SourceFileInfo) {
 			final SourceFileInfo rinfo = (SourceFileInfo) info;
-			if (rinfo.fCount == 1 && rinfo.fWorkingCopy != null) {
+			if (rinfo.fCount == 1 && rinfo.workingCopy != null) {
 				final IProgressMonitor monitor = getProgressMonitor();
 				final SubMonitor progress = SubMonitor.convert(monitor, 1);
 				try {
-					rinfo.fWorkingCopy.disconnect(progress.newChild(1));
+					rinfo.workingCopy.disconnect(progress.newChild(1));
 				}
 				finally {
-					rinfo.fWorkingCopy = null;
+					rinfo.workingCopy = null;
 					if (monitor != null) {
 						monitor.done();
 					}
@@ -109,8 +112,8 @@ public class SourceDocumentProvider<T extends ISourceUnit> extends TextFileDocum
 			final Object ifile = adaptable.getAdapter(IFile.class);
 			final ISourceUnitManager suManager = LTK.getSourceUnitManager();
 			if (ifile != null) {
-				final ISourceUnit pUnit = suManager.getSourceUnit(fModelTypeId, LTK.PERSISTENCE_CONTEXT, ifile, true, progress.newChild(1));
-				sourceInfo.fWorkingCopy = suManager.getSourceUnit(fModelTypeId, LTK.EDITOR_CONTEXT, pUnit, true, progress.newChild(1));
+				final ISourceUnit pUnit = suManager.getSourceUnit(this.modelTypeId, LTK.PERSISTENCE_CONTEXT, ifile, true, progress.newChild(1));
+				sourceInfo.workingCopy = suManager.getSourceUnit(this.modelTypeId, LTK.EDITOR_CONTEXT, pUnit, true, progress.newChild(1));
 			}
 			else if (element instanceof IURIEditorInput) {
 				final IFileStore store;
@@ -120,7 +123,7 @@ public class SourceDocumentProvider<T extends ISourceUnit> extends TextFileDocum
 				catch (final CoreException e) {
 					return sourceInfo;
 				}
-				sourceInfo.fWorkingCopy = suManager.getSourceUnit(fModelTypeId, LTK.EDITOR_CONTEXT, store, true, progress.newChild(1));
+				sourceInfo.workingCopy = suManager.getSourceUnit(this.modelTypeId, LTK.EDITOR_CONTEXT, store, true, progress.newChild(1));
 			}
 		}
 		finally {
@@ -133,8 +136,8 @@ public class SourceDocumentProvider<T extends ISourceUnit> extends TextFileDocum
 	}
 	
 	protected void setupDocument(final AbstractDocument document) {
-		if (document.getDocumentPartitioner(fDocumentSetupParticipant.getPartitioningId()) == null) {
-			fDocumentSetupParticipant.setup(document);
+		if (this.documentSetupParticipant != null) {
+			this.documentSetupParticipant.setup(document);
 		}
 	}
 	
@@ -142,7 +145,7 @@ public class SourceDocumentProvider<T extends ISourceUnit> extends TextFileDocum
 	public T getWorkingCopy(final Object element) {
 		final FileInfo fileInfo = getFileInfo(element);
 		if (fileInfo instanceof SourceFileInfo) {
-			return (T) ((SourceFileInfo) fileInfo).fWorkingCopy;
+			return (T) ((SourceFileInfo) fileInfo).workingCopy;
 		}
 		return null;
 	}
