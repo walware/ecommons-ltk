@@ -14,12 +14,14 @@ package de.walware.ecommons.text;
 import org.eclipse.core.filebuffers.IDocumentSetupParticipant;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentExtension3;
+import org.eclipse.jface.text.IDocumentPartitioner;
+import org.eclipse.jface.text.IDocumentPartitionerExtension3;
 import org.eclipse.jface.text.ISynchronizable;
 
 
 /**
- * Base implementation of {@link IDocumentSetupParticipant} configuring the
- * document for a {@link Partitioner}.
+ * Base implementation of {@link IDocumentSetupParticipant} configuring the document for a
+ * {@link IDocumentPartitioner document partitioner}.
  */
 public abstract class PartitionerDocumentSetupParticipant implements IDocumentSetupParticipant {
 	
@@ -31,17 +33,9 @@ public abstract class PartitionerDocumentSetupParticipant implements IDocumentSe
 	@Override
 	public void setup(final IDocument document) {
 		if (document instanceof IDocumentExtension3) {
-			final IDocumentExtension3 extension3 = (IDocumentExtension3) document;
-			
 			final Object synch = getLockObject(document);
-			
 			synchronized (synch) {
-				if (extension3.getDocumentPartitioner(getPartitioningId()) == null) {
-					// Setup the document scanner
-					final Partitioner partitioner = createDocumentPartitioner();
-					partitioner.connect(document, true);
-					extension3.setDocumentPartitioner(getPartitioningId(), partitioner);
-				}
+				doSetup(document);
 			}
 		}
 		else {
@@ -66,8 +60,23 @@ public abstract class PartitionerDocumentSetupParticipant implements IDocumentSe
 		return synch;
 	}
 	
+	protected void doSetup(final IDocument document) {
+		final IDocumentExtension3 extension3 = (IDocumentExtension3) document;
+		if (extension3.getDocumentPartitioner(getPartitioningId()) == null) {
+			// Setup the document scanner
+			final IDocumentPartitioner partitioner= createDocumentPartitioner();
+			if (partitioner instanceof IDocumentPartitionerExtension3) {
+				((IDocumentPartitionerExtension3) partitioner).connect(document, true);
+			}
+			else {
+				partitioner.connect(document);
+			}
+			extension3.setDocumentPartitioner(getPartitioningId(), partitioner);
+		}
+	}
+	
 	public abstract String getPartitioningId();
 	
-	protected abstract Partitioner createDocumentPartitioner();
+	protected abstract IDocumentPartitioner createDocumentPartitioner();
 	
 }

@@ -29,4 +29,6 @@ Export-Package: de.walware.ecommons.ltk,
  de.walware.ecommons.tasklist,
  de.walware.ecommons.text,
  de.walware.ecommons.text.core.rules,
- de.walware.ecommons.text.core.sections
+ de.walware.ecommons.text.core.sections,
+ de.walware.ecommons.text.core.treepartitioner,
+ de.walware.ecommons.text.core.util
