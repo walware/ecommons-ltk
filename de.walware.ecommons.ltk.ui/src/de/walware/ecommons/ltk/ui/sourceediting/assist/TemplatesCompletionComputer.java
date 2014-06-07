@@ -11,23 +11,28 @@
 
 package de.walware.ecommons.ltk.ui.sourceediting.assist;
 
+import java.util.List;
+import java.util.regex.Pattern;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
-import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
 import org.eclipse.jface.text.templates.DocumentTemplateContext;
 import org.eclipse.jface.text.templates.GlobalTemplateVariables;
+import org.eclipse.jface.text.templates.GlobalTemplateVariables.LineSelection;
+import org.eclipse.jface.text.templates.GlobalTemplateVariables.WordSelection;
 import org.eclipse.jface.text.templates.Template;
-import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateContextType;
 import org.eclipse.jface.text.templates.TemplateException;
 import org.eclipse.jface.text.templates.persistence.TemplateStore;
 import org.eclipse.swt.graphics.Image;
+
+import de.walware.ecommons.collections.ImCollections;
 
 import de.walware.ecommons.ltk.internal.ui.LTKUIPlugin;
 import de.walware.ecommons.ltk.ui.LTKUI;
@@ -44,8 +49,14 @@ public abstract class TemplatesCompletionComputer implements IContentAssistCompu
 	
 	private static final TemplateComparator fgTemplateComparator= new TemplateProposal.TemplateComparator();
 	
-	private static final String LINE_SELECTION= "{" + GlobalTemplateVariables.LineSelection.NAME + "}"; //$NON-NLS-1$ //$NON-NLS-2$
-	private static final String WORD_SELECTION= "{" + GlobalTemplateVariables.WordSelection.NAME + "}"; //$NON-NLS-1$ //$NON-NLS-2$
+	private static final byte SELECTION_NONE= 0;
+	private static final byte SELECTION_INLINE= 1;
+	private static final byte SELECTION_MULTILINE= 2;
+	
+	private static final Pattern SELECTION_INLINE_PATTERN= Pattern.compile(
+			"\\$\\{" + WordSelection.NAME + "\\}"); //$NON-NLS-1$ //$NON-NLS-2$
+	private static final Pattern SELECTION_ANY_PATTERN= Pattern.compile(
+			"\\$\\{(?:" + WordSelection.NAME + "|" + LineSelection.NAME + ")\\}"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	
 	
 	protected final TemplateStore templateStore;
@@ -54,6 +65,12 @@ public abstract class TemplatesCompletionComputer implements IContentAssistCompu
 	
 	
 	public TemplatesCompletionComputer(final TemplateStore templateStore, final ContextTypeRegistry contextTypes) {
+		if (templateStore == null) {
+			throw new NullPointerException("templateStore"); //$NON-NLS-1$
+		}
+		if (contextTypes == null) {
+			throw new NullPointerException("contextTypes"); //$NON-NLS-1$
+		}
 		this.templateStore= templateStore;
 		this.typeRegistry= contextTypes;
 	}
@@ -79,6 +96,11 @@ public abstract class TemplatesCompletionComputer implements IContentAssistCompu
 	public void sessionEnded() {
 	}
 	
+	protected boolean handleRequest(final int mode, final String prefix) {
+		return (prefix != null
+				&& (prefix.length() > 0 || mode == IContentAssistComputer.SPECIFIC_MODE) );
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -88,8 +110,7 @@ public abstract class TemplatesCompletionComputer implements IContentAssistCompu
 		final ISourceViewer viewer= context.getSourceViewer();
 		
 		String prefix= extractPrefix(context);
-		if (prefix == null
-				|| (prefix.length() == 0 && mode != IContentAssistComputer.SPECIFIC_MODE) ) {
+		if (!handleRequest(mode, prefix)) {
 			return null;
 		}
 		IRegion region;
@@ -117,14 +138,16 @@ public abstract class TemplatesCompletionComputer implements IContentAssistCompu
 		try {
 			final IDocument document= viewer.getDocument();
 			final String text= document.get(context.getOffset(), context.getLength());
-			int selectionType;
-			if (context.getLength() > 0) {
-				selectionType= 1;
+			final int selectionType;
+			if (text.isEmpty()) {
+				selectionType= SELECTION_NONE;
 			}
 			else {
-				selectionType= 0;
+				selectionType= (text.indexOf('\n') >= 0) ? SELECTION_MULTILINE : SELECTION_INLINE;
+				templateContext.setVariable("text", text); //$NON-NLS-1$
 			}
-			templateContext.setVariable("selection", text); // name of the selection variables {line, word}_selection //$NON-NLS-1$
+			templateContext.setVariable(GlobalTemplateVariables.SELECTION, text);
+			
 			doComputeProposals(tenders, templateContext, prefix, selectionType, region);
 		}
 		catch (final BadLocationException e) {
@@ -137,45 +160,38 @@ public abstract class TemplatesCompletionComputer implements IContentAssistCompu
 			final IRegion replacementRegion) {
 		// Add Templates
 		final int count= 0;
-		final Template[] templates= getTemplates(context.getContextType().getId());
-		for (int i= 0; i < templates.length; i++) {
-			final Template template= templates[i];
-			if (include(template, prefix)) { // Change <-> super
-				final String pattern= template.getPattern();
-				if (selectionType > 0 && !isSelectionTemplate(pattern)) {
-					continue;
-				}
+		final List<Template> templates= getTemplates(context.getContextType().getId());
+		for (final Template template : templates) {
+			if (include(template, prefix) || isSelectionTemplate(selectionType, template) ) {
 				try {
 					context.getContextType().validate(template.getPattern());
 				}
 				catch (final TemplateException e) {
 					continue;
 				}
-				proposals.add(createProposal(template, context, replacementRegion,
-						getRelevance(template, prefix) ));
+				
+				proposals.add(createProposal(template, context, prefix, replacementRegion,
+						(template.getName().regionMatches(true, 0, prefix, 0, prefix.length())) ? 90 : 0
+						));
 			}
 		}
 		
 		return count;
 	}
 	
-	private boolean isSelectionTemplate(final String pattern) {
-		int offset= 0;
-		while (true) {
-			offset= pattern.indexOf('$', offset) + 1;
-			if (offset <= 0 && offset + 2 < pattern.length()) {
-				return false;
-			}
-			if (pattern.regionMatches(offset, WORD_SELECTION, 0, WORD_SELECTION.length())
-					|| pattern.regionMatches(offset, LINE_SELECTION, 0, LINE_SELECTION.length()) ) {
-				return true;
-			}
-			offset++;
-		}
-	}
-	
 	protected boolean include(final Template template, final String prefix) {
 		return template.getName().regionMatches(true, 0, prefix, 0, prefix.length());
+	}
+	
+	private boolean isSelectionTemplate(final int selectionType, final Template template) {
+		switch (selectionType) {
+		case SELECTION_INLINE:
+			return SELECTION_INLINE_PATTERN.matcher(template.getPattern()).matches();
+		case SELECTION_MULTILINE:
+			return SELECTION_ANY_PATTERN.matcher(template.getPattern()).matches();
+		default:
+			return false;
+		}
 	}
 	
 	@Override
@@ -189,13 +205,15 @@ public abstract class TemplatesCompletionComputer implements IContentAssistCompu
 		return context.getIdentifierPrefix();
 	}
 	
-	protected Template[] getTemplates(final String contextTypeId) {
-		return this.templateStore.getTemplates(contextTypeId);
+	protected List<Template> getTemplates(final String contextTypeId) {
+		return ImCollections.newList(this.templateStore.getTemplates(contextTypeId));
 	}
 	
-	protected abstract TemplateContextType getContextType(final AssistInvocationContext context, final IRegion region);
+	protected abstract TemplateContextType getContextType(AssistInvocationContext context,
+			IRegion region);
 	
-	protected DocumentTemplateContext createTemplateContext(final AssistInvocationContext context, final IRegion region) {
+	protected DocumentTemplateContext createTemplateContext(final AssistInvocationContext context,
+			final IRegion region) {
 		final ISourceViewer viewer= context.getSourceViewer();
 		final TemplateContextType contextType= getContextType(context, region);
 		if (contextType != null) {
@@ -205,29 +223,14 @@ public abstract class TemplatesCompletionComputer implements IContentAssistCompu
 		return null;
 	}
 	
-	protected TemplateProposal createProposal(final Template template, final TemplateContext context, final IRegion region, final int relevance) {
+	protected TemplateProposal createProposal(final Template template,
+			final DocumentTemplateContext context, final String prefix, final IRegion region,
+			final int relevance) {
 		return new TemplateProposal(template, context, region, getImage(template), relevance);
 	}
 	
 	protected Image getImage(final Template template) {
 		return LTKUIPlugin.getDefault().getImageRegistry().get(LTKUI.OBJ_TEXT_TEMPLATE_IMAGE_ID);
-	}
-	
-	/**
-	 * Returns the relevance of a template given a prefix. The default
-	 * implementation returns a number greater than zero if the template name
-	 * starts with the prefix, and zero otherwise.
-	 *
-	 * @param template the template to compute the relevance for
-	 * @param prefix the prefix after which content assist was requested
-	 * @return the relevance of <code>template</code>
-	 * @see #extractPrefix(ITextViewer, int)
-	 */
-	protected int getRelevance(final Template template, final String prefix) {
-		if (template.getName().regionMatches(true, 0, prefix, 0, prefix.length())) {
-			return 90;
-		}
-		return 0;
 	}
 	
 }

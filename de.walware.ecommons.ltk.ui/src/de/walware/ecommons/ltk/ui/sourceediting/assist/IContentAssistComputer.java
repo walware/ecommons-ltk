@@ -44,6 +44,15 @@ public interface IContentAssistComputer {
 	void sessionStarted(ISourceEditor editor, ContentAssist assist);
 	
 	/**
+	 * Informs the computer that a content assist session has ended. This call will always be after
+	 * any calls to
+	 * {@linkplain #computeCompletionProposals(ContentAssistInvocationContext, IProgressMonitor) computeCompletionProposals}
+	 * and
+	 * {@linkplain #computeContextInformation(ContentAssistInvocationContext, IProgressMonitor) computeContextInformation}.
+	 */
+	void sessionEnded();
+	
+	/**
 	 * Returns a list of completion proposals valid at the given invocation context.
 	 * 
 	 * @param context the context of the content assist invocation
@@ -63,14 +72,5 @@ public interface IContentAssistComputer {
 	 *     invocation, i.e. there is no need for the receiver to spawn a sub monitor.
 	 */
 	IStatus computeContextInformation(AssistInvocationContext context, AssistProposalCollector<IAssistInformationProposal> proposals, IProgressMonitor monitor);
-	
-	/**
-	 * Informs the computer that a content assist session has ended. This call will always be after
-	 * any calls to
-	 * {@linkplain #computeCompletionProposals(ContentAssistInvocationContext, IProgressMonitor) computeCompletionProposals}
-	 * and
-	 * {@linkplain #computeContextInformation(ContentAssistInvocationContext, IProgressMonitor) computeContextInformation}.
-	 */
-	void sessionEnded();
 	
 }

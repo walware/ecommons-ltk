@@ -12,7 +12,11 @@
 package de.walware.ecommons.ltk.ui.sourceediting.assist;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.ITypedRegion;
+import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.text.quickassist.IQuickAssistInvocationContext;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.swt.graphics.Point;
@@ -108,6 +112,10 @@ public class AssistInvocationContext implements IQuickAssistInvocationContext, I
 		return this.sourceViewer;
 	}
 	
+	public IDocument getDocument() {
+		return getSourceViewer().getDocument();
+	}
+	
 	/**
 	 * Returns the text selection offset.
 	 * 
@@ -168,14 +176,30 @@ public class AssistInvocationContext implements IQuickAssistInvocationContext, I
 	}
 	
 	/**
-	 * Computes the identifier (as specified by {@link Character#isJavaIdentifierPart(char)}) that
+	 * Computes the prefix separated by a white space ( {@link Character#isWhitespace(char)}
 	 * immediately precedes the invocation offset.
 	 * 
 	 * @return the prefix preceding the content assist invocation offset, <code>null</code> if
 	 *     there is no document
 	 */
 	protected String computeIdentifierPrefix(final int offset) {
-		return null;
+		final IDocument document= getDocument();
+		
+		try {
+			final ITypedRegion partition= TextUtilities.getPartition(document,
+					getEditor().getPartitioning().getPartitioning(), offset, true );
+			final int bound= partition.getOffset();
+			int prefixOffset= offset;
+			for (; prefixOffset > bound; prefixOffset--) {
+				if (Character.isWhitespace(document.getChar(prefixOffset - 1))) {
+					break;
+				}
+			}
+			return document.get(prefixOffset, offset - prefixOffset);
+		}
+		catch (final BadLocationException e) {
+			return ""; //$NON-NLS-1$
+		}
 	}
 	
 }

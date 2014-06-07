@@ -188,14 +188,17 @@ public class AdvancedContentAssistConfigurationBlock extends ManagedConfiguratio
 		composite.setLayout(LayoutUtil.createCompositeGrid(1));
 //		final Composite composite= pageComposite;
 		
-		final String keybinding= getDefaultKeybindingAsString();
-		final String message= ((keybinding != null) ? 
-				NLS.bind(EditingMessages.ContentAssistAdvancedConfig_message_DefaultKeyBinding, keybinding) :
-				EditingMessages.ContentAssistAdvancedConfig_message_NoDefaultKeyBinding) + ' ' +
-				EditingMessages.ContentAssistAdvancedConfig_message_KeyBindingHint;
-		final Link control= addLinkControl(composite, message);
+		final Link control= addLinkControl(composite,
+				EditingMessages.ContentAssistAdvancedConfig_message_KeyBindingHint);
 		control.setLayoutData(applyWrapWidth(new GridData(SWT.FILL, SWT.FILL, true, false)));
 		
+		{	final Label defaultKeyBindingLabel= new Label(composite, SWT.NONE);
+			final String defaultKeyBinding= getDefaultKeybindingAsString();
+			defaultKeyBindingLabel.setText((defaultKeyBinding != null) ? 
+					NLS.bind(EditingMessages.ContentAssistAdvancedConfig_message_DefaultKeyBinding, defaultKeyBinding) :
+					EditingMessages.ContentAssistAdvancedConfig_message_NoDefaultKeyBinding );
+			defaultKeyBindingLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		}
 		{	// Default
 			final Group group= new Group(composite, SWT.NONE);
 			group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -210,7 +213,7 @@ public class AdvancedContentAssistConfigurationBlock extends ManagedConfiguratio
 			table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		}
 		
-		{	// Default
+		{	// Cicling
 			final Group group= new Group(composite, SWT.NONE);
 			group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 			group.setLayout(LayoutUtil.createGroupGrid(2));

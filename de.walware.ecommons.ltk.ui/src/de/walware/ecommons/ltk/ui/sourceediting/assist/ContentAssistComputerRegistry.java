@@ -159,7 +159,7 @@ public class ContentAssistComputerRegistry implements ManageListener, IDisposabl
 	
 	private final String contentTypeId;
 	
-	private final String settingsGroupId;
+	private final String qualifier;
 	private final StringSetPref prefDisabledCategoryIds;
 	private final StringArrayPref prefOrderedCategoryIds;
 	
@@ -167,10 +167,9 @@ public class ContentAssistComputerRegistry implements ManageListener, IDisposabl
 	private String specificModeId;
 	
 	
-	public ContentAssistComputerRegistry(final String contentTypeId, final String prefQualifier, 
-			final String settingsGroupId) {
+	public ContentAssistComputerRegistry(final String contentTypeId, final String prefQualifier) {
 		this.contentTypeId= contentTypeId;
-		this.settingsGroupId= settingsGroupId;
+		this.qualifier= prefQualifier;
 		this.prefDisabledCategoryIds= new StringSetPref(prefQualifier, DEFAULT_DISABLED);
 		this.prefOrderedCategoryIds= new StringArrayPref(prefQualifier, CIRCLING_ORDERED);
 		
@@ -188,7 +187,7 @@ public class ContentAssistComputerRegistry implements ManageListener, IDisposabl
 	
 	
 	String getSettingsGroupId() {
-		return this.settingsGroupId;
+		return this.qualifier;
 	}
 	
 	StringSetPref getPrefDefaultDisabledCategoryIds() {
@@ -201,7 +200,7 @@ public class ContentAssistComputerRegistry implements ManageListener, IDisposabl
 	
 	@Override
 	public void beforeSettingsChangeNotification(final Set<String> groupIds) {
-		if (this.settingsGroupId != null && groupIds.contains(this.settingsGroupId)) {
+		if (this.qualifier != null && groupIds.contains(this.qualifier)) {
 			synchronized (this) {
 				if (this.categories != null) {
 					this.categories= Collections.unmodifiableList(applyPreferences(

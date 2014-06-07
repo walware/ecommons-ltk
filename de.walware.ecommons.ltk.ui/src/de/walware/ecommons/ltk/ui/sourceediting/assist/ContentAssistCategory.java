@@ -165,4 +165,10 @@ public final class ContentAssistCategory {
 		return computers;
 	}
 	
+	
+	@Override
+	public String toString() {
+		return this.id;
+	}
+	
 }
