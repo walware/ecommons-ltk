@@ -15,6 +15,8 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.jface.text.IRegion;
 
+import de.walware.ecommons.collections.ImList;
+
 
 /**
  * AST node.
@@ -24,23 +26,27 @@ import org.eclipse.jface.text.IRegion;
 public interface IAstNode extends IRegion {
 	
 	
-	public int getStatusCode();
+	int getStatusCode();
 	
 	@Override
-	public int getOffset();
-	public int getStopOffset();
+	int getOffset();
+	int getStopOffset();
 	@Override
-	public int getLength();
+	int getLength();
 	
-	public void accept(ICommonAstVisitor visitor) throws InvocationTargetException;
-	public void acceptInChildren(ICommonAstVisitor visitor) throws InvocationTargetException;
+	void accept(ICommonAstVisitor visitor) throws InvocationTargetException;
+	void acceptInChildren(ICommonAstVisitor visitor) throws InvocationTargetException;
 	
-	public IAstNode getParent();
-	public IAstNode getRoot();
-	public boolean hasChildren();
-	public int getChildCount();
-	public IAstNode getChild(int index);
-//	public IAstNode[] getChildren();
-	public int getChildIndex(IAstNode element);
+	IAstNode getParent();
+	IAstNode getRoot();
+	boolean hasChildren();
+	int getChildCount();
+	IAstNode getChild(int index);
+//	IAstNode[] getChildren();
+	int getChildIndex(IAstNode element);
+	
+	void addAttachment(Object data);
+	void removeAttachment(Object data);
+	ImList<Object> getAttachments();
 	
 }

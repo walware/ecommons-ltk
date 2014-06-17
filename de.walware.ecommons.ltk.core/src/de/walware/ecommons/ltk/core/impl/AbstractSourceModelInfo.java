@@ -11,8 +11,6 @@
 
 package de.walware.ecommons.ltk.core.impl;
 
-import java.util.List;
-
 import de.walware.ecommons.collections.ImCollections;
 import de.walware.ecommons.collections.ImList;
 
@@ -28,7 +26,7 @@ public abstract class AbstractSourceModelInfo implements ISourceUnitModelInfo {
 	
 	private final AstInfo ast;
 	
-	private ImList<Object> attachments= NO_ATTACHMENTS;
+	private volatile ImList<Object> attachments= NO_ATTACHMENTS;
 	
 	
 	public AbstractSourceModelInfo(final AstInfo ast) {
@@ -48,12 +46,17 @@ public abstract class AbstractSourceModelInfo implements ISourceUnitModelInfo {
 	
 	
 	@Override
-	public void addAttachment(final Object data) {
-		this.attachments= ImCollections.concatList(this.attachments, data);
+	public synchronized void addAttachment(final Object data) {
+		this.attachments= ImCollections.addElement(this.attachments, data);
 	}
 	
 	@Override
-	public List<Object> getAttachments() {
+	public void removeAttachment(final Object data) {
+		this.attachments= ImCollections.removeElement(this.attachments, data);
+	}
+	
+	@Override
+	public ImList<Object> getAttachments() {
 		return this.attachments;
 	}
 	

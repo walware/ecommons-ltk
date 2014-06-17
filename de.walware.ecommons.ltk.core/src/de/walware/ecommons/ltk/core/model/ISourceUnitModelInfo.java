@@ -11,9 +11,9 @@
 
 package de.walware.ecommons.ltk.core.model;
 
-import java.util.List;
-
 import org.eclipse.jface.text.IDocumentExtension4;
+
+import de.walware.ecommons.collections.ImList;
 
 import de.walware.ecommons.ltk.AstInfo;
 
@@ -48,6 +48,7 @@ public interface ISourceUnitModelInfo {
 	ISourceStructElement getSourceElement();
 	
 	void addAttachment(Object data);
-	List<Object> getAttachments();
+	void removeAttachment(Object data);
+	ImList<Object> getAttachments();
 	
 }
