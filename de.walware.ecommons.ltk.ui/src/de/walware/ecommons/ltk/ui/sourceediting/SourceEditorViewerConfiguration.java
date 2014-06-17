@@ -16,7 +16,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IAdaptable;
@@ -218,18 +217,21 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	
 	protected void initPresentationReconciler(final PresentationReconciler reconciler) {
 		if (this.scanners != null) {
-			for (final Entry<String, ITokenScanner> entry : this.scanners.entrySet()) {
-				final String contentType= entry.getKey();
-				final DefaultDamagerRepairer dr= new DefaultDamagerRepairer(entry.getValue());
-				reconciler.setDamager(dr, contentType);
-				reconciler.setRepairer(dr, contentType);
+			final String[] contentTypes= getConfiguredContentTypes(null);
+			for (String contentType : contentTypes) {
+				final ITokenScanner scanner= getScanner(contentType);
+				if (scanner != null) {
+					final DefaultDamagerRepairer dr= new DefaultDamagerRepairer(scanner);
+					reconciler.setDamager(dr, contentType);
+					reconciler.setRepairer(dr, contentType);
+				}
 			}
 		}
 	}
 	
 	
 	public List<ISourceEditorAddon> getAddOns() {
-		return new ArrayList<ISourceEditorAddon>();
+		return new ArrayList<>();
 	}
 	
 	
