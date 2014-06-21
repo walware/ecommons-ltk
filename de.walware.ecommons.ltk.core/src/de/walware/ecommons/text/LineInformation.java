@@ -29,7 +29,7 @@ public class LineInformation implements ILineInformation {
 	
 	@Override
 	public int getNumberOfLines() {
-		return 1+this.offsets.length;
+		return this.offsets.length;
 	}
 	
 	@Override
@@ -41,7 +41,7 @@ public class LineInformation implements ILineInformation {
 			return 0;
 		}
 		int low= 0;
-		int high= this.offsets.length-1;
+		int high= this.offsets.length - 1;
 		
 		while (low <= high) {
 			final int mid= (low + high) >> 1;
@@ -55,7 +55,7 @@ public class LineInformation implements ILineInformation {
 				return mid;
 			}
 		}
-		return low-1;
+		return low - 1;
 	}
 	
 	@Override
@@ -64,6 +64,14 @@ public class LineInformation implements ILineInformation {
 			throw new BadLocationException("line= " + line); //$NON-NLS-1$
 		}
 		return this.offsets[line];
+	}
+	
+	@Override
+	public int getLineEndOffset(final int line) throws BadLocationException {
+		if (line < 0 || line >= this.offsets.length) {
+			throw new BadLocationException("line= " + line); //$NON-NLS-1$
+		}
+		return (line + 1 == this.offsets.length) ? this.textLength : this.offsets[line + 1];
 	}
 	
 	@Override

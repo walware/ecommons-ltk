@@ -47,6 +47,17 @@ public interface ILineInformation {
 	int getLineOffset(int line) throws BadLocationException;
 	
 	/**
+	 * Returns the end offset of the specified line.
+	 * 
+	 * Equivalent to <code>getLineOffset(line) + getLineLength(line)</code>
+	 * 
+	 * @param line
+	 * @return the end offset of the line
+	 * @throws BadLocationException if line is out of bounds
+	 */
+	int getLineEndOffset(int line) throws BadLocationException;
+	
+	/**
 	 * Returns the length (including the line delimiters) of the specified line.
 	 * 
 	 * @param line
