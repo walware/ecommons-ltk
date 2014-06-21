@@ -11,6 +11,7 @@
 
 package de.walware.ecommons.ltk.core.impl;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -225,7 +226,7 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	 */
 	@Override
 	public List<? extends IModelElement> getModelChildren(final Filter filter) {
-		return NO_CHILDREN;
+		return Collections.EMPTY_LIST;
 	}
 	
 	

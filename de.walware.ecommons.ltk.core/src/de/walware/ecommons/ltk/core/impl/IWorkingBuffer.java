@@ -28,6 +28,15 @@ public interface IWorkingBuffer {
 	
 	
 	long getContentStamp(IProgressMonitor monitor);
+	
+	/**
+	 * @return the document or <code>null</code>
+	 */
+	AbstractDocument getDocument();
+	
+	/**
+	 * @return the document
+	 */
 	AbstractDocument getDocument(IProgressMonitor monitor);
 	SourceContent getContent(IProgressMonitor monitor);
 	boolean checkState(boolean validate, IProgressMonitor monitor);

@@ -11,6 +11,7 @@
 
 package de.walware.ecommons.ltk.core.impl;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -50,6 +51,10 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	@Override
 	public final ISourceUnit getUnderlyingUnit() {
 		return this.from;
+	}
+	
+	protected final IWorkingBuffer getWorkingBuffer() {
+		return this.buffer;
 	}
 	
 	@Override
@@ -186,7 +191,7 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	 */
 	@Override
 	public List<? extends IModelElement> getModelChildren(final Filter filter) {
-		return NO_CHILDREN; 
+		return Collections.EMPTY_LIST; 
 	}
 	
 	

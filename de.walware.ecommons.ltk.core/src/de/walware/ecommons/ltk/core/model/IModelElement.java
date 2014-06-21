@@ -11,7 +11,6 @@
 
 package de.walware.ecommons.ltk.core.model;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.IAdaptable;
@@ -47,9 +46,6 @@ public interface IModelElement extends IAdaptable {
 	
 	static final int C2_SOURCE_FILE =     C1_SOURCE | 0x10;
 	static final int C2_SOURCE_CHUNK =    C1_SOURCE | 0x80;
-	
-	
-	static final List<IModelElement> NO_CHILDREN = Collections.emptyList();
 	
 	
 	String getModelTypeId();

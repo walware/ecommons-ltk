@@ -11,6 +11,7 @@
 
 package de.walware.ecommons.ltk.core.impl;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.filesystem.IFileStore;
@@ -211,7 +212,7 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	 */
 	@Override
 	public List<? extends IModelElement> getModelChildren(final Filter filter) {
-		return NO_CHILDREN;
+		return Collections.EMPTY_LIST;
 	}
 	
 	

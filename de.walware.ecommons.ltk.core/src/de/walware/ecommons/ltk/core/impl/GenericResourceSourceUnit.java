@@ -12,6 +12,7 @@
 package de.walware.ecommons.ltk.core.impl;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -261,7 +262,7 @@ public abstract class GenericResourceSourceUnit implements IWorkspaceSourceUnit 
 	 */
 	@Override
 	public List<? extends IModelElement> getModelChildren(final Filter filter) {
-		return NO_CHILDREN; 
+		return Collections.EMPTY_LIST; 
 	}
 	
 	
