@@ -21,7 +21,9 @@ public class EditingMessages extends NLS {
 	public static String GotoMatchingBracketAction_error_InvalidSelection;
 	public static String GotoMatchingBracketAction_error_NoMatchingBracket;
 	
-	public static String OpenFileHyperlink_label;
+	public static String Hyperlink_OpenFile_label;
+	public static String Hyperlink_OpenFile2_label;
+	public static String Hyperlink_OpenFile_error_message;
 	
 	public static String ContentAssistProcessor_DefaultProposalCategory;
 	public static String ContentAssistProcessor_ContextSelection_label;

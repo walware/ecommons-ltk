@@ -9,9 +9,9 @@
  #     Stephan Wahlbrink - initial API and implementation
  #=============================================================================*/
 
-package de.walware.ecommons.text.ui;
+package de.walware.ecommons.ltk.ui.util;
 
-import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.IRegion;
@@ -29,16 +29,16 @@ import de.walware.ecommons.ltk.internal.ui.EditingMessages;
 
 
 /**
- * Hyperlink opening an editor for a {@link IFileStore}.
+ * Hyperlink opening an editor for a {@link IFile}.
  */
-public class OpenFileHyperlink implements IHyperlink {
+public class OpenWorkspaceFileHyperlink implements IHyperlink {
 	
 	
 	private final IRegion region;
-	private final IFileStore file;
+	private final IFile file;
 	
 	
-	public OpenFileHyperlink(final IRegion region, final IFileStore file) {
+	public OpenWorkspaceFileHyperlink(final IRegion region, final IFile file) {
 		this.region= region;
 		this.file= file;
 	}
@@ -56,19 +56,20 @@ public class OpenFileHyperlink implements IHyperlink {
 	
 	@Override
 	public String getHyperlinkText() {
-		return NLS.bind(EditingMessages.Hyperlink_OpenFile_label, this.file.toString());
+		return NLS.bind(EditingMessages.Hyperlink_OpenFile2_label,
+				this.file.getName(), this.file.getParent().getFullPath() );
 	}
 	
 	@Override
 	public void open() {
 		try {
-			IDE.openEditorOnFileStore(UIAccess.getActiveWorkbenchPage(true), this.file);
+			IDE.openEditor(UIAccess.getActiveWorkbenchPage(true), this.file);
 		}
 		catch (final PartInitException e) {
 			Display.getCurrent().beep();
 			StatusManager.getManager().handle(new Status(IStatus.INFO, SharedUIResources.PLUGIN_ID, -1,
 					NLS.bind(EditingMessages.Hyperlink_OpenFile_error_message, this.file.toString()),
-					e ));
+			e ));
 		}
 	}
 	
