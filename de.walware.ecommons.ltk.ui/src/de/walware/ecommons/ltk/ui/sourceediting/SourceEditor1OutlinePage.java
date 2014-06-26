@@ -14,6 +14,7 @@ package de.walware.ecommons.ltk.ui.sourceediting;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.ISelection;
@@ -44,10 +45,10 @@ import de.walware.ecommons.ui.workbench.AbstractEditorOutlinePage;
 import de.walware.ecommons.ltk.AstInfo;
 import de.walware.ecommons.ltk.IModelElementDelta;
 import de.walware.ecommons.ltk.core.model.IModelElement;
+import de.walware.ecommons.ltk.core.model.IModelElement.Filter;
 import de.walware.ecommons.ltk.core.model.ISourceStructElement;
 import de.walware.ecommons.ltk.core.model.ISourceUnit;
 import de.walware.ecommons.ltk.core.model.ISourceUnitModelInfo;
-import de.walware.ecommons.ltk.core.model.IModelElement.Filter;
 import de.walware.ecommons.ltk.internal.ui.EditingMessages;
 import de.walware.ecommons.ltk.ui.IModelElementInputListener;
 import de.walware.ecommons.ltk.ui.ISelectionWithElementInfoListener;
@@ -286,6 +287,8 @@ public abstract class SourceEditor1OutlinePage extends AbstractEditorOutlinePage
 	
 	@Override
 	protected void contextMenuAboutToShow(final IMenuManager m) {
+		final Separator additions = new Separator(SharedUIResources.ADDITIONS_MENU_ID);
+		m.add(additions);
 	}
 	
 	

@@ -20,6 +20,8 @@ import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 
+import de.walware.ecommons.ui.SharedUIResources;
+
 
 /**
  * Proposal completing a given replacement string.
@@ -53,7 +55,7 @@ public abstract class SimpleCompletionProposal extends CompletionProposalWithOve
 	 */
 	@Override
 	public Image getImage() {
-		return null;
+		return SharedUIResources.getImages().get(SharedUIResources.PLACEHOLDER_IMAGE_ID);
 	}
 	
 	/**

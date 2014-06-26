@@ -106,16 +106,16 @@ public abstract class AbstractMarkOccurrencesProvider implements ISourceEditorAd
 	
 	
 	public AbstractMarkOccurrencesProvider(final SourceEditor1 editor,
-			final IPartitionConstraint validPartitions) {
+			final IPartitionConstraint toleratePartitions) {
 		if (editor == null) {
 			throw new NullPointerException("editor");
 		}
-		if (validPartitions == null) {
+		if (toleratePartitions == null) {
 			throw new NullPointerException("validPartitions");
 		}
 		fEditor = editor;
 		fPartitioning = fEditor.getPartitioning().getPartitioning();
-		fToleratePartitions = validPartitions;
+		fToleratePartitions = toleratePartitions;
 	}
 	
 	@Override

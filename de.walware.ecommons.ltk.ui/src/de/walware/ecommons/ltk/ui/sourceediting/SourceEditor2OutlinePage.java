@@ -133,8 +133,7 @@ public abstract class SourceEditor2OutlinePage extends SourceEditor1OutlinePage 
 		m.add(new CommandContributionItem(new CommandContributionItemParameter(
 				site, null, IWorkbenchCommandConstants.EDIT_PASTE, CommandContributionItem.STYLE_PUSH)));
 		
-		final Separator additions = new Separator(SharedUIResources.ADDITIONS_MENU_ID);
-		m.add(additions);
+		super.contextMenuAboutToShow(m);
 	}
 	
 }
