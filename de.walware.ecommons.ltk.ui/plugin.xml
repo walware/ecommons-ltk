@@ -794,7 +794,7 @@
             id="de.walware.workbench.themes.CodePreprocessorColor"
             isEditable="false"
             label=""
-            value="95,95,255">
+            value="96,159,251">
       </colorDefinition>
       <colorDefinition
             id="de.walware.workbench.themes.CodeCommentColor"
@@ -872,7 +872,7 @@
             id="de.walware.workbench.themes.CodeDoc2ndColor"
             isEditable="false"
             label=""
-            value="175,95,95">
+            value="111,63,63">
       </colorDefinition>
       <colorDefinition
             id="de.walware.workbench.themes.CodeDoc2ndCommandColor"
@@ -934,7 +934,7 @@
             id="de.walware.workbench.themes.MatchingBracketColor"
             isEditable="false"
             label=""
-            value="192,192,192">
+            value="191,191,191">
       </colorDefinition>
       <colorDefinition
             id="de.walware.workbench.themes.InformationBackgroundColor"

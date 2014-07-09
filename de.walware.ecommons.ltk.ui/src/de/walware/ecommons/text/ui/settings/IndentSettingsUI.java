@@ -11,6 +11,8 @@
 
 package de.walware.ecommons.text.ui.settings;
 
+import java.util.EnumMap;
+
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
@@ -39,6 +41,12 @@ import de.walware.ecommons.ui.util.LayoutUtil;
 
 public class IndentSettingsUI {
 	
+	private final static EnumMap<IndentationType, String> INDENT_NAMES= new EnumMap<>(IndentationType.class);
+	static {
+		INDENT_NAMES.put(IndentationType.TAB, Messages.CodeStyle_Indent_Type_UseTabs_name);
+		INDENT_NAMES.put(IndentationType.SPACES, Messages.CodeStyle_Indent_Type_UseSpaces_name);
+	};
+	
 	
 	private Text fTabSize;
 	private ComboViewer fIndentPolicy;
@@ -63,24 +71,17 @@ public class IndentSettingsUI {
 			label.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
 			fIndentPolicy = new ComboViewer(composite, SWT.DROP_DOWN | SWT.READ_ONLY);
 			fIndentPolicy.setContentProvider(new ArrayContentProvider());
-			final IndentationType[] items = new IndentationType[] { IndentationType.TAB, IndentationType.SPACES };
-			final String[] itemLabels = new String[] { Messages.CodeStyle_Indent_Type_UseTabs_name, Messages.CodeStyle_Indent_Type_UseSpaces_name };
+			final IndentationType[] items= getAvailableIndentationTypes();
 			fIndentPolicy.setLabelProvider(new LabelProvider() {
 				@Override
 				public String getText(final Object element) {
 					final IndentationType t = (IndentationType) element;
-					switch (t) {
-					case TAB:
-						return itemLabels[0];
-					case SPACES:
-						return itemLabels[1];
-					}
-					return null;
+					return INDENT_NAMES.get(t);
 				}
 			});
 			fIndentPolicy.setInput(items);
 			final GridData gd = new GridData(SWT.LEFT, SWT.CENTER, false, false);
-			gd.widthHint = LayoutUtil.hintWidth(fIndentPolicy.getCombo(), itemLabels);
+			gd.widthHint = LayoutUtil.hintWidth(fIndentPolicy.getCombo(), INDENT_NAMES.values());
 			fIndentPolicy.getCombo().setLayoutData(gd);
 			fIndentPolicy.setSelection(new StructuredSelection(IndentationType.TAB));
 		}
@@ -121,6 +122,10 @@ public class IndentSettingsUI {
 			gd.widthHint = LayoutUtil.hintWidth(fLineWidthControl, 4);
 			fLineWidthControl.setLayoutData(gd);
 		}
+	}
+	
+	protected IndentationType[] getAvailableIndentationTypes() {
+		return new IndentationType[] { IndentationType.TAB, IndentationType.SPACES };
 	}
 	
 	public void addBindings(final DataBindingSupport db, final Object model) {
