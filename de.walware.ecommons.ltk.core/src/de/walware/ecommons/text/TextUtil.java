@@ -29,8 +29,12 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
+import org.eclipse.jface.text.TextUtilities;
 
 
+/**
+ * Text utilities, in addition to {@link TextUtilities} of JFace.
+ */
 public class TextUtil {
 	
 	public static final Pattern LINE_DELIMITER_PATTERN = Pattern.compile("\\r[\\n]?|\\n"); //$NON-NLS-1$
@@ -88,6 +92,7 @@ public class TextUtil {
 		return getPlatformLineDelimiter();
 	}
 	
+	
 	/**
 	 * Return the length of the overlapping length of two regions.
 	 * If they don't overlap, it return the negative distance of the regions.
@@ -136,7 +141,7 @@ public class TextUtil {
 	}
 	
 	public static ArrayList<String> toLines(final String text) {
-		final ArrayList<String> lines = new ArrayList<String>(2 + text.length() / 30);
+		final ArrayList<String> lines = new ArrayList<>(2 + text.length() / 30);
 		TextUtil.addLines(text, lines);
 		return lines;
 	}
@@ -311,10 +316,31 @@ public class TextUtil {
 		return currentColumn;
 	}
 	
+	
+	public static final int countBackward(final IDocument document, int offset, final char c)
+			throws BadLocationException {
+		int count= 0;
+		while (offset > 0 && document.getChar(--offset) == c) {
+			count++;
+		}
+		return count;
+	}
+	
+	public static final int countForward(final IDocument document, int offset, final char c)
+			throws BadLocationException {
+		int count= 0;
+		final int length= document.getLength();
+		while (offset < length && document.getChar(offset++) == c) {
+			count++;
+		}
+		return count;
+	}
+	
+	
 	public static List<IRegion> getMatchingRegions(final AbstractDocument document,
 			final String partitioning, final IPartitionConstraint contraint,
 			final IRegion region, final boolean extend) throws BadLocationException, BadPartitioningException {
-		final List<IRegion> regions = new ArrayList<IRegion>();
+		final List<IRegion> regions = new ArrayList<>();
 		
 		final int regionEnd = region.getOffset() + region.getLength();
 		int validBegin = -1;
