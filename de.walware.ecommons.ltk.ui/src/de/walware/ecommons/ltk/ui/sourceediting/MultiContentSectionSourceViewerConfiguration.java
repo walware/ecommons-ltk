@@ -43,7 +43,7 @@ public class MultiContentSectionSourceViewerConfiguration extends SourceEditorVi
 	
 	public MultiContentSectionSourceViewerConfiguration(final DocContentSections sections,
 			final ISourceEditor sourceEditor) {
-		super(sourceEditor);
+		super(sections, sourceEditor);
 		
 		this.sections= sections;
 	}
@@ -99,12 +99,6 @@ public class MultiContentSectionSourceViewerConfiguration extends SourceEditorVi
 		this.primaryConfig.handleSettingsChanged(groupIds, options);
 		
 		super.handleSettingsChanged(groupIds, options);
-	}
-	
-	
-	@Override
-	public String getConfiguredDocumentPartitioning(final ISourceViewer sourceViewer) {
-		return this.sections.getPartitioning();
 	}
 	
 	

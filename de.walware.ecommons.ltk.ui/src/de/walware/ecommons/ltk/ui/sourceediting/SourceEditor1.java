@@ -79,8 +79,8 @@ import de.walware.ecommons.preferences.Preference;
 import de.walware.ecommons.preferences.PreferencesUtil;
 import de.walware.ecommons.preferences.SettingsChangeNotifier;
 import de.walware.ecommons.text.ICharPairMatcher;
-import de.walware.ecommons.text.PartitioningConfiguration;
 import de.walware.ecommons.text.TextUtil;
+import de.walware.ecommons.text.core.sections.DocContentSections;
 import de.walware.ecommons.text.ui.TextHandlerUtil;
 import de.walware.ecommons.ui.ISettingsChangedHandler;
 import de.walware.ecommons.ui.SharedUIResources;
@@ -454,8 +454,8 @@ public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 	}
 	
 	@Override
-	public PartitioningConfiguration getPartitioning() {
-		return fConfigurator.getPartitioning();
+	public DocContentSections getDocumentContentInfo() {
+		return fConfigurator.getDocumentContentInfo();
 	}
 	
 	@Override
@@ -1013,7 +1013,7 @@ public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 					if (modelInfo != null) {
 						final IRegion toReveal= getRangeToReveal(modelInfo, sourceElement);
 						if (toReveal != null) {
-							SourceViewer viewer= getViewer();
+							final SourceViewer viewer= getViewer();
 							if (viewer instanceof ITextViewerExtension5) {
 								((ITextViewerExtension5) viewer).exposeModelRange(toReveal);
 							}

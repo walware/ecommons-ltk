@@ -18,6 +18,6 @@ package de.walware.ecommons.text;
 public interface IPartitionConstraint {
 	
 	
-	public boolean matches(String partitionType);
+	public boolean matches(String contentType);
 	
 }

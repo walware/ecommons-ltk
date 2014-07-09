@@ -114,7 +114,7 @@ public abstract class AbstractMarkOccurrencesProvider implements ISourceEditorAd
 			throw new NullPointerException("validPartitions");
 		}
 		fEditor = editor;
-		fPartitioning = fEditor.getPartitioning().getPartitioning();
+		fPartitioning= fEditor.getDocumentContentInfo().getPartitioning();
 		fToleratePartitions = toleratePartitions;
 	}
 	

@@ -21,6 +21,8 @@ import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.TextUtilities;
 
+import de.walware.ecommons.text.core.sections.DocContentSections;
+
 
 /**
  * Helper class for match pairs of characters.
@@ -50,8 +52,8 @@ public class PairMatcher implements ICharPairMatcher {
 	protected String fPartition;
 	
 	
-	public PairMatcher(final char[][] pairs, final String partitioning, final String[] partitions,
-			final ITokenScanner scanner, final char escapeChar) {
+	public PairMatcher(final char[][] pairs, final String partitioning,
+			final String[] partitions, final ITokenScanner scanner, final char escapeChar) {
 		fPairs = pairs;
 		fScanner = scanner;
 		fPartitioning = partitioning;
@@ -62,8 +64,21 @@ public class PairMatcher implements ICharPairMatcher {
 	/**
 	 * Constructor using <code>BasicHeuristicTokenScanner</code>.
 	 */
-	public PairMatcher(final char[][] pairs, final PartitioningConfiguration partitioning, final String[] partitions, final char escapeChar) {
-		this(pairs, partitioning.getPartitioning(), partitions, new BasicHeuristicTokenScanner(partitioning), escapeChar);
+	public PairMatcher(final char[][] pairs, final DocContentSections documentContentInfo,
+			final String[] partitions, final char escapeChar) {
+		this(pairs, documentContentInfo.getPartitioning(), partitions,
+				new BasicHeuristicTokenScanner(documentContentInfo, new IPartitionConstraint() {
+					@Override
+					public boolean matches(final String partitionType) {
+						for (int i= 0; i < partitions.length; i++) {
+							if (partitions[i] == partitionType) {
+								return true;
+							}
+						}
+						return false;
+					}
+				}),
+				escapeChar );
 	}
 	
 	

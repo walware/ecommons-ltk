@@ -18,9 +18,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.text.AbstractDocument;
 
+import de.walware.ecommons.text.core.sections.DocContentSections;
+
 import de.walware.ecommons.ltk.AstInfo;
 import de.walware.ecommons.ltk.IElementName;
-import de.walware.ecommons.ltk.SourceContent;
+import de.walware.ecommons.ltk.core.SourceContent;
 import de.walware.ecommons.ltk.core.model.IModelElement;
 import de.walware.ecommons.ltk.core.model.ISourceUnit;
 import de.walware.ecommons.ltk.core.model.ISourceUnitModelInfo;
@@ -135,6 +137,11 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 	@Override
 	public AbstractDocument getDocument(final IProgressMonitor monitor) {
 		return this.buffer.getDocument(monitor);
+	}
+	
+	@Override
+	public DocContentSections getDocumentContentInfo() {
+		return this.from.getDocumentContentInfo();
 	}
 	
 	/**

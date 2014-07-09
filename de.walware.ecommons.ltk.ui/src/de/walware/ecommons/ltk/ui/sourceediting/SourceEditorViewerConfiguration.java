@@ -59,6 +59,7 @@ import de.walware.ecommons.templates.WordFinder;
 import de.walware.ecommons.text.ICharPairMatcher;
 import de.walware.ecommons.text.IIndentSettings;
 import de.walware.ecommons.text.IndentUtil;
+import de.walware.ecommons.text.core.sections.DocContentSections;
 import de.walware.ecommons.text.ui.DefaultBrowserInformationInput;
 import de.walware.ecommons.text.ui.settings.AssistPreferences;
 import de.walware.ecommons.text.ui.settings.DecorationPreferences;
@@ -123,6 +124,8 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 			};
 	
 	
+	private final DocContentSections documentContentInfo;
+	
 	private final ISourceEditor editor;
 	
 	private ColorManager colorManager;
@@ -140,7 +143,12 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	private EffectiveHovers effectiveHovers;
 	
 	
-	public SourceEditorViewerConfiguration(final ISourceEditor sourceEditor) {
+	public SourceEditorViewerConfiguration(final DocContentSections documentContentInfo,
+			final ISourceEditor sourceEditor) {
+		if (documentContentInfo == null) {
+			throw new NullPointerException("documentContentInfo"); //$NON-NLS-1$
+		}
+		this.documentContentInfo= documentContentInfo;
 		this.editor= sourceEditor;
 	}
 	
@@ -169,6 +177,15 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	
 	protected ISourceEditor getSourceEditor() {
 		return this.editor;
+	}
+	
+	public final DocContentSections getDocumentContentInfo() {
+		return this.documentContentInfo;
+	}
+	
+	@Override
+	public final String getConfiguredDocumentPartitioning(final ISourceViewer sourceViewer) {
+		return this.documentContentInfo.getPartitioning();
 	}
 	
 	public IPreferenceStore getPreferences() {

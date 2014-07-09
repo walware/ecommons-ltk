@@ -22,6 +22,8 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.text.TypedRegion;
 
+import de.walware.ecommons.text.core.sections.DocContentSections;
+
 
 /**
  * Utility methods for heuristic based R manipulations in an incomplete source file.
@@ -239,7 +241,9 @@ public class BasicHeuristicTokenScanner implements ITokenScanner {
 	
 	
 	/** The partitioning being used for scanning. */
-	private final PartitioningConfiguration fPartitioning;
+	private final String partitioning;
+	
+	private final IPartitionConstraint defaultPartitionConstraint;
 	
 	/** The document being scanned. */
 	protected IDocument fDocument;
@@ -259,29 +263,19 @@ public class BasicHeuristicTokenScanner implements ITokenScanner {
 	private StopCondition fNonWSorLRCondition;
 	
 	
-	/**
-	 * Creates a new instance.
-	 * Before using scan..., you have to call configure...
-	 * 
-	 * @param partitioning the partitioning to use for scanning
-	 */
-	public BasicHeuristicTokenScanner(final PartitioningConfiguration partitioning) {
-		assert (partitioning != null);
-		
-		fPartitioning = partitioning;
+	public BasicHeuristicTokenScanner(final DocContentSections documentContentInfo,
+			final IPartitionConstraint defaultContentConstraint) {
+		this.partitioning= documentContentInfo.getPartitioning();
+		this.defaultPartitionConstraint= defaultContentConstraint;
 	}
 	
 	
-	public final PartitioningConfiguration getPartitioningConfig() {
-		return fPartitioning;
-	}
-	
-	protected final String getPartitioning() {
-		return fPartitioning.getPartitioning();
+	public final String getDocumentPartitioning() {
+		return this.partitioning;
 	}
 	
 	protected final IPartitionConstraint getDefaultPartitionConstraint() {
-		return fPartitioning.getDefaultPartitionConstraint();
+		return this.defaultPartitionConstraint;
 	}
 	
 	protected final IPartitionConstraint getPartitionConstraint() {
@@ -813,7 +807,7 @@ public class BasicHeuristicTokenScanner implements ITokenScanner {
 	 */
 	protected final String getContentType() {
 		try {
-			return TextUtilities.getContentType(fDocument, fPartitioning.getPartitioning(), fPos, false);
+			return TextUtilities.getContentType(fDocument, this.partitioning, fPos, false);
 		}
 		catch (final BadLocationException e) {
 			return null; // ?
@@ -829,7 +823,7 @@ public class BasicHeuristicTokenScanner implements ITokenScanner {
 	 */
 	protected final ITypedRegion getPartition() {
 		try {
-			return TextUtilities.getPartition(fDocument, fPartitioning.getPartitioning(), fPos, false);
+			return TextUtilities.getPartition(fDocument, this.partitioning, fPos, false);
 		}
 		catch (final BadLocationException e) {
 			return new TypedRegion(fPos, 0, "__no_partition_at_all"); //$NON-NLS-1$
@@ -845,7 +839,7 @@ public class BasicHeuristicTokenScanner implements ITokenScanner {
 	 */
 	public final ITypedRegion getPartition(final int position) {
 		try {
-			return TextUtilities.getPartition(fDocument, fPartitioning.getPartitioning(), position, false);
+			return TextUtilities.getPartition(fDocument, this.partitioning, position, false);
 		}
 		catch (final BadLocationException e) {
 			return new TypedRegion(fPos, 0, "__no_partition_at_all"); //$NON-NLS-1$

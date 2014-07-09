@@ -172,7 +172,7 @@ public class ToggleCommentHandler extends AbstractHandler {
 			final IRegion block= EditorUtil.getTextBlockFromSelection(document,
 					selection.getOffset(), selection.getLength() );
 			final ITypedRegion[] regions= TextUtilities.computePartitioning(document,
-					this.editor.getPartitioning().getPartitioning(),
+					this.editor.getDocumentContentInfo().getPartitioning(),
 					block.getOffset(), block.getLength(), false );
 			
 			final int[] lines= new int[regions.length * 2]; // [startline, endline, startline, endline, ...]

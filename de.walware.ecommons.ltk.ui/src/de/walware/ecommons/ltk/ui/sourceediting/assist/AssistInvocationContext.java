@@ -187,7 +187,7 @@ public class AssistInvocationContext implements IQuickAssistInvocationContext, I
 		
 		try {
 			final ITypedRegion partition= TextUtilities.getPartition(document,
-					getEditor().getPartitioning().getPartitioning(), offset, true );
+					getEditor().getDocumentContentInfo().getPartitioning(), offset, true );
 			final int bound= partition.getOffset();
 			int prefixOffset= offset;
 			for (; prefixOffset > bound; prefixOffset--) {

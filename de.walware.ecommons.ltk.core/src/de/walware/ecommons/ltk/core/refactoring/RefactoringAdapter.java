@@ -68,7 +68,6 @@ import org.eclipse.text.edits.MultiTextEdit;
 import de.walware.ecommons.collections.ImCollections;
 import de.walware.ecommons.io.FileUtil;
 import de.walware.ecommons.text.BasicHeuristicTokenScanner;
-import de.walware.ecommons.text.PartitioningConfiguration;
 import de.walware.ecommons.text.TextUtil;
 
 import de.walware.ecommons.ltk.LTK;
@@ -174,7 +173,6 @@ public abstract class RefactoringAdapter {
 		// and create one single range including comments at line end
 		try {
 			final BasicHeuristicTokenScanner scanner = getScanner(su);
-			final PartitioningConfiguration partitioning = scanner.getPartitioningConfig();
 			scanner.configure(doc);
 			final int start = elements[0].getSourceRange().getOffset();
 			int end = elements[0].getSourceRange().getOffset() + elements[0].getSourceRange().getLength();
@@ -191,7 +189,7 @@ public abstract class RefactoringAdapter {
 				int match;
 				while (end < elementStart &&
 						(match = scanner.findAnyNonBlankForward(end, elementStart, true)) >= 0) {
-					final ITypedRegion partition = doc.getPartition(partitioning.getPartitioning(), match, false);
+					final ITypedRegion partition = doc.getPartition(scanner.getDocumentPartitioning(), match, false);
 					if (isCommentContent(partition)) {
 						end = partition.getOffset() + partition.getLength();
 					}
@@ -204,7 +202,7 @@ public abstract class RefactoringAdapter {
 			final IRegion lastLine = doc.getLineInformationOfOffset(end);
 			final int match = scanner.findAnyNonBlankForward(end, lastLine.getOffset()+lastLine.getLength(), true);
 			if (match >= 0) {
-				final ITypedRegion partition = doc.getPartition(partitioning.getPartitioning(), match, false);
+				final ITypedRegion partition = doc.getPartition(scanner.getDocumentPartitioning(), match, false);
 				if (isCommentContent(partition)) {
 					end = partition.getOffset() + partition.getLength();
 				}
@@ -317,7 +315,7 @@ public abstract class RefactoringAdapter {
 		lastLineInfo = doc.getLineInformationOfOffset(end);
 		match = scanner.findAnyNonBlankForward(end, lastLineInfo.getOffset()+lastLineInfo.getLength(), true);
 		if (match >= 0) {
-			final ITypedRegion partition = doc.getPartition(scanner.getPartitioningConfig().getPartitioning(),
+			final ITypedRegion partition = doc.getPartition(scanner.getDocumentPartitioning(),
 					match, false );
 			if (isCommentContent(partition)) {
 				end = partition.getOffset() + partition.getLength();

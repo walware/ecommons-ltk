@@ -15,6 +15,8 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TextUtilities;
 
+import de.walware.ecommons.collections.ImList;
+
 
 public abstract class DocContentSections {
 	
@@ -25,11 +27,14 @@ public abstract class DocContentSections {
 	private final String partitioning;
 	
 	private final String primaryType;
+	private final ImList<String> secondaryTypes;
 	
 	
-	protected DocContentSections(final String partitioning, final String primaryType) {
+	protected DocContentSections(final String partitioning, final String primaryType,
+			final ImList<String> secondaryTypes) {
 		this.partitioning= partitioning;
 		this.primaryType= primaryType;
+		this.secondaryTypes= secondaryTypes;
 	}
 	
 	
@@ -39,6 +44,10 @@ public abstract class DocContentSections {
 	
 	public String getPrimaryType() {
 		return this.primaryType;
+	}
+	
+	public ImList<String> getSecondaryTypes() {
+		return this.secondaryTypes;
 	}
 	
 	

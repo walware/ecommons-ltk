@@ -16,7 +16,7 @@ import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.services.IServiceLocator;
 
-import de.walware.ecommons.text.PartitioningConfiguration;
+import de.walware.ecommons.text.core.sections.DocContentSections;
 
 import de.walware.ecommons.ltk.core.model.ISourceUnit;
 
@@ -64,11 +64,12 @@ public interface ISourceEditor extends IAdaptable {
 	public SourceViewer getViewer();
 	
 	/**
-	 * The partitioning the viewer is configured to.
+	 * Returns the information about partitioning and content sections types of the document for 
+	 * the content type the editor is configured for.
 	 * 
-	 * @return the partitioning configuration
+	 * @return the document content information
 	 */
-	public PartitioningConfiguration getPartitioning();
+	public DocContentSections getDocumentContentInfo();
 	
 	/**
 	 * Returns whether the text in this text editor (SourceViewer) can be changed by the user

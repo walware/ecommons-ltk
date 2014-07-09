@@ -27,9 +27,6 @@ public class Partitioner extends FastPartitioner {
 	
 	public Partitioner(final IPartitionTokenScanner scanner, final String[] legalContentTypes) {
 		super(scanner, legalContentTypes);
-		if (scanner instanceof IPartitionScannerCallbackExt) {
-			((IPartitionScannerCallbackExt) scanner).setPartitionerCallback(this);
-		}
 	}
 	
 	

@@ -19,6 +19,8 @@ import org.eclipse.jface.text.AbstractDocument;
 import org.eclipse.jface.text.IDocumentExtension4;
 import org.eclipse.jface.text.ISynchronizable;
 
+import de.walware.ecommons.text.core.sections.DocContentSections;
+
 import de.walware.ecommons.ltk.AstInfo;
 import de.walware.ecommons.ltk.ISourceUnitManager;
 import de.walware.ecommons.ltk.SourceContent;
@@ -80,6 +82,14 @@ public interface ISourceUnit extends IModelElement, IAdaptable {
 	 * @return the shared document
 	 */
 	AbstractDocument getDocument(IProgressMonitor monitor);
+	
+	/**
+	 * Returns the information about partitioning and content sections types of the document for 
+	 * the content type of this source unit.
+	 * 
+	 * @return the document content information
+	 */
+	DocContentSections getDocumentContentInfo();
 	
 	/**
 	 * Returns the current stamp of the content of this source unit.
