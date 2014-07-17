@@ -89,9 +89,13 @@ public class OutlineContentProvider implements ITreeContentProvider {
 	
 	@Override
 	public Object[] getChildren(final Object parentElement) {
-		final ISourceStructElement o= (ISourceStructElement) parentElement;
-		final List<? extends ISourceStructElement> children= o.getSourceChildren(getContent().getContentFilter());
-		return children.toArray(new ISourceStructElement[children.size()]);
+		// Check required for E bug #438919
+		if (parentElement instanceof ISourceStructElement) {
+			final ISourceStructElement o= (ISourceStructElement) parentElement;
+			final List<? extends ISourceStructElement> children= o.getSourceChildren(getContent().getContentFilter());
+			return children.toArray(new ISourceStructElement[children.size()]);
+		}
+		return new ISourceStructElement[0];
 	}
 	
 }
