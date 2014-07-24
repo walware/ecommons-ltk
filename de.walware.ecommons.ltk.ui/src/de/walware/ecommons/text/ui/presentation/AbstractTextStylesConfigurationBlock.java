@@ -16,7 +16,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -81,6 +80,7 @@ import de.walware.ecommons.text.internal.ui.Messages;
 import de.walware.ecommons.text.ui.TextViewerEditorColorUpdater;
 import de.walware.ecommons.text.ui.TextViewerJFaceUpdater;
 import de.walware.ecommons.text.ui.presentation.AbstractTextStylesConfigurationBlock.SyntaxNode.UseStyle;
+import de.walware.ecommons.text.ui.settings.TextStyleManager;
 import de.walware.ecommons.ui.ColorManager;
 import de.walware.ecommons.ui.util.LayoutUtil;
 import de.walware.ecommons.ui.util.MessageUtil;
@@ -467,6 +467,7 @@ public abstract class AbstractTextStylesConfigurationBlock extends OverlayStoreC
 	private Button underlineCheckbox;
 	
 	private ColorManager colorManager;
+	private TextStyleManager textStyles;
 	
 	protected SourceViewer previewViewer;
 	private SourceEditorViewerConfiguration configuration;
@@ -477,7 +478,7 @@ public abstract class AbstractTextStylesConfigurationBlock extends OverlayStoreC
 	
 	
 	protected abstract SyntaxNode[] createItems();
-	protected abstract String[] getSettingsGroups();
+	protected abstract String getSettingsGroup();
 	
 	
 	@Override
@@ -500,9 +501,8 @@ public abstract class AbstractTextStylesConfigurationBlock extends OverlayStoreC
 	protected void createBlockArea(final Composite pageComposite) {
 		// Prepare model
 		this.rootNodes= createItems();
-		final String[] groupIds= getSettingsGroups();
 		this.groupIds= new HashSet<>();
-		this.groupIds.addAll(Arrays.asList(groupIds));
+		this.groupIds.add(getSettingsGroup());
 		final List<OverlayStorePreference> keys= new ArrayList<>();
 		collectKeys(keys, this.rootNodes);
 		setupOverlayStore(keys.toArray(new OverlayStorePreference[keys.size()]));
@@ -679,7 +679,14 @@ public abstract class AbstractTextStylesConfigurationBlock extends OverlayStoreC
 	
 	protected abstract String getPreviewFileName();
 	
-	protected abstract SourceEditorViewerConfiguration getSourceViewerConfiguration(ColorManager colorManager, IPreferenceStore store);
+	protected SourceEditorViewerConfiguration getSourceViewerConfiguration(
+			final ColorManager colorManager, final IPreferenceStore preferenceStore) {
+		this.textStyles= new TextStyleManager(colorManager, preferenceStore, getSettingsGroup());
+		return getSourceEditorViewerConfiguration(preferenceStore, this.textStyles);
+	}
+	
+	protected abstract SourceEditorViewerConfiguration getSourceEditorViewerConfiguration(
+			IPreferenceStore preferenceStore, TextStyleManager textStyles);
 	
 	protected abstract IDocumentSetupParticipant getDocumentSetupParticipant();
 	
@@ -796,6 +803,9 @@ public abstract class AbstractTextStylesConfigurationBlock extends OverlayStoreC
 	protected void handlePropertyChange() {
 		if (UIAccess.isOkToUse(this.previewViewer)) {
 			final Map<String, Object> options= new HashMap<>();
+			if (this.textStyles != null) {
+				this.textStyles.handleSettingsChanged(this.groupIds, options);
+			}
 			this.configuration.handleSettingsChanged(this.groupIds, options);
 			this.previewViewer.invalidateTextPresentation();
 		}

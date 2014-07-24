@@ -61,9 +61,10 @@ import de.walware.ecommons.text.IIndentSettings;
 import de.walware.ecommons.text.IndentUtil;
 import de.walware.ecommons.text.core.sections.DocContentSections;
 import de.walware.ecommons.text.ui.DefaultBrowserInformationInput;
+import de.walware.ecommons.text.ui.presentation.ITextPresentationConstants;
 import de.walware.ecommons.text.ui.settings.AssistPreferences;
 import de.walware.ecommons.text.ui.settings.DecorationPreferences;
-import de.walware.ecommons.ui.ColorManager;
+import de.walware.ecommons.text.ui.settings.TextStyleManager;
 import de.walware.ecommons.ui.ISettingsChangedHandler;
 
 import de.walware.ecommons.ltk.ui.LTKUIPreferences;
@@ -128,7 +129,7 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	
 	private final ISourceEditor editor;
 	
-	private ColorManager colorManager;
+	private TextStyleManager textStyles;
 	private final FastList<ISettingsChangedHandler> settingsHandler= new FastList<ISettingsChangedHandler>(ISettingsChangedHandler.class);
 	
 	private final Map<String, ITokenScanner> scanners= new LinkedHashMap<String, ITokenScanner>();
@@ -153,11 +154,11 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	}
 	
 	
-	protected void setup(final IPreferenceStore preferenceStore, final ColorManager colorManager,
+	protected void setup(final IPreferenceStore preferenceStore, final TextStyleManager textStyles,
 			final DecorationPreferences decoPrefs, final AssistPreferences assistPrefs) {
 		assert (preferenceStore != null);
 		this.fPreferenceStore= preferenceStore;
-		this.colorManager= colorManager;
+		this.textStyles= textStyles;
 		this.decorationPreferences= decoPrefs;
 		this.assistPreferences= assistPrefs;
 	}
@@ -192,8 +193,8 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 		return this.fPreferenceStore;
 	}
 	
-	protected ColorManager getColorManager() {
-		return this.colorManager;
+	protected TextStyleManager getTextStyles() {
+		return this.textStyles;
 	}
 	
 	
@@ -217,6 +218,9 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 				this.assistPreferences.configure(this.quickAssistant);
 			}
 		}
+		if (this.textStyles != null && this.textStyles.affectsTextPresentation(groupIds)) {
+			options.put(ITextPresentationConstants.SETTINGSCHANGE_AFFECTSPRESENTATION_KEY, Boolean.TRUE);
+		}
 		for (final ISettingsChangedHandler handler : this.settingsHandler.toArray()) {
 			handler.handleSettingsChanged(groupIds, options);
 		}
@@ -235,7 +239,7 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	protected void initPresentationReconciler(final PresentationReconciler reconciler) {
 		if (this.scanners != null) {
 			final String[] contentTypes= getConfiguredContentTypes(null);
-			for (String contentType : contentTypes) {
+			for (final String contentType : contentTypes) {
 				final ITokenScanner scanner= getScanner(contentType);
 				if (scanner != null) {
 					final DefaultDamagerRepairer dr= new DefaultDamagerRepairer(scanner);

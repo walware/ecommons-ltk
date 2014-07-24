@@ -11,59 +11,41 @@
 
 package de.walware.ecommons.text.ui.presentation;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 
 import de.walware.ecommons.text.ui.settings.TextStyleManager;
-import de.walware.ecommons.ui.ColorManager;
-import de.walware.ecommons.ui.ISettingsChangedHandler;
 
 
 /**
  * BufferedRuleBasedScanner with managed text styles/tokens.
  */
-public abstract class AbstractRuleBasedScanner extends BufferedRuleBasedScanner implements ISettingsChangedHandler {
+public abstract class AbstractRuleBasedScanner extends BufferedRuleBasedScanner {
 	
 	
-	private final TextStyleManager fTextStyles;
+	private final TextStyleManager textStyles;
 	
 	
-	public AbstractRuleBasedScanner(final ColorManager colorManager, final IPreferenceStore preferenceStore,
-			final String stylesGroupId) {
-		super();
-		fTextStyles = new TextStyleManager(colorManager, preferenceStore, stylesGroupId);
+	public AbstractRuleBasedScanner(final TextStyleManager textStyles) {
+		this.textStyles= textStyles;
 	}
 	
 	
-	/**
-	 * Must be called after the constructor has been called.
-	 */
-	protected void initialize() {
-		final List<IRule> rules = createRules();
-		if (rules != null) {
-			setRules(rules.toArray(new IRule[rules.size()]));
-		}
+	protected void initRules() {
+		final List<IRule> rules= new ArrayList<>();
+		createRules(rules);
+		setRules(rules.toArray(new IRule[rules.size()]));
 	}
 	
-	/**
-	 * Creates the list of rules controlling this scanner.
-	 */
-	abstract protected List<IRule> createRules();
+	protected abstract void createRules(final List<IRule> rules);
 	
 	
 	protected IToken getToken(final String key) {
-		return fTextStyles.getToken(key);
-	}
-	
-	@Override
-	public void handleSettingsChanged(final Set<String> groupIds, final Map<String, Object> options) {
-		fTextStyles.handleSettingsChanged(groupIds, options);
+		return this.textStyles.getToken(key);
 	}
 	
 }
