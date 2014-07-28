@@ -23,9 +23,9 @@ import de.walware.ecommons.text.core.sections.DocContentSections;
 
 import de.walware.ecommons.ltk.AstInfo;
 import de.walware.ecommons.ltk.ISourceUnitManager;
-import de.walware.ecommons.ltk.SourceContent;
 import de.walware.ecommons.ltk.SourceDocumentRunnable;
 import de.walware.ecommons.ltk.WorkingContext;
+import de.walware.ecommons.ltk.core.SourceContent;
 
 
 /**

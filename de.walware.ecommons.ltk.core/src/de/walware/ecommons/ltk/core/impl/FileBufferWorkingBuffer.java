@@ -26,7 +26,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.text.AbstractDocument;
 import org.eclipse.jface.text.IDocument;
 
-import de.walware.ecommons.ltk.SourceContent;
+import de.walware.ecommons.ltk.core.SourceContent;
 import de.walware.ecommons.ltk.core.model.ISourceUnit;
 import de.walware.ecommons.ltk.internal.core.LTKCorePlugin;
 

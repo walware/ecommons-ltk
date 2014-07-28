@@ -34,7 +34,7 @@ import org.eclipse.jface.text.ISynchronizable;
 import de.walware.ecommons.ICommonStatusConstants;
 import de.walware.ecommons.io.FileUtil;
 
-import de.walware.ecommons.ltk.SourceContent;
+import de.walware.ecommons.ltk.core.SourceContent;
 import de.walware.ecommons.ltk.core.model.ISourceUnit;
 import de.walware.ecommons.ltk.internal.core.LTKCorePlugin;
 
@@ -135,6 +135,7 @@ public class WorkingBuffer implements IWorkingBuffer {
 		return 0;
 	}
 	
+	@Override
 	public synchronized AbstractDocument getDocument() {
 		return this.document;
 	}

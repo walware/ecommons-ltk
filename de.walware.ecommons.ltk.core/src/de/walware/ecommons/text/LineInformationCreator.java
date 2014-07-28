@@ -17,14 +17,19 @@ import java.util.Arrays;
 public class LineInformationCreator {
 	
 	
-	private int[] fBuffer = new int[2048];
+	private int[] buffer= new int[2048];
+	
+	
+	public LineInformationCreator() {
+	}
 	
 	
 	public ILineInformation create(final String text) {
-		int line = 0;
-		fBuffer[0] = 0;
-		for (int offset = 0; offset < text.length(); ) {
-			final int c = text.charAt(offset++);
+		int[] lines= this.buffer;
+		int line= 0;
+		lines[0]= 0;
+		for (int offset= 0; offset < text.length(); ) {
+			final int c= text.charAt(offset++);
 			switch (c) {
 			case '\r':
 				if (offset < text.length() && text.charAt(offset) == '\n') {
@@ -39,12 +44,12 @@ public class LineInformationCreator {
 			default:
 				continue;
 			}
-			if (++line >= fBuffer.length) {
-				fBuffer = Arrays.copyOf(fBuffer, fBuffer.length+1024);
+			if (++line >= lines.length) {
+				lines= this.buffer= Arrays.copyOf(lines, lines.length + 1024);
 			}
-			fBuffer[line] = offset;
+			lines[line]= offset;
 		}
-		return new LineInformation(Arrays.copyOf(fBuffer, line+1), text.length());
+		return new LineInformation(Arrays.copyOf(lines, line + 1), text.length());
 	}
 	
 }

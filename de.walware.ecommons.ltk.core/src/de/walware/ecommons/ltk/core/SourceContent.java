@@ -9,7 +9,7 @@
  #     Stephan Wahlbrink - initial API and implementation
  #=============================================================================*/
 
-package de.walware.ecommons.ltk;
+package de.walware.ecommons.ltk.core;
 
 import de.walware.ecommons.text.ILineInformation;
 import de.walware.ecommons.text.LineInformationCreator;
@@ -34,16 +34,23 @@ public class SourceContent {
 	
 	public final String text;
 	
+	private final int offset;
 	private volatile ILineInformation lines;
 	
 	
 	public SourceContent(final long stamp, final String text) {
-		this(stamp, text, null);
+		this(stamp, text, 0, null);
 	}
 	
-	public SourceContent(final long stamp, final String text, final ILineInformation lines) {
+	public SourceContent(final long stamp, final String text, final int offset) {
+		this(stamp, text, offset, null);
+	}
+	
+	public SourceContent(final long stamp, final String text, final int offset,
+			final ILineInformation lines) {
 		this.stamp= stamp;
 		this.text= text;
+		this.offset= offset;
 		this.lines= lines;
 	}
 	
@@ -54,6 +61,10 @@ public class SourceContent {
 	
 	public final String getText() {
 		return this.text;
+	}
+	
+	public final int getOffset() {
+		return this.offset;
 	}
 	
 	public final ILineInformation getLines() {

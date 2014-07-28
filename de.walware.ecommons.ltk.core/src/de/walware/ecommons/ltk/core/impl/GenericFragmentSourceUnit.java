@@ -23,7 +23,7 @@ import de.walware.ecommons.text.ISourceFragment;
 
 import de.walware.ecommons.ltk.AstInfo;
 import de.walware.ecommons.ltk.IElementName;
-import de.walware.ecommons.ltk.SourceContent;
+import de.walware.ecommons.ltk.core.SourceContent;
 import de.walware.ecommons.ltk.core.model.IModelElement;
 import de.walware.ecommons.ltk.core.model.ISourceUnit;
 import de.walware.ecommons.ltk.core.model.ISourceUnitModelInfo;
