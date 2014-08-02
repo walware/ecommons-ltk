@@ -17,15 +17,27 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.IAutoEditStrategy;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextHover;
+import org.eclipse.jface.text.contentassist.ContentAssistant;
+import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.information.IInformationProvider;
+import org.eclipse.jface.text.presentation.IPresentationDamager;
+import org.eclipse.jface.text.presentation.IPresentationReconciler;
+import org.eclipse.jface.text.presentation.IPresentationRepairer;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.quickassist.IQuickAssistProcessor;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.ui.statushandlers.StatusManager;
 
 import de.walware.ecommons.text.core.sections.DocContentSections;
+import de.walware.ecommons.ui.util.DialogUtil;
 
+import de.walware.ecommons.ltk.internal.ui.LTKUIPlugin;
+import de.walware.ecommons.ltk.ui.sourceediting.assist.ContentAssist;
 import de.walware.ecommons.ltk.ui.sourceediting.assist.MultiContentSectionQuickAssistProcessor;
 
 
@@ -35,10 +47,93 @@ import de.walware.ecommons.ltk.ui.sourceediting.assist.MultiContentSectionQuickA
 public class MultiContentSectionSourceViewerConfiguration extends SourceEditorViewerConfiguration {
 	
 	
+	private class LazyPresentationReconciler extends PresentationReconciler {
+		
+		
+		private IDocument document;
+		
+		
+		public LazyPresentationReconciler() {
+		}
+		
+		
+		@Override
+		public void setDamager(final IPresentationDamager damager, final String contentType) {
+			if (damager != null && this.document != null) {
+				damager.setDocument(this.document);
+			}
+			super.setDamager(damager, contentType);
+		}
+		
+		@Override
+		public void setRepairer(final IPresentationRepairer repairer, final String contentType) {
+			if (repairer != null && this.document != null) {
+				repairer.setDocument(this.document);
+			}
+			super.setRepairer(repairer, contentType);
+		}
+		
+		@Override
+		public IPresentationDamager getDamager(final String contentType) {
+			IPresentationDamager damager= super.getDamager(contentType);
+			if (damager == null && checkInit(
+					MultiContentSectionSourceViewerConfiguration.this.sections.getTypeByPartition(contentType) )) {
+				damager= super.getDamager(contentType);
+			}
+			if (DEBUG && damager == null) {
+				StatusManager.getManager().handle(new Status(IStatus.WARNING, LTKUIPlugin.PLUGIN_ID,
+						"No presentation damager for contentType= " + contentType + "." ));
+			}
+			return damager;
+		}
+		
+		@Override
+		public IPresentationRepairer getRepairer(final String contentType) {
+			IPresentationRepairer repairer= super.getRepairer(contentType);
+			if (repairer == null && checkInit(
+					MultiContentSectionSourceViewerConfiguration.this.sections.getTypeByPartition(contentType) )) {
+				repairer= super.getRepairer(contentType);
+			}
+			if (DEBUG && repairer == null) {
+				StatusManager.getManager().handle(new Status(IStatus.WARNING, LTKUIPlugin.PLUGIN_ID,
+						"No presentation repairer for contentType= " + contentType + "." ));
+			}
+			return repairer;
+		}
+		
+		@Override
+		protected void setDocumentToDamagers(final IDocument document) {
+			this.document= document;
+			super.setDocumentToDamagers(document);
+		}
+		
+	}
+	
+	private class LazyContentAssist extends ContentAssist {
+		
+		
+		public LazyContentAssist() {
+		}
+		
+		
+		@Override
+		public IContentAssistProcessor getContentAssistProcessor(final String contentType) {
+			IContentAssistProcessor processor= super.getContentAssistProcessor(contentType);
+			if (processor == null && checkInit(
+					MultiContentSectionSourceViewerConfiguration.this.sections.getTypeByPartition(contentType) )) {
+				processor= super.getContentAssistProcessor(contentType);
+			}
+			return processor;
+		}
+		
+	}
+	
+	
 	private final DocContentSections sections;
 	
 	private SourceEditorViewerConfiguration primaryConfig;
 	private final Map<String, SourceEditorViewerConfiguration> secondaryConfigs= new IdentityHashMap<>(8);
+	private final Map<String, Integer> secondaryConfigStates= new IdentityHashMap<>();
 	
 	
 	public MultiContentSectionSourceViewerConfiguration(final DocContentSections sections,
@@ -79,6 +174,31 @@ public class MultiContentSectionSourceViewerConfiguration extends SourceEditorVi
 	}
 	
 	
+	protected boolean checkInit(final String type) {
+		if (type == null) {
+			return false;
+		}
+		
+		final SourceEditorViewerConfiguration config= this.secondaryConfigs.get(type);
+		if (config != null) {
+			final Integer state= this.secondaryConfigStates.put(type, Integer.valueOf(1));
+			if (state == null) {
+				config.initPresentationReconciler(getPresentationReconciler());
+				
+				{	final ContentAssist contentAssist= getContentAssist();
+					if (contentAssist != null) {
+						config.initContentAssist(contentAssist);
+					}
+				}
+				
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	
 	@Override
 	public List<ISourceEditorAddon> getAddOns() {
 		final List<ISourceEditorAddon> addOns= super.getAddOns();
@@ -103,11 +223,19 @@ public class MultiContentSectionSourceViewerConfiguration extends SourceEditorVi
 	
 	
 	@Override
+	protected IPresentationReconciler createPresentationReconciler() {
+		final PresentationReconciler reconciler= new LazyPresentationReconciler();
+		reconciler.setDocumentPartitioning(getConfiguredDocumentPartitioning(null));
+		
+		initPresentationReconciler(reconciler);
+		
+		return reconciler;
+	}
+	
+	@Override
 	protected void initPresentationReconciler(final PresentationReconciler reconciler) {
-		for (final SourceEditorViewerConfiguration config : this.secondaryConfigs.values()) {
-			config.initPresentationReconciler(reconciler);
-		}
 		this.primaryConfig.initPresentationReconciler(reconciler);
+		// secondary are initialized lazily
 	}
 	
 	
@@ -155,6 +283,33 @@ public class MultiContentSectionSourceViewerConfiguration extends SourceEditorVi
 		return null;
 	}
 	
+	
+	@Override
+	protected ContentAssistant createContentAssistant(final ISourceViewer sourceViewer) {
+		if (getSourceEditor() != null) {
+			final ContentAssist assistant= new LazyContentAssist();
+			assistant.setDocumentPartitioning(getConfiguredDocumentPartitioning(null));
+			assistant.setRestoreCompletionProposalSize(DialogUtil.getDialogSettings(LTKUIPlugin.getDefault(), "ContentAssist.Proposal.size")); //$NON-NLS-1$
+			
+			initContentAssist(assistant);
+			return assistant;
+		}
+		return null;
+	};
+	
+	@Override
+	protected void initContentAssist(final ContentAssist assistant) {
+		this.primaryConfig.initContentAssist(assistant);
+		
+		// secondary are initialized lazily
+		if (!this.secondaryConfigStates.isEmpty()) {
+			// a secondary type is already initialized?
+			for (final String type : this.secondaryConfigStates.keySet()) {
+				// this.secondaryConfigStates.get(type) > 0
+				this.secondaryConfigs.get(type).initContentAssist(assistant);
+			}
+		}
+	}
 	
 	@Override
 	protected IQuickAssistProcessor createQuickAssistProcessor() {

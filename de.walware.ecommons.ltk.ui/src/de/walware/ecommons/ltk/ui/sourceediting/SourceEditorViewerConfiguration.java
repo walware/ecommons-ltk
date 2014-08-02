@@ -12,13 +12,15 @@
 package de.walware.ecommons.ltk.ui.sourceediting;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.internal.text.html.BrowserInformationControl;
 import org.eclipse.jface.internal.text.html.HTMLTextPresenter;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -52,6 +54,7 @@ import org.eclipse.jface.text.templates.TemplateContextType;
 import org.eclipse.jface.text.templates.TemplateVariableResolver;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
+import org.eclipse.ui.statushandlers.StatusManager;
 
 import de.walware.ecommons.FastList;
 import de.walware.ecommons.templates.TemplateVariableProcessor;
@@ -66,8 +69,11 @@ import de.walware.ecommons.text.ui.settings.AssistPreferences;
 import de.walware.ecommons.text.ui.settings.DecorationPreferences;
 import de.walware.ecommons.text.ui.settings.TextStyleManager;
 import de.walware.ecommons.ui.ISettingsChangedHandler;
+import de.walware.ecommons.ui.util.DialogUtil;
 
+import de.walware.ecommons.ltk.internal.ui.LTKUIPlugin;
 import de.walware.ecommons.ltk.ui.LTKUIPreferences;
+import de.walware.ecommons.ltk.ui.sourceediting.assist.ContentAssist;
 import de.walware.ecommons.ltk.ui.sourceediting.assist.InfoHoverRegistry;
 import de.walware.ecommons.ltk.ui.sourceediting.assist.InfoHoverRegistry.EffectiveHovers;
 
@@ -78,6 +84,8 @@ import de.walware.ecommons.ltk.ui.sourceediting.assist.InfoHoverRegistry.Effecti
 public abstract class SourceEditorViewerConfiguration extends TextSourceViewerConfiguration
 		implements ISettingsChangedHandler {
 	
+	
+	static final boolean DEBUG= true;
 	
 	private static IInformationControlCreator ASSIST_INFO_CREATOR;
 	
@@ -132,8 +140,9 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	private TextStyleManager textStyles;
 	private final FastList<ISettingsChangedHandler> settingsHandler= new FastList<ISettingsChangedHandler>(ISettingsChangedHandler.class);
 	
-	private final Map<String, ITokenScanner> scanners= new LinkedHashMap<String, ITokenScanner>();
+	private Map<String, ITokenScanner> scanners;
 	
+	private IPresentationReconciler presentationReconciler;
 	private ICharPairMatcher pairMatcher;
 	private ContentAssistant contentAssistant;
 	private IQuickAssistAssistant quickAssistant;
@@ -154,13 +163,31 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	}
 	
 	
-	protected void setup(final IPreferenceStore preferenceStore, final TextStyleManager textStyles,
+	protected void setup(final IPreferenceStore preferenceStore,
 			final DecorationPreferences decoPrefs, final AssistPreferences assistPrefs) {
 		assert (preferenceStore != null);
 		this.fPreferenceStore= preferenceStore;
-		this.textStyles= textStyles;
 		this.decorationPreferences= decoPrefs;
 		this.assistPreferences= assistPrefs;
+	}
+	
+	
+	protected void initTextStyles() {
+	}
+	
+	protected void setTextStyles(final TextStyleManager textStyles) {
+		this.textStyles= textStyles;
+	}
+	
+	protected TextStyleManager getTextStyles() {
+		if (this.textStyles == null) {
+			initTextStyles();
+		}
+		return this.textStyles;
+	}
+	
+	
+	protected void initScanners() {
 	}
 	
 	protected void addScanner(final String contentType, final ITokenScanner scanner) {
@@ -172,7 +199,16 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	}
 	
 	protected ITokenScanner getScanner(final String contentType) {
-		return this.scanners.get(contentType);
+		if (this.scanners == null) {
+			this.scanners= new HashMap<>();
+			initScanners();
+		}
+		final ITokenScanner scanner= this.scanners.get(contentType);
+		if (DEBUG && scanner == null) {
+			StatusManager.getManager().handle(new Status(IStatus.WARNING, LTKUIPlugin.PLUGIN_ID,
+					"No scanner for contentType= " + contentType + "." ));
+		}
+		return scanner;
 	}
 	
 	
@@ -193,10 +229,6 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 		return this.fPreferenceStore;
 	}
 	
-	protected TextStyleManager getTextStyles() {
-		return this.textStyles;
-	}
-	
 	
 	public DecorationPreferences getDecorationPreferences() {
 		return this.decorationPreferences;
@@ -210,7 +242,7 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	@Override
 	public void handleSettingsChanged(final Set<String> groupIds, final Map<String, Object> options) {
 		if (this.assistPreferences != null
-				&& groupIds.contains(LTKUIPreferences.ASSIST_GROUP_ID) || groupIds.contains(this.assistPreferences.getGroupId())) {
+				&& (groupIds.contains(LTKUIPreferences.ASSIST_GROUP_ID) || groupIds.contains(this.assistPreferences.getGroupId())) ) {
 			if (this.contentAssistant != null) {
 				this.assistPreferences.configure(this.contentAssistant);
 			}
@@ -228,6 +260,13 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	
 	@Override
 	public IPresentationReconciler getPresentationReconciler(final ISourceViewer sourceViewer) {
+		if (this.presentationReconciler == null) {
+			this.presentationReconciler= createPresentationReconciler();
+		}
+		return this.presentationReconciler;
+	}
+	
+	protected IPresentationReconciler createPresentationReconciler() {
 		final PresentationReconciler reconciler= new PresentationReconciler();
 		reconciler.setDocumentPartitioning(getConfiguredDocumentPartitioning(null));
 		
@@ -236,16 +275,18 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 		return reconciler;
 	}
 	
+	PresentationReconciler getPresentationReconciler() {
+		return (PresentationReconciler) this.presentationReconciler;
+	}
+	
 	protected void initPresentationReconciler(final PresentationReconciler reconciler) {
-		if (this.scanners != null) {
-			final String[] contentTypes= getConfiguredContentTypes(null);
-			for (final String contentType : contentTypes) {
-				final ITokenScanner scanner= getScanner(contentType);
-				if (scanner != null) {
-					final DefaultDamagerRepairer dr= new DefaultDamagerRepairer(scanner);
-					reconciler.setDamager(dr, contentType);
-					reconciler.setRepairer(dr, contentType);
-				}
+		final String[] contentTypes= getConfiguredContentTypes(null);
+		for (final String contentType : contentTypes) {
+			final ITokenScanner scanner= getScanner(contentType);
+			if (scanner != null) {
+				final DefaultDamagerRepairer dr= new DefaultDamagerRepairer(scanner);
+				reconciler.setDamager(dr, contentType);
+				reconciler.setRepairer(dr, contentType);
 			}
 		}
 	}
@@ -326,7 +367,22 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	}
 	
 	protected ContentAssistant createContentAssistant(final ISourceViewer sourceViewer) {
+		if (getSourceEditor() != null) {
+			final ContentAssist assistant = new ContentAssist();
+			assistant.setDocumentPartitioning(getConfiguredDocumentPartitioning(null));
+			assistant.setRestoreCompletionProposalSize(DialogUtil.getDialogSettings(LTKUIPlugin.getDefault(), "ContentAssist.Proposal.size")); //$NON-NLS-1$
+			
+			initContentAssist(assistant);
+			return assistant;
+		}
 		return null;
+	}
+	
+	ContentAssist getContentAssist() {
+		return (ContentAssist) this.contentAssistant;
+	}
+	
+	protected void initContentAssist(final ContentAssist assistant) {
 	}
 	
 	
@@ -407,7 +463,7 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	public IInformationPresenter getInformationPresenter(final ISourceViewer sourceViewer) {
 		final InformationPresenter presenter= new InformationPresenter(
 				DEFAULT_INFORMATION_CONTROL_CREATOR);
-		presenter.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
+		presenter.setDocumentPartitioning(getConfiguredDocumentPartitioning(null));
 		
 		// Register information provider
 		final IInformationProvider provider= getInformationProvider();
@@ -479,7 +535,7 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 			try {
 				final IDocument doc= textViewer.getDocument();
 				final int offset= subject.getOffset();
-				if (offset >= 2 && "${".equals(doc.get(offset-2, 2))) {  //$NON-NLS-1$
+				if (offset >= 2 && "${".equals(doc.get(offset-2, 2))) { //$NON-NLS-1$
 					final String varName= doc.get(offset, subject.getLength());
 					final TemplateContextType contextType= this.processor.getContextType();
 					if (contextType != null) {
@@ -507,13 +563,15 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 		
 	}
 	
-	protected ContentAssistant createTemplateVariableContentAssistant(final ISourceViewer sourceViewer, final TemplateVariableProcessor processor) {
+	protected ContentAssistant createTemplateVariableContentAssistant(final ISourceViewer sourceViewer,
+			final TemplateVariableProcessor processor) {
 		final ContentAssistant assistant= new ContentAssistant();
 		assistant.setDocumentPartitioning(getConfiguredDocumentPartitioning(null));
 		
 		for (final String contentType : getConfiguredContentTypes(null)) {
 			assistant.setContentAssistProcessor(processor, contentType);
 		}
+		
 		return assistant;
 	}
 	
