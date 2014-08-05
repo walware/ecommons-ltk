@@ -22,8 +22,6 @@ import org.eclipse.core.commands.IHandler2;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.action.IMenuManager;
@@ -37,6 +35,7 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ISynchronizable;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewerExtension5;
+import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.link.ILinkedModeListener;
 import org.eclipse.jface.text.link.LinkedModeModel;
 import org.eclipse.jface.text.source.IAnnotationModel;
@@ -64,7 +63,6 @@ import org.eclipse.ui.part.IShowInSource;
 import org.eclipse.ui.part.IShowInTargetList;
 import org.eclipse.ui.part.ShowInContext;
 import org.eclipse.ui.services.IServiceLocator;
-import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
@@ -74,7 +72,6 @@ import org.eclipse.ui.texteditor.templates.ITemplatesPage;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
 import de.walware.ecommons.FastList;
-import de.walware.ecommons.ICommonStatusConstants;
 import de.walware.ecommons.preferences.Preference;
 import de.walware.ecommons.preferences.PreferencesUtil;
 import de.walware.ecommons.preferences.SettingsChangeNotifier;
@@ -83,7 +80,6 @@ import de.walware.ecommons.text.TextUtil;
 import de.walware.ecommons.text.core.sections.DocContentSections;
 import de.walware.ecommons.text.ui.TextHandlerUtil;
 import de.walware.ecommons.ui.ISettingsChangedHandler;
-import de.walware.ecommons.ui.SharedUIResources;
 import de.walware.ecommons.ui.util.UIAccess;
 
 import de.walware.ecommons.ltk.IDocumentModelProvider;
@@ -154,11 +150,6 @@ public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 			}
 		}
 		return annotationModel;
-	}
-	
-	private static void logUnexpectedError(final Throwable e) {
-		StatusManager.getManager().handle(new Status(IStatus.ERROR, SharedUIResources.PLUGIN_ID,
-				ICommonStatusConstants.INTERNAL_ERROR, "Internal Error in source editor (Unexpected Exeption)", e), StatusManager.LOG);
 	}
 	
 	
@@ -1006,6 +997,9 @@ public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 					region= sourceElement.getNameSourceRange();
 					if (region == null) {
 						region= sourceElement.getSourceRange();
+						if (region != null) {
+							region= new Region(region.getOffset(), 0);
+						}
 					}
 					
 					final ISourceUnit sourceUnit= sourceElement.getSourceUnit();
