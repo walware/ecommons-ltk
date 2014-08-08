@@ -11,11 +11,15 @@
 
 package de.walware.ecommons.ltk.ui.sourceediting;
 
+import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.information.IInformationPresenter;
 import org.eclipse.jface.text.source.IOverviewRuler;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 
 
@@ -42,6 +46,8 @@ public class SourceEditorViewer extends ProjectionViewer {
 	private static final int QUICK_PRESENTER_END = SHOW_ELEMENT_HIERARCHY;
 	
 	
+	private final Point lastSentSelection= new Point(-1, -1);
+	
 	private IInformationPresenter sourceOutlinePresenter;
 	private IInformationPresenter elementOutlinePresenter;
 	private IInformationPresenter elementHierarchyPresenter;
@@ -50,6 +56,34 @@ public class SourceEditorViewer extends ProjectionViewer {
 	public SourceEditorViewer(final Composite parent, final IVerticalRuler ruler,
 			final IOverviewRuler overviewRuler, final boolean showsAnnotationOverview, final int styles) {
 		super(parent, ruler, overviewRuler, showsAnnotationOverview, styles);
+		
+		addPostSelectionChangedListener(new ISelectionChangedListener() {
+			/** 
+			 * By default source viewers do not caret changes to selection change listeners, only 
+			 * to post selection change listeners.  This sents these post selection changes after
+			 * validation to the selection change listeners too.
+			 */
+			@Override
+			public void selectionChanged(final SelectionChangedEvent event) {
+				final ITextSelection selection= (ITextSelection) event.getSelection();
+				if (lastSentSelection.x != selection.getOffset() || lastSentSelection.y != selection.getLength()) {
+					final Point currentSelection= getSelectedRange();
+					if (currentSelection.x == selection.getOffset() && currentSelection.y == selection.getLength()) {
+						fireSelectionChanged(currentSelection.x, currentSelection.y);
+					}
+				}
+			}
+		});
+	}
+	
+	
+	@Override
+	protected void fireSelectionChanged(SelectionChangedEvent event) {
+		final ITextSelection selection= (ITextSelection) event.getSelection();
+		lastSentSelection.x= selection.getOffset();
+		lastSentSelection.y= selection.getLength();
+		
+		super.fireSelectionChanged(event);
 	}
 	
 	

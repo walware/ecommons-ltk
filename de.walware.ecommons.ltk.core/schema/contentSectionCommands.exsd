@@ -1,0 +1,120 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="de.walware.ecommons.ltk" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="de.walware.ecommons.ltk.core"
+               id="de.walware.ecommons.ltk.contentSectionCommands"
+               name="Command Handlers for Document Content Sections"/>
+      </appinfo>
+      <documentation>
+         This extension-point allows to define command handlers for document content sections.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <choice minOccurs="0" maxOccurs="unbounded">
+            <element ref="commandHandler"/>
+         </choice>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="commandHandler">
+      <annotation>
+         <documentation>
+            This point allows to provide new types of document content sections.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="commandId" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The id of the command.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.ui.commands/command/@id"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="sectionType" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The id of the section type.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="de.walware.ecommons.ltk.contentSections/sectionType/@type"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="handler" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The command handler implementation.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.core.commands.IHandler2"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         0.4
+      </documentation>
+   </annotation>
+
+
+
+
+   <annotation>
+      <appinfo>
+         <meta.section type="copyright"/>
+      </appinfo>
+      <documentation>
+         Copyright (c) 2014 Stephan Wahlbrink (WalWare.de) and others.
+All rights reserved. This program and the accompanying materials
+are made available under the terms of the Eclipse Public License v1.0
+which accompanies this distribution, and is available at
+http://www.eclipse.org/legal/epl-v10.html
+
+Contributors:
+    Stephan Wahlbrink - initial API and implementation
+      </documentation>
+   </annotation>
+
+</schema>

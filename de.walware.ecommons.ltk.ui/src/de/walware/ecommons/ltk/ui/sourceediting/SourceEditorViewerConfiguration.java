@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.internal.text.html.BrowserInformationControl;
 import org.eclipse.jface.internal.text.html.HTMLTextPresenter;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -43,6 +44,8 @@ import org.eclipse.jface.text.information.InformationPresenter;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.quickassist.IQuickAssistAssistant;
+import org.eclipse.jface.text.quickassist.IQuickAssistProcessor;
+import org.eclipse.jface.text.quickassist.QuickAssistAssistant;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -204,7 +207,7 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	@Override
 	public IPresentationReconciler getPresentationReconciler(final ISourceViewer sourceViewer) {
 		final PresentationReconciler reconciler= new PresentationReconciler();
-		reconciler.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
+		reconciler.setDocumentPartitioning(getConfiguredDocumentPartitioning(null));
 		
 		initPresentationReconciler(reconciler);
 		
@@ -317,7 +320,18 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	}
 	
 	protected IQuickAssistAssistant createQuickAssistant(final ISourceViewer sourceViewer) {
+		final IQuickAssistProcessor processor= createQuickAssistProcessor();
+		if (processor != null) {
+			final QuickAssistAssistant assistent= new QuickAssistAssistant();
+			assistent.setQuickAssistProcessor(processor);
+			assistent.enableColoredLabels(true);
+			return assistent;
+		}
 		return super.getQuickAssistAssistant(sourceViewer);
+	}
+	
+	protected IQuickAssistProcessor createQuickAssistProcessor() {
+		return null;
 	}
 	
 	protected IInformationControlCreator getAssistInformationControlCreator(final ISourceViewer sourceViewer) {
@@ -330,7 +344,7 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	@Override
 	public int[] getConfiguredTextHoverStateMasks(final ISourceViewer sourceViewer, final String contentType) {
 		if (this.editor != null) {
-			final String[] partitioning= getConfiguredContentTypes(sourceViewer);
+			final String[] partitioning= getConfiguredContentTypes(null);
 			if (partitioning != null && partitioning.length > 0 && partitioning[0].equals(contentType)) {
 				final InfoHoverRegistry registry= getInfoHoverRegistry();
 				if (registry != null) {
@@ -372,7 +386,7 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 		
 		// Register information provider
 		final IInformationProvider provider= getInformationProvider();
-		final String[] contentTypes= getConfiguredContentTypes(sourceViewer);
+		final String[] contentTypes= getConfiguredContentTypes(null);
 		for (int i= 0; i < contentTypes.length; i++) {
 			presenter.setInformationProvider(provider, contentTypes[i]);
 		}
@@ -384,6 +398,43 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	protected IInformationProvider getInformationProvider() {
 		return null;
 	}
+	
+	
+	@Override
+	protected Map getHyperlinkDetectorTargets(final ISourceViewer sourceViewer) {
+		final Map<String, IAdaptable> targets= super.getHyperlinkDetectorTargets(sourceViewer);
+		collectHyperlinkDetectorTargets(targets, sourceViewer);
+		return targets;
+	}
+	
+	protected void collectHyperlinkDetectorTargets(final Map<String, IAdaptable> targets, final ISourceViewer sourceViewer) {
+	}
+	
+	public IInformationPresenter getQuickPresenter(final ISourceViewer sourceViewer,
+			final int operation) {
+		final IInformationProvider provider= getQuickInformationProvider(sourceViewer, operation);
+		if (provider == null) {
+			return null;
+		}
+		final InformationPresenter presenter= new InformationPresenter(((IInformationProviderExtension2) provider).getInformationPresenterControlCreator());
+		presenter.setDocumentPartitioning(getConfiguredDocumentPartitioning(null));
+		presenter.setAnchor(AbstractInformationControlManager.ANCHOR_GLOBAL);
+		presenter.setSizeConstraints(50, 20, true, false);
+		
+		final String[] contentTypes= getConfiguredContentTypes(null);
+		for (int i= 0; i < contentTypes.length; i++) {
+			presenter.setInformationProvider(provider, contentTypes[i]);
+		}
+		
+		return presenter;
+	}
+	
+	protected IInformationProvider getQuickInformationProvider(final ISourceViewer sourceViewer,
+			final int operation) {
+		return null;
+	}
+	
+
 	
 /* For TemplateEditors ********************************************************/
 	
@@ -433,37 +484,12 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	
 	protected ContentAssistant createTemplateVariableContentAssistant(final ISourceViewer sourceViewer, final TemplateVariableProcessor processor) {
 		final ContentAssistant assistant= new ContentAssistant();
-		assistant.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
+		assistant.setDocumentPartitioning(getConfiguredDocumentPartitioning(null));
 		
-		for (final String contentType : getConfiguredContentTypes(sourceViewer)) {
+		for (final String contentType : getConfiguredContentTypes(null)) {
 			assistant.setContentAssistProcessor(processor, contentType);
 		}
 		return assistant;
-	}
-	
-	
-	public IInformationPresenter getQuickPresenter(final ISourceViewer sourceViewer,
-			final int operation) {
-		final IInformationProvider provider= getQuickInformationProvider(sourceViewer, operation);
-		if (provider == null) {
-			return null;
-		}
-		final InformationPresenter presenter= new InformationPresenter(((IInformationProviderExtension2) provider).getInformationPresenterControlCreator());
-		presenter.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
-		presenter.setAnchor(AbstractInformationControlManager.ANCHOR_GLOBAL);
-		presenter.setSizeConstraints(50, 20, true, false);
-		
-		final String[] contentTypes= getConfiguredContentTypes(sourceViewer);
-		for (int i= 0; i < contentTypes.length; i++) {
-			presenter.setInformationProvider(provider, contentTypes[i]);
-		}
-		
-		return presenter;
-	}
-	
-	protected IInformationProvider getQuickInformationProvider(final ISourceViewer sourceViewer,
-			final int operation) {
-		return null;
 	}
 	
 }

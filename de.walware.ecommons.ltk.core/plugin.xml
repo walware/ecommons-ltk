@@ -19,6 +19,13 @@
          name="Additional activation for content types"
          schema="schema/de.walware.ecommons.ltk.contentTypeActivation.exsd"/>
    
+   <extension-point id="de.walware.ecommons.ltk.contentSections" 
+         name="Document Content Sections"
+         schema="schema/contentSections.exsd"/>
+   <extension-point id="de.walware.ecommons.ltk.contentSectionCommands" 
+         name="Command Handlers for Document Content Sections"
+         schema="schema/contentSectionCommands.exsd"/>
+   
    <extension-point id="de.walware.ecommons.ltk.modelTypes"
          name="LTK Working Contexts"
          schema="schema/de.walware.ecommons.ltk.modelTypes.exsd"/>
