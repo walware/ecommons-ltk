@@ -23,6 +23,8 @@ import de.walware.ecommons.preferences.ui.RGBPref;
 import de.walware.ecommons.ui.ColorManager;
 import de.walware.ecommons.ui.SharedUIResources;
 
+import de.walware.ecommons.ltk.ui.LTKUIPreferences;
+
 
 /**
  * Preferences for content and quick assist assistant.
@@ -30,7 +32,7 @@ import de.walware.ecommons.ui.SharedUIResources;
 public class AssistPreferences {
 	
 	
-	private final String fGroupId;
+	private final String qualifier;
 	
 	/**
 	 * Preference for content assist auto activation
@@ -75,19 +77,16 @@ public class AssistPreferences {
 //	private final RGBPref fReplacementForeground;
 	
 	
-	public AssistPreferences(final String prefQualifier, final String groupId) {
-		fGroupId = groupId;
+	public AssistPreferences(final String prefQualifier) {
+		this.qualifier= prefQualifier;
 		
 		fAutoActivationEnabled = new BooleanPref(prefQualifier, "AutoActivation.enable"); //$NON-NLS-1$
-		fAutoActivationDelay = new IntPref(prefQualifier, "AutoActivation.delay"); //$NON-NLS-1$
+		fAutoActivationDelay= LTKUIPreferences.CONTENT_ASSIST_DELAY_PREF;
 		fAutoInsertSingle = new BooleanPref(prefQualifier, "AutoInsert.Single.enable"); //$NON-NLS-1$
 		fAutoInsertPrefix = new BooleanPref(prefQualifier, "AutoInsert.Prefix.enable"); //$NON-NLS-1$
 		
-		fInformationBackground = new RGBPref(prefQualifier, "Parameters.background"); //$NON-NLS-1$
-		fInformationForeground = new RGBPref(prefQualifier, "Parameters.foreground"); //$NON-NLS-1$
-		
-//		fReplacementBackground = new RGBPref(prefQualifier, "CompletionReplacement.background"); //$NON-NLS-1$
-//		fReplacementForeground = new RGBPref(prefQualifier, "CompletionReplacement.foreground"); //$NON-NLS-1$
+		fInformationBackground= LTKUIPreferences.CONTEXT_INFO_BACKGROUND_COLOR_PREF;
+		fInformationForeground= LTKUIPreferences.CONTEXT_INFO_FOREGROUND_COLOR_PREF;
 	}
 	
 	
@@ -110,15 +109,11 @@ public class AssistPreferences {
 	
 	
 	public String getGroupId() {
-		return fGroupId;
+		return this.qualifier;
 	}
 	
 	public BooleanPref getAutoActivationEnabledPref() {
 		return fAutoActivationEnabled;
-	}
-	
-	public IntPref getAutoActivationDelayPref() {
-		return fAutoActivationDelay;
 	}
 	
 	public BooleanPref getAutoInsertSinglePref() {
@@ -129,39 +124,23 @@ public class AssistPreferences {
 		return fAutoInsertPrefix;
 	}
 	
-	public RGBPref getInformationBackgroundPref() {
-		return fInformationBackground;
-	}
-	
-	public RGBPref getInformationForegroundPref() {
-		return fInformationForeground;
-	}
-	
-//	public RGBPref getReplacementBackgroundPref() {
-//		return fReplacementBackground;
-//	}
-//	
-//	public RGBPref getReplacementForegroundPref() {
-//		return fReplacementForeground;
-//	}
-	
 	
 	/**
 	 * Configure the given content assistant according common StatET settings.
 	 */
 	public void configure(final ContentAssistant assistant) {
 		final ColorManager manager = SharedUIResources.getColors();
-		final IPreferenceAccess statet = PreferencesUtil.getInstancePrefs();
+		final IPreferenceAccess prefs = PreferencesUtil.getInstancePrefs();
 		
-		assistant.enableAutoActivation(statet.getPreferenceValue(fAutoActivationEnabled));
-		assistant.setAutoActivationDelay(statet.getPreferenceValue(fAutoActivationDelay));
-		assistant.enableAutoInsert(statet.getPreferenceValue(fAutoInsertSingle));
-		assistant.enablePrefixCompletion(statet.getPreferenceValue(fAutoInsertPrefix));
-		{	final Color c = manager.getColor(statet.getPreferenceValue(fInformationForeground));
+		assistant.enableAutoActivation(prefs.getPreferenceValue(fAutoActivationEnabled));
+		assistant.setAutoActivationDelay(prefs.getPreferenceValue(fAutoActivationDelay));
+		assistant.enableAutoInsert(prefs.getPreferenceValue(fAutoInsertSingle));
+		assistant.enablePrefixCompletion(prefs.getPreferenceValue(fAutoInsertPrefix));
+		{	final Color c = manager.getColor(prefs.getPreferenceValue(fInformationForeground));
 			assistant.setContextInformationPopupForeground(c);
 			assistant.setContextSelectorForeground(c);
 		}
-		{	final Color c = manager.getColor(statet.getPreferenceValue(fInformationBackground));
+		{	final Color c = manager.getColor(prefs.getPreferenceValue(fInformationBackground));
 			assistant.setContextInformationPopupBackground(c);
 			assistant.setContextSelectorBackground(c);
 		}

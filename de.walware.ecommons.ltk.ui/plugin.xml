@@ -1075,7 +1075,24 @@
                value="COLOR_INFO_FOREGROUND">
          </colorOverride>
       </theme>
-      
+   </extension>
+   
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="de.walware.ecommons.ltk.internal.ui.LTKUIPreferenceInitializer" />
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            id="de.walware.ecommons.ltk.preferencePages.SourceEditors"
+            category="org.eclipse.ui.preferencePages.GeneralTextEditor"
+            name="%preferencePages_SourceEditors_name"
+            class="de.walware.ecommons.ltk.internal.ui.config.EditorsPreferencePage">
+         <keywordReference id="de.walware.ecommons.ltk.keywords.SourceEditor"/>
+         <keywordReference id="de.walware.ecommons.ltk.keywords.SourceAppearance"/>
+         <keywordReference id="de.walware.ecommons.ltk.keywords.SourceContentAssist"/>
+      </page>
    </extension>
    
 </plugin>

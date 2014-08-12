@@ -66,6 +66,7 @@ import de.walware.ecommons.text.ui.settings.DecorationPreferences;
 import de.walware.ecommons.ui.ColorManager;
 import de.walware.ecommons.ui.ISettingsChangedHandler;
 
+import de.walware.ecommons.ltk.ui.LTKUIPreferences;
 import de.walware.ecommons.ltk.ui.sourceediting.assist.InfoHoverRegistry;
 import de.walware.ecommons.ltk.ui.sourceediting.assist.InfoHoverRegistry.EffectiveHovers;
 
@@ -191,7 +192,8 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	
 	@Override
 	public void handleSettingsChanged(final Set<String> groupIds, final Map<String, Object> options) {
-		if (this.assistPreferences != null && groupIds.contains(this.assistPreferences.getGroupId())) {
+		if (this.assistPreferences != null
+				&& groupIds.contains(LTKUIPreferences.ASSIST_GROUP_ID) || groupIds.contains(this.assistPreferences.getGroupId())) {
 			if (this.contentAssistant != null) {
 				this.assistPreferences.configure(this.contentAssistant);
 			}
