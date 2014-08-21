@@ -11,6 +11,8 @@
 
 package de.walware.ecommons.ltk.ui.templates;
 
+import java.util.List;
+
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
@@ -29,6 +31,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
+import de.walware.ecommons.collections.ImCollections;
+import de.walware.ecommons.collections.ImList;
 import de.walware.ecommons.ui.util.LayoutUtil;
 import de.walware.ecommons.ui.util.ViewerUtil;
 import de.walware.ecommons.ui.util.ViewerUtil.TableComposite;
@@ -40,17 +44,17 @@ import de.walware.ecommons.ltk.ui.sourceediting.SourceEditorViewerConfigurator;
 public class TemplateSelectionComposite extends Composite implements ISelectionChangedListener {
 	
 	
-	private static final Template NONE = new Template("none", "None", "", "", false); //$NON-NLS-1$
+	private static final Template NONE= new Template("none", "None", "", "", false); //$NON-NLS-1$
 	
 	
-	private ContextTypeRegistry fContextRegistry;
-	private Template[] fTemplates;
+	private ContextTypeRegistry contextRegistry;
+	private ImList<Template> templates;
 	
-	private SourceEditorViewerConfigurator fViewerConfigurator;
-	private TableViewer fTableViewer;
-	private TemplatePreview fPreview;
+	private SourceEditorViewerConfigurator viewerConfigurator;
+	private TableViewer tableViewer;
+	private TemplatePreview preview;
 	
-	private Template fSelectedTemplate;
+	private Template selectedTemplate;
 	
 	
 	
@@ -62,37 +66,32 @@ public class TemplateSelectionComposite extends Composite implements ISelectionC
 	
 	
 	public TableViewer getSelectionViewer() {
-		return fTableViewer;
+		return this.tableViewer;
 	}
 	
 	public TemplatePreview getPreview() {
-		return fPreview;
+		return this.preview;
 	}
 	
 	public void setConfigurator(final SourceEditorViewerConfigurator patternConfigurator) {
-		fViewerConfigurator = patternConfigurator;
+		this.viewerConfigurator= patternConfigurator;
 	}
 	
-	public void setInput(final Template[] templates, final boolean allowNone,
+	public void setInput(final List<Template> templates, final boolean allowNone,
 			final ContextTypeRegistry contextRegistry) {
-		fTemplates = (allowNone) ? addNone(templates) : templates;
-		fContextRegistry = contextRegistry;
+		this.templates= (allowNone) ?
+				ImCollections.concatList(NONE, templates) :
+				ImCollections.toList(templates);
+		this.contextRegistry= contextRegistry;
 		
-		fTableViewer.setInput(fTemplates);
-	}
-	
-	private Template[] addNone(final Template[] templates) {
-		final Template[] combined = new Template[templates.length + 1];
-		combined[0] = NONE;
-		System.arraycopy(templates, 0, combined, 1, templates.length);
-		return combined;
+		this.tableViewer.setInput(this.templates);
 	}
 	
 	public void setSelection(final String name) {
 		if (name != null) {
-			for (int i = 0; i < fTemplates.length; i++) {
-				if (fTemplates[i].getName().equals(name)) {
-					setSelection(fTemplates[i]);
+			for (final Template template : this.templates) {
+				if (template.getName().equals(name)) {
+					setSelection(template);
 					return;
 				}
 			}
@@ -101,7 +100,7 @@ public class TemplateSelectionComposite extends Composite implements ISelectionC
 	}
 	
 	public void setSelection(final Template template) {
-		fTableViewer.setSelection(new StructuredSelection(template));
+		this.tableViewer.setSelection(new StructuredSelection(template));
 		updateSourceViewerInput();
 	}
 	
@@ -109,32 +108,32 @@ public class TemplateSelectionComposite extends Composite implements ISelectionC
 	protected void createControls() {
 		setLayout(LayoutUtil.createCompositeGrid(1));
 		
-		{	final Control control = createTableViewer(this);
+		{	final Control control= createTableViewer(this);
 			control.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		}
-		fPreview = new TemplatePreview();
-		{	final Label label = new Label(this, SWT.LEFT);
+		this.preview= new TemplatePreview();
+		{	final Label label= new Label(this, SWT.LEFT);
 			label.setText(TemplatesMessages.Preview_label);
 			label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		}
-		{	final SourceViewer viewer = fPreview.createSourceViewer(this);
-			final GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-			gd.heightHint = new PixelConverter(viewer.getControl()).convertHeightInCharsToPixels(5);
+		{	final SourceViewer viewer= this.preview.createSourceViewer(this);
+			final GridData gd= new GridData(SWT.FILL, SWT.FILL, true, true);
+			gd.heightHint= new PixelConverter(viewer.getControl()).convertHeightInCharsToPixels(5);
 			viewer.getControl().setLayoutData(gd);
 		}
 	}
 	
 	protected Control createTableViewer(final Composite parent) {
-		final TableComposite tableComposite = new ViewerUtil.TableComposite(parent, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION);
+		final TableComposite tableComposite= new ViewerUtil.TableComposite(parent, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION);
 		tableComposite.addColumn("Name", SWT.LEFT, new ColumnWeightData(100));
 		
-		final TableViewer viewer = tableComposite.viewer;
+		final TableViewer viewer= tableComposite.viewer;
 		viewer.setContentProvider(new ArrayContentProvider());
 		configureViewer(viewer);
 		
 		viewer.addSelectionChangedListener(this);
 		
-		fTableViewer = viewer;
+		this.tableViewer= viewer;
 		return tableComposite;
 	}
 	
@@ -148,20 +147,20 @@ public class TemplateSelectionComposite extends Composite implements ISelectionC
 	}
 	
 	protected void updateSourceViewerInput() {
-		final Template template = fSelectedTemplate;
-		fPreview.updateSourceViewerInput(template, fContextRegistry, fViewerConfigurator);
+		final Template template= this.selectedTemplate;
+		this.preview.updateSourceViewerInput(template, this.contextRegistry, this.viewerConfigurator);
 	}
 	
 	@Override
 	public void selectionChanged(final SelectionChangedEvent event) {
-		final Template template = (Template) ((IStructuredSelection) event.getSelection()).getFirstElement();
-		fSelectedTemplate = (template != NONE) ? template : null;
+		final Template template= (Template) ((IStructuredSelection) event.getSelection()).getFirstElement();
+		this.selectedTemplate= (template != NONE) ? template : null;
 		
 		updateSourceViewerInput();
 	}
 	
 	public Template getSelectedTemplate() {
-		return fSelectedTemplate;
+		return this.selectedTemplate;
 	}
 	
 }

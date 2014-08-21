@@ -42,8 +42,12 @@ public class TemplatesMessages extends NLS {
 	public static String Config_Export_error_CanNotWrite_message;
 	public static String Config_Export_Exists_title;
 	public static String Config_Export_Exists_message;
-
+	
 	public static String Config_Preview_label;
+	
+	public static String NewDocWizardPage_title;
+	public static String NewDocWizardPage_description;
+	public static String NewDocWizardPage_Template_group;
 	
 	
 	static {
