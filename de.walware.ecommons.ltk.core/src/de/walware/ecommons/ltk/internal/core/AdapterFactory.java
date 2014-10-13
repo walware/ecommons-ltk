@@ -55,7 +55,7 @@ public class AdapterFactory {
 				return fConfigurationElement.createExecutableExtension(CLASS_ATTRIBUTE_NAME);
 			}
 			catch (final CoreException e) {
-				LTKCorePlugin.getSafe().log(new Status(IStatus.ERROR, LTKCorePlugin.PLUGIN_ID, 0,
+				LTKCorePlugin.log(new Status(IStatus.ERROR, LTKCorePlugin.PLUGIN_ID, 0,
 						NLS.bind("An error occurred when loading adapter class for model ''{0}''.", modelTypeId),
 						e ));
 				fConfigurationElement = null;
@@ -83,7 +83,7 @@ public class AdapterFactory {
 						fConfigurationElement = null;
 					}
 					catch (final CoreException e) {
-						LTKCorePlugin.getSafe().log(new Status(IStatus.ERROR, LTKCorePlugin.PLUGIN_ID, 0,
+						LTKCorePlugin.log(new Status(IStatus.ERROR, LTKCorePlugin.PLUGIN_ID, 0,
 								NLS.bind("An error occurred when loading adapter factory for model ''{0}''.", modelTypeId),
 								e ));
 						fConfigurationElement = null;
@@ -101,8 +101,7 @@ public class AdapterFactory {
 	
 	private final String fExtensionPointId;
 	
-	private final Map<String, Map<String, AdapterContribution>> fMap = new IdentityHashMap<String,
-			Map<String, AdapterContribution>>();
+	private final Map<String, Map<String, AdapterContribution>> fMap = new IdentityHashMap<>();
 	
 	
 	public AdapterFactory(final String extensionPointId) {
@@ -122,7 +121,7 @@ public class AdapterFactory {
 				modelTypeId = modelTypeId.intern();
 				Map<String, AdapterContribution> map = fMap.get(modelTypeId);
 				if (map == null) {
-					map = new HashMap<String, AdapterContribution>();
+					map = new HashMap<>();
 					fMap.put(modelTypeId, map);
 				}
 				final IConfigurationElement[] adapterElements = contributionElement.getChildren();

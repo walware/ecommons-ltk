@@ -57,8 +57,9 @@ public class FileBufferWorkingBuffer extends WorkingBuffer {
 					this.fileBuffer= FileBuffers.getTextFileBufferManager().getTextFileBuffer(path, LocationKind.IFILE);
 				}
 				catch (final CoreException e) {
-					LTKCorePlugin.getSafe().log(new Status(IStatus.ERROR, LTKCorePlugin.PLUGIN_ID, -1,
-							"An error occurred when allocating the document of the file buffer.", e ));
+					LTKCorePlugin.log(new Status(IStatus.ERROR, LTKCorePlugin.PLUGIN_ID, -1,
+							"An error occurred when allocating the document of the file buffer.",
+							e ));
 				}
 			}
 			else if (getMode() == FILESTORE) {
@@ -68,8 +69,9 @@ public class FileBufferWorkingBuffer extends WorkingBuffer {
 					this.fileBuffer= FileBuffers.getTextFileBufferManager().getFileStoreTextFileBuffer(store);
 				}
 				catch (final CoreException e) {
-					LTKCorePlugin.getSafe().log(new Status(IStatus.ERROR, LTKCorePlugin.PLUGIN_ID, -1,
-							"An error occurred when allocating the document of the file buffer.", e ));
+					LTKCorePlugin.log(new Status(IStatus.ERROR, LTKCorePlugin.PLUGIN_ID, -1,
+							"An error occurred when allocating the document of the file buffer.",
+							e ));
 				}
 			}
 			if (this.fileBuffer != null) {
@@ -126,7 +128,7 @@ public class FileBufferWorkingBuffer extends WorkingBuffer {
 				}
 			}
 			catch (final CoreException e) {
-				LTKCorePlugin.getSafe().log(new Status(IStatus.ERROR, LTKCorePlugin.PLUGIN_ID, -1,
+				LTKCorePlugin.log(new Status(IStatus.ERROR, LTKCorePlugin.PLUGIN_ID, -1,
 						"An error occurred when releasing the document of the file buffer.", e ));
 			}
 			finally {
@@ -152,7 +154,7 @@ public class FileBufferWorkingBuffer extends WorkingBuffer {
 					buffer.validateState(monitor, IWorkspace.VALIDATE_PROMPT);
 				}
 				catch (final CoreException e) {
-					LTKCorePlugin.getSafe().log(new Status(IStatus.ERROR, LTKCorePlugin.PLUGIN_ID, -1,
+					LTKCorePlugin.log(new Status(IStatus.ERROR, LTKCorePlugin.PLUGIN_ID, -1,
 							"An error occurred when validating file buffer state.", e ));
 				}
 			}

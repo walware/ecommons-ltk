@@ -42,8 +42,8 @@ public class ElementInfoController implements IModelElementInputProvider, IDispo
 	private final WorkingContext fModelContext;
 	private final IElementChangedListener fElementChangeListener;
 	
-	private final FastList<IModelElementInputListener> fListenerList = new FastList<IModelElementInputListener>(IModelElementInputListener.class);
-	private final FastList<IModelElementInputListener> fNewListenerList = new FastList<IModelElementInputListener>(IModelElementInputListener.class);
+	private final FastList<IModelElementInputListener> fListenerList = new FastList<>(IModelElementInputListener.class);
+	private final FastList<IModelElementInputListener> fNewListenerList = new FastList<>(IModelElementInputListener.class);
 	
 	private volatile ISourceUnit fInput;
 	private final Object fInputLock = new Object();

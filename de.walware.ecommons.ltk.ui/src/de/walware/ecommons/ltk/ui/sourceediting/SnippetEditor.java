@@ -245,7 +245,7 @@ public class SnippetEditor extends Object {
 	}
 	
 	private void initActions() {
-		fGlobalActions = new HashMap<String, Action>(10);
+		fGlobalActions = new HashMap<>(10);
 		
 		if (fServiceLocator != null) {
 			fServiceUtil = new ControlServicesUtil(fServiceLocator, getClass().getName()+'#'+hashCode(), getSourceViewer().getControl());

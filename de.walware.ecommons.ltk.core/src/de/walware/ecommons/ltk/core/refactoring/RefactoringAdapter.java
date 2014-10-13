@@ -489,7 +489,7 @@ public abstract class RefactoringAdapter {
 	}
 	
 	public void checkFinalToModify(final RefactoringStatus result, final ElementSet elements, final IProgressMonitor monitor) {
-		final Set<IResource> resources = new HashSet<IResource>();
+		final Set<IResource> resources = new HashSet<>();
 		resources.addAll(elements.getResources());
 		for(final IModelElement element : elements.getModelElements()) {
 			final ISourceUnit su = LTKUtil.getSourceUnit(element);

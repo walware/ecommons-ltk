@@ -94,7 +94,7 @@ public class RefactoringExecutionHelper {
 	 * @throws InvocationTargetException thrown when the operation failed to execute
 	 */
 	public void perform(final boolean forkChangeExecution, final boolean cancelable) throws InterruptedException, InvocationTargetException {
-		final AtomicReference<PerformChangeOperation> op = new AtomicReference<PerformChangeOperation>();
+		final AtomicReference<PerformChangeOperation> op = new AtomicReference<>();
 		try {
 			fExecContext.busyCursorWhile(new IRunnableWithProgress() {
 				@Override
@@ -154,7 +154,7 @@ public class RefactoringExecutionHelper {
 							operation.run(progress.newChild(4, SubMonitor.SUPPRESS_NONE));
 						}
 						else {
-							final AtomicReference<Exception> opException = new AtomicReference<Exception>();
+							final AtomicReference<Exception> opException = new AtomicReference<>();
 							final Runnable runnable = new Runnable() {
 								@Override
 								public void run() {

@@ -162,7 +162,7 @@ public class EcoReconciler implements IReconciler {
 	/** Tells whether this reconciler's editor is active. */
 	private volatile boolean fIsEditorVisible;
 	
-	private final FastList<StrategyEntry> fStrategies = new FastList<StrategyEntry>(StrategyEntry.class, ListenerList.EQUALITY);
+	private final FastList<StrategyEntry> fStrategies = new FastList<>(StrategyEntry.class, ListenerList.EQUALITY);
 	
 	
 	/**

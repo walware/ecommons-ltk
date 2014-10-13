@@ -62,7 +62,7 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 		public void dispose() {
 			final ISourceUnit su = get();
 			if (su != null && su.isConnected()) {
-				LTKCorePlugin.getSafe().log(
+				LTKCorePlugin.log(
 						new Status(IStatus.WARNING, LTKCorePlugin.PLUGIN_ID, -1,
 								NLS.bind("Source Unit ''{0}'' disposed but connected.", su.getId()), null));
 			}
@@ -81,8 +81,8 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 		public ContextItem(final WorkingContext context, final ISourceUnitFactory factory) {
 			this.context = context;
 			this.factory = factory;
-			this.sus = new HashMap<String, SuItem>();
-			this.susToClean = new ReferenceQueue<ISourceUnit>();
+			this.sus = new HashMap<>();
+			this.susToClean = new ReferenceQueue<>();
 		}
 		
 		@Override
@@ -105,7 +105,7 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 		
 		private final String modelTypeId;
 		
-		private final FastList<ContextItem> contexts = new FastList<ContextItem>(ContextItem.class, FastList.IDENTITY);
+		private final FastList<ContextItem> contexts = new FastList<>(ContextItem.class, FastList.IDENTITY);
 		
 		
 		public ModelItem(final String modelTypeId) {
@@ -152,8 +152,8 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 						}
 					}
 					catch (final Exception e) {
-						LTKCorePlugin.getSafe().log(new Status(IStatus.ERROR, LTK.PLUGIN_ID, ICommonStatusConstants.INTERNAL_PLUGGED_IN,
-								"Error loading working context contributions", e)); //$NON-NLS-1$
+						LTKCorePlugin.log(new Status(IStatus.ERROR, LTK.PLUGIN_ID, ICommonStatusConstants.INTERNAL_PLUGGED_IN,
+								"Error loading working context contributions", e )); //$NON-NLS-1$
 					}
 				}
 			}
@@ -216,7 +216,7 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 	
 	private final CleanupJob cleanupJob = new CleanupJob();
 	
-	private final FastList<ModelItem> modelItems = new FastList<ModelItem>(ModelItem.class, FastList.IDENTITY);
+	private final FastList<ModelItem> modelItems = new FastList<>(ModelItem.class, FastList.IDENTITY);
 	
 	
 	public SourceUnitManager() {
@@ -332,7 +332,7 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 		if (includedModelItems == null || includedModelItems.length == 0) {
 			return Collections.emptyList();
 		}
-		final ArrayList<ISourceUnit> list = new ArrayList<ISourceUnit>();
+		final ArrayList<ISourceUnit> list = new ArrayList<>();
 		for (int i = 0; i < includedModelItems.length; i++) {
 			ContextItem[] includedContextItems = null;
 			final ContextItem[] contextItems = includedModelItems[i].contexts.toArray();

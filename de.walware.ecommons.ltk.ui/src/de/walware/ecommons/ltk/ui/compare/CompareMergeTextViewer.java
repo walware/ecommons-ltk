@@ -72,7 +72,7 @@ public abstract class CompareMergeTextViewer extends TextMergeViewer {
 		}
 		
 		if (fTextViewers == null) {
-			fTextViewers = new ArrayList<TextViewer>(3);
+			fTextViewers = new ArrayList<>(3);
 		}
 		fTextViewers.add(textViewer);
 	}

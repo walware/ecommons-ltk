@@ -51,7 +51,7 @@ public class LTKUIPlugin extends AbstractUIPlugin {
 	
 	private boolean fStarted;
 	
-	private final List<IDisposable> fDisposables = new ArrayList<IDisposable>();
+	private final List<IDisposable> fDisposables = new ArrayList<>();
 	
 	private WorkbenchLabelProvider fWorkbenchLabelProvider;
 	

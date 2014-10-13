@@ -138,7 +138,7 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	private final ISourceEditor editor;
 	
 	private TextStyleManager textStyles;
-	private final FastList<ISettingsChangedHandler> settingsHandler= new FastList<ISettingsChangedHandler>(ISettingsChangedHandler.class);
+	private final FastList<ISettingsChangedHandler> settingsHandler= new FastList<>(ISettingsChangedHandler.class);
 	
 	private Map<String, ITokenScanner> scanners;
 	

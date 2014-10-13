@@ -133,8 +133,8 @@ public final class SourceUnitChange extends TextFileChange {
 			return new UndoSourceUnitChange(getName(), fSourceUnit, (IFile) super.getModifiedElement(), edit, stampToRestore, getSaveMode());
 		}
 		catch (final CoreException e) {
-			LTKCorePlugin.getSafe().log(new Status(IStatus.ERROR, LTKCorePlugin.PLUGIN_ID, -1,
-					"Failed to create Refactoring Undo", e)); //$NON-NLS-1$
+			LTKCorePlugin.log(new Status(IStatus.ERROR, LTKCorePlugin.PLUGIN_ID, -1,
+					"Failed to create Refactoring Undo", e )); //$NON-NLS-1$
 			return null;
 		}
 	}

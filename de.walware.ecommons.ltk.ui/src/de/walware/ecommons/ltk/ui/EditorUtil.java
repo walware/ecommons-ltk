@@ -55,7 +55,7 @@ public class EditorUtil {
 	 */
 	public static List<IEditorPart> getDirtyEditors(final boolean skipNonResourceEditors) {
 		final Set inputs = new HashSet();
-		final List<IEditorPart> result = new ArrayList<IEditorPart>(0);
+		final List<IEditorPart> result = new ArrayList<>(0);
 		final IWorkbench workbench = PlatformUI.getWorkbench();
 		final IWorkbenchWindow[] windows = workbench.getWorkbenchWindows();
 		for (int i = 0; i < windows.length; i++) {

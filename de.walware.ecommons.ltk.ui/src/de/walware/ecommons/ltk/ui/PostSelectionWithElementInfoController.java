@@ -207,8 +207,8 @@ public class PostSelectionWithElementInfoController {
 	
 	private final IPostSelectionProvider fSelectionProvider;
 	private final IModelElementInputProvider fModelProvider;
-	private final FastList<ISelectionWithElementInfoListener> fListeners = new FastList<ISelectionWithElementInfoListener>(ISelectionWithElementInfoListener.class);
-	private final FastList<ISelectionWithElementInfoListener> fNewListeners = new FastList<ISelectionWithElementInfoListener>(ISelectionWithElementInfoListener.class);
+	private final FastList<ISelectionWithElementInfoListener> fListeners = new FastList<>(ISelectionWithElementInfoListener.class);
+	private final FastList<ISelectionWithElementInfoListener> fNewListeners = new FastList<>(ISelectionWithElementInfoListener.class);
 	private final Object fInputLock = new Object();
 	
 	private final IModelElementInputListener fElementChangeListener;
@@ -216,7 +216,7 @@ public class PostSelectionWithElementInfoController {
 	private final SelectionListener fPostSelectionListener;
 	private PostSelectionCancelExtension fCancelExtension;
 	
-	private final List<IgnoreActivation> fIgnoreList = new ArrayList<IgnoreActivation>();
+	private final List<IgnoreActivation> fIgnoreList = new ArrayList<>();
 	
 	private ISourceUnit fInput; // current input
 	private boolean fInputChanged;

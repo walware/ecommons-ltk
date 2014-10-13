@@ -28,7 +28,7 @@ public class FixDocumentPartitioner implements IDocumentPartitioner {
 	
 	private IDocument document;
 	
-	private final List<ITypedRegion> partitions= new ArrayList<ITypedRegion>();
+	private final List<ITypedRegion> partitions= new ArrayList<>();
 	
 	
 	public FixDocumentPartitioner(final String[] contentTypes) {

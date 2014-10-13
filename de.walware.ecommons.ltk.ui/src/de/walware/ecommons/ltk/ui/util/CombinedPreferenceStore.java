@@ -46,7 +46,7 @@ public class CombinedPreferenceStore {
 			return new ScopedPreferenceStore(mainScope, coreQualifier[0]);
 		}
 		
-		final List<IPreferenceStore> stores = new ArrayList<IPreferenceStore>();
+		final List<IPreferenceStore> stores = new ArrayList<>();
 		for (final String qualifier : coreQualifier) {
 			final ScopedPreferenceStore store = new ScopedPreferenceStore(mainScope, qualifier);
 			store.setSearchContexts(contexts);

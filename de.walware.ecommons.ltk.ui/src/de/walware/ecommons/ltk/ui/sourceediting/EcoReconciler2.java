@@ -173,7 +173,7 @@ public class EcoReconciler2 implements IReconciler {
 	/** The current source unit */
 	private ISourceUnit fSourceUnit;
 	
-	private final FastList<StrategyEntry> fStrategies = new FastList<StrategyEntry>(StrategyEntry.class, ListenerList.EQUALITY);
+	private final FastList<StrategyEntry> fStrategies = new FastList<>(StrategyEntry.class, ListenerList.EQUALITY);
 	
 	
 	/**

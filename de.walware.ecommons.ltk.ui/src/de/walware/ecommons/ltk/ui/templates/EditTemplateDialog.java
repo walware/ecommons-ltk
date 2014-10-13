@@ -202,7 +202,7 @@ public class EditTemplateDialog extends ExtStatusDialog {
 				}
 			});
 			fContextCombo.setContentProvider(new ArrayContentProvider());
-			final List<TemplateContextType> contextTypes = new ArrayList<TemplateContextType>();
+			final List<TemplateContextType> contextTypes = new ArrayList<>();
 			for (final Iterator<TemplateContextType> iter = fContextTypeRegistry.contextTypes(); iter.hasNext(); ) {
 				contextTypes.add(iter.next());
 			}

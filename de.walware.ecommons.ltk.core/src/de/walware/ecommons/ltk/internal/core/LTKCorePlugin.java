@@ -65,7 +65,7 @@ public final class LTKCorePlugin extends Plugin {
 	
 	private boolean fStarted;
 	
-	private final List<IDisposable> fDisposables = new ArrayList<IDisposable>();
+	private final List<IDisposable> fDisposables = new ArrayList<>();
 	
 	private ExtContentTypeServices fContentTypeServices;
 	private SourceUnitManager fSourceUnitManager;

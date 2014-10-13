@@ -55,7 +55,7 @@ public class ExtContentTypeServices implements IExtContentTypeManager, IDisposab
 	private static void add(final Map<String, Set<String>> map, final String key, final String value) {
 		Set<String> set = map.get(key);
 		if (set == null) {
-			set = new HashSet<String>();
+			set = new HashSet<>();
 			map.put(key, set);
 		}
 		set.add(value);
@@ -93,11 +93,11 @@ public class ExtContentTypeServices implements IExtContentTypeManager, IDisposab
 	private void load() {
 		final IExtensionRegistry extensionRegistry = Platform.getExtensionRegistry();
 		
-		final Map<String, ModelTypeDescriptor> modelTypes = new HashMap<String, ModelTypeDescriptor>();
+		final Map<String, ModelTypeDescriptor> modelTypes = new HashMap<>();
 		
-		final Map<String, Set<String>> primaryToSecondary = new HashMap<String, Set<String>>();
-		final Map<String, Set<String>> secondaryToPrimary = new HashMap<String, Set<String>>();
-		final Map<String, String> primaryToModel = new HashMap<String, String>();
+		final Map<String, Set<String>> primaryToSecondary = new HashMap<>();
+		final Map<String, Set<String>> secondaryToPrimary = new HashMap<>();
+		final Map<String, String> primaryToModel = new HashMap<>();
 		
 		{	final IConfigurationElement[] elements = extensionRegistry
 					.getConfigurationElementsFor(CONFIG_CONTENTTYPEACTIVATION_EXTENSIONPOINT_ID); 

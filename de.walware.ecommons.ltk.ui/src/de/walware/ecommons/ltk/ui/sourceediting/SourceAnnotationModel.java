@@ -36,7 +36,7 @@ public abstract class SourceAnnotationModel extends ResourceMarkerAnnotationMode
 	protected class ProblemRequestor implements IProblemRequestor {
 		
 		
-		protected final List<IProblem> fReportedProblems = new ArrayList<IProblem>();
+		protected final List<IProblem> fReportedProblems = new ArrayList<>();
 		
 		protected final boolean fHandleTemporaryProblems;
 		
@@ -75,7 +75,7 @@ public abstract class SourceAnnotationModel extends ResourceMarkerAnnotationMode
 	
 	private final AtomicInteger fReportingCounter = new AtomicInteger();
 	
-	private final List<SourceProblemAnnotation> fProblemAnnotations = new ArrayList<SourceProblemAnnotation>();
+	private final List<SourceProblemAnnotation> fProblemAnnotations = new ArrayList<>();
 	
 //	private ReverseMap fReverseMap= new ReverseMap();
 //	private List fPreviouslyOverlaid= null;
@@ -124,7 +124,7 @@ public abstract class SourceAnnotationModel extends ResourceMarkerAnnotationMode
 						if (annotation.getProblem().getCategoryId() == category) {
 							iter.remove();
 							if (toRemove == null) {
-								toRemove = new ArrayList<SourceProblemAnnotation>();
+								toRemove = new ArrayList<>();
 							}
 							toRemove.add(annotation);
 						}

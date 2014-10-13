@@ -122,7 +122,7 @@ public abstract class CommonDeleteProcessor extends DeleteProcessor {
 	public RefactoringParticipant[] loadParticipants(final RefactoringStatus status,
 			final SharableParticipants shared)
 			throws CoreException {
-		final List<RefactoringParticipant> result = new ArrayList<RefactoringParticipant>();
+		final List<RefactoringParticipant> result = new ArrayList<>();
 		fAdapter.addParticipantsToDelete(fElementsToDelete, result, status, this, shared);
 		return result.toArray(new RefactoringParticipant[result.size()]);
 	}
@@ -145,7 +145,7 @@ public abstract class CommonDeleteProcessor extends DeleteProcessor {
 	public Change createChange(final IProgressMonitor monitor) throws CoreException {
 		try {
 			monitor.beginTask(RefactoringMessages.Common_CreateChanges_label, 1);
-			final Map<String, String> arguments = new HashMap<String, String>();
+			final Map<String, String> arguments = new HashMap<>();
 			final String description = (fElementsToDelete.getElementCount() == 1) ? 
 					Messages.DeleteRefactoring_description_singular : Messages.DeleteRefactoring_description_plural;
 			final IProject resource = fElementsToDelete.getSingleProject();

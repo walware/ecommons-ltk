@@ -133,7 +133,7 @@ public abstract class CommonCopyProcessor extends CopyProcessor {
 	public RefactoringParticipant[] loadParticipants(final RefactoringStatus status,
 			final SharableParticipants shared)
 			throws CoreException {
-		final List<RefactoringParticipant> result = new ArrayList<RefactoringParticipant>();
+		final List<RefactoringParticipant> result = new ArrayList<>();
 		fExecutionLog = new ReorgExecutionLog();
 		fAdapter.addParticipantsToCopy(fElementsToCopy, fDestination, result, status, this,
 				shared, fExecutionLog );
@@ -145,7 +145,7 @@ public abstract class CommonCopyProcessor extends CopyProcessor {
 			throws CoreException, OperationCanceledException {
 		try {
 			monitor.beginTask(RefactoringMessages.Common_CreateChanges_label, 1);
-			final Map<String, String> arguments = new HashMap<String, String>();
+			final Map<String, String> arguments = new HashMap<>();
 			final String description = (fElementsToCopy.getElementCount() == 1) ? 
 					Messages.CopyRefactoring_description_singular : Messages.CopyRefactoring_description_plural;
 			final IProject resource = fElementsToCopy.getSingleProject();

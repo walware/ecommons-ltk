@@ -30,7 +30,7 @@ import de.walware.ecommons.ltk.core.model.ISourceUnit;
 public class TextChangeManager {
 	
 	
-	private final Map<ISourceUnit, TextFileChange> fMap = new HashMap<ISourceUnit, TextFileChange>(10);
+	private final Map<ISourceUnit, TextFileChange> fMap = new HashMap<>(10);
 	
 	private final boolean fKeepExecutedTextEdits;
 	

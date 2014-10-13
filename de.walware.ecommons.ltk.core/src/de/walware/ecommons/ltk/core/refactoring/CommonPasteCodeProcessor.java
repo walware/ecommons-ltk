@@ -124,7 +124,7 @@ public abstract class CommonPasteCodeProcessor extends RefactoringProcessor {
 	public RefactoringParticipant[] loadParticipants(final RefactoringStatus status,
 			final SharableParticipants shared)
 			throws CoreException {
-		final List<RefactoringParticipant> result = new ArrayList<RefactoringParticipant>();
+		final List<RefactoringParticipant> result = new ArrayList<>();
 //		fAdapter.addParticipantsTo(fElementsToDelete, result, status, this, shared);
 		return result.toArray(new RefactoringParticipant[result.size()]);
 	}
@@ -133,7 +133,7 @@ public abstract class CommonPasteCodeProcessor extends RefactoringProcessor {
 	public Change createChange(final IProgressMonitor monitor) throws CoreException {
 		try {
 			monitor.beginTask(RefactoringMessages.Common_CreateChanges_label, 1);
-			final Map<String, String> arguments = new HashMap<String, String>();
+			final Map<String, String> arguments = new HashMap<>();
 			final String description = Messages.PasteRefactoring_Code_description;
 			final IProject resource = fDestination.getSingleProject();
 			final String project = (resource != null) ? resource.getName() : null;

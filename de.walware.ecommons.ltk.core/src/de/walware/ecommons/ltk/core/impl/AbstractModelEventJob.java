@@ -54,9 +54,9 @@ public abstract class AbstractModelEventJob<ElementType extends IModelElement, I
 		}
 		
 		@Override
-		public void handleException(final Throwable exception) {
-			LTKCorePlugin.getSafe().log(new Status(IStatus.ERROR, LTK.PLUGIN_ID, -1,
-					"An error occured while notifying an ElementChangedListener.", exception));  //$NON-NLS-1$
+		public void handleException(final Throwable e) {
+			LTKCorePlugin.log(new Status(IStatus.ERROR, LTK.PLUGIN_ID, -1,
+					"An error occured while notifying an ElementChangedListener.", e )); //$NON-NLS-1$
 		}
 		
 	}
@@ -96,8 +96,8 @@ public abstract class AbstractModelEventJob<ElementType extends IModelElement, I
 	private final AbstractModelManager fModelManager;
 	
 	private final Object fTasksLock = new Object();
-	private final LinkedList<IModelElement> fTaskQueue = new LinkedList<IModelElement>();
-	private final HashMap<IModelElement, Task> fTaskDetail = new HashMap<IModelElement, Task>();
+	private final LinkedList<IModelElement> fTaskQueue = new LinkedList<>();
+	private final HashMap<IModelElement, Task> fTaskDetail = new HashMap<>();
 	
 	private boolean fWorking = false;
 	private boolean fStop = false;
@@ -154,8 +154,9 @@ public abstract class AbstractModelEventJob<ElementType extends IModelElement, I
 				task.run();
 			}
 			catch (final Throwable e) {
-				LTKCorePlugin.getSafe().log(new Status(IStatus.ERROR, LTK.PLUGIN_ID, -1,
-						"An error occurred when firing model event for " + fModelManager.getModelTypeId() + ".", e )); //$NON-NLS-1$
+				LTKCorePlugin.log(new Status(IStatus.ERROR, LTK.PLUGIN_ID, -1,
+						"An error occurred when firing model event for " + fModelManager.getModelTypeId() + ".", //$NON-NLS-1$
+						e ));
 			}
 		}
 	}

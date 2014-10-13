@@ -51,7 +51,7 @@ public abstract class SourceEditorViewerConfigurator implements ISettingsChanged
 	
 	private ISourceEditor fSourceEditor;
 	
-	private final List<ISourceEditorAddon> fAddons = new ArrayList<ISourceEditorAddon>();
+	private final List<ISourceEditorAddon> fAddons = new ArrayList<>();
 	private List<ISourceEditorAddon> fConfigurationAddons;
 	
 	protected boolean fIsConfigured;
@@ -199,7 +199,7 @@ public abstract class SourceEditorViewerConfigurator implements ISettingsChanged
 			groupIds = getResetGroupIds();
 		}
 		if (options == null) {
-			options = new HashMap<String, Object>();
+			options = new HashMap<>();
 		}
 		options.put(ISettingsChangedHandler.VIEWER_KEY, viewer);
 		

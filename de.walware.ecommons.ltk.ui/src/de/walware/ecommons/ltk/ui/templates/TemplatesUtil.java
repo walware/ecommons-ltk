@@ -150,7 +150,7 @@ public class TemplatesUtil {
 	}
 	
 	public static List<TextEdit> variablesToPositions(final TemplateVariable[] variables) {
-		final List<TextEdit> positions = new ArrayList<TextEdit>(5);
+		final List<TextEdit> positions = new ArrayList<>(5);
 		for (final TemplateVariable variable : variables) {
 			final int[] offsets = variable.getOffsets();
 			

@@ -40,7 +40,7 @@ public class SpecificContentAssistParameterValues implements IParameterValues {
 	public Map<String, String> getParameterValues() {
 		Map<String, String> map = fParameterValues;
 		if (map == null) {
-			map = new HashMap<String, String>();
+			map = new HashMap<>();
 			
 			final IExtensionRegistry extensionRegistry = Platform.getExtensionRegistry();
 			final IConfigurationElement[] contributions = extensionRegistry.getConfigurationElementsFor(AdvancedExtensionsInternal.CONTENTASSIST_EXTENSIONPOINT_ID);

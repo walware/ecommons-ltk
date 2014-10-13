@@ -715,8 +715,8 @@ public class TreePartitioner implements IDocumentPartitioner,
 		}
 		catch (final Error e) {
 			LTKCorePlugin.log(new Status(IStatus.ERROR, LTKCorePlugin.PLUGIN_ID,
-					"Error in document partition - " + toString()
-					+ "\n==== document content:\n" + this.document.get() + "\n====",
+					"Error in document partition - " + toString() +
+					"\n==== document content:\n" + this.document.get() + "\n====",
 					e ));
 		}
 	}

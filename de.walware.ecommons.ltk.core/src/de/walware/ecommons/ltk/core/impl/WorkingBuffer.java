@@ -198,7 +198,6 @@ public class WorkingBuffer implements IWorkingBuffer {
 					return !store.fetchInfo(EFS.NONE, monitor).getAttribute(EFS.ATTRIBUTE_READ_ONLY);
 				}
 				catch (final CoreException e) {
-					LTKCorePlugin.getSafe();
 					LTKCorePlugin.log(new Status(IStatus.ERROR, LTKCorePlugin.PLUGIN_ID, ICommonStatusConstants.IO_ERROR,
 							"An error occurred when checking modifiable state of the file.", e));
 				}
@@ -267,7 +266,7 @@ public class WorkingBuffer implements IWorkingBuffer {
 		catch (final OperationCanceledException e) {
 		}
 		catch (final CoreException e) {
-			LTKCorePlugin.getSafe().getLog().log(e.getStatus());
+			LTKCorePlugin.log(e.getStatus());
 		}
 	}
 	
@@ -278,7 +277,7 @@ public class WorkingBuffer implements IWorkingBuffer {
 		}
 		else {
 			final Object resource= this.unit.getResource();
-			final AtomicReference<SourceContent> content= new AtomicReference<SourceContent>();
+			final AtomicReference<SourceContent> content= new AtomicReference<>();
 			if (resource instanceof IFile) {
 				loadContentFromFile((IFile) resource, content, progress);
 			}
@@ -304,7 +303,7 @@ public class WorkingBuffer implements IWorkingBuffer {
 		catch (final OperationCanceledException e) {
 		}
 		catch (final CoreException e) {
-			LTKCorePlugin.getSafe().getLog().log(e.getStatus());
+			LTKCorePlugin.log(e.getStatus());
 		}
 	}
 	

@@ -82,7 +82,7 @@ public final class TemplateVariableProcessor implements IContentAssistProcessor 
 		if (fContextType == null) {
 			return null;
 		}
-		final List<TemplateVariableProposal> proposals = new ArrayList<TemplateVariableProposal>();
+		final List<TemplateVariableProposal> proposals = new ArrayList<>();
 		
 		final String text = viewer.getDocument().get();
 		final int start = getStart(text, documentOffset);

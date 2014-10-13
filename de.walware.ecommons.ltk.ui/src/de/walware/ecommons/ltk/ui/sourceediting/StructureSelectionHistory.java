@@ -37,12 +37,12 @@ public class StructureSelectionHistory {
 	private final ISelectionChangedListener fSelectionListener;
 	private int fSelectionChangeListenerCounter;
 	
-	private final FastList<IUpdate> fUpdateActions = new FastList<IUpdate>(IUpdate.class);
+	private final FastList<IUpdate> fUpdateActions = new FastList<>(IUpdate.class);
 	
 	
 	public StructureSelectionHistory(final ISourceEditor editor) {
 		fSourceEditor = editor;
-		fHistory = new ArrayList<IRegion>();
+		fHistory = new ArrayList<>();
 		fSelectionListener = new ISelectionChangedListener() {
 			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {

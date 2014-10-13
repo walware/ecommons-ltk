@@ -23,7 +23,7 @@ public class ModelTypeDescriptor implements IModelTypeDescriptor {
 	
 	private final String id;
 	
-	List<String> secondaryTypeIds = new ArrayList<String>(1);
+	List<String> secondaryTypeIds = new ArrayList<>(1);
 	List<String> checkedSecondaryTypeIds;
 	
 	

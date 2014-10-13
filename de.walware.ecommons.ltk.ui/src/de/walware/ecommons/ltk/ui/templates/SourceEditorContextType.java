@@ -221,7 +221,7 @@ public class SourceEditorContextType extends TemplateContextType {
 		
 		final IDocument document= new Document(buffer.getString());
 		final List<TextEdit> positions = TemplatesUtil.variablesToPositions(variables);
-		final List<TextEdit> edits= new ArrayList<TextEdit>(5);
+		final List<TextEdit> edits= new ArrayList<>(5);
 		
 		
 		// iterate over all variables and try to resolve them
