@@ -257,4 +257,10 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 		return this.from.getAdapter(required);
 	}
 	
+	
+	@Override
+	public String toString() {
+		return getModelTypeId() + '/' + getWorkingContext() + ": " + getId(); //$NON-NLS-1$
+	}
+	
 }

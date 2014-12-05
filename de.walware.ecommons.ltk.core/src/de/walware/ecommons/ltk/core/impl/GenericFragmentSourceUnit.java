@@ -267,4 +267,10 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	protected void unregister() {
 	}
 	
+	
+	@Override
+	public String toString() {
+		return getModelTypeId() + '/' + getWorkingContext() + ": " + getId(); //$NON-NLS-1$
+	}
+	
 }
