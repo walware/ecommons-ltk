@@ -44,6 +44,7 @@ import de.walware.ecommons.preferences.Preference;
 import de.walware.ecommons.preferences.Preference.BooleanPref;
 import de.walware.ecommons.preferences.Preference.IntPref;
 import de.walware.ecommons.preferences.ui.ColorSelectorObservableValue;
+import de.walware.ecommons.preferences.ui.ConfigurationBlock;
 import de.walware.ecommons.preferences.ui.ConfigurationBlockPreferencePage;
 import de.walware.ecommons.preferences.ui.ManagedConfigurationBlock;
 import de.walware.ecommons.preferences.ui.RGBPref;
@@ -53,7 +54,7 @@ import de.walware.ecommons.ui.util.LayoutUtil;
 import de.walware.ecommons.ltk.ui.LTKUIPreferences;
 
 
-public class EditorsPreferencePage extends ConfigurationBlockPreferencePage<EditorsConfigurationBlock> {
+public class EditorsPreferencePage extends ConfigurationBlockPreferencePage {
 	
 	
 	public EditorsPreferencePage() {
@@ -61,7 +62,7 @@ public class EditorsPreferencePage extends ConfigurationBlockPreferencePage<Edit
 	
 	
 	@Override
-	protected EditorsConfigurationBlock createConfigurationBlock() {
+	protected ConfigurationBlock createConfigurationBlock() {
 		return new EditorsConfigurationBlock(createStatusChangedListener());
 	}
 	
