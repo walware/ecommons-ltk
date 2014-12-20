@@ -43,5 +43,8 @@ public interface ISourceUnitManager {
 			boolean create, IProgressMonitor monitor);
 	
 	List<ISourceUnit> getOpenSourceUnits(String modelTypeId, WorkingContext context);
+	List<ISourceUnit> getOpenSourceUnits(List<String> modelTypeIds, WorkingContext context);
+	List<ISourceUnit> getOpenSourceUnits(List<String> modelTypeIds, WorkingContext context,
+			Object from);
 	
 }

@@ -27,9 +27,10 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.osgi.util.NLS;
 
-import de.walware.ecommons.FastList;
 import de.walware.ecommons.ICommonStatusConstants;
 import de.walware.ecommons.IDisposable;
+import de.walware.ecommons.collections.ImCollections;
+import de.walware.ecommons.collections.ImList;
 
 import de.walware.ecommons.ltk.ISourceUnitFactory;
 import de.walware.ecommons.ltk.ISourceUnitManager;
@@ -42,8 +43,8 @@ import de.walware.ecommons.ltk.core.model.ISourceUnit;
 public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 	
 	
-	private static final String CONFIG_MODELTYPE_ID_ATTRIBUTE_NAME = "modelTypeId"; //$NON-NLS-1$
-	private static final String CONFIG_CONTEXT_KEY_ATTRIBUTE_NAME = "contextKey"; //$NON-NLS-1$
+	private static final String CONFIG_MODELTYPE_ID_ATTRIBUTE_NAME= "modelTypeId"; //$NON-NLS-1$
+	private static final String CONFIG_CONTEXT_KEY_ATTRIBUTE_NAME= "contextKey"; //$NON-NLS-1$
 	
 	
 	private static final class SuItem extends SoftReference<ISourceUnit> {
@@ -52,7 +53,7 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 		
 		public SuItem(final String key, final ISourceUnit su, final ReferenceQueue<ISourceUnit> queue) {
 			super(su);
-			this.key = key;
+			this.key= key;
 		}
 		
 		public String getKey() {
@@ -60,7 +61,7 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 		}
 		
 		public void dispose() {
-			final ISourceUnit su = get();
+			final ISourceUnit su= get();
 			if (su != null && su.isConnected()) {
 				LTKCorePlugin.log(
 						new Status(IStatus.WARNING, LTKCorePlugin.PLUGIN_ID, -1,
@@ -79,10 +80,10 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 		private final ReferenceQueue<ISourceUnit> susToClean;
 		
 		public ContextItem(final WorkingContext context, final ISourceUnitFactory factory) {
-			this.context = context;
-			this.factory = factory;
-			this.sus = new HashMap<>();
-			this.susToClean = new ReferenceQueue<>();
+			this.context= context;
+			this.factory= factory;
+			this.sus= new HashMap<>();
+			this.susToClean= new ReferenceQueue<>();
 		}
 		
 		@Override
@@ -98,6 +99,32 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 			return false;
 		}
 		
+		
+		public synchronized ISourceUnit getOpenSu(final Object from) {
+			final String id= this.factory.createId(from);
+			if (id != null) {
+				final SuItem suItem= this.sus.get(id);
+				if (suItem != null) {
+					final ISourceUnit su= suItem.get();
+					if (su != null && !suItem.isEnqueued()) {
+						return su;
+					}
+				}
+			}
+			return null;
+		}
+		
+		public synchronized void appendOpenSus(final ArrayList<ISourceUnit> list) {
+			final Collection<SuItem> suItems= this.sus.values();
+			list.ensureCapacity(list.size() + suItems.size());
+			for (final SuItem suItem : suItems) {
+				final ISourceUnit su= suItem.get();
+				if (su != null && !suItem.isEnqueued()) {
+					list.add(su);
+				}
+			}
+		}
+		
 	}
 	
 	private static class ModelItem {
@@ -105,49 +132,49 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 		
 		private final String modelTypeId;
 		
-		private final FastList<ContextItem> contexts = new FastList<>(ContextItem.class, FastList.IDENTITY);
+		private volatile ImList<ContextItem> contextItems= ImCollections.newList();
 		
 		
 		public ModelItem(final String modelTypeId) {
-			this.modelTypeId = modelTypeId;
+			this.modelTypeId= modelTypeId;
 		}
 		
 		public ContextItem getContextItem(final WorkingContext context, final boolean create) {
-			final ContextItem[] contextItems = this.contexts.toArray();
-			for (int i = 0; i < contextItems.length; i++) {
-				if (contextItems[i].context == context) {
-					return contextItems[i];
+			final ImList<ContextItem> contextItems= this.contextItems;
+			for (final ContextItem contextItem : contextItems) {
+				if (contextItem.context == context) {
+					return contextItem;
 				}
 			}
 			if (create) {
-				synchronized (this.contexts) {
-					if (contextItems != this.contexts.toArray()) {
+				synchronized (this) {
+					if (contextItems != this.contextItems) {
 						return getContextItem(context, true);
 					}
 					try {
-						final IConfigurationElement[] elements = Platform.getExtensionRegistry().
+						final IConfigurationElement[] elements= Platform.getExtensionRegistry().
 								getConfigurationElementsFor("de.walware.ecommons.ltk.modelTypes"); //$NON-NLS-1$
-						IConfigurationElement matchingElement = null;
+						IConfigurationElement matchingElement= null;
 						for (final IConfigurationElement element : elements) {
 							if (element.getName().equals("unitType") && element.isValid()) { //$NON-NLS-1$
-								final String typeIdOfElement = element.getAttribute(CONFIG_MODELTYPE_ID_ATTRIBUTE_NAME);
-								final String contextKeyOfElement = element.getAttribute(CONFIG_CONTEXT_KEY_ATTRIBUTE_NAME);
+								final String typeIdOfElement= element.getAttribute(CONFIG_MODELTYPE_ID_ATTRIBUTE_NAME);
+								final String contextKeyOfElement= element.getAttribute(CONFIG_CONTEXT_KEY_ATTRIBUTE_NAME);
 								if (this.modelTypeId.equals(typeIdOfElement)) {
 									if ((contextKeyOfElement == null) || (contextKeyOfElement.length() == 0)) {
-										matchingElement = element;
+										matchingElement= element;
 										continue;
 									}
 									if (contextKeyOfElement.equals(context.getKey())) {
-										matchingElement = element;
+										matchingElement= element;
 										break;
 									}
 								}
 							}
 						}
 						if (matchingElement != null) {
-							final ISourceUnitFactory factory = (ISourceUnitFactory) matchingElement.createExecutableExtension("unitFactory"); //$NON-NLS-1$
-							final ContextItem contextItem = new ContextItem(context, factory);
-							this.contexts.add(contextItem);
+							final ISourceUnitFactory factory= (ISourceUnitFactory) matchingElement.createExecutableExtension("unitFactory"); //$NON-NLS-1$
+							final ContextItem contextItem= new ContextItem(context, factory);
+							this.contextItems= ImCollections.concatList(contextItems, contextItem);
 							return contextItem;
 						}
 					}
@@ -158,6 +185,21 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 				}
 			}
 			return null;
+		}
+		
+		public ImList<ContextItem> getOpenContextItems(final WorkingContext context) {
+			final ImList<ContextItem> contextItems= this.contextItems;
+			if (context != null) {
+				for (final ContextItem contextItem : contextItems) {
+					if (contextItem.context == context) {
+						return ImCollections.newList(contextItem);
+					}
+				}
+				return ImCollections.emptyList();
+			}
+			else {
+				return contextItems;
+			}
 		}
 		
 		@Override
@@ -175,7 +217,7 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 	
 	private class CleanupJob extends Job {
 		
-		private final Object scheduleLock = new Object();
+		private final Object scheduleLock= new Object();
 		
 		public CleanupJob() {
 			super("SourceUnit Cleanup"); //$NON-NLS-1$
@@ -198,7 +240,7 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 		
 		@Override
 		protected IStatus run(final IProgressMonitor monitor) {
-			final int count = performCleanup();
+			final int count= performCleanup();
 			
 			synchronized (this.scheduleLock) {
 				if (monitor.isCanceled()) {
@@ -214,9 +256,9 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 	}
 	
 	
-	private final CleanupJob cleanupJob = new CleanupJob();
+	private final CleanupJob cleanupJob= new CleanupJob();
 	
-	private final FastList<ModelItem> modelItems = new FastList<>(ModelItem.class, FastList.IDENTITY);
+	private volatile ImList<ModelItem> modelItems= ImCollections.newList();
 	
 	
 	public SourceUnitManager() {
@@ -225,14 +267,13 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 	
 	
 	private int performCleanup() {
-		int count = 0;
-		final ModelItem[] modelItems = this.modelItems.toArray();
-		for (int i = 0; i < modelItems.length; i++) {
-			final ContextItem[] contextItems = modelItems[i].contexts.toArray();
-			for (int j = 0; j < contextItems.length; j++) {
-				final ContextItem contextItem = contextItems[j];
+		int count= 0;
+		final ImList<ModelItem> modelItems= this.modelItems;
+		for (final ModelItem modelItem : modelItems) {
+			final List<ContextItem> contextItems= modelItem.contextItems;
+			for (final ContextItem contextItem : contextItems) {
 				SuItem suItem;
-				while ((suItem = (SuItem) contextItem.susToClean.poll()) != null){
+				while ((suItem= (SuItem) contextItem.susToClean.poll()) != null){
 					synchronized (contextItem.sus) {
 						if (contextItem.sus.get(suItem.getKey()) == suItem) {
 							contextItem.sus.remove(suItem.getKey());
@@ -252,44 +293,44 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 	}
 	
 	@Override
-	public ISourceUnit getSourceUnit(String modelTypeId, final WorkingContext context, final Object from,
-			final boolean create, final IProgressMonitor monitor) {
+	public ISourceUnit getSourceUnit(String modelTypeId, final WorkingContext context,
+			final Object from, final boolean create, final IProgressMonitor monitor) {
 		if (context == null) {
 			throw new NullPointerException("Missing working context."); //$NON-NLS-1$
 		}
-		final ISourceUnit fromUnit = (from instanceof ISourceUnit) ? ((ISourceUnit) from) : null;
+		final ISourceUnit fromUnit= (from instanceof ISourceUnit) ? ((ISourceUnit) from) : null;
 		if (modelTypeId == null) {
 			if (fromUnit != null) {
-				modelTypeId = fromUnit.getModelTypeId();
+				modelTypeId= fromUnit.getModelTypeId();
 			}
 			else {
 				throw new IllegalArgumentException("Missing model type."); //$NON-NLS-1$
 			}
 		}
 		
-		final ModelItem modelItem = getModelItem(modelTypeId);
-		final ContextItem contextItem = modelItem.getContextItem(context, create);
-		ISourceUnit su = null;
+		final ModelItem modelItem= getModelItem(modelTypeId);
+		final ContextItem contextItem= modelItem.getContextItem(context, create);
+		ISourceUnit su= null;
 		if (contextItem != null) {
-			final String id = (fromUnit != null) ? fromUnit.getId() : contextItem.factory.createId(from);
+			final String id= (fromUnit != null) ? fromUnit.getId() : contextItem.factory.createId(from);
 			if (id != null) {
 				synchronized (contextItem) {
-					SuItem suItem = contextItem.sus.get(id);
+					SuItem suItem= contextItem.sus.get(id);
 					if (suItem != null) {
-						su = suItem.get();
+						su= suItem.get();
 						if (suItem.isEnqueued()) {
-							su = null;
+							su= null;
 						}
 					}
 					else {
 						if (create) {
-							su = contextItem.factory.createSourceUnit(id, from);
+							su= contextItem.factory.createSourceUnit(id, from);
 							if (su == null || !su.getModelTypeId().equals(modelItem.modelTypeId)
 									|| (su.getElementType() & IModelElement.MASK_C1) != IModelElement.C1_SOURCE) {
 								// TODO log
 								return null; 
 							}
-							suItem = new SuItem(id, su, contextItem.susToClean);
+							suItem= new SuItem(id, su, contextItem.susToClean);
 						}
 						else {
 							return null;
@@ -315,72 +356,123 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 	}
 	
 	@Override
-	public List<ISourceUnit> getOpenSourceUnits(final String modelTypeId, final WorkingContext context) {
-		ModelItem[] includedModelItems = null;
-		final ModelItem[] modelItems = this.modelItems.toArray();
-		if (modelTypeId != null) {
-			for (int i = 0; i < modelItems.length; i++) {
-				if (modelItems[i].modelTypeId == modelTypeId) {
-					includedModelItems = new ModelItem[] { modelItems[i] };
-					break;
-				}
-			}
-		}
-		else {
-			includedModelItems = modelItems;
-		}
-		if (includedModelItems == null || includedModelItems.length == 0) {
+	public List<ISourceUnit> getOpenSourceUnits(final String modelTypeId,
+			final WorkingContext context) {
+		final List<ModelItem> modelItems= getOpenModelItems(modelTypeId);
+		if (modelItems.isEmpty()) {
 			return Collections.emptyList();
 		}
-		final ArrayList<ISourceUnit> list = new ArrayList<>();
-		for (int i = 0; i < includedModelItems.length; i++) {
-			ContextItem[] includedContextItems = null;
-			final ContextItem[] contextItems = includedModelItems[i].contexts.toArray();
-			if (context != null) {
-				for (int j = 0; j < contextItems.length; j++) {
-					if (contextItems[j].context == context) {
-						includedContextItems = new ContextItem[] { contextItems[j] };
-						break;
-					}
-				}
-			}
-			else {
-				includedContextItems = contextItems;
-			}
-			if (includedContextItems == null || includedContextItems.length == 0) {
+		
+		final ArrayList<ISourceUnit> list= new ArrayList<>();
+		
+		for (int i= 0; i < modelItems.size(); i++) {
+			final ImList<ContextItem> contextItems= modelItems.get(i).getOpenContextItems(context);
+			if (contextItems.isEmpty()) {
 				continue;
 			}
-			for (int j = 0; j < contextItems.length; j++) {
-				final ContextItem contextItem = contextItems[j];
-				synchronized (contextItem) {
-					final Collection<SuItem> suItems = contextItem.sus.values();
-					list.ensureCapacity(list.size()+suItems.size());
-					for (final SuItem suItem : suItems) {
-						final ISourceUnit su = suItem.get();
-						if (su != null && su.isConnected() && !suItem.isEnqueued()) {
-							list.add(su);
-						}
-					}
+			
+			for (final ContextItem contextItem : contextItems) {
+				contextItem.appendOpenSus(list);
+			}
+		}
+		return list;
+	}
+	
+	@Override
+	public List<ISourceUnit> getOpenSourceUnits(final List<String> modelTypeIds,
+			final WorkingContext context) {
+		final List<ModelItem> includedModelItems= getOpenModelItems(modelTypeIds);
+		if (includedModelItems.isEmpty()) {
+			return Collections.emptyList();
+		}
+		
+		final ArrayList<ISourceUnit> list= new ArrayList<>(4);
+		
+		for (int i= 0; i < includedModelItems.size(); i++) {
+			final ImList<ContextItem> contextItems= this.modelItems.get(i).getOpenContextItems(context);
+			if (contextItems.isEmpty()) {
+				continue;
+			}
+			
+			for (final ContextItem contextItem : contextItems) {
+				contextItem.appendOpenSus(list);
+			}
+		}
+		return list;
+	}
+	
+	@Override
+	public List<ISourceUnit> getOpenSourceUnits(final List<String> modelTypeIds,
+			final WorkingContext context, final Object from) {
+		final List<ModelItem> includedModelItems= getOpenModelItems(modelTypeIds);
+		if (includedModelItems.isEmpty()) {
+			return Collections.emptyList();
+		}
+		
+		final ArrayList<ISourceUnit> list= new ArrayList<>(4);
+		
+		for (int i= 0; i < includedModelItems.size(); i++) {
+			final ImList<ContextItem> contextItems= this.modelItems.get(i).getOpenContextItems(context);
+			if (contextItems.isEmpty()) {
+				continue;
+			}
+			
+			for (final ContextItem contextItem : contextItems) {
+				final ISourceUnit su= contextItem.getOpenSu(from);
+				if (su != null) {
+					list.add(su);
 				}
 			}
 		}
 		return list;
 	}
 	
+	
 	private ModelItem getModelItem(final String modelTypeId) {
-		final ModelItem[] modelItems = this.modelItems.toArray();
-		for (int i = 0; i < modelItems.length; i++) {
-			if (modelItems[i].modelTypeId == modelTypeId) {
-				return modelItems[i];
+		final ImList<ModelItem> modelItems= this.modelItems;
+		for (final ModelItem modelItem : modelItems) {
+			if (modelItem.modelTypeId == modelTypeId) {
+				return modelItem;
 			}
 		}
-		synchronized (this.modelItems) {
-			if (modelItems != this.modelItems.toArray()) {
+		synchronized (this) {
+			if (modelItems != this.modelItems) {
 				return getModelItem(modelTypeId);
 			}
-			final ModelItem modelItem = new ModelItem(modelTypeId);
-			this.modelItems.add(modelItem);
+			final ModelItem modelItem= new ModelItem(modelTypeId);
+			this.modelItems= ImCollections.concatList(modelItems, modelItem);
 			return modelItem;
+		}
+	}
+	
+	private List<ModelItem> getOpenModelItems(final String modelTypeId) {
+		final ImList<ModelItem> modelItems= this.modelItems;
+		if (modelTypeId != null) {
+			for (final ModelItem modelItem : modelItems) {
+				if (modelItem.modelTypeId == modelTypeId) {
+					return ImCollections.newList(modelItem);
+				}
+			}
+			return ImCollections.emptyList();
+		}
+		else {
+			return modelItems;
+		}
+	}
+	
+	private List<ModelItem> getOpenModelItems(final List<String> modelTypeIds) {
+		final ImList<ModelItem> modelItems= this.modelItems;
+		if (modelTypeIds != null) {
+			final List<ModelItem> matches= new ArrayList<>(modelTypeIds.size());
+			for (final ModelItem modelItem : modelItems) {
+				if (modelTypeIds.contains(modelItem.modelTypeId)) {
+					matches.add(modelItem);
+				}
+			}
+			return matches;
+		}
+		else {
+			return modelItems;
 		}
 	}
 	
