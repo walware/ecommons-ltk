@@ -22,13 +22,14 @@ import de.walware.ecommons.ltk.core.model.ISourceUnit;
  */
 public interface IModelManager {
 	
-	int NONE =                                              0x00000000;
+	int NONE =                                              0x00_00_00_00;
 	
-	int AST =                                               0x00000001;
-	int MODEL_FILE =                                        0x00000002;
-	int MODEL_DEPENDENCIES =                                0x00000003;
+	int AST=                                                0x00_00_00_01;
+	int MODEL_FILE=                                         0x00_00_00_02;
+	int MODEL_DEPENDENCIES=                                 0x00_00_00_03;
 	
-	int RECONCILER =                                        0x10000000; 
+	int REFRESH=                                            0x01_00_00_00;
+	int RECONCILE=                                          0x02_00_00_00;
 	
 	
 	/**
@@ -42,7 +43,6 @@ public interface IModelManager {
 	void registerDependentUnit(ISourceUnit su);
 	void deregisterDependentUnit(ISourceUnit su);
 	
-	void reconcile(SourceUnitModelContainer<?, ?> adapter, int level,
-			IProgressMonitor monitor);
+	void reconcile(SourceUnitModelContainer<?, ?> adapter, int level, IProgressMonitor monitor);
 	
 }

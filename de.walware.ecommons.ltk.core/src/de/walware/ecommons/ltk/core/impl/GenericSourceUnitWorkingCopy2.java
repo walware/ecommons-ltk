@@ -39,6 +39,7 @@ public abstract class GenericSourceUnitWorkingCopy2<M extends SourceUnitModelCon
 		this.model= createModelContainer();
 	}
 	
+	
 	protected abstract M createModelContainer();
 	
 	protected final M getModelContainer() {
@@ -63,10 +64,10 @@ public abstract class GenericSourceUnitWorkingCopy2<M extends SourceUnitModelCon
 	}
 	
 	@Override
-	public ISourceUnitModelInfo getModelInfo(final String type, final int syncLevel,
+	public ISourceUnitModelInfo getModelInfo(final String type, final int flags,
 			final IProgressMonitor monitor) {
 		if (type == null || this.model.isContainerFor(type)) {
-			return this.model.getModelInfo(syncLevel, monitor);
+			return this.model.getModelInfo(flags, monitor);
 		}
 		return null;
 	}
@@ -77,12 +78,6 @@ public abstract class GenericSourceUnitWorkingCopy2<M extends SourceUnitModelCon
 			return this.model;
 		}
 		return super.getAdapter(required);
-	}
-	
-	
-	@Override
-	public String toString() {
-		return getModelTypeId() + '/' + getWorkingContext() + ": " + getId(); //$NON-NLS-1$
 	}
 	
 }

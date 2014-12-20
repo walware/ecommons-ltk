@@ -57,7 +57,7 @@ public abstract class GenericResourceSourceUnit implements IWorkspaceSourceUnit 
 	
 	public GenericResourceSourceUnit(final String id, final IFile file) {
 		if (file == null) {
-			throw new NullPointerException();
+			throw new NullPointerException("file"); //$NON-NLS-1$
 		}
 		this.id= id;
 		this.file= file;

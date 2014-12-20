@@ -61,20 +61,23 @@ public abstract class AbstractModelManager implements IModelManager {
 		
 		private final List<ISourceUnit> list;
 		
+		private final int flags;
 		
-		public RefreshJob(final WorkingContext context) {
+		
+		public RefreshJob(final WorkingContext context, final int flags) {
 			super("Model Refresh"); //$NON-NLS-1$
 			setUser(false);
 			setSystem(true);
 			setPriority(DECORATE);
 			
 			this.list= LTK.getSourceUnitManager().getOpenSourceUnits(AbstractModelManager.this.typeId, context);
+			this.flags= flags;
 		}
 		
 		@Override
 		protected IStatus run(final IProgressMonitor monitor) {
 			for (final ISourceUnit su : this.list) {
-				reconcile(su, (IModelManager.MODEL_FILE | IModelManager.RECONCILER), monitor);
+				su.getModelInfo(null, this.flags, monitor);
 			}
 			return Status.OK_STATUS;
 		}
@@ -150,7 +153,7 @@ public abstract class AbstractModelManager implements IModelManager {
 	 */
 	@Override
 	public void refresh(final WorkingContext context) {
-		new RefreshJob(context).schedule();
+		new RefreshJob(context, (MODEL_DEPENDENCIES | RECONCILE)).schedule();
 	}
 	
 	@Override
@@ -160,8 +163,5 @@ public abstract class AbstractModelManager implements IModelManager {
 	@Override
 	public void deregisterDependentUnit(final ISourceUnit su) {
 	}
-	
-	
-	protected abstract void reconcile(ISourceUnit su, int level, IProgressMonitor monitor);
 	
 }

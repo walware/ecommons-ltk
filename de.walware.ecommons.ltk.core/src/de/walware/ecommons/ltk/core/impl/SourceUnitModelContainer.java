@@ -75,9 +75,13 @@ public abstract class SourceUnitModelContainer<U extends ISourceUnit, M extends 
 	}
 	
 	public M getModelInfo(final int syncLevel, final IProgressMonitor monitor) {
+		if ((syncLevel & IModelManager.REFRESH) != 0) {
+			clear();
+		}
 		if ((syncLevel & 0xf) >= IModelManager.MODEL_FILE) {
 			final M currentModel= this.modelInfo;
-			if (currentModel == null
+			if ((syncLevel & IModelManager.RECONCILE) != 0
+					|| currentModel == null
 					|| currentModel.getStamp() == 0
 					|| currentModel.getStamp() != this.unit.getContentStamp(monitor)) {
 				getModelManager().reconcile(this, syncLevel, monitor);

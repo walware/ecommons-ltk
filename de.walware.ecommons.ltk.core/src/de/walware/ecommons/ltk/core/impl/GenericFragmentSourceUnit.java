@@ -32,43 +32,43 @@ import de.walware.ecommons.ltk.core.model.ISourceUnitModelInfo;
 public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	
 	
-	private final IElementName fName;
+	private final IElementName name;
 	
-	private final ISourceFragment fFragment;
-	private final long fTimestamp;
+	private final ISourceFragment fragment;
+	private final long timestamp;
 	
-	private AbstractDocument fDocument;
+	private AbstractDocument document;
 	
-	private int fCounter = 0;
+	private int counter= 0;
 	
 	
 	public GenericFragmentSourceUnit(final String id, final ISourceFragment fragment) {
-		fFragment = fragment;
-		fName = new IElementName() {
+		if (fragment == null) {
+			throw new NullPointerException("fragment"); //$NON-NLS-1$
+		}
+		this.fragment = fragment;
+		this.name = new IElementName() {
 			@Override
 			public int getType() {
 				return 0x011;
 			}
 			@Override
 			public String getDisplayName() {
-				return fFragment.getName();
+				return GenericFragmentSourceUnit.this.fragment.getName();
 			}
 			@Override
 			public String getSegmentName() {
-				return fFragment.getName();
+				return GenericFragmentSourceUnit.this.fragment.getName();
 			}
 			@Override
 			public IElementName getNextSegment() {
 				return null;
 			}
 		};
-		fTimestamp = System.currentTimeMillis();
+		this.timestamp = System.currentTimeMillis();
 	}
 	
 	
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public ISourceUnit getUnderlyingUnit() {
 		return null;
@@ -81,11 +81,11 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	
 	@Override
 	public String getId() {
-		return fFragment.getId();
+		return this.fragment.getId();
 	}
 	
 	public ISourceFragment getFragment() {
-		return fFragment;
+		return this.fragment;
 	}
 	
 	/**
@@ -104,7 +104,7 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	 */
 	@Override
 	public IElementName getElementName() {
-		return fName;
+		return this.name;
 	}
 	
 	/**
@@ -112,7 +112,7 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	 */
 	@Override
 	public boolean exists() {
-		return fCounter > 0;
+		return this.counter > 0;
 	}
 	
 	/**
@@ -145,10 +145,10 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	 */
 	@Override
 	public synchronized AbstractDocument getDocument(final IProgressMonitor monitor) {
-		if (fDocument == null) {
-			fDocument = fFragment.getDocument();
+		if (this.document == null) {
+			this.document = this.fragment.getDocument();
 		}
-		return fDocument;
+		return this.document;
 	}
 	
 	/**
@@ -156,7 +156,7 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	 */
 	@Override
 	public long getContentStamp(final IProgressMonitor monitor) {
-		return fTimestamp;
+		return this.timestamp;
 	}
 	
 	/**
@@ -170,7 +170,7 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 			lockObject = ((ISynchronizable) document).getLockObject();
 		}
 		if (lockObject == null) {
-			lockObject = fFragment;
+			lockObject = this.fragment;
 		}
 		synchronized (lockObject) {
 			return new SourceContent(document.getModificationStamp(), document.get());
@@ -183,7 +183,7 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	@Override
 	public Object getAdapter(final Class required) {
 		if (ISourceFragment.class.equals(required)) {
-			return fFragment;
+			return this.fragment;
 		}
 		return null;
 	}
@@ -235,8 +235,8 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	 */
 	@Override
 	public synchronized final void connect(final IProgressMonitor monitor) {
-		fCounter++;
-		if (fCounter == 1) {
+		this.counter++;
+		if (this.counter == 1) {
 			final SubMonitor progress = SubMonitor.convert(monitor, 1);
 			register();
 		}
@@ -247,8 +247,8 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	 */
 	@Override
 	public synchronized final void disconnect(final IProgressMonitor monitor) {
-		fCounter--;
-		if (fCounter == 0) {
+		this.counter--;
+		if (this.counter == 0) {
 			unregister();
 		}
 	}
@@ -258,7 +258,7 @@ public abstract class GenericFragmentSourceUnit implements ISourceUnit {
 	 */
 	@Override
 	public synchronized boolean isConnected() {
-		return (fCounter > 0);
+		return (this.counter > 0);
 	}
 	
 	protected void register() {

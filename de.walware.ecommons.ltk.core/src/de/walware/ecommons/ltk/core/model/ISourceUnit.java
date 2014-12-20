@@ -126,7 +126,7 @@ public interface ISourceUnit extends IModelElement, IAdaptable {
 	
 	AstInfo getAstInfo(String type, boolean ensureSync, IProgressMonitor monitor);
 	
-	ISourceUnitModelInfo getModelInfo(String type, int syncLevel, IProgressMonitor monitor);
+	ISourceUnitModelInfo getModelInfo(String type, int flags, IProgressMonitor monitor);
 	
 	void connect(IProgressMonitor monitor);
 	void disconnect(IProgressMonitor monitor);

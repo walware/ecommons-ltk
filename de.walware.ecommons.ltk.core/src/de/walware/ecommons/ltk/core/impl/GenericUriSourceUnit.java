@@ -33,36 +33,39 @@ import de.walware.ecommons.ltk.core.model.ISourceUnitModelInfo;
 public abstract class GenericUriSourceUnit implements ISourceUnit {
 	
 	
-	private final String fId;
-	private final IElementName fName;
+	private final String id;
+	private final IElementName name;
 	
-	private final IFileStore fStore;
-	private IWorkingBuffer fBuffer;
+	private final IFileStore fileStore;
+	private IWorkingBuffer buffer;
 	
-	private int fCounter = 0;
+	private int counter= 0;
 	
 	
-	public GenericUriSourceUnit(final String id, final IFileStore store) {
-		fId = id;
-		fName = new IElementName() {
+	public GenericUriSourceUnit(final String id, final IFileStore fileStore) {
+		if (fileStore == null) {
+			throw new NullPointerException("fileStore"); //$NON-NLS-1$
+		}
+		this.id= id;
+		this.name= new IElementName() {
 			@Override
 			public int getType() {
 				return 0x011; // see RElementName
 			}
 			@Override
 			public String getDisplayName() {
-				return fStore.toString();
+				return GenericUriSourceUnit.this.fileStore.toString();
 			}
 			@Override
 			public String getSegmentName() {
-				return fId;
+				return GenericUriSourceUnit.this.id;
 			}
 			@Override
 			public IElementName getNextSegment() {
 				return null;
 			}
 		};
-		fStore = store;
+		this.fileStore= fileStore;
 	}
 	
 	
@@ -76,7 +79,7 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	
 	@Override
 	public boolean isSynchronized() {
-		return fBuffer.isSynchronized();
+		return this.buffer.isSynchronized();
 	}
 	
 	/**
@@ -84,7 +87,7 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	 */
 	@Override
 	public String getId() {
-		return fId;
+		return this.id;
 	}
 	
 	/**
@@ -103,7 +106,7 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	 */
 	@Override
 	public IElementName getElementName() {
-		return fName;
+		return this.name;
 	}
 	
 	/**
@@ -111,7 +114,7 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	 */
 	@Override
 	public boolean exists() {
-		return fCounter > 0;
+		return this.counter > 0;
 	}
 	
 	/**
@@ -124,7 +127,7 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	
 	@Override
 	public boolean checkState(final boolean validate, final IProgressMonitor monitor) {
-		return fBuffer.checkState(validate, monitor);
+		return this.buffer.checkState(validate, monitor);
 	}
 	
 	
@@ -135,7 +138,7 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	 */
 	@Override
 	public Object getResource() {
-		return fStore;
+		return this.fileStore;
 	}
 	
 	
@@ -144,7 +147,7 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	 */
 	@Override
 	public AbstractDocument getDocument(final IProgressMonitor monitor) {
-		return fBuffer.getDocument(monitor);
+		return this.buffer.getDocument(monitor);
 	}
 	
 	/**
@@ -152,7 +155,7 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	 */
 	@Override
 	public long getContentStamp(final IProgressMonitor monitor) {
-		return fBuffer.getContentStamp(monitor);
+		return this.buffer.getContentStamp(monitor);
 	}
 	
 	/**
@@ -160,7 +163,7 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	 */
 	@Override
 	public SourceContent getContent(final IProgressMonitor monitor) {
-		return fBuffer.getContent(monitor);
+		return this.buffer.getContent(monitor);
 	}
 	
 	/**
@@ -169,7 +172,7 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	@Override
 	public Object getAdapter(final Class required) {
 		if (IFileStore.class.equals(required)) {
-			return fStore;
+			return this.fileStore;
 		}
 		return null;
 	}
@@ -221,12 +224,12 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	 */
 	@Override
 	public synchronized final void connect(final IProgressMonitor monitor) {
-		fCounter++;
-		if (fCounter == 1) {
-			final SubMonitor progress = SubMonitor.convert(monitor, 1);
-			if (fBuffer == null) {
+		this.counter++;
+		if (this.counter == 1) {
+			final SubMonitor progress= SubMonitor.convert(monitor, 1);
+			if (this.buffer == null) {
 				progress.setWorkRemaining(2);
-				fBuffer = createWorkingBuffer(progress.newChild(1));
+				this.buffer= createWorkingBuffer(progress.newChild(1));
 			}
 			register();
 		}
@@ -237,10 +240,10 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	 */
 	@Override
 	public synchronized final void disconnect(final IProgressMonitor monitor) {
-		fCounter--;
-		if (fCounter == 0) {
-			final SubMonitor progress = SubMonitor.convert(monitor, 2);
-			fBuffer.releaseDocument(progress.newChild(1));
+		this.counter--;
+		if (this.counter == 0) {
+			final SubMonitor progress= SubMonitor.convert(monitor, 2);
+			this.buffer.releaseDocument(progress.newChild(1));
 			unregister();
 		}
 	}
@@ -250,7 +253,7 @@ public abstract class GenericUriSourceUnit implements ISourceUnit {
 	 */
 	@Override
 	public synchronized boolean isConnected() {
-		return (fCounter > 0);
+		return (this.counter > 0);
 	}
 	
 	protected abstract IWorkingBuffer createWorkingBuffer(SubMonitor progress);
