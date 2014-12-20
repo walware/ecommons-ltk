@@ -210,10 +210,15 @@ public class ExtContentTypeServices implements IExtContentTypeManager, IDisposab
 		return false;
 	}
 	
+	
+	@Override
+	public ModelTypeDescriptor getModelType(final String modelTypeId) {
+		return (modelTypeId != null) ? this.modelDescriptors.get(modelTypeId) : null;
+	}
+	
 	@Override
 	public ModelTypeDescriptor getModelTypeForContentType(final String contentTypeId) {
-		final String modelTypeId = this.primaryToModel.get(contentTypeId);
-		return (modelTypeId != null) ? this.modelDescriptors.get(modelTypeId) : null;
+		return getModelType(this.primaryToModel.get(contentTypeId));
 	}
 	
 	

@@ -27,6 +27,9 @@ public interface IExtContentTypeManager {
 	
 	boolean matchesActivatedContentType(String primaryContentTypeId, String secondaryContentTypeId, boolean self);
 	
+	
+	IModelTypeDescriptor getModelType(String modelTypeId);
+	
 	IModelTypeDescriptor getModelTypeForContentType(String contentTypeId);
 	
 }
