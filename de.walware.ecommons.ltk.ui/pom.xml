@@ -8,7 +8,7 @@
 		<groupId>de.walware.ecommons</groupId>
 		<artifactId>ecommons-ltk</artifactId>
 		<version>2.3-SNAPSHOT</version>
-		<relativePath>../de.walware.ecommons.ltk-build</relativePath>
+		<relativePath>../-build</relativePath>
 	</parent>
 	
 	<groupId>de.walware.ecommons</groupId>

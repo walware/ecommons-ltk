@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="de.walware.ecommons.ltk.source"
-      label="Commons - Sources of LTK Extensions"
+      id="de.walware.ecommons.ltk"
+      label="Commons - LTK Extensions"
       version="2.3.0.qualifier"
       provider-name="WalWare.de"
       license-feature="de.walware.opensource.license"
       license-feature-version="1.0.0">
 
    <description url="http://www.walware.de/goto/opensource">
-      Sources of LKT Framework Extensions for projects based on the Eclipse IDE
+      LKT Framework Extensions for projects based on the Eclipse IDE
    </description>
 
    <copyright>
@@ -19,22 +19,33 @@
       %license_text
    </license>
 
+   <requires>
+      <import feature="de.walware.ecommons.e" version="1.5.0" match="equivalent"/>
+   </requires>
+
    <plugin
-         id="de.walware.ecommons.ltk.core.source"
+         id="de.walware.ecommons.ltk"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="de.walware.ecommons.ltk.ui.source"
+         id="de.walware.ecommons.ltk.core"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="de.walware.thirdparty-org.apache.commons.primitives.source"
+         id="de.walware.ecommons.ltk.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="de.walware.thirdparty-org.apache.commons.primitives"
          download-size="0"
          install-size="0"
          version="0.0.0"
