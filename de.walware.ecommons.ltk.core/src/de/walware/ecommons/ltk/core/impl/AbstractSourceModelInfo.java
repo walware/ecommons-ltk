@@ -15,6 +15,7 @@ import de.walware.ecommons.collections.ImCollections;
 import de.walware.ecommons.collections.ImList;
 
 import de.walware.ecommons.ltk.AstInfo;
+import de.walware.ecommons.ltk.core.ISourceModelStamp;
 import de.walware.ecommons.ltk.core.model.ISourceUnitModelInfo;
 
 
@@ -35,8 +36,8 @@ public abstract class AbstractSourceModelInfo implements ISourceUnitModelInfo {
 	
 	
 	@Override
-	public long getStamp() {
-		return this.ast.stamp;
+	public ISourceModelStamp getStamp() {
+		return this.ast.getStamp();
 	}
 	
 	@Override

@@ -11,11 +11,10 @@
 
 package de.walware.ecommons.ltk.core.model;
 
-import org.eclipse.jface.text.IDocumentExtension4;
-
 import de.walware.ecommons.collections.ImList;
 
 import de.walware.ecommons.ltk.AstInfo;
+import de.walware.ecommons.ltk.core.ISourceModelStamp;
 
 
 /**
@@ -25,16 +24,14 @@ public interface ISourceUnitModelInfo {
 	
 	
 	/**
-	 * Modification stamp, same as
-	 *   {@link IDocumentExtension4#getModificationStamp()}
+	 * Returns the stamp of the model.
 	 * 
 	 * @return the stamp
 	 */
-	long getStamp();
+	ISourceModelStamp getStamp();
 	
 	/**
 	 * The AST used to create this info.
-	 * The AST has the same stamp as this info.
 	 * 
 	 * @return the AST information
 	 */

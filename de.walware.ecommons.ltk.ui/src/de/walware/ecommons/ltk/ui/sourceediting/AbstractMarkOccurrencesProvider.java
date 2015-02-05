@@ -31,6 +31,7 @@ import de.walware.ecommons.text.IPartitionConstraint;
 
 import de.walware.ecommons.ltk.IModelManager;
 import de.walware.ecommons.ltk.ast.AstSelection;
+import de.walware.ecommons.ltk.core.ISourceModelStamp;
 import de.walware.ecommons.ltk.core.model.ISourceUnit;
 import de.walware.ecommons.ltk.core.model.ISourceUnitModelInfo;
 import de.walware.ecommons.ltk.ui.ISelectionWithElementInfoListener;
@@ -49,7 +50,7 @@ public abstract class AbstractMarkOccurrencesProvider implements ISourceEditorAd
 	public final class RunData {
 		
 		public final AbstractDocument doc;
-		public final long stamp;
+		public ISourceModelStamp stamp;
 		
 		private Annotation[] annotations;
 		private Point range;
@@ -58,17 +59,17 @@ public abstract class AbstractMarkOccurrencesProvider implements ISourceEditorAd
 		private Map<Annotation, Position> todo;
 		
 		
-		RunData(final AbstractDocument doc, final long stamp) {
-			this.doc = doc;
-			this.stamp = stamp;
+		RunData(final AbstractDocument doc, final ISourceModelStamp stamp) {
+			this.doc= doc;
+			this.stamp= stamp;
 		}
 		
 		
 		public boolean isValid() {
 			final Point currentSelection = fEditor.fCurrentSelection;
-			return (range != null && currentSelection.x >= range.x
-					&& currentSelection.x+currentSelection.y <= range.y
-					&& doc.getModificationStamp() == stamp);
+			return (this.range != null && currentSelection.x >= this.range.x
+					&& currentSelection.x+currentSelection.y <= this.range.y
+					&& this.doc.getModificationStamp() == this.stamp.getSourceStamp() );
 		}
 		
 		public boolean accept(final Point range) {
@@ -168,7 +169,7 @@ public abstract class AbstractMarkOccurrencesProvider implements ISourceEditorAd
 			if (run.doc == null) {
 				return false;
 			}
-			if (fLastRun != null && fLastRun.isValid()) {
+			if (fLastRun != null && fLastRun.isValid() && fLastRun.stamp.equals(run.stamp)) {
 				return true;
 			}
 			
@@ -207,7 +208,7 @@ public abstract class AbstractMarkOccurrencesProvider implements ISourceEditorAd
 	
 	protected void checkKeep(final RunData run, final ITextSelection selection)
 			throws BadLocationException, BadPartitioningException {
-		if (fLastRun == null || fLastRun.stamp != run.stamp) {
+		if (fLastRun == null || !fLastRun.stamp.equals(run.stamp)) {
 			run.clear();
 			return;
 		}

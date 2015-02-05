@@ -82,8 +82,8 @@ public abstract class SourceUnitModelContainer<U extends ISourceUnit, M extends 
 			final M currentModel= this.modelInfo;
 			if ((syncLevel & IModelManager.RECONCILE) != 0
 					|| currentModel == null
-					|| currentModel.getStamp() == 0
-					|| currentModel.getStamp() != this.unit.getContentStamp(monitor)) {
+					|| currentModel.getStamp().getSourceStamp() == 0
+					|| currentModel.getStamp().getSourceStamp() != this.unit.getContentStamp(monitor) ) {
 				getModelManager().reconcile(this, syncLevel, monitor);
 			}
 		}
@@ -109,14 +109,6 @@ public abstract class SourceUnitModelContainer<U extends ISourceUnit, M extends 
 		return this.astInfo;
 	}
 	
-	public AstInfo getCurrentAst(final long stamp) {
-		final AstInfo ast= getCurrentAst();
-		if (ast != null && ast.stamp == stamp) {
-			return ast;
-		}
-		return null;
-	}
-	
 	public void setAst(final AstInfo ast) {
 		if (this.mode == LTK.PERSISTENCE_CONTEXT) {
 			return;
@@ -128,17 +120,9 @@ public abstract class SourceUnitModelContainer<U extends ISourceUnit, M extends 
 		return this.modelInfo;
 	}
 	
-	public M getCurrentModel(final long stamp) {
-		final M model= getCurrentModel();
-		if (model != null && model.getStamp() == stamp) {
-			return model;
-		}
-		return null;
-	}
-	
 	public void setModel(final M modelInfo) {
 		if (modelInfo != null
-				&& (this.astInfo == null || this.astInfo.stamp == modelInfo.getStamp()) ) {
+				&& (this.astInfo == null || this.astInfo.getStamp().equals(modelInfo.getAst().getStamp())) ) {
 									// otherwise, the ast is probably newer
 			setAst(modelInfo.getAst());
 		}
@@ -146,7 +130,7 @@ public abstract class SourceUnitModelContainer<U extends ISourceUnit, M extends 
 	}
 	
 	
-	public IProblemRequestor createProblemRequestor(final long stamp) {
+	public IProblemRequestor createProblemRequestor() {
 		return null;
 	}
 	

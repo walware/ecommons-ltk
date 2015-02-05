@@ -105,7 +105,8 @@ public class PostSelectionWithElementInfoController {
 					input = run.fInputElement;
 					input.connect(monitor);
 				}
-				if (run.getInputInfo() == null || run.getInputInfo().getStamp() != input.getDocument(null).getModificationStamp()) {
+				if (run.getInputInfo() == null
+						|| run.getInputInfo().getStamp().getSourceStamp() != input.getDocument(null).getModificationStamp()) {
 					return Status.OK_STATUS;
 				}
 				

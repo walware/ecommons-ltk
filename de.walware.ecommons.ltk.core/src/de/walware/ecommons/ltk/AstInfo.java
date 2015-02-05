@@ -12,10 +12,11 @@
 package de.walware.ecommons.ltk;
 
 import de.walware.ecommons.ltk.ast.IAstNode;
+import de.walware.ecommons.ltk.core.ISourceModelStamp;
 
 
 /**
- * 
+ * Container for AST.
  */
 public class AstInfo {
 	
@@ -33,22 +34,42 @@ public class AstInfo {
 	public static final int LEVEL_MODEL_DEFAULT =           0x4;
 	
 	
-	public final int level;
-	public final long stamp;
+	private final ISourceModelStamp stamp;
+	
+	private final int level;
+	
 	public final IAstNode root;
 	
 	
-	public AstInfo(final int level, final long stamp, final IAstNode root) {
-		this.level = level;
-		this.stamp = stamp;
-		this.root = root;
+	public AstInfo(final int level, final ISourceModelStamp stamp, final IAstNode root) {
+		this.level= level;
+		this.stamp= stamp;
+		this.root= root;
 	}
 	
 	public AstInfo(final int level, final AstInfo ast) {
-		this.level = level;
-		this.stamp = ast.stamp;
-		this.root = ast.root;
+		this.level= level;
+		this.stamp= ast.stamp;
+		this.root= ast.root;
 	}
 	
+	
+	/**
+	 * Returns the stamp of the AST.
+	 * 
+	 * @return the stamp
+	 */
+	public ISourceModelStamp getStamp() {
+		return this.stamp;
+	}
+	
+	/**
+	 * Returns the level of detail of the AST.
+	 * 
+	 * @return
+	 */
+	public final int getLevel() {
+		return this.level;
+	}
 	
 }

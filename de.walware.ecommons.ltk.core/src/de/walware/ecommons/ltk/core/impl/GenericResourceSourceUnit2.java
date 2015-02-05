@@ -62,7 +62,7 @@ public abstract class GenericResourceSourceUnit2<M extends SourceUnitModelContai
 		if (type == null || this.model.isContainerFor(type)) {
 			final AstInfo ast= this.model.getCurrentAst();
 			final long stamp= getResource().getModificationStamp();
-			if (ast != null && ast.stamp == stamp) {
+			if (ast != null && ast.getStamp().getSourceStamp() == stamp) {
 				return ast;
 			}
 			// TODO

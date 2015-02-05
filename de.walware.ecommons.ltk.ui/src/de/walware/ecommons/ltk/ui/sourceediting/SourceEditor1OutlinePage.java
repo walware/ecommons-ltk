@@ -44,6 +44,7 @@ import de.walware.ecommons.ui.workbench.AbstractEditorOutlinePage;
 
 import de.walware.ecommons.ltk.AstInfo;
 import de.walware.ecommons.ltk.IModelElementDelta;
+import de.walware.ecommons.ltk.core.ISourceModelStamp;
 import de.walware.ecommons.ltk.core.model.IModelElement;
 import de.walware.ecommons.ltk.core.model.IModelElement.Filter;
 import de.walware.ecommons.ltk.core.model.ISourceStructElement;
@@ -91,23 +92,23 @@ public abstract class SourceEditor1OutlinePage extends AbstractEditorOutlinePage
 		
 		
 		@Override
-		public long getStamp(final Object inputElement) {
+		public ISourceModelStamp getStamp(final Object inputElement) {
 			if (inputElement instanceof ISourceUnit) {
-				final AstInfo info = ((ISourceUnit) inputElement).getAstInfo(fMainType, false, null); 
-				if (info != null) {
-					return info.stamp;
+				final AstInfo ast= ((ISourceUnit) inputElement).getAstInfo(fMainType, false, null);
+				if (ast != null) {
+					return ast.getStamp();
 				}
 			}
-			return ISourceUnit.UNKNOWN_MODIFICATION_STAMP;
+			return null;
 		}
 		
 		@Override
 		public Object[] getElements(final Object inputElement) {
 			if (inputElement instanceof ISourceUnit) {
-				final AstInfo info = ((ISourceUnit) inputElement).getAstInfo(fMainType, false, null); 
-				if (info != null) {
-					fCurrentModelStamp = info.stamp;
-					return new Object[] { info.root };
+				final AstInfo ast= ((ISourceUnit) inputElement).getAstInfo(fMainType, false, null); 
+				if (ast != null) {
+					fCurrentModelStamp= ast.getStamp();
+					return new Object[] { ast.root };
 				}
 			}
 			return new Object[0];
@@ -191,7 +192,7 @@ public abstract class SourceEditor1OutlinePage extends AbstractEditorOutlinePage
 			if (!state.isStillValid()) {
 				return;
 			}
-			if (fCurrentModelStamp != state.getInputInfo().getStamp()) {
+			if (!isUpToDate(state.getInputInfo().getStamp())) {
 				elementUpdatedInfo(state.getInputElement(), null);
 			}
 			UIAccess.getDisplay().syncExec(new Runnable() {
@@ -211,7 +212,7 @@ public abstract class SourceEditor1OutlinePage extends AbstractEditorOutlinePage
 	private final String fMainType;
 	private OutlineContentProvider fContentProvider;
 	
-	private long fCurrentModelStamp;
+	private ISourceModelStamp fCurrentModelStamp;
 	
 	private IModelElement fInputUnit;
 	
@@ -235,6 +236,11 @@ public abstract class SourceEditor1OutlinePage extends AbstractEditorOutlinePage
 	public void init(final IPageSite pageSite) {
 		super.init(pageSite);
 		pageSite.setSelectionProvider(this);
+	}
+	
+	protected boolean isUpToDate(final ISourceModelStamp stamp) {
+		final ISourceModelStamp current= fCurrentModelStamp;
+		return (current != null && current.equals(stamp));
 	}
 	
 	protected IModelElement.Filter getContentFilter() {
@@ -295,7 +301,7 @@ public abstract class SourceEditor1OutlinePage extends AbstractEditorOutlinePage
 	@Override
 	public void elementChanged(final IModelElement element) {
 		fInputUnit = element;
-		fCurrentModelStamp = ISourceUnit.UNKNOWN_MODIFICATION_STAMP;
+		fCurrentModelStamp= null;
 		final TreeViewer viewer = getViewer();
 		if (UIAccess.isOkToUse(viewer)) {
 			viewer.setInput(fInputUnit);
@@ -320,7 +326,7 @@ public abstract class SourceEditor1OutlinePage extends AbstractEditorOutlinePage
 				
 				if (element != fInputUnit 
 						|| !UIAccess.isOkToUse(viewer)
-						|| (fCurrentModelStamp != ISourceUnit.UNKNOWN_MODIFICATION_STAMP && fContentProvider.getStamp(element) == fCurrentModelStamp)) {
+						|| isUpToDate(fContentProvider.getStamp(element)) ) {
 					return;
 				}
 				beginIgnoreSelection();

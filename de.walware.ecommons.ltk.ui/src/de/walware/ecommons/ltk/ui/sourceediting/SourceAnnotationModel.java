@@ -100,12 +100,12 @@ public abstract class SourceAnnotationModel extends ResourceMarkerAnnotationMode
 //		return new CompilationUnitAnnotationModelEvent(this, getResource());
 //	}
 	
-	public final IProblemRequestor createProblemRequestor(final long stamp) {
+	public final IProblemRequestor createProblemRequestor() {
 		fReportingCounter.incrementAndGet();
-		return doCreateProblemRequestor(stamp);
+		return doCreateProblemRequestor();
 	}
 	
-	protected IProblemRequestor doCreateProblemRequestor(final long stamp) {
+	protected IProblemRequestor doCreateProblemRequestor() {
 		return new ProblemRequestor();
 	}
 	

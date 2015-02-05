@@ -84,7 +84,7 @@ public class ElementInfoController implements IModelElementInputProvider, IDispo
 				}
 				else {
 					final AstInfo astInfo = fNewInput.getAstInfo(null, false, null);
-					if (astInfo == null || (astInfo.level & AstInfo.DEFAULT_LEVEL_MASK) < 1) {
+					if (astInfo == null || (astInfo.getLevel() & AstInfo.DEFAULT_LEVEL_MASK) < 1) {
 						return Status.CANCEL_STATUS;
 					}
 					fInput = fNewInput;

@@ -16,9 +16,9 @@ import java.util.List;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
+import de.walware.ecommons.ltk.core.ISourceModelStamp;
 import de.walware.ecommons.ltk.core.model.IModelElement.Filter;
 import de.walware.ecommons.ltk.core.model.ISourceStructElement;
-import de.walware.ecommons.ltk.core.model.ISourceUnit;
 import de.walware.ecommons.ltk.core.model.ISourceUnitModelInfo;
 
 
@@ -36,8 +36,6 @@ public class OutlineContentProvider implements ITreeContentProvider {
 	
 	private final IOutlineContent content;
 	
-	private long currentModelStamp;
-	
 	
 	public OutlineContentProvider(final IOutlineContent content) {
 		this.content= content;
@@ -48,12 +46,9 @@ public class OutlineContentProvider implements ITreeContentProvider {
 		return this.content;
 	}
 	
-	public long getStamp(final Object inputElement) {
+	public ISourceModelStamp getStamp(final Object inputElement) {
 		final ISourceUnitModelInfo modelInfo= getContent().getModelInfo(inputElement);
-		if (modelInfo != null) {
-			return modelInfo.getStamp();
-		}
-		return ISourceUnit.UNKNOWN_MODIFICATION_STAMP;
+		return (modelInfo != null) ? modelInfo.getStamp() : null;
 	}
 	
 	@Override
@@ -64,7 +59,6 @@ public class OutlineContentProvider implements ITreeContentProvider {
 	public Object[] getElements(final Object inputElement) {
 		final ISourceUnitModelInfo modelInfo= getContent().getModelInfo(inputElement);
 		if (modelInfo != null) {
-			this.currentModelStamp= modelInfo.getStamp();
 			final List<? extends ISourceStructElement> children= modelInfo.getSourceElement().getSourceChildren(getContent().getContentFilter());
 			return children.toArray(new ISourceStructElement[children.size()]);
 		}

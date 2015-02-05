@@ -158,10 +158,10 @@ public class SourceDocumentProvider<T extends ISourceUnit> extends TextFileDocum
 		return super.getAnnotationModel(element);
 	}
 	
-	public IProblemRequestor createProblemRequestor(final ISourceUnit element, final long stamp) {
+	public IProblemRequestor createProblemRequestor(final ISourceUnit element) {
 		final IAnnotationModel annotationModel = getAnnotationModel(element);
 		if (annotationModel instanceof SourceAnnotationModel) {
-			return ((SourceAnnotationModel) annotationModel).createProblemRequestor(stamp);
+			return ((SourceAnnotationModel) annotationModel).createProblemRequestor();
 		}
 		return null;
 	}

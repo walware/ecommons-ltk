@@ -43,6 +43,7 @@ import de.walware.ecommons.text.TextUtil;
 import de.walware.ecommons.ltk.AstInfo;
 import de.walware.ecommons.ltk.IModelElementDelta;
 import de.walware.ecommons.ltk.IModelManager;
+import de.walware.ecommons.ltk.core.ISourceModelStamp;
 import de.walware.ecommons.ltk.core.model.IModelElement;
 import de.walware.ecommons.ltk.core.model.ISourceUnit;
 import de.walware.ecommons.ltk.core.model.ISourceUnitModelInfo;
@@ -91,7 +92,7 @@ public class FoldingEditorAddon implements ISourceEditorAddon, IModelElementInpu
 		private final ISourceUnit fUnit;
 		
 		private boolean fIsInitilized;
-		private long fUpdateStamp;
+		private ISourceModelStamp fUpdateStamp;
 		
 		private QualifiedName fSavePropertyName;
 		
@@ -100,7 +101,6 @@ public class FoldingEditorAddon implements ISourceEditorAddon, IModelElementInpu
 		Input(final ISourceUnit unit) {
 			this.fUnit= unit;
 			this.fIsInitilized= false;
-			this.fUpdateStamp= Long.MIN_VALUE;
 		}
 		
 	}
@@ -141,7 +141,7 @@ public class FoldingEditorAddon implements ISourceEditorAddon, IModelElementInpu
 	public void elementInitialInfo(final IModelElement element) {
 		final Input input= this.input;
 		if (input != null && input.fUnit == element) {
-			update(input, -1);
+			update(input, null);
 		}
 	}
 	
@@ -149,7 +149,7 @@ public class FoldingEditorAddon implements ISourceEditorAddon, IModelElementInpu
 	public void elementUpdatedInfo(final IModelElement element, final IModelElementDelta delta) {
 		final Input input= this.input;
 		if (input != null && input.fUnit == element) {
-			update(input, delta.getNewAst().stamp);
+			update(input, delta.getNewAst().getStamp());
 		}
 	}
 	
@@ -165,7 +165,7 @@ public class FoldingEditorAddon implements ISourceEditorAddon, IModelElementInpu
 	protected void refresh() {
 		final Input input= this.input;
 		if (input != null) {
-			update(input, -1);
+			update(input, null);
 		}
 	}
 	
@@ -196,20 +196,20 @@ public class FoldingEditorAddon implements ISourceEditorAddon, IModelElementInpu
 			ast= input.fUnit.getAstInfo(null, false, monitor);
 		}
 		final AbstractDocument document= input.fUnit.getDocument(monitor);
-		if (ast == null || document == null || ast.stamp != document.getModificationStamp()) {
+		if (ast == null || document == null || ast.getStamp().getSourceStamp() != document.getModificationStamp()) {
 			return null;
 		}
 		return new FoldingStructureComputationContext(document, modelInfo, ast, !input.fIsInitilized);
 	}
 	
-	private void update(final Input input, final long stamp) {
+	private void update(final Input input, final ISourceModelStamp stamp) {
 		synchronized(input) {
 			final SourceEditor1 editor= this.editor;
 			if (editor == null) {
 				return;
 			}
 			if (input.fUnit == null
-					|| (stamp != -1 && input.fUpdateStamp == stamp)) { // already uptodate
+					|| (stamp != null && stamp.equals(input.fUpdateStamp)) ) { // already uptodate
 				return;
 			}
 			FoldingStructureComputationContext ctx;
@@ -259,7 +259,8 @@ public class FoldingEditorAddon implements ISourceEditorAddon, IModelElementInpu
 					}
 				}
 				deletions= del.toArray(new FoldingAnnotation[del.size()]);
-				if (ctx.document.getModificationStamp() != ctx.ast.stamp || input != this.input) {
+				if (ctx.document.getModificationStamp() != ctx.ast.getStamp().getSourceStamp()
+						|| input != this.input) {
 					return;
 				}
 			}
@@ -269,7 +270,7 @@ public class FoldingEditorAddon implements ISourceEditorAddon, IModelElementInpu
 				additions.put(next.getValue(), next.getKey());
 			}
 			input.fAnnotationModel.modifyAnnotations(deletions, additions, null);
-			input.fUpdateStamp= ctx.ast.stamp;
+			input.fUpdateStamp= ctx.ast.getStamp();
 		}
 	}
 	
