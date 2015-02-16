@@ -113,7 +113,7 @@ public class TemplateSelectionComposite extends Composite implements ISelectionC
 		}
 		this.preview= new TemplatePreview();
 		{	final Label label= new Label(this, SWT.LEFT);
-			label.setText(TemplatesMessages.Preview_label);
+			label.setText(TemplatesMessages.Preview_label + ':');
 			label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		}
 		{	final SourceViewer viewer= this.preview.createSourceViewer(this);

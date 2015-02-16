@@ -28,6 +28,8 @@ public class TemplatesMessages extends NLS {
 	
 	public static String Preview_label;
 	
+	public static String Config_DocTemplates_label;
+	
 	public static String Config_error_Read_message;
 	public static String Config_error_Write_message;
 	public static String Config_RestoreDefaults_title;
@@ -42,8 +44,6 @@ public class TemplatesMessages extends NLS {
 	public static String Config_Export_error_CanNotWrite_message;
 	public static String Config_Export_Exists_title;
 	public static String Config_Export_Exists_message;
-	
-	public static String Config_Preview_label;
 	
 	public static String NewDocWizardPage_title;
 	public static String NewDocWizardPage_description;

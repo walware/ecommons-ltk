@@ -376,8 +376,6 @@ public class CodeTemplateConfigurationBlock extends ManagedConfigurationBlock
 	}
 	
 	
-	private final String title;
-	
 	private final int mode;
 	
 	private ImList<TemplateCategory> templateCategories;
@@ -408,8 +406,7 @@ public class CodeTemplateConfigurationBlock extends ManagedConfigurationBlock
 	
 	public CodeTemplateConfigurationBlock(final String title, int mode,
 			final Preference<String> defaultPref) throws CoreException {
-		super(null);
-		this.title= title;
+		super(null, title, null);
 		
 		if (defaultPref != null) {
 			mode|= DEFAULT_SINGLE;
@@ -434,6 +431,10 @@ public class CodeTemplateConfigurationBlock extends ManagedConfigurationBlock
 		this.defaultPref= defaultPref;
 	}
 	
+	
+	protected String getListLabel() {
+		return TemplatesMessages.Config_DocTemplates_label;
+	}
 	
 	protected void setCategories(final List<? extends TemplateCategory> categories) {
 		this.templateCategories= ImCollections.<TemplateCategory>toList(categories);
@@ -500,7 +501,7 @@ public class CodeTemplateConfigurationBlock extends ManagedConfigurationBlock
 		setupPreferenceManager(prefs);
 		
 		{	final Label label= new Label(pageComposite, SWT.LEFT);
-			label.setText(this.title + ':');
+			label.setText(getListLabel() + ':');
 			label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		}
 		
@@ -549,7 +550,7 @@ public class CodeTemplateConfigurationBlock extends ManagedConfigurationBlock
 		
 		this.preview= new TemplatePreview();
 		{	final Label label= new Label(pageComposite, SWT.LEFT);
-			label.setText(TemplatesMessages.Config_Preview_label + ':');
+			label.setText(TemplatesMessages.Preview_label + ':');
 			label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		}
 		{	final SourceViewer viewer= this.preview.createSourceViewer(pageComposite);
@@ -814,7 +815,7 @@ public class CodeTemplateConfigurationBlock extends ManagedConfigurationBlock
 		
 		public DefaultsDialog(final Shell parentShell) {
 			super(parentShell, TemplatesMessages.Config_RestoreDefaults_title, null,
-					TemplatesMessages.Config_RestoreDefaults_title + ": " + CodeTemplateConfigurationBlock.this.title, //$NON-NLS-1$
+					TemplatesMessages.Config_RestoreDefaults_title + ": " + getTitle(), //$NON-NLS-1$
 					MessageDialog.QUESTION,
 					new String[] { IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL }, 0 );
 			setShellStyle(getShellStyle() | SWT.SHEET);
