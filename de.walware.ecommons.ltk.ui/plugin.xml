@@ -595,7 +595,17 @@
       <menuContribution
             locationURI="menu:navigate?after=open.ext">
          <command
+               commandId="org.eclipse.ui.edit.text.open.hyperlink"
+               mnemonic="%menus_Navigate_OpenHyperlink_mnemonic"
+               style="push">
+            <visibleWhen>
+               <reference
+                     definitionId="de.walware.ecommons.ltk.expressions.isContextActive.EditSource1MenuSet"/>
+            </visibleWhen>
+         </command>
+         <command
                commandId="org.eclipse.jdt.ui.edit.text.java.open.editor"
+               mnemonic="%menus_Navigate_OpenDeclaration_mnemonic"
                style="push">
             <visibleWhen>
                <reference
@@ -606,10 +616,23 @@
       <menuContribution locationURI="menu:goTo">
          <command
                commandId="de.walware.ecommons.text.commands.GotoMatchingBracket"
-               label="%menus_Nav_Goto_GotoMatchingBracket_label"
-               mnemonic="%menus_Nav_GoTo_GotoMatchingBracket_mnemonic"
+               label="%menus_Navigate_Goto_GotoMatchingBracket_label"
+               mnemonic="%menus_Navigate_GoTo_GotoMatchingBracket_mnemonic"
                style="push">
             <visibleWhen>
+               <reference
+                     definitionId="de.walware.ecommons.ltk.expressions.isContextActive.EditSource1MenuSet"/>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="menu:navigate?endof=show.ext">
+         <command
+               commandId="de.walware.ecommons.ltk.commands.ShowQuickSourceOutline"
+               mnemonic="%menus_Navigate_ShowQuickOutline_mnemonic"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
                <reference
                      definitionId="de.walware.ecommons.ltk.expressions.isContextActive.EditSource1MenuSet"/>
             </visibleWhen>
