@@ -13,6 +13,7 @@ package de.walware.ecommons.ltk.ui.sourceediting;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,6 +73,8 @@ import org.eclipse.ui.texteditor.templates.ITemplatesPage;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
 import de.walware.ecommons.FastList;
+import de.walware.ecommons.collections.ImCollections;
+import de.walware.ecommons.collections.ImList;
 import de.walware.ecommons.preferences.Preference;
 import de.walware.ecommons.preferences.PreferencesUtil;
 import de.walware.ecommons.preferences.SettingsChangeNotifier;
@@ -118,6 +121,13 @@ public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 	
 	
 	public static final String ACTION_ID_TOGGLE_COMMENT = "de.walware.statet.ui.actions.ToggleComment"; //$NON-NLS-1$
+	
+	protected static final ImList<String> ACTION_SET_CONTEXT_IDS= ImCollections.newIdentityList(
+			"de.walware.ecommons.ltk.contexts.EditSource1MenuSet" ); //$NON-NLS-1$
+	
+	private static final ImList<String> CONTEXT_IDS= ImCollections.addElement(
+			ACTION_SET_CONTEXT_IDS,
+			"de.walware.ecommons.text.contexts.TextEditor" ); //$NON-NLS-1$
 	
 	
 /*- Static utility methods --------------------------------------------------*/
@@ -320,7 +330,11 @@ public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 	
 	@Override
 	protected void initializeKeyBindingScopes() {
-		setKeyBindingScopes(new String[] { "de.walware.ecommons.text.contexts.TextEditor" }); //$NON-NLS-1$
+		setContexts(CONTEXT_IDS);
+	}
+	
+	protected void setContexts(final Collection<String> ids) {
+		setKeyBindingScopes(ids.toArray(new String[ids.size()]));
 	}
 	
 	@Override

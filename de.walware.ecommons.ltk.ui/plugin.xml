@@ -37,28 +37,7 @@
             description="%contexts_StructuredElementViewer_description">
       </context>
    </extension>
-   <extension
-         point="org.eclipse.ui.actionSets">
-      <actionSet
-            id="de.walware.ecommons.ltk.contexts.EditSourceActionSet"
-            label="StatET Source Editing">
-      </actionSet>
-   </extension>
-   
-   <extension
-         point="org.eclipse.core.expressions.definitions">
-      <definition
-            id="de.walware.statet.base.expressions.EditSourceActionSet">
-              <with variable="activeContexts">
-                 <iterate
-                       operator="or">
-                    <equals value="de.walware.ecommons.ltk.contexts.EditSourceActionSet">
-                    </equals>
-                 </iterate>
-              </with>
-      </definition>
-   </extension>
-   
+      
    <extension
          point="org.eclipse.ui.commands">
       <!-- edit -->
@@ -270,6 +249,7 @@
             icon="icons/tool_16/search.gif">
       </image>
    </extension>
+   
    <extension
          point="org.eclipse.ui.bindings">
          
@@ -505,6 +485,27 @@
    </extension>
    
    <extension
+         point="org.eclipse.ui.contexts">
+      <context
+            id="de.walware.ecommons.ltk.contexts.EditSource1MenuSet"
+            parentId="org.eclipse.ui.contexts.actionSet"
+            name="StatET Source Editor Menus">
+      </context>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.definitions">
+      <definition
+            id="de.walware.ecommons.ltk.expressions.isContextActive.EditSource1MenuSet">
+         <with variable="activeContexts">
+            <iterate
+                  operator="or">
+               <equals value="de.walware.ecommons.ltk.contexts.EditSource1MenuSet"/>
+            </iterate>
+         </with>
+      </definition>
+   </extension>
+   
+   <extension
          point="org.eclipse.ui.menus">
       <!-- edit -->
       <menuContribution
@@ -534,8 +535,7 @@
             </command>
             <visibleWhen>
                <reference
-                     definitionId="de.walware.statet.base.expressions.EditSourceActionSet">
-               </reference>
+                     definitionId="de.walware.ecommons.ltk.expressions.isContextActive.EditSource1MenuSet"/>
             </visibleWhen>
          </menu>
       </menuContribution>
@@ -586,8 +586,7 @@
             </separator>
             <visibleWhen>
                <reference
-                     definitionId="de.walware.statet.base.expressions.EditSourceActionSet">
-               </reference>
+                     definitionId="de.walware.ecommons.ltk.expressions.isContextActive.EditSource1MenuSet"/>
            </visibleWhen>
          </menu>
       </menuContribution>
@@ -599,10 +598,8 @@
                commandId="org.eclipse.jdt.ui.edit.text.java.open.editor"
                style="push">
             <visibleWhen>
-               <and>
-                  <reference
-                        definitionId="de.walware.statet.base.expressions.EditSourceActionSet"/>
-               </and>
+               <reference
+                     definitionId="de.walware.ecommons.ltk.expressions.isContextActive.EditSource1MenuSet"/>
             </visibleWhen>
          </command>
       </menuContribution>
@@ -614,8 +611,7 @@
                style="push">
             <visibleWhen>
                <reference
-                     definitionId="de.walware.statet.base.expressions.EditSourceActionSet">
-               </reference>
+                     definitionId="de.walware.ecommons.ltk.expressions.isContextActive.EditSource1MenuSet"/>
             </visibleWhen>
          </command>
       </menuContribution>
