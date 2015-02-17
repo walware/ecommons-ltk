@@ -80,7 +80,7 @@ import de.walware.ecommons.preferences.PreferencesUtil;
 import de.walware.ecommons.preferences.SettingsChangeNotifier;
 import de.walware.ecommons.text.ICharPairMatcher;
 import de.walware.ecommons.text.TextUtil;
-import de.walware.ecommons.text.core.sections.DocContentSections;
+import de.walware.ecommons.text.core.sections.IDocContentSections;
 import de.walware.ecommons.text.ui.TextHandlerUtil;
 import de.walware.ecommons.ui.ISettingsChangedHandler;
 import de.walware.ecommons.ui.util.UIAccess;
@@ -459,7 +459,7 @@ public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 	}
 	
 	@Override
-	public DocContentSections getDocumentContentInfo() {
+	public IDocContentSections getDocumentContentInfo() {
 		return fConfigurator.getDocumentContentInfo();
 	}
 	

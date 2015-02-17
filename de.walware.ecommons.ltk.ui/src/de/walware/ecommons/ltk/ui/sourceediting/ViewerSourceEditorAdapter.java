@@ -15,7 +15,7 @@ import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.services.IServiceLocator;
 
-import de.walware.ecommons.text.core.sections.DocContentSections;
+import de.walware.ecommons.text.core.sections.IDocContentSections;
 import de.walware.ecommons.ui.util.UIAccess;
 
 import de.walware.ecommons.ltk.core.model.ISourceUnit;
@@ -69,7 +69,7 @@ public class ViewerSourceEditorAdapter implements ISourceEditor {
 	}
 	
 	@Override
-	public DocContentSections getDocumentContentInfo() {
+	public IDocContentSections getDocumentContentInfo() {
 		return fConfigurator.getDocumentContentInfo();
 	}
 	

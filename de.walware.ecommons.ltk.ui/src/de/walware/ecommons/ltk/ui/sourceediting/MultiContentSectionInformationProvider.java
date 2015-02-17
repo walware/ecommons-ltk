@@ -21,7 +21,7 @@ import org.eclipse.jface.text.information.IInformationProvider;
 import org.eclipse.jface.text.information.IInformationProviderExtension;
 import org.eclipse.jface.text.information.IInformationProviderExtension2;
 
-import de.walware.ecommons.text.core.sections.DocContentSections;
+import de.walware.ecommons.text.core.sections.IDocContentSections;
 
 
 /**
@@ -31,7 +31,7 @@ import de.walware.ecommons.text.core.sections.DocContentSections;
  * Implement {@link #createHandler(String)} for lazy initialization of the information provider
  * of the section types.
  * 
- * @see DocContentSections
+ * @see IDocContentSections
  */
 public class MultiContentSectionInformationProvider implements
 		IInformationProvider, IInformationProviderExtension, IInformationProviderExtension2 {
@@ -40,26 +40,26 @@ public class MultiContentSectionInformationProvider implements
 	private static final Object NULL= new Object();
 	
 	
-	private final DocContentSections sections;
+	private final IDocContentSections sections;
 	
 	private final Map<String, Object> handlers= new IdentityHashMap<>(8);
 	
 	private EditorInformationProvider activeProvider;
 	
 	
-	public MultiContentSectionInformationProvider(final DocContentSections sections) {
+	public MultiContentSectionInformationProvider(final IDocContentSections sections) {
 		if (sections == null) {
 			throw new NullPointerException("sections"); //$NON-NLS-1$
 		}
 		this.sections= sections;
 	}
 	
-	public MultiContentSectionInformationProvider(final DocContentSections sections,
+	public MultiContentSectionInformationProvider(final IDocContentSections sections,
 			final String key1, final EditorInformationProvider provider1) {
 		this(sections, key1, provider1, null, null);
 	}
 	
-	public MultiContentSectionInformationProvider(final DocContentSections sections,
+	public MultiContentSectionInformationProvider(final IDocContentSections sections,
 			final String sectionType1, final EditorInformationProvider provider1,
 			final String sectionType2, final EditorInformationProvider provider2) {
 		this(sections);
@@ -73,7 +73,7 @@ public class MultiContentSectionInformationProvider implements
 	}
 	
 	
-	protected final DocContentSections getSections() {
+	protected final IDocContentSections getSections() {
 		return this.sections;
 	}
 	
@@ -86,7 +86,7 @@ public class MultiContentSectionInformationProvider implements
 	}
 	
 	protected final EditorInformationProvider getProvider(final String sectionType) {
-		if (sectionType == DocContentSections.ERROR) {
+		if (sectionType == IDocContentSections.ERROR) {
 			return null;
 		}
 		Object handler= this.handlers.get(sectionType);

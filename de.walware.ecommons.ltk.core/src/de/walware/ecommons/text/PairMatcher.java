@@ -21,7 +21,7 @@ import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.TextUtilities;
 
-import de.walware.ecommons.text.core.sections.DocContentSections;
+import de.walware.ecommons.text.core.sections.IDocContentSections;
 
 
 /**
@@ -64,7 +64,7 @@ public class PairMatcher implements ICharPairMatcher {
 	/**
 	 * Constructor using <code>BasicHeuristicTokenScanner</code>.
 	 */
-	public PairMatcher(final char[][] pairs, final DocContentSections documentContentInfo,
+	public PairMatcher(final char[][] pairs, final IDocContentSections documentContentInfo,
 			final String[] partitions, final char escapeChar) {
 		this(pairs, documentContentInfo.getPartitioning(), partitions,
 				new BasicHeuristicTokenScanner(documentContentInfo, new IPartitionConstraint() {

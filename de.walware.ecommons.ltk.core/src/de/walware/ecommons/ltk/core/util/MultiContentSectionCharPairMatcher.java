@@ -18,7 +18,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 
 import de.walware.ecommons.text.ICharPairMatcher;
-import de.walware.ecommons.text.core.sections.DocContentSections;
+import de.walware.ecommons.text.core.sections.IDocContentSections;
 
 
 /**
@@ -28,7 +28,7 @@ import de.walware.ecommons.text.core.sections.DocContentSections;
  * Implement {@link #createHandler(String)} for lazy initialization of the matchers of the section
  * types.
  * 
- * @see DocContentSections
+ * @see IDocContentSections
  */
 public class MultiContentSectionCharPairMatcher implements ICharPairMatcher {
 	
@@ -36,26 +36,26 @@ public class MultiContentSectionCharPairMatcher implements ICharPairMatcher {
 	private static final Object NULL= new Object();
 	
 	
-	private final DocContentSections sections;
+	private final IDocContentSections sections;
 	
 	private final Map<String, Object> handlers= new IdentityHashMap<>(8);
 	
 	private ICharPairMatcher activeMatcher;
 	
 	
-	public MultiContentSectionCharPairMatcher(final DocContentSections sections) {
+	public MultiContentSectionCharPairMatcher(final IDocContentSections sections) {
 		if (sections == null) {
 			throw new NullPointerException("sections"); //$NON-NLS-1$
 		}
 		this.sections= sections;
 	}
 	
-	public MultiContentSectionCharPairMatcher(final DocContentSections sections,
+	public MultiContentSectionCharPairMatcher(final IDocContentSections sections,
 			final String sectionType1, final ICharPairMatcher matcher1) {
 		this(sections, sectionType1, matcher1, null, null);
 	}
 	
-	public MultiContentSectionCharPairMatcher(final DocContentSections sections,
+	public MultiContentSectionCharPairMatcher(final IDocContentSections sections,
 			final String sectionType1, final ICharPairMatcher matcher1,
 			final String sectionType2, final ICharPairMatcher matcher2) {
 		this(sections);
@@ -69,7 +69,7 @@ public class MultiContentSectionCharPairMatcher implements ICharPairMatcher {
 	}
 	
 	
-	protected DocContentSections getSections() {
+	protected IDocContentSections getSections() {
 		return this.sections;
 	}
 	
@@ -92,7 +92,7 @@ public class MultiContentSectionCharPairMatcher implements ICharPairMatcher {
 	}
 	
 	protected final ICharPairMatcher getHandler(final String sectionType) {
-		if (sectionType == DocContentSections.ERROR) {
+		if (sectionType == IDocContentSections.ERROR) {
 			return null;
 		}
 		Object handler= this.handlers.get(sectionType);

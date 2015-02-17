@@ -33,7 +33,7 @@ import org.eclipse.jface.text.quickassist.IQuickAssistProcessor;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.ui.statushandlers.StatusManager;
 
-import de.walware.ecommons.text.core.sections.DocContentSections;
+import de.walware.ecommons.text.core.sections.IDocContentSections;
 import de.walware.ecommons.ui.util.DialogUtil;
 
 import de.walware.ecommons.ltk.internal.ui.LTKUIPlugin;
@@ -129,14 +129,14 @@ public class MultiContentSectionSourceViewerConfiguration extends SourceEditorVi
 	}
 	
 	
-	private final DocContentSections sections;
+	private final IDocContentSections sections;
 	
 	private SourceEditorViewerConfiguration primaryConfig;
 	private final Map<String, SourceEditorViewerConfiguration> secondaryConfigs= new IdentityHashMap<>(8);
 	private final Map<String, Integer> secondaryConfigStates= new IdentityHashMap<>();
 	
 	
-	public MultiContentSectionSourceViewerConfiguration(final DocContentSections sections,
+	public MultiContentSectionSourceViewerConfiguration(final IDocContentSections sections,
 			final ISourceEditor sourceEditor) {
 		super(sections, sourceEditor);
 		

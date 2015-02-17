@@ -16,7 +16,7 @@ import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.services.IServiceLocator;
 
-import de.walware.ecommons.text.core.sections.DocContentSections;
+import de.walware.ecommons.text.core.sections.IDocContentSections;
 
 import de.walware.ecommons.ltk.core.model.ISourceUnit;
 
@@ -69,7 +69,7 @@ public interface ISourceEditor extends IAdaptable {
 	 * 
 	 * @return the document content information
 	 */
-	public DocContentSections getDocumentContentInfo();
+	public IDocContentSections getDocumentContentInfo();
 	
 	/**
 	 * Returns whether the text in this text editor (SourceViewer) can be changed by the user

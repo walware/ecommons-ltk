@@ -19,7 +19,7 @@ import org.eclipse.jface.text.AbstractDocument;
 import org.eclipse.jface.text.IDocumentExtension4;
 import org.eclipse.jface.text.ISynchronizable;
 
-import de.walware.ecommons.text.core.sections.DocContentSections;
+import de.walware.ecommons.text.core.sections.IDocContentSections;
 
 import de.walware.ecommons.ltk.AstInfo;
 import de.walware.ecommons.ltk.ISourceUnitManager;
@@ -89,7 +89,7 @@ public interface ISourceUnit extends IModelElement, IAdaptable {
 	 * 
 	 * @return the document content information
 	 */
-	DocContentSections getDocumentContentInfo();
+	IDocContentSections getDocumentContentInfo();
 	
 	/**
 	 * Returns the current stamp of the content of this source unit.

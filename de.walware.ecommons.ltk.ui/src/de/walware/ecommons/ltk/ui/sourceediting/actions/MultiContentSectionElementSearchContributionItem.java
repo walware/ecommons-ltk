@@ -24,7 +24,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.menus.IWorkbenchContribution;
 import org.eclipse.ui.services.IServiceLocator;
 
-import de.walware.ecommons.text.core.sections.DocContentSections;
+import de.walware.ecommons.text.core.sections.IDocContentSections;
 import de.walware.ecommons.ui.actions.ListContributionItem;
 import de.walware.ecommons.ui.util.UIAccess;
 
@@ -38,7 +38,7 @@ import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditor;
  * Implement {@link #createItem(String)} for lazy initialization of the contribution items of the
  * section types.
  * 
- * @see DocContentSections
+ * @see IDocContentSections
  */
 public class MultiContentSectionElementSearchContributionItem extends ListContributionItem
 		implements IWorkbenchContribution, IExecutableExtension {
@@ -47,7 +47,7 @@ public class MultiContentSectionElementSearchContributionItem extends ListContri
 	private static final Object NULL= new Object();
 	
 	
-	private final DocContentSections sections;
+	private final IDocContentSections sections;
 	
 	private final Map<String, Object> items= new IdentityHashMap<>(8);
 	
@@ -56,7 +56,7 @@ public class MultiContentSectionElementSearchContributionItem extends ListContri
 	private IServiceLocator serviceLocator;
 	
 	
-	public MultiContentSectionElementSearchContributionItem(final DocContentSections sections) {
+	public MultiContentSectionElementSearchContributionItem(final IDocContentSections sections) {
 		super();
 		if (sections == null) {
 			throw new NullPointerException("sections"); //$NON-NLS-1$
@@ -64,12 +64,12 @@ public class MultiContentSectionElementSearchContributionItem extends ListContri
 		this.sections= sections;
 	}
 	
-	public MultiContentSectionElementSearchContributionItem(final DocContentSections sections,
+	public MultiContentSectionElementSearchContributionItem(final IDocContentSections sections,
 			final String sectionType1, final ListContributionItem item1) {
 		this(sections, sectionType1, item1, null, null);
 	}
 	
-	public MultiContentSectionElementSearchContributionItem(final DocContentSections sections,
+	public MultiContentSectionElementSearchContributionItem(final IDocContentSections sections,
 			final String sectionType1, final ListContributionItem item1,
 			final String sectionType2, final ListContributionItem item2) {
 		this(sections);
@@ -111,7 +111,7 @@ public class MultiContentSectionElementSearchContributionItem extends ListContri
 	}
 	
 	
-	protected final DocContentSections getSections() {
+	protected final IDocContentSections getSections() {
 		return this.sections;
 	}
 	
@@ -137,7 +137,7 @@ public class MultiContentSectionElementSearchContributionItem extends ListContri
 	}
 	
 	protected final ListContributionItem getItem(final String sectionType) {
-		if (sectionType == DocContentSections.ERROR) {
+		if (sectionType == IDocContentSections.ERROR) {
 			return null;
 		}
 		Object item= this.items.get(sectionType);

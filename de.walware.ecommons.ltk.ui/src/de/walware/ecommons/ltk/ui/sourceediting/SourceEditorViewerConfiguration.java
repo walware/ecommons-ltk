@@ -62,7 +62,7 @@ import de.walware.ecommons.templates.WordFinder;
 import de.walware.ecommons.text.ICharPairMatcher;
 import de.walware.ecommons.text.IIndentSettings;
 import de.walware.ecommons.text.IndentUtil;
-import de.walware.ecommons.text.core.sections.DocContentSections;
+import de.walware.ecommons.text.core.sections.IDocContentSections;
 import de.walware.ecommons.text.ui.DefaultBrowserInformationInput;
 import de.walware.ecommons.text.ui.presentation.ITextPresentationConstants;
 import de.walware.ecommons.text.ui.settings.AssistPreferences;
@@ -133,7 +133,7 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 			};
 	
 	
-	private final DocContentSections documentContentInfo;
+	private final IDocContentSections documentContentInfo;
 	
 	private final ISourceEditor editor;
 	
@@ -153,7 +153,7 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	private EffectiveHovers effectiveHovers;
 	
 	
-	public SourceEditorViewerConfiguration(final DocContentSections documentContentInfo,
+	public SourceEditorViewerConfiguration(final IDocContentSections documentContentInfo,
 			final ISourceEditor sourceEditor) {
 		if (documentContentInfo == null) {
 			throw new NullPointerException("documentContentInfo"); //$NON-NLS-1$
@@ -216,7 +216,7 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 		return this.editor;
 	}
 	
-	public final DocContentSections getDocumentContentInfo() {
+	public final IDocContentSections getDocumentContentInfo() {
 		return this.documentContentInfo;
 	}
 	

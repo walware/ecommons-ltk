@@ -19,7 +19,7 @@ import org.eclipse.jface.text.quickassist.IQuickAssistInvocationContext;
 import org.eclipse.jface.text.quickassist.IQuickAssistProcessor;
 import org.eclipse.jface.text.source.Annotation;
 
-import de.walware.ecommons.text.core.sections.DocContentSections;
+import de.walware.ecommons.text.core.sections.IDocContentSections;
 
 
 /**
@@ -29,7 +29,7 @@ import de.walware.ecommons.text.core.sections.DocContentSections;
  * Implement {@link #createProcessor(String)} for lazy initialization of the processors of the
  * section types.
  * 
- * @see DocContentSections
+ * @see IDocContentSections
  */
 public class MultiContentSectionQuickAssistProcessor implements IQuickAssistProcessor {
 	
@@ -37,14 +37,14 @@ public class MultiContentSectionQuickAssistProcessor implements IQuickAssistProc
 	private static final Object NULL= new Object();
 	
 	
-	private final DocContentSections sections;
+	private final IDocContentSections sections;
 	
 	private final Map<String, Object> processors= new IdentityHashMap<>(8);
 	
 	private String errorMessage;
 	
 	
-	public MultiContentSectionQuickAssistProcessor(final DocContentSections sections) {
+	public MultiContentSectionQuickAssistProcessor(final IDocContentSections sections) {
 		if (sections == null) {
 			throw new NullPointerException("sections"); //$NON-NLS-1$
 		}
@@ -60,7 +60,7 @@ public class MultiContentSectionQuickAssistProcessor implements IQuickAssistProc
 	}
 	
 	protected final IQuickAssistProcessor getProcessor(final String sectionType) {
-		if (sectionType == DocContentSections.ERROR) {
+		if (sectionType == IDocContentSections.ERROR) {
 			return null;
 		}
 		Object processor= this.processors.get(sectionType);

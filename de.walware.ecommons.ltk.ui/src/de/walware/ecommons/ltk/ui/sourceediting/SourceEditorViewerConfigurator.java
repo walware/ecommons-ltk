@@ -34,7 +34,7 @@ import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 import org.eclipse.ui.texteditor.spelling.SpellingProblem;
 
 import de.walware.ecommons.text.IIndentSettings;
-import de.walware.ecommons.text.core.sections.DocContentSections;
+import de.walware.ecommons.text.core.sections.IDocContentSections;
 import de.walware.ecommons.text.ui.presentation.ITextPresentationConstants;
 import de.walware.ecommons.text.ui.settings.DecorationPreferences;
 import de.walware.ecommons.ui.ISettingsChangedHandler;
@@ -78,7 +78,7 @@ public abstract class SourceEditorViewerConfigurator implements ISettingsChanged
 	 */
 	public abstract IDocumentSetupParticipant getDocumentSetupParticipant();
 	
-	public final DocContentSections getDocumentContentInfo() {
+	public final IDocContentSections getDocumentContentInfo() {
 		return fConfiguration.getDocumentContentInfo();
 	}
 	

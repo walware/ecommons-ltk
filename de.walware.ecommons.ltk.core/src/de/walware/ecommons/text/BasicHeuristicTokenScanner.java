@@ -22,7 +22,7 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.text.TypedRegion;
 
-import de.walware.ecommons.text.core.sections.DocContentSections;
+import de.walware.ecommons.text.core.sections.IDocContentSections;
 
 
 /**
@@ -263,7 +263,7 @@ public class BasicHeuristicTokenScanner implements ITokenScanner {
 	private StopCondition fNonWSorLRCondition;
 	
 	
-	public BasicHeuristicTokenScanner(final DocContentSections documentContentInfo,
+	public BasicHeuristicTokenScanner(final IDocContentSections documentContentInfo,
 			final IPartitionConstraint defaultContentConstraint) {
 		this.partitioning= documentContentInfo.getPartitioning();
 		this.defaultPartitionConstraint= defaultContentConstraint;

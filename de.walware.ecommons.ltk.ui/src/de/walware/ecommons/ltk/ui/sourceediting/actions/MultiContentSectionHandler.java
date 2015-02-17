@@ -21,7 +21,7 @@ import org.eclipse.core.commands.IHandler2;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.ui.IWorkbenchPart;
 
-import de.walware.ecommons.text.core.sections.DocContentSections;
+import de.walware.ecommons.text.core.sections.IDocContentSections;
 import de.walware.ecommons.workbench.ui.WorkbenchUIUtil;
 
 import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditor;
@@ -33,7 +33,7 @@ import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditor;
  * Implement {@link #createHandler(String)} for lazy initialization of the command handlers
  * of the section types.
  * 
- * @see DocContentSections
+ * @see IDocContentSections
  */
 public class MultiContentSectionHandler extends AbstractHandler {
 	
@@ -41,26 +41,26 @@ public class MultiContentSectionHandler extends AbstractHandler {
 	private static final Object NULL= new Object();
 	
 	
-	private final DocContentSections sections;
+	private final IDocContentSections sections;
 	
 	private final Map<String, Object> handlers= new IdentityHashMap<>(8);
 	
 	private ISourceEditor expliciteEditor;
 	
 	
-	public MultiContentSectionHandler(final DocContentSections sections) {
+	public MultiContentSectionHandler(final IDocContentSections sections) {
 		if (sections == null) {
 			throw new NullPointerException("sections"); //$NON-NLS-1$
 		}
 		this.sections= sections;
 	}
 	
-	public MultiContentSectionHandler(final DocContentSections sections,
+	public MultiContentSectionHandler(final IDocContentSections sections,
 			final String sectionType1, final IHandler2 handler1) {
 		this(sections, sectionType1, handler1, null, null);
 	}
 	
-	public MultiContentSectionHandler(final DocContentSections sections,
+	public MultiContentSectionHandler(final IDocContentSections sections,
 			final String sectionType1, final IHandler2 handler1,
 			final String sectionType2, final IHandler2 handler2) {
 		this(sections);
@@ -78,7 +78,7 @@ public class MultiContentSectionHandler extends AbstractHandler {
 		this.expliciteEditor= editor;
 	}
 	
-	protected final DocContentSections getSections() {
+	protected final IDocContentSections getSections() {
 		return this.sections;
 	}
 	
@@ -116,7 +116,7 @@ public class MultiContentSectionHandler extends AbstractHandler {
 	}
 	
 	protected final IHandler2 getHandler(final String sectionType) {
-		if (sectionType == DocContentSections.ERROR) {
+		if (sectionType == IDocContentSections.ERROR) {
 			return null;
 		}
 		Object handler= this.handlers.get(sectionType);

@@ -18,10 +18,7 @@ import org.eclipse.jface.text.TextUtilities;
 import de.walware.ecommons.collections.ImList;
 
 
-public abstract class DocContentSections {
-	
-	
-	public static final String ERROR= ""; //$NON-NLS-1$
+public abstract class AbstractDocContentSections implements IDocContentSections {
 	
 	
 	private final String partitioning;
@@ -30,7 +27,7 @@ public abstract class DocContentSections {
 	private final ImList<String> secondaryTypes;
 	
 	
-	protected DocContentSections(final String partitioning, final String primaryType,
+	protected AbstractDocContentSections(final String partitioning, final String primaryType,
 			final ImList<String> secondaryTypes) {
 		this.partitioning= partitioning;
 		this.primaryType= primaryType;
@@ -38,19 +35,23 @@ public abstract class DocContentSections {
 	}
 	
 	
+	@Override
 	public final String getPartitioning() {
 		return this.partitioning;
 	}
 	
+	@Override
 	public String getPrimaryType() {
 		return this.primaryType;
 	}
 	
+	@Override
 	public ImList<String> getSecondaryTypes() {
 		return this.secondaryTypes;
 	}
 	
 	
+	@Override
 	public String getType(final IDocument document, final int offset) {
 		try {
 			return getTypeByPartition(
@@ -62,6 +63,7 @@ public abstract class DocContentSections {
 		}
 	}
 	
+	@Override
 	public abstract String getTypeByPartition(String contentType);
 	
 }
