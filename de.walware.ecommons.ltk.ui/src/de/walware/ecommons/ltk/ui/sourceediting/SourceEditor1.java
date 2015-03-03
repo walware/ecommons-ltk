@@ -23,6 +23,7 @@ import org.eclipse.core.commands.IHandler2;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.action.IMenuManager;
@@ -89,6 +90,7 @@ import de.walware.ecommons.ltk.IDocumentModelProvider;
 import de.walware.ecommons.ltk.IModelManager;
 import de.walware.ecommons.ltk.LTK;
 import de.walware.ecommons.ltk.ast.IAstNode;
+import de.walware.ecommons.ltk.core.IModelTypeDescriptor;
 import de.walware.ecommons.ltk.core.model.IModelElement;
 import de.walware.ecommons.ltk.core.model.ISourceStructElement;
 import de.walware.ecommons.ltk.core.model.ISourceUnit;
@@ -225,6 +227,9 @@ public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 	
 /*- Fields -----------------------------------------------------------------*/
 	
+	private final IContentType contentType;
+	private final IModelTypeDescriptor modelType;
+	
 	private SourceEditorViewerConfigurator fConfigurator;
 	private boolean fLazySetup;
 	private ISourceUnit fSourceUnit;
@@ -260,12 +265,30 @@ public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 	
 /*- Contructors ------------------------------------------------------------*/
 	
-	public SourceEditor1() {
+	public SourceEditor1(final IContentType contentType) {
 		super();
+		this.contentType= contentType;
+		this.modelType= LTK.getExtContentTypeManager().getModelTypeForContentType(contentType.getId());
 	}
 	
 	
 /*- Methods ----------------------------------------------------------------*/
+	
+	@Override
+	public IContentType getContentType() {
+		return this.contentType;
+	}
+	
+	/**
+	 * Returns the model type of source units of the editor.
+	 * The value must not change for an editor instance and all source units
+	 * in the editor must be of the same type.
+	 * 
+	 * @return id of the model type
+	 */
+	public String getModelTypeId() {
+		return this.modelType.getId();
+	}
 	
 	@Override
 	protected void initializeEditor() {
@@ -864,10 +887,18 @@ public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 	
 	@Override
 	public Object getAdapter(final Class required) {
-		if (ISourceEditor.class.equals(required)) {
+		if (required == ISourceEditor.class) {
 			return this;
 		}
-		if (IContentOutlinePage.class.equals(required)) {
+		if (required == ISourceViewer.class) {
+			return getSourceViewer();
+		}
+		
+		if (required == IContentType.class) {
+			return this.contentType;
+		}
+		
+		if (required == IContentOutlinePage.class) {
 			if (fOutlinePage == null) {
 				fOutlinePage = createOutlinePage();
 				if (fOutlinePage != null) {
@@ -876,14 +907,11 @@ public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 			}
 			return fOutlinePage;
 		}
-		if (ITemplatesPage.class.equals(required)) {
+		if (required == ITemplatesPage.class) {
 			if (fTemplatesPage == null) {
 				fTemplatesPage = createTemplatesPage();
 			}
 			return fTemplatesPage;
-		}
-		if (ISourceViewer.class.equals(required)) {
-			return getSourceViewer();
 		}
 		if (fFoldingSupport != null) {
 			final Object adapter = fFoldingSupport.getAdapter(getSourceViewer(), required);

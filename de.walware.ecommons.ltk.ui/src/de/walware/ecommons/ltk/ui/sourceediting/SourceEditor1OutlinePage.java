@@ -12,6 +12,7 @@
 package de.walware.ecommons.ltk.ui.sourceediting;
 
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
@@ -438,11 +439,14 @@ public abstract class SourceEditor1OutlinePage extends AbstractEditorOutlinePage
 	
 	@Override
 	public Object getAdapter(final Class required) {
-		if (ISourceEditorAssociated.class.equals(required)) {
+		if (required == ISourceEditorAssociated.class) {
 			return this;
 		}
-		if (IEncodingSupport.class.equals(required)) {
+		if (required == IEncodingSupport.class) {
 			return fEditor.getAdapter(IEncodingSupport.class);
+		}
+		if (required == IContentType.class) {
+			return fEditor.getContentType();
 		}
 		return null;
 	}

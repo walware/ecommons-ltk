@@ -11,6 +11,7 @@
 
 package de.walware.ecommons.ltk.ui.sourceediting;
 
+import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.services.IServiceLocator;
@@ -44,7 +45,7 @@ public class ViewerSourceEditorAdapter implements ISourceEditor {
 	
 	
 	@Override
-	public String getModelTypeId() {
+	public IContentType getContentType() {
 		return null;
 	}
 	

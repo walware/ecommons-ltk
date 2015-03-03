@@ -52,8 +52,6 @@ public interface ISourceUnit extends IModelElement, IAdaptable {
 	 */
 	boolean isSynchronized();
 	
-	String getContentTypeId();
-	
 	/**
 	 * The file resource of the source unit. The type depends on the source unit.
 	 * 

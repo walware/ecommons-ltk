@@ -41,7 +41,6 @@ import org.eclipse.ui.texteditor.IEditorStatusLine;
 
 import de.walware.ecommons.ui.SharedUIResources;
 
-import de.walware.ecommons.ltk.core.model.ISourceUnit;
 import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditor;
 
 
@@ -68,15 +67,9 @@ public class LTKWorkbenchUIUtil {
 	}
 	
 	public static String getContentTypeId(final IWorkbenchPart part) {
-		{	final ISourceEditor editor = (ISourceEditor) part.getAdapter(ISourceEditor.class);
-			if (editor != null) {
-				final ISourceUnit su = editor.getSourceUnit();
-				if (su != null) {
-					final String contentTypeId = su.getContentTypeId();
-					if (contentTypeId != null) {
-						return contentTypeId;
-					}
-				}
+		{	final IContentType contentType= (IContentType) part.getAdapter(IContentType.class);
+			if (contentType != null) {
+				return contentType.getId();
 			}
 		}
 		if (part instanceof IEditorPart) {

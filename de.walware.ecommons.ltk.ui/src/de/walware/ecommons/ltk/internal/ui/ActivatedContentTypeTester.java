@@ -16,15 +16,12 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 
 import de.walware.ecommons.ltk.LTK;
-import de.walware.ecommons.ltk.core.model.ISourceUnit;
-import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditor;
 
 
 /**
@@ -87,16 +84,7 @@ public class ActivatedContentTypeTester extends PropertyTester {
 		else {
 			// get content type by ISourceEditor
 			if (receiver instanceof IAdaptable) {
-				final ISourceEditor editor = (ISourceEditor) ((IAdaptable) receiver).getAdapter(ISourceEditor.class);
-				if (editor != null) {
-					final ISourceUnit sourceUnit = editor.getSourceUnit();
-					if (sourceUnit != null) {
-						final String contentTypeId = sourceUnit.getContentTypeId();
-						if (contentTypeId != null) {
-							contentType = Platform.getContentTypeManager().getContentType(contentTypeId);
-						}
-					}
-				}
+				contentType= (IContentType) ((IAdaptable) receiver).getAdapter(IContentType.class);
 			}
 		}
 		

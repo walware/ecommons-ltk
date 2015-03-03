@@ -85,8 +85,8 @@ public class PasteElementsHandler extends AbstractElementsHandler {
 		if (selection instanceof IStructuredSelection) {
 			final IProgressMonitor monitor = new NullProgressMonitor();
 			final IStructuredSelection structuredSelection = (IStructuredSelection) selection;
-			final ISourceUnitModelInfo modelInfo = su.getModelInfo(fEditor.getModelTypeId(),
-					IModelManager.MODEL_FILE, monitor );
+			final ISourceUnitModelInfo modelInfo = su.getModelInfo(null, IModelManager.MODEL_FILE,
+					monitor );
 			if (modelInfo == null) {
 				return null;
 			}

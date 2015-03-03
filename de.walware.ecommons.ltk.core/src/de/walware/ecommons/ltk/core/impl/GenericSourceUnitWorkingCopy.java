@@ -72,11 +72,6 @@ public abstract class GenericSourceUnitWorkingCopy implements ISourceUnit {
 		return this.from.getModelTypeId();
 	}
 	
-	@Override
-	public String getContentTypeId() {
-		return this.from.getContentTypeId();
-	}
-	
 	/**
 	 * {@inheritDoc}
 	 */

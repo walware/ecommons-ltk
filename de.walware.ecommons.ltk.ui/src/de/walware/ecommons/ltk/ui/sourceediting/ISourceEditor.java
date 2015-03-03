@@ -12,6 +12,7 @@
 package de.walware.ecommons.ltk.ui.sourceediting;
 
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.services.IServiceLocator;
@@ -26,42 +27,41 @@ import de.walware.ecommons.ltk.core.model.ISourceUnit;
  */
 public interface ISourceEditor extends IAdaptable {
 	
+	
 	/**
-	 * Returns the model type of source units of the editor.
-	 * The value must not change for an editor instance and all source units
-	 * in the editor must be of the same type.
+	 * Returns the content type the editor is intended for.
 	 * 
-	 * @return id of the model type
+	 * @return the content type or <code>null</code>
 	 */
-	public String getModelTypeId();
+	IContentType getContentType();
 	
 	/**
 	 * Returns the source unit of editor input, if exists.
 	 * 
 	 * @return model element or <code>null</code>
 	 */
-	public ISourceUnit getSourceUnit();
+	ISourceUnit getSourceUnit();
 	
 	/**
 	 * Returns the part the editor belongs to
 	 * 
 	 * @return the part or <code>null</code>, if not in part
 	 */
-	public IWorkbenchPart getWorkbenchPart();
+	IWorkbenchPart getWorkbenchPart();
 	
 	/**
 	 * Returns the service locator for the editor
 	 * 
 	 * @return service locator responsible for editor
 	 */
-	public IServiceLocator getServiceLocator();
+	IServiceLocator getServiceLocator();
 	
 	/**
 	 * Allows access to the SourceViewer
 	 * 
 	 * @return the source viewer of the editor.
 	 */
-	public SourceViewer getViewer();
+	SourceViewer getViewer();
 	
 	/**
 	 * Returns the information about partitioning and content sections types of the document for 
@@ -69,7 +69,7 @@ public interface ISourceEditor extends IAdaptable {
 	 * 
 	 * @return the document content information
 	 */
-	public IDocContentSections getDocumentContentInfo();
+	IDocContentSections getDocumentContentInfo();
 	
 	/**
 	 * Returns whether the text in this text editor (SourceViewer) can be changed by the user
@@ -77,7 +77,7 @@ public interface ISourceEditor extends IAdaptable {
 	 * @param validate causes final validation if editor input is editable
 	 * @return <code>true</code> if it can be edited, and <code>false</code> if it is read-only
 	 */
-	public boolean isEditable(boolean validate);
+	boolean isEditable(boolean validate);
 	
 	/**
 	 * Selects and reveals the specified range in this text editor
@@ -85,8 +85,8 @@ public interface ISourceEditor extends IAdaptable {
 	 * @param offset the offset of the selection
 	 * @param length the length of the selection
 	 */
-	public void selectAndReveal(int offset, int length);
+	void selectAndReveal(int offset, int length);
 	
-	public ITextEditToolSynchronizer getTextEditToolSynchronizer();
+	ITextEditToolSynchronizer getTextEditToolSynchronizer();
 	
 }
