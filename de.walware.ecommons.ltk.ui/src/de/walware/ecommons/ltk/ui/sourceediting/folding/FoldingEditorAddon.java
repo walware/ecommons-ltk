@@ -383,7 +383,7 @@ public class FoldingEditorAddon implements ISourceEditorAddon, IModelElementInpu
 		private final QualifiedName fPropertyName;
 		
 		public SaveJob(final IResource resource, final QualifiedName propertyName) {
-			super(NLS.bind("Save Folding State for '{0}'", resource.toString())); //$NON-NLS-1$
+			super(NLS.bind("Save Folding State for ''{0}''", resource.toString())); //$NON-NLS-1$
 			setSystem(true);
 			setUser(false);
 			setPriority(Job.LONG);
