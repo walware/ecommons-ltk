@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.BadPositionCategoryException;
@@ -51,9 +52,8 @@ public class TreePartitioner implements IDocumentPartitioner,
 		IDocumentPartitionerExtension, IDocumentPartitionerExtension2, IDocumentPartitionerExtension3 {
 	
 	
-	private static final boolean DEBUG_CHECK= true;
-//	private static final boolean DEBUG_CHECK= "true".equalsIgnoreCase( //$NON-NLS-1$
-//			Platform.getDebugOption("de.walware.ecommons.text/debug/TreePartitioner/validate")); //$NON-NLS-1$
+	static final boolean DEBUG_CHECK= "true".equalsIgnoreCase( //$NON-NLS-1$
+			Platform.getDebugOption("de.walware.ecommons.text/debug/TreePartitioner/validate")); //$NON-NLS-1$
 	
 	
 	/**
@@ -206,6 +206,7 @@ public class TreePartitioner implements IDocumentPartitioner,
 		finally {
 			if (DEBUG_CHECK) {
 				check();
+//				System.out.println(toString());
 			}
 		}
 	}
@@ -308,6 +309,7 @@ public class TreePartitioner implements IDocumentPartitioner,
 			finally {
 				if (DEBUG_CHECK) {
 					check();
+//					System.out.println(toString());
 				}
 			}
 			
@@ -711,7 +713,6 @@ public class TreePartitioner implements IDocumentPartitioner,
 	void check() {
 		try {
 			validateChildren(this.rootPosition);
-//			System.out.println(toString());
 		}
 		catch (final Error e) {
 			LTKCorePlugin.log(new Status(IStatus.ERROR, LTKCorePlugin.PLUGIN_ID,

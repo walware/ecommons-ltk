@@ -112,6 +112,10 @@ final class TreePartitionerScan implements ITreePartitionNodeScan {
 			final ITreePartitionNode parent, final int offset) {
 		final NodePosition position= doAdd(type, (NodePosition) parent, offset, 0);
 		
+		if (TreePartitioner.DEBUG_CHECK) {
+			this.partitioner.check();
+		}
+		
 		if (this.autoBreakEnabled) {
 			checkBreak();
 		}
@@ -124,8 +128,16 @@ final class TreePartitionerScan implements ITreePartitionNodeScan {
 			final ITreePartitionNode parent, final int offset, final int length) {
 		final NodePosition position= doAdd(type, (NodePosition) parent, offset, length);
 		
+		if (TreePartitioner.DEBUG_CHECK) {
+			this.partitioner.check();
+		}
+		
 		if (position.getLength() != length) {
 			doUpdateEnd(position, offset + length);
+			
+			if (TreePartitioner.DEBUG_CHECK) {
+				this.partitioner.check();
+			}
 		}
 		
 		if (this.autoBreakEnabled) {
@@ -205,7 +217,11 @@ final class TreePartitionerScan implements ITreePartitionNodeScan {
 			}
 			
 			position= createPosition(parentPosition, offset, length, childIdx, type);
-			position.setLength(length);
+			
+			this.lastParentPosition= parentPosition;
+			this.lastAddedIndex= childIdx;
+			this.lastAddedPosition= position;
+			this.currentOffset= offset;
 		}
 		
 		return position;
@@ -303,7 +319,9 @@ final class TreePartitionerScan implements ITreePartitionNodeScan {
 			doUpdateEnd(position, offset);
 		}
 		
-		this.partitioner.check();
+		if (TreePartitioner.DEBUG_CHECK) {
+			this.partitioner.check();
+		}
 		
 		if (this.autoBreakEnabled) {
 			checkBreak();

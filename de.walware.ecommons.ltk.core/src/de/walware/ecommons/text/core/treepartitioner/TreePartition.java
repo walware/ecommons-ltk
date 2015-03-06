@@ -67,7 +67,7 @@ public class TreePartition extends Region implements ITypedRegion {
 	
 	@Override
 	public String toString() {
-		return getType() + " - " + super.toString(); //$NON-NLS-1$
+		return getType() + ": offset= " + getOffset() + ", length= " + getLength(); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 }
