@@ -17,7 +17,7 @@ import java.util.Set;
 import de.walware.ecommons.ltk.ui.sourceediting.folding.FoldingEditorAddon.FoldingStructureComputationContext;
 
 
-public abstract interface FoldingProvider {
+public interface FoldingProvider {
 	
 	
 	boolean checkConfig(Set<String> groupIds);
