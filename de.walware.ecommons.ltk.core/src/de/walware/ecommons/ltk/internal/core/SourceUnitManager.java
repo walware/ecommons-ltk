@@ -174,7 +174,7 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 						if (matchingElement != null) {
 							final ISourceUnitFactory factory= (ISourceUnitFactory) matchingElement.createExecutableExtension("unitFactory"); //$NON-NLS-1$
 							final ContextItem contextItem= new ContextItem(context, factory);
-							this.contextItems= ImCollections.concatList(contextItems, contextItem);
+							this.contextItems= ImCollections.addElement(contextItems, contextItem);
 							return contextItem;
 						}
 					}
@@ -440,7 +440,7 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 				return getModelItem(modelTypeId);
 			}
 			final ModelItem modelItem= new ModelItem(modelTypeId);
-			this.modelItems= ImCollections.concatList(modelItems, modelItem);
+			this.modelItems= ImCollections.addElement(modelItems, modelItem);
 			return modelItem;
 		}
 	}

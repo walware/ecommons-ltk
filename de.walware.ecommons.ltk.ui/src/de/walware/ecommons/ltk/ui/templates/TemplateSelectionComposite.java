@@ -80,7 +80,7 @@ public class TemplateSelectionComposite extends Composite implements ISelectionC
 	public void setInput(final List<Template> templates, final boolean allowNone,
 			final ContextTypeRegistry contextRegistry) {
 		this.templates= (allowNone) ?
-				ImCollections.concatList(NONE, templates) :
+				ImCollections.addElement(templates, 0, NONE) :
 				ImCollections.toList(templates);
 		this.contextRegistry= contextRegistry;
 		
