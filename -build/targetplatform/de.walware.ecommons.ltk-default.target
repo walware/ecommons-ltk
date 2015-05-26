@@ -5,15 +5,15 @@
 	<locations>
 		<location includeAllPlatforms="false" includeMode="planner" includeConfigurePhase="false" includeSource="false"
 				type="InstallableUnit">
-			<repository location="http://download.eclipse.org/eclipse/updates/3.8"/>
+			<repository location="http://download.eclipse.org/eclipse/updates/4.4"/>
 			<unit id="org.eclipse.platform.feature.group"
-					version="3.8.1.v20130118-180812-9jF7oIBFG8eU2pim-VbIlTuQjY0RWWK3x-bv4I"/>
+					version="4.4.2.v20150204-1700"/>
 		</location>
 		<location includeAllPlatforms="false" includeMode="planner" includeConfigurePhase="false" includeSource="false"
 				type="InstallableUnit">
-			<repository location="http://download.eclipse.org/releases/juno"/>
-			<unit id="org.eclipse.ecf.core.feature.group"
-					version="3.5.6.v20120610-1946"/>
+			<repository location="http://download.eclipse.org/releases/luna"/>
+			<unit id="org.eclipse.ecf.docshare.feature.feature.group"
+					version="1.0.0.v20141221-2352"/>
 		</location>
 	</locations>
 </target>

@@ -12,7 +12,6 @@
 package de.walware.ecommons.text;
 
 
-
 /**
  * Generic API for input of lexers etc.
  * <p>
