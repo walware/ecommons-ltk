@@ -11,6 +11,7 @@
 
 package de.walware.ecommons.ltk.ui.sourceediting.assist;
 
+import java.io.File;
 import java.util.Arrays;
 
 import com.ibm.icu.text.Collator;
@@ -27,7 +28,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
@@ -45,6 +45,8 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.statushandlers.StatusManager;
 
+import de.walware.ecommons.lang.SystemUtils;
+import de.walware.ecommons.runtime.core.utils.PathUtils;
 import de.walware.ecommons.ui.SharedUIResources;
 
 import de.walware.ecommons.ltk.internal.ui.LTKUIPlugin;
@@ -92,7 +94,7 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 				name.insert(0, prefix);
 			}
 			if (this.isDirectory) {
-				name.append(PathCompletionComputor.this.pathSeparator);
+				name.append(PathCompletionComputor.this.fileSeparator);
 			}
 			this.name= name.toString();
 		}
@@ -282,8 +284,10 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 	}
 	
 	
-	private String pathSeparator;
-	private String pathSeparatorBackup;
+	private char fileSeparator;
+	private char fileSeparatorBackup;
+	
+	private boolean isWindows;
 	
 	private ISourceEditor editor;
 	
@@ -304,7 +308,8 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 	@Override
 	public void sessionStarted(final ISourceEditor editor, final ContentAssist assist) {
 		this.editor= editor;
-		this.pathSeparator= getDefaultFileSeparator();
+		this.isWindows= getIsWindows();
+		this.fileSeparator= getDefaultFileSeparator();
 	}
 	
 	/**
@@ -315,13 +320,20 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 		this.editor= null;
 	}
 	
-	protected String getDefaultFileSeparator() {
-		// use backslash only for local window systems
-		return isWin() ? "\\" : "/"; //$NON-NLS-1$ //$NON-NLS-2$
+	protected boolean getIsWindows() {
+		return SystemUtils.isOSWindows(System.getProperty(SystemUtils.OS_NAME_KEY));
 	}
 	
-	protected String getFileSeparator() {
-		return this.pathSeparator;
+	protected final boolean isWindows() {
+		return this.isWindows;
+	}
+	
+	protected char getDefaultFileSeparator() {
+		return (isWindows()) ? '\\' : '/';
+	}
+	
+	protected char getSegmentSeparator() {
+		return this.fileSeparator;
 	}
 	
 	public char[] getCompletionProposalAutoActivationCharacters() {
@@ -346,96 +358,78 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 			}
 			
 			String prefix= checkPrefix(context.getSourceViewer().getDocument().get(
-					partition.getOffset(), offset-partition.getOffset() ));
+					partition.getOffset(), offset - partition.getOffset() ));
 			
 			if (prefix == null) {
 				return null;
 			}
 			
 			boolean needSeparatorBeforeStart= false; // including virtual separator
-			String start= ""; //$NON-NLS-1$
+			String segmentPrefix= ""; //$NON-NLS-1$
 			IFileStore baseStore= null;
-			IPath path= null;
 			
-			final char lastChar= (prefix.length() > 0) ? prefix.charAt(prefix.length()-1) : 0;
-			switch (lastChar) {
-			case ':':
-				prefix= prefix+this.pathSeparator;
-				if (Path.ROOT.isValidPath(prefix)) {
-					path= new Path(prefix);
+			if (prefix.length() > 0 && prefix.charAt(prefix.length() - 1) == '.') {
+				// prevent that path segments '.' and '..' at end are resolved by Path#canonicalize
+				if (prefix.equals(".") || prefix.endsWith("/.") || (isWindows() && prefix.endsWith("\\."))) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					prefix= prefix.substring(0, prefix.length() - 1);
+					segmentPrefix= "."; //$NON-NLS-1$
+				}
+				else if (prefix.equals("..") || prefix.endsWith("/..") || (isWindows() && prefix.endsWith("\\.."))) { // //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					prefix= prefix.substring(0, prefix.length() - 2);
+					segmentPrefix= ".."; //$NON-NLS-1$
+				}
+			}
+			IPath path= createPath(prefix);
+			if (path == null) {
+				return null;
+			}
+			if (path.segmentCount() == 0) {
+				if (isWindows() && path.getDevice() != null && !path.isRoot()) { // C: -> C:/
+					path= path.addTrailingSeparator();
 					needSeparatorBeforeStart= true;
 				}
-				break;
-			case '.':
-				// prevent that path segments '.' and '..' at end are resolved
-				if (prefix.equals(".") || prefix.endsWith("\\.") || prefix.endsWith("/.")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					prefix= prefix.substring(0, prefix.length()-1);
-					if (Path.ROOT.isValidPath(prefix)) {
-						start= "."; //$NON-NLS-1$
-						path= new Path(prefix);
-					}
-					break;
+			}
+			else if (// path.segmentCount() > 0 &&
+					segmentPrefix.isEmpty() && !path.hasTrailingSeparator()) {
+				segmentPrefix= path.lastSegment();
+				path= path.removeLastSegments(1);
+			}
+			// on Windows, path starting with path separator are relative to the device of current directory
+			if (path.isAbsolute() && isWindows() && path.getDevice() == null && !path.isUNC()) { 
+				final IPath basePath= getRelativeBasePath();
+				if (basePath != null) {
+					path= path.setDevice(basePath.getDevice());
 				}
-				else if (prefix.equals("..") || prefix.endsWith("\\..") || prefix.endsWith("/..")) { // //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					prefix= prefix.substring(0, prefix.length()-2);
-					if (Path.ROOT.isValidPath(prefix)) {
-						start= ".."; //$NON-NLS-1$
-						path= new Path(prefix);
-					}
-					break;
-				}
-				//$FALL-THROUGH$
-			default:
-				if (Path.ROOT.isValidPath(prefix)) {
-					path= new Path(prefix);
-					if (path.segmentCount() > 0 && lastChar != '\\' && lastChar != '/') {
-						start= path.lastSegment();
-						path= path.removeLastSegments(1);
-						if (path == null) {
-							path= new Path(""); //$NON-NLS-1$
-						}
-					}
-				}
-				break;
 			}
 			
-			if (path != null) {
-				// on Windows, path starting with path separator are relative to the device of current directory
-				if (path.isAbsolute() && isWin() && path.getDevice() == null && !path.isUNC()) { 
-					final IPath workspace= getRelativeBasePath();
-					if (workspace != null) {
-						path= path.setDevice(workspace.getDevice());
-					}
-				}
-				baseStore= resolveStore(path);
-			}
+			baseStore= resolveStore(path);
 			
 			updatePathSeparator(prefix);
 			
-			String completionPrefix= (needSeparatorBeforeStart) ? this.pathSeparator : null;
+			String completionPrefix= (needSeparatorBeforeStart) ? Character.toString(this.fileSeparator) : null;
 			
 			if (baseStore == null || !baseStore.fetchInfo().exists()) {
 				if (path != null) {
-					return tryAlternative(context, proposals, path, offset - start.length(), start,
-							prefix, completionPrefix );
+					return tryAlternative(context, proposals, path, offset - segmentPrefix.length(), 
+							segmentPrefix, completionPrefix );
 				}
 				return null;
 			}
 			
-			doAddChildren(context, proposals, baseStore, offset - start.length(), start,
+			doAddChildren(context, proposals, baseStore, offset - segmentPrefix.length(), segmentPrefix,
 					completionPrefix );
-			if (start != null && start.length() > 0 && !start.equals(".")) { //$NON-NLS-1$
-				baseStore= baseStore.getChild(start);
+			if (!segmentPrefix.isEmpty() && !segmentPrefix.equals(".")) { //$NON-NLS-1$
+				baseStore= baseStore.getChild(segmentPrefix);
 				if (baseStore.fetchInfo().exists()) {
 					final StringBuilder prefixBuilder= new StringBuilder();
 					if (completionPrefix != null) {
 						prefixBuilder.append(completionPrefix);
 					}
 					prefixBuilder.append(baseStore.getName());
-					prefixBuilder.append(this.pathSeparator);
+					prefixBuilder.append(this.fileSeparator);
 					completionPrefix= prefixBuilder.toString();
-					doAddChildren(context, proposals, baseStore, offset - start.length(),
-							null, completionPrefix );
+					doAddChildren(context, proposals, baseStore, offset - segmentPrefix.length(),
+							"", completionPrefix ); //$NON-NLS-1$
 				}
 			}
 			return Status.OK_STATUS;
@@ -466,37 +460,47 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 		return prefix;
 	}
 	
+	private IPath createPath(String s) {
+		if (isWindows() && File.separatorChar == '/') {
+			s= s.replace('\\', '/');
+		}
+		return PathUtils.check(new Path(s));
+	}
+	
 	private void updatePathSeparator(final String prefix) {
 		final int lastBack= prefix.lastIndexOf('\\');
 		final int lastForw= prefix.lastIndexOf('/');
 		if (lastBack > lastForw) {
-			this.pathSeparatorBackup= this.pathSeparator;
-			this.pathSeparator= "\\"; //$NON-NLS-1$
+			this.fileSeparatorBackup= this.fileSeparator;
+			this.fileSeparator= '\\';
 		}
 		else if (lastForw > lastBack) {
-			this.pathSeparatorBackup= this.pathSeparator;
-			this.pathSeparator= "/"; //$NON-NLS-1$
+			this.fileSeparatorBackup= this.fileSeparator;
+			this.fileSeparator= '/';
 		}
 		// else -1 == -1
 	}
 	
 	private void restorePathSeparator() {
-		if (this.pathSeparatorBackup != null) {
-			this.pathSeparator= this.pathSeparatorBackup;
-			this.pathSeparatorBackup= null;
+		if (this.fileSeparatorBackup != 0) {
+			this.fileSeparator= this.fileSeparatorBackup;
+			this.fileSeparatorBackup= 0;
 		}
 	}
 	
 	protected void doAddChildren(final AssistInvocationContext context, final AssistProposalCollector<IAssistCompletionProposal> proposals,
 			final IFileStore baseStore,
-			final int startOffset, final String startsWith, final String prefix) throws CoreException {
+			final int startOffset, final String segmentPrefix, final String completionPrefix) throws CoreException {
 		final IContainer[] workspaceRefs= ResourcesPlugin.getWorkspace().getRoot().findContainersForLocationURI(baseStore.toURI());
 		final IContainer workspaceRef= (workspaceRefs.length > 0) ? workspaceRefs[0] : null;
 		final String[] names= baseStore.childNames(EFS.NONE, new NullProgressMonitor());
 		Arrays.sort(names, Collator.getInstance());
 		for (final String name : names) {
-			if (startsWith == null || name.regionMatches(true, 0, startsWith, 0, startsWith.length())) {
-				proposals.add(new ResourceProposal(context, startOffset, baseStore.getChild(name), null, prefix, workspaceRef));
+			if (segmentPrefix.isEmpty()
+					|| name.regionMatches(true, 0, segmentPrefix, 0, segmentPrefix.length()) ) {
+				proposals.add(new ResourceProposal(context, startOffset,
+						baseStore.getChild(name), null, completionPrefix,
+						workspaceRef ));
 			}
 		}
 	}
@@ -522,26 +526,27 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 		return null;
 	}
 	
-	protected IFileStore resolveStore(final IPath path) throws CoreException {
+	protected IFileStore resolveStore(IPath path) throws CoreException {
 		if (!path.isAbsolute()) {
-			final IFileStore base= getRelativeBaseStore();
-			if (base != null) {
-				return base.getFileStore(path);
+			if (!isWindows() && path.getDevice() == null && "~".equals(path.segment(0))) { //$NON-NLS-1$
+				final IPath homePath= new Path(System.getProperty(SystemUtils.USER_HOME_KEY));
+				path= PathUtils.check(homePath.append(path.removeFirstSegments(1)));
 			}
-			return null;
+			else {
+				final IFileStore base= getRelativeBaseStore();
+				if (base != null) {
+					return base.getFileStore(path);
+				}
+				return null;
+			}
 		}
-		else {
-			return EFS.getStore(URIUtil.toURI(path));
-		}
+		return EFS.getStore(URIUtil.toURI(path));
 	}
 	
 	protected IStatus tryAlternative(final AssistInvocationContext context, final AssistProposalCollector<IAssistCompletionProposal> proposals,
-			final IPath path, final int startOffset, final String startsWith, final String prefix, final String completionPrefix) throws CoreException {
+			final IPath path, final int startOffset,
+			final String segmentPrefix, final String completionPrefix) throws CoreException {
 		return null;
-	}
-	
-	protected boolean isWin() {
-		return Platform.getOS().startsWith("win"); //$NON-NLS-1$
 	}
 	
 	/**

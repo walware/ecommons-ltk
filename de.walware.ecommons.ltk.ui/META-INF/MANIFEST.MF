@@ -31,7 +31,9 @@ Import-Package: com.ibm.icu.text;version="4.4.2.2",
  de.walware.ecommons.collections;version="1.1.0",
  de.walware.ecommons.databinding;version="0.10.0",
  de.walware.ecommons.io,
- de.walware.ecommons.preferences
+ de.walware.ecommons.lang,
+ de.walware.ecommons.preferences,
+ de.walware.ecommons.runtime.core.utils
 Export-Package: de.walware.ecommons.ltk.ui,
  de.walware.ecommons.ltk.ui.compare,
  de.walware.ecommons.ltk.ui.refactoring,
