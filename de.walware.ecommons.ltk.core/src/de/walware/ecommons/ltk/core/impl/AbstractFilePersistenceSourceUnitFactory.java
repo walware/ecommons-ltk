@@ -82,7 +82,7 @@ public abstract class AbstractFilePersistenceSourceUnitFactory implements ISourc
 			ifile = (IFile) from;
 		}
 		else {
-			final IPath path = new Path(id.substring(IFILE_PREFIX.length()));
+			final IPath path = Path.fromPortableString(id.substring(IFILE_PREFIX.length()));
 			ifile = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
 		}
 		return createSourceUnit(id, ifile);
