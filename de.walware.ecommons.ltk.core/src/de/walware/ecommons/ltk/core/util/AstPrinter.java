@@ -110,6 +110,14 @@ public class AstPrinter implements ICommonAstVisitor {
 	private void writeEncoded(final String s, final int begin, final int length) throws IOException {
 		final int end= begin + length;
 		for (int i= begin; i < end; i++) {
+			if (i < 0) {
+				this.writer.write("<E: out of bounds>");
+				i= 0;
+			}
+			else if (i >= s.length()) {
+				this.writer.write("<E: out of bounds>");
+				return;
+			}
 			final int c= s.charAt(i);
 			if (c < 0x10) {
 				this.writer.write("<0x0"); //$NON-NLS-1$
