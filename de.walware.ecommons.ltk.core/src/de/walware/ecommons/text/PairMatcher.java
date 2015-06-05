@@ -21,6 +21,7 @@ import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.TextUtilities;
 
+import de.walware.ecommons.text.core.IPartitionConstraint;
 import de.walware.ecommons.text.core.sections.IDocContentSections;
 
 

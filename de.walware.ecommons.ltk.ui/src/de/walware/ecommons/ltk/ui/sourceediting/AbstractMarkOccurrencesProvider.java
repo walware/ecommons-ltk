@@ -27,7 +27,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
-import de.walware.ecommons.text.IPartitionConstraint;
+import de.walware.ecommons.text.core.IPartitionConstraint;
 
 import de.walware.ecommons.ltk.IModelManager;
 import de.walware.ecommons.ltk.ast.AstSelection;

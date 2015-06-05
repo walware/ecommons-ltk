@@ -31,6 +31,8 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.TextUtilities;
 
+import de.walware.ecommons.text.core.IPartitionConstraint;
+
 
 /**
  * Text utilities, in addition to {@link TextUtilities} of JFace.
