@@ -218,7 +218,7 @@ public class WorkingBuffer implements IWorkingBuffer {
 		if (underlyingUnit != null) {
 			final SourceContent underlyingContent= underlyingUnit.getContent(progress);
 //			if (document instanceof IDocumentExtension4) {
-			document.set(underlyingContent.text, underlyingContent.stamp);
+			document.set(underlyingContent.getText(), underlyingContent.getStamp());
 //			}
 //			else {
 //				document.set(underlyingContent.text);

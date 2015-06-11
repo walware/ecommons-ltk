@@ -23,16 +23,10 @@ public class SourceContent {
 	
 	private static final LineInformationCreator LINES_CREATOR= new LineInformationCreator();
 	
-	private static ILineInformation createLines(final String text) {
-		synchronized (LINES_CREATOR) {
-			return LINES_CREATOR.create(text);
-		}
-	}
 	
+	private final long stamp;
 	
-	public final long stamp;
-	
-	public final String text;
+	private final String text;
 	
 	private final int offset;
 	private volatile ILineInformation lines;
@@ -63,15 +57,29 @@ public class SourceContent {
 		return this.text;
 	}
 	
-	public final int getOffset() {
+	/**
+	 * Returns offset of begin of the {@link #getText() text} in complete source.
+	 * 
+	 * @return begin offset
+	 */
+	public final int getBeginOffset() {
 		return this.offset;
+	}
+	
+	/**
+	 * Returns offset of end of the {@link #getText() text} in complete source.
+	 * 
+	 * @return end offset (exclusive)
+	 */
+	public final int getEndOffset() {
+		return this.offset + this.text.length();
 	}
 	
 	public final ILineInformation getLines() {
 		if (this.lines == null) {
 			synchronized (LINES_CREATOR) {
 				if (this.lines == null) {
-					this.lines= createLines(this.text);
+					this.lines= LINES_CREATOR.create(this.text);
 				}
 			}
 		}
