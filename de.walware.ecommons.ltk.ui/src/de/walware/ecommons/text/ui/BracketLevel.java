@@ -182,10 +182,10 @@ public abstract class BracketLevel implements IExitPolicy {
 		return null;
 	}
 	
-	private void skipChars(final VerifyEvent event, final int num) {
+	private void skipChars(final VerifyEvent event, final int n) {
 		event.doit = false;
 		final StyledText styledText = (StyledText) event.widget;
-		styledText.setSelection(styledText.getCaretOffset() + num);
+		styledText.setSelection(styledText.getCaretOffset() + n);
 	}
 	
 	protected int getPositionIdx(final int offset) {

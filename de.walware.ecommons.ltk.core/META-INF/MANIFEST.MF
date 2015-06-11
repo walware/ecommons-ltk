@@ -18,6 +18,7 @@ Import-Package: com.ibm.icu.text;version="4.4.2.2",
  de.walware.ecommons,
  de.walware.ecommons.collections;version="1.1.0",
  de.walware.ecommons.io,
+ de.walware.ecommons.string,
  de.walware.ecommons.text.core,
  org.apache.commons.collections.primitives;version="1.0.0"
 Export-Package: de.walware.ecommons.ltk,
@@ -30,5 +31,4 @@ Export-Package: de.walware.ecommons.ltk,
  de.walware.ecommons.tasklist,
  de.walware.ecommons.text,
  de.walware.ecommons.text.core.rules,
- de.walware.ecommons.text.core.sections,
- de.walware.ecommons.text.core.util
+ de.walware.ecommons.text.core.sections

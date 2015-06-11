@@ -9,7 +9,7 @@
  #     Stephan Wahlbrink - initial API and implementation
  #=============================================================================*/
 
-package de.walware.ecommons.text.core.util;
+package de.walware.ecommons.text;
 
 import org.eclipse.jface.text.IDocument;
 
