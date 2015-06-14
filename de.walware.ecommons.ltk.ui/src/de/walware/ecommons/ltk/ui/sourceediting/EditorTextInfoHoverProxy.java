@@ -60,7 +60,7 @@ public abstract class EditorTextInfoHoverProxy implements ITextHover, ITextHover
 		if (fHover == null) {
 			fHover = fDescriptor.createHover();
 			if (fHover instanceof CombinedHover) {
-				final EffectiveHovers effectiveHovers = fSourceEditorConfig.getEffectiveHovers();
+				final EffectiveHovers effectiveHovers = fSourceEditorConfig.getConfiguredInfoHovers();
 				if (effectiveHovers != null) {
 					((CombinedHover) fHover).setHovers(effectiveHovers.getDescriptorsForCombined());
 				}

@@ -74,6 +74,7 @@ import de.walware.ecommons.ui.util.DialogUtil;
 import de.walware.ecommons.ltk.internal.ui.LTKUIPlugin;
 import de.walware.ecommons.ltk.ui.LTKUIPreferences;
 import de.walware.ecommons.ltk.ui.sourceediting.assist.ContentAssist;
+import de.walware.ecommons.ltk.ui.sourceediting.assist.InfoHoverDescriptor;
 import de.walware.ecommons.ltk.ui.sourceediting.assist.InfoHoverRegistry;
 import de.walware.ecommons.ltk.ui.sourceediting.assist.InfoHoverRegistry.EffectiveHovers;
 
@@ -132,6 +133,17 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 				
 			};
 	
+	private static final ITextHover NO_HOVER= new ITextHover() {
+		@Override
+		public IRegion getHoverRegion(final ITextViewer textViewer, final int offset) {
+			return null;
+		}
+		@Override
+		public String getHoverInfo(final ITextViewer textViewer, final IRegion hoverRegion) {
+			return null;
+		}
+	};
+	
 	
 	private final IDocContentSections documentContentInfo;
 	
@@ -150,7 +162,8 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	private DecorationPreferences decorationPreferences;
 	private AssistPreferences assistPreferences;
 	
-	private EffectiveHovers effectiveHovers;
+	private EffectiveHovers infoHovers;
+	private Map<Integer, ITextHover> infoHoverCache;
 	
 	
 	public SourceEditorViewerConfiguration(final IDocContentSections documentContentInfo,
@@ -428,20 +441,28 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 			final String[] partitioning= getConfiguredContentTypes(null);
 			if (partitioning != null && partitioning.length > 0 && partitioning[0].equals(contentType)) {
 				final InfoHoverRegistry registry= getInfoHoverRegistry();
-				if (registry != null) {
-					this.effectiveHovers= registry.getEffectiveHoverDescriptors();
-					if (this.effectiveHovers != null) {
-						return this.effectiveHovers.getStateMasks();
-					}
-					return null;
+				this.infoHovers= (registry != null) ? registry.getEffectiveHoverDescriptors() : null;
+				if (this.infoHoverCache == null) {
+					this.infoHoverCache= new HashMap<>();
 				}
+				else {
+					this.infoHoverCache.clear();
+				}
+			}
+			if (this.infoHovers != null && isInfoHoverDefaultContentType(contentType)) {
+				return this.infoHovers.getStateMasks();
 			}
 		}
 		return super.getConfiguredTextHoverStateMasks(sourceViewer, contentType);
 	}
 	
-	public EffectiveHovers getEffectiveHovers() {
-		return this.effectiveHovers;
+	protected boolean isInfoHoverDefaultContentType(final String contentType) {
+		final String[] partitioning= getConfiguredContentTypes(null);
+		return (partitioning != null && partitioning.length > 0 && partitioning[0].equals(contentType));
+	}
+	
+	public EffectiveHovers getConfiguredInfoHovers() {
+		return this.infoHovers;
 	}
 	
 	@Override
@@ -451,10 +472,29 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	
 	@Override
 	public ITextHover getTextHover(final ISourceViewer sourceViewer, final String contentType, final int stateMask) {
+		if (this.infoHovers != null && isInfoHoverDefaultContentType(contentType)) {
+			final Integer key= Integer.valueOf(stateMask);
+			ITextHover hover= this.infoHoverCache.get(key);
+			if (hover == null) {
+				final InfoHoverDescriptor descriptor= this.infoHovers.getDescriptor(stateMask);
+				if (descriptor != null) {
+					hover= createInfoHover(descriptor);
+					if (hover == null) {
+						hover= NO_HOVER;
+					}
+					this.infoHoverCache.put(key, hover);
+				}
+			}
+			return (hover != NO_HOVER) ? hover : null;
+		}
 		return null;
 	}
 	
 	protected InfoHoverRegistry getInfoHoverRegistry() {
+		return null;
+	}
+	
+	protected ITextHover createInfoHover(final InfoHoverDescriptor descriptor) {
 		return null;
 	}
 	
