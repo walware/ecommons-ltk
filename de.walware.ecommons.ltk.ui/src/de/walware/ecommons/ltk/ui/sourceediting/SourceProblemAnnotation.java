@@ -21,9 +21,10 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.texteditor.AnnotationPreference;
-import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
+import org.eclipse.ui.texteditor.DefaultMarkerAnnotationAccess;
 
 import de.walware.ecommons.ltk.IProblem;
 
@@ -39,87 +40,84 @@ public class SourceProblemAnnotation extends Annotation implements IAnnotationPr
 	
 	public static class PresentationConfig {
 		
-		private final int fLevel;
-		private Image fImage;
+		private final int level;
 		
-		private final String fImageKey;
+		private Image image;
 		
 		
-		public PresentationConfig(final int level, final String image) {
-			fLevel = level;
-			fImageKey = image;
-		}
-		
-		public PresentationConfig(final String referenceType, final int diff) {
-			this(referenceType, diff, null);
-		}
-		
-		private PresentationConfig(final String referenceType, final int diff, final String image) {
-			final AnnotationPreferenceLookup lookup = EditorsUI.getAnnotationPreferenceLookup();
-			final Annotation annotation = new Annotation(referenceType, false, null);
-			final AnnotationPreference preference = lookup.getAnnotationPreference(annotation);
-			fLevel = (diff != Integer.MIN_VALUE) ? 
-					(((preference != null) ? preference.getPresentationLayer() : IAnnotationAccessExtension.DEFAULT_LAYER) + diff) :
-					0;
-			fImageKey = image;
+		private PresentationConfig(final String referenceType, final int levelDiff) {
+			final AnnotationPreference preference= EditorsUI.getAnnotationPreferenceLookup().getAnnotationPreference(referenceType);
+			
+			if (levelDiff != Integer.MIN_VALUE) {
+				this.level= ((preference != null) ?
+								preference.getPresentationLayer() :
+								IAnnotationAccessExtension.DEFAULT_LAYER ) +
+						levelDiff;
+			}
+			else {
+				this.level= 0;
+			}
+			
+			if (preference != null) {
+				final String symbolicImageName= preference.getSymbolicImageName();
+				if (symbolicImageName != null) {
+					final String imageKey= DefaultMarkerAnnotationAccess.getSharedImageName(preference.getSymbolicImageName());
+					if (imageKey != null) {
+						this.image= PlatformUI.getWorkbench().getSharedImages().getImage(imageKey);
+					}
+				}
+			}
 		}
 		
 		public final int getLevel() {
-			return fLevel;
+			return this.level;
 		}
 		
 		public final Image getImage() {
-			if (fImage == null && fImageKey != null) {
-				loadImage();
-			}
-			return fImage;
-		}
-		
-		
-		private synchronized void loadImage() {
-			// TODO which registry?
-//			fImage = ECommonsUI.getImages().get(fImageKey);
+			return this.image;
 		}
 		
 	}
+	
 	
 	public static final PresentationConfig ERROR_CONFIG = new PresentationConfig("org.eclipse.ui.workbench.texteditor.error", +1); //$NON-NLS-1$
 	public static final PresentationConfig WARNING_CONFIG = new PresentationConfig("org.eclipse.ui.workbench.texteditor.warning", +1); //$NON-NLS-1$
 	public static final PresentationConfig INFO_CONFIG = new PresentationConfig("org.eclipse.ui.workbench.texteditor.info", +1); //$NON-NLS-1$
 	
 	
-	private final IProblem fProblem;
-	private boolean fIsQuickFixable = false;
-	private boolean fIsQuickFixableStateSet = false;
+	private final IProblem problem;
 	
-	private final PresentationConfig fConfig;
+	private boolean isQuickFixable= false;
+	private boolean isQuickFixableStateSet= false;
+	
+	private final PresentationConfig config;
 	
 	
 	public SourceProblemAnnotation(final String type, final IProblem problem, final PresentationConfig config) {
 		super(type, false, null);
-		fProblem = problem;
-		fConfig = config;
+		this.problem = problem;
+		this.config = config;
 	}
 	
 	
 	@Override
 	public String getText() {
-		return fProblem.getMessage();
+		return this.problem.getMessage();
 	}
 	
 	public IProblem getProblem() {
-		return fProblem;
+		return this.problem;
 	}
 	
 	
 	@Override
 	public int getLayer() {
-		return fConfig.getLevel();
+		return this.config.getLevel();
 	}
 	
 	@Override
 	public void paint(final GC gc, final Canvas canvas, final Rectangle bounds) {
-		final Image image = fConfig.getImage();
+		final Image image = this.config.getImage();
 		if (image != null) {
 			ImageUtilities.drawImage(image, gc, canvas, bounds, SWT.CENTER, SWT.TOP);
 		}
@@ -128,18 +126,18 @@ public class SourceProblemAnnotation extends Annotation implements IAnnotationPr
 	
 	@Override
 	public void setQuickFixable(final boolean state) {
-		fIsQuickFixable = state;
-		fIsQuickFixableStateSet = true;
+		this.isQuickFixable = state;
+		this.isQuickFixableStateSet = true;
 	}
 	
 	@Override
 	public boolean isQuickFixableStateSet() {
-		return fIsQuickFixableStateSet;
+		return this.isQuickFixableStateSet;
 	}
 	
 	@Override
 	public boolean isQuickFixable() {
-		return fIsQuickFixable;
+		return this.isQuickFixable;
 	}
 	
 }
