@@ -16,8 +16,10 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.filebuffers.FileBuffers;
+import org.eclipse.core.filebuffers.LocationKind;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.CoreException;
@@ -91,7 +93,7 @@ public class WorkingBuffer implements IWorkingBuffer {
 	 * 
 	 * @return <code>true</code> if valid mode, otherwise <code>false</code>
 	 */
-	protected final boolean detectMode() {
+	protected final int detectMode() {
 		if (this.mode == 0) {
 			final Object resource= this.unit.getResource();
 			if (resource instanceof IFile) {
@@ -105,7 +107,7 @@ public class WorkingBuffer implements IWorkingBuffer {
 				this.mode= -1;
 			}
 		}
-		return (this.mode > 0);
+		return this.mode;
 	}
 	
 	protected final int getMode() {
@@ -124,12 +126,10 @@ public class WorkingBuffer implements IWorkingBuffer {
 				return underlyingUnit.getContentStamp(monitor);
 			}
 		}
-		if (detectMode()) {
-			if (getMode() == IFILE) {
-				final IFile resource= (IFile) this.unit.getResource();
-				if (resource != null) {
-					return resource.getModificationStamp();
-				}
+		if (detectMode() == IFILE) {
+			final IFile resource= (IFile) this.unit.getResource();
+			if (resource != null) {
+				return resource.getModificationStamp();
 			}
 		}
 		return 0;
@@ -178,13 +178,14 @@ public class WorkingBuffer implements IWorkingBuffer {
 	
 	@Override
 	public boolean checkState(final boolean validate, final IProgressMonitor monitor) {
-		final ISourceUnit underlyingUnit= this.unit.getUnderlyingUnit();
-		if (underlyingUnit != null) {
-			return underlyingUnit.checkState(validate, monitor);
+		{	final ISourceUnit underlyingUnit= this.unit.getUnderlyingUnit();
+			if (underlyingUnit != null) {
+				return underlyingUnit.checkState(validate, monitor);
+			}
 		}
-		else if (detectMode()) {
-			if (getMode() == IFILE) {
-				final IFile resource= (IFile) this.unit.getResource();
+		switch (detectMode()) {
+		case IFILE:
+			{	final IFile resource= (IFile) this.unit.getResource();
 				if (!validate) {
 					return !resource.getResourceAttributes().isReadOnly();
 				}
@@ -192,23 +193,25 @@ public class WorkingBuffer implements IWorkingBuffer {
 					return resource.getWorkspace().validateEdit(new IFile[] { resource }, IWorkspace.VALIDATE_PROMPT).isOK();
 				}
 			}
-			else if (getMode() == FILESTORE) {
-				final IFileStore store= (IFileStore) this.unit.getAdapter(IFileStore.class);
+		case FILESTORE:
+			{	final IFileStore store= (IFileStore) this.unit.getResource();
 				try {
 					return !store.fetchInfo(EFS.NONE, monitor).getAttribute(EFS.ATTRIBUTE_READ_ONLY);
 				}
 				catch (final CoreException e) {
 					LTKCorePlugin.log(new Status(IStatus.ERROR, LTKCorePlugin.PLUGIN_ID, ICommonStatusConstants.IO_ERROR,
 							"An error occurred when checking modifiable state of the file.", e));
+					return false;
 				}
 			}
+		default:
+			return false;
 		}
-		return false;
 	}
 	
 	
 	protected AbstractDocument createDocument(final SubMonitor progress) {
-		final IDocument fileDoc= FileBuffers.getTextFileBufferManager().createEmptyDocument(null, null);
+		final IDocument fileDoc= createEmptyDocument();
 		if (!(fileDoc instanceof AbstractDocument)) {
 			return null;
 		}
@@ -230,7 +233,23 @@ public class WorkingBuffer implements IWorkingBuffer {
 				loadDocumentFromFile((IFile) resource, document, progress);
 			}
 		}
+		
 		return document;
+	}
+	
+	private IDocument createEmptyDocument() {
+		switch (detectMode()) {
+		case IFILE:
+			return FileBuffers.getTextFileBufferManager().createEmptyDocument(
+					((IFile) this.unit.getResource()).getFullPath(),
+					LocationKind.IFILE );
+		case FILESTORE:
+			return FileBuffers.getTextFileBufferManager().createEmptyDocument(
+					URIUtil.toPath(((IFileStore) this.unit.getResource()).toURI()),
+					LocationKind.LOCATION );
+		default:
+			return FileBuffers.getTextFileBufferManager().createEmptyDocument(null, null);
+		}
 	}
 	
 	protected void checkDocument(final AbstractDocument document) {

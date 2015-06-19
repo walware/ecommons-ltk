@@ -49,9 +49,9 @@ public class FileBufferWorkingBuffer extends WorkingBuffer {
 	
 	@Override
 	protected AbstractDocument createDocument(final SubMonitor progress) {
-		if (detectMode()) {
-			if (getMode() == IFILE) {
-				final IPath path= ((IFile) this.unit.getResource()).getFullPath();
+		switch (detectMode()) {
+		case IFILE:
+			{	final IPath path= ((IFile) this.unit.getResource()).getFullPath();
 				try {
 					FileBuffers.getTextFileBufferManager().connect(path, LocationKind.IFILE, progress);
 					this.fileBuffer= FileBuffers.getTextFileBufferManager().getTextFileBuffer(path, LocationKind.IFILE);
@@ -61,9 +61,10 @@ public class FileBufferWorkingBuffer extends WorkingBuffer {
 							"An error occurred when allocating the document of the file buffer.",
 							e ));
 				}
+				break;
 			}
-			else if (getMode() == FILESTORE) {
-				final IFileStore store= (IFileStore) this.unit.getResource();
+		case FILESTORE:
+			{	final IFileStore store= (IFileStore) this.unit.getResource();
 				try {
 					FileBuffers.getTextFileBufferManager().connectFileStore(store, progress);
 					this.fileBuffer= FileBuffers.getTextFileBufferManager().getFileStoreTextFileBuffer(store);
@@ -73,16 +74,19 @@ public class FileBufferWorkingBuffer extends WorkingBuffer {
 							"An error occurred when allocating the document of the file buffer.",
 							e ));
 				}
+				break;
 			}
-			if (this.fileBuffer != null) {
-				final IDocument fileDoc= this.fileBuffer.getDocument();
-				if (fileDoc instanceof AbstractDocument) {
-					return (AbstractDocument) fileDoc;
-				}
-			}
-			return null;
+		default:
+			return super.createDocument(progress);
 		}
-		return super.createDocument(progress);
+		
+		if (this.fileBuffer != null) {
+			final IDocument fileDoc= this.fileBuffer.getDocument();
+			if (fileDoc instanceof AbstractDocument) {
+				return (AbstractDocument) fileDoc;
+			}
+		}
+		return null;
 	}
 	
 	private ITextFileBuffer getBuffer() {
@@ -91,20 +95,23 @@ public class FileBufferWorkingBuffer extends WorkingBuffer {
 				return this.fileBuffer;
 			};
 		}
-		if (getMode() == IFILE) {
-			final IPath path= ((IFile) this.unit.getResource()).getFullPath();
-			return FileBuffers.getTextFileBufferManager().getTextFileBuffer(path, LocationKind.IFILE);
+		switch (getMode()) {
+		case IFILE:
+			{	final IPath path= ((IFile) this.unit.getResource()).getFullPath();
+				return FileBuffers.getTextFileBufferManager().getTextFileBuffer(path, LocationKind.IFILE);
+			}
+		case FILESTORE:
+			{	final IFileStore store= (IFileStore) this.unit.getResource();
+				return FileBuffers.getTextFileBufferManager().getFileStoreTextFileBuffer(store);
+			}
+		default:
+			return null;
 		}
-		else if (getMode() == FILESTORE) {
-			final IFileStore store= (IFileStore) this.unit.getResource();
-			return FileBuffers.getTextFileBufferManager().getFileStoreTextFileBuffer(store);
-		}
-		return null;
 	}
 	
 	@Override
 	protected SourceContent createContent(final SubMonitor progress) {
-		if (detectMode()) {
+		if (detectMode() > 0) {
 			final ITextFileBuffer buffer= getBuffer();
 			if (buffer != null) {
 				return createContentFromDocument(buffer.getDocument());
@@ -118,13 +125,19 @@ public class FileBufferWorkingBuffer extends WorkingBuffer {
 		if (this.fileBuffer != null) {
 			try {
 				final SubMonitor progress= SubMonitor.convert(monitor);
-				if (getMode() == IFILE) {
-					final IPath path= ((IFile) this.unit.getResource()).getFullPath();
-					FileBuffers.getTextFileBufferManager().disconnect(path, LocationKind.IFILE, progress);
-				}
-				else if (getMode() == FILESTORE) {
-					final IFileStore store= (IFileStore) this.unit.getResource();
-					FileBuffers.getTextFileBufferManager().disconnectFileStore(store, progress);
+				switch (getMode()) {
+				case IFILE:
+					{	final IPath path= ((IFile) this.unit.getResource()).getFullPath();
+						FileBuffers.getTextFileBufferManager().disconnect(path, LocationKind.IFILE, progress);
+						break;
+					}
+				case FILESTORE:
+					{	final IFileStore store= (IFileStore) this.unit.getResource();
+						FileBuffers.getTextFileBufferManager().disconnectFileStore(store, progress);
+						break;
+					}
+				default:
+					break;
 				}
 			}
 			catch (final CoreException e) {
@@ -135,7 +148,6 @@ public class FileBufferWorkingBuffer extends WorkingBuffer {
 				this.fileBuffer= null;
 				super.releaseDocument(monitor);
 			}
-			return;
 		}
 		else {
 			super.releaseDocument(monitor);
@@ -164,7 +176,7 @@ public class FileBufferWorkingBuffer extends WorkingBuffer {
 	
 	@Override
 	public boolean isSynchronized() {
-		if (detectMode()) {
+		if (detectMode() > 0) {
 			final ITextFileBuffer buffer= getBuffer();
 			if (buffer != null) {
 				return !buffer.isDirty();

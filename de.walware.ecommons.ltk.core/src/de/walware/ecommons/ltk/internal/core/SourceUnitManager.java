@@ -11,6 +11,8 @@
 
 package de.walware.ecommons.ltk.internal.core;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
@@ -19,11 +21,17 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.content.IContentDescription;
+import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.osgi.util.NLS;
 
@@ -32,10 +40,12 @@ import de.walware.ecommons.IDisposable;
 import de.walware.ecommons.collections.ImCollections;
 import de.walware.ecommons.collections.ImList;
 
+import de.walware.ecommons.ltk.IExtContentTypeManager;
 import de.walware.ecommons.ltk.ISourceUnitFactory;
 import de.walware.ecommons.ltk.ISourceUnitManager;
 import de.walware.ecommons.ltk.LTK;
 import de.walware.ecommons.ltk.WorkingContext;
+import de.walware.ecommons.ltk.core.IModelTypeDescriptor;
 import de.walware.ecommons.ltk.core.model.IModelElement;
 import de.walware.ecommons.ltk.core.model.ISourceUnit;
 
@@ -260,6 +270,8 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 	
 	private volatile ImList<ModelItem> modelItems= ImCollections.newList();
 	
+	private final IExtContentTypeManager contentManager= LTK.getExtContentTypeManager();
+	
 	
 	public SourceUnitManager() {
 		this.cleanupJob.initialSchedule();
@@ -293,20 +305,52 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 	}
 	
 	@Override
-	public ISourceUnit getSourceUnit(String modelTypeId, final WorkingContext context,
-			final Object from, final boolean create, final IProgressMonitor monitor) {
-		if (context == null) {
-			throw new NullPointerException("Missing working context."); //$NON-NLS-1$
-		}
-		final ISourceUnit fromUnit= (from instanceof ISourceUnit) ? ((ISourceUnit) from) : null;
+	public ISourceUnit getSourceUnit(final String modelTypeId, final WorkingContext context,
+			final Object from, final boolean create,
+			final IProgressMonitor monitor) {
 		if (modelTypeId == null) {
-			if (fromUnit != null) {
-				modelTypeId= fromUnit.getModelTypeId();
-			}
-			else {
-				throw new IllegalArgumentException("Missing model type."); //$NON-NLS-1$
-			}
+			throw new NullPointerException("modelTypeId"); //$NON-NLS-1$
 		}
+		if (context == null) {
+			throw new NullPointerException("context"); //$NON-NLS-1$
+		}
+		
+		return doGetSourceUnit(modelTypeId, context, from, null, create, monitor);
+	}
+	
+	@Override
+	public ISourceUnit getSourceUnit(final WorkingContext context,
+			final Object from, IContentType contentType, final boolean create,
+			final IProgressMonitor monitor) {
+		if (context == null) {
+			throw new NullPointerException("context"); //$NON-NLS-1$
+		}
+		
+		String modelTypeId;
+		if (from instanceof ISourceUnit) {
+			modelTypeId= ((ISourceUnit) from).getModelTypeId();
+		}
+		else {
+			if (contentType == null) {
+				contentType= detectContentType(from);
+				if (contentType == null) {
+					return null;
+				}
+			}
+			final IModelTypeDescriptor modelType= this.contentManager.getModelTypeForContentType(contentType.getId());
+			if (modelType == null) {
+				return null;
+			}
+			modelTypeId= modelType.getId();
+		}
+		
+		return doGetSourceUnit(modelTypeId, context, from, contentType, create, monitor);
+	}
+	
+	private ISourceUnit doGetSourceUnit(final String modelTypeId, final WorkingContext context,
+			final Object from, final IContentType contentType, final boolean create,
+			final IProgressMonitor monitor) {
+		final ISourceUnit fromUnit= (from instanceof ISourceUnit) ? ((ISourceUnit) from) : null;
 		
 		final ModelItem modelItem= getModelItem(modelTypeId);
 		final ContextItem contextItem= modelItem.getContextItem(context, create);
@@ -332,9 +376,6 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 							}
 							suItem= new SuItem(id, su, contextItem.susToClean);
 						}
-						else {
-							return null;
-						}
 					}
 				}
 			}
@@ -348,11 +389,19 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 				return null;
 			}
 		}
-		su.connect(monitor);
-		if (fromUnit != null) {
-			fromUnit.disconnect(null);
+		
+		if (su != null) {
+			su.connect(monitor);
+			
+			if (fromUnit != null) {
+				fromUnit.disconnect(null);
+			}
+			
+			return su;
 		}
-		return su;
+		else {
+			return null;
+		}
 	}
 	
 	@Override
@@ -426,6 +475,46 @@ public class SourceUnitManager implements ISourceUnitManager, IDisposable {
 		}
 		return list;
 	}
+	
+	
+	private IContentType detectContentType(final Object from) {
+		try {
+			if (from instanceof IFile) {
+				final IFile file= (IFile) from;
+				final IContentDescription contentDescription= file.getContentDescription();
+				if (contentDescription != null) {
+					return contentDescription.getContentType();
+				}
+				else {
+					return null;
+				}
+			}
+			else if (from instanceof IFileStore) {
+				final IFileStore file= (IFileStore) from;
+				try (final InputStream stream= file.openInputStream(EFS.NONE, null)) {
+					final IContentDescription contentDescription= Platform.getContentTypeManager()
+							.getDescriptionFor(stream, file.getName(), IContentDescription.ALL);
+					if (contentDescription != null) {
+						return contentDescription.getContentType();
+					}
+					else {
+						return null;
+					}
+				}
+			}
+			else {
+				return null;
+			}
+		}
+		catch (final CoreException | IOException | UnsupportedOperationException e) {
+			LTKCorePlugin.log(new Status(IStatus.ERROR, LTK.PLUGIN_ID, 0,
+					"An error occurred when trying to detect content type of " + from,
+					e ));
+			return null;
+		}
+	}
+	
+	
 	
 	
 	private ModelItem getModelItem(final String modelTypeId) {

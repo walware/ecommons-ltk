@@ -14,6 +14,7 @@ package de.walware.ecommons.ltk;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.content.IContentType;
 
 import de.walware.ecommons.ltk.core.model.ISourceUnit;
 
@@ -40,6 +41,9 @@ public interface ISourceUnitManager {
 	 * @return the source unit or <code>null</code>
 	 */
 	ISourceUnit getSourceUnit(String modelTypeId, WorkingContext context, Object from,
+			boolean create, IProgressMonitor monitor);
+	
+	ISourceUnit getSourceUnit(WorkingContext context, Object from, IContentType contentType,
 			boolean create, IProgressMonitor monitor);
 	
 	List<ISourceUnit> getOpenSourceUnits(String modelTypeId, WorkingContext context);

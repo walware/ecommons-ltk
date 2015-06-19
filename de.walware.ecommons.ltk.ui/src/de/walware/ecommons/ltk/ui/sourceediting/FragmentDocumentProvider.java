@@ -70,7 +70,7 @@ public class FragmentDocumentProvider extends AbstractDocumentProvider
 				}
 			}
 		}
-		if (su == null) {
+		if (document == null) {
 			document= createDocument((su != null) ? su : element);
 		}
 		if (document != null) {
