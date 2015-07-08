@@ -13,17 +13,21 @@ package de.walware.ecommons.ltk.ui.sourceediting.actions;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.text.AbstractDocument;
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.BadPartitioningException;
 import org.eclipse.jface.text.DocumentRewriteSession;
 import org.eclipse.jface.text.DocumentRewriteSessionType;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IDocumentExtension4;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.ITextSelection;
@@ -33,6 +37,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.text.edits.DeleteEdit;
 import org.eclipse.text.edits.InsertEdit;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.TextEdit;
@@ -48,6 +53,21 @@ import de.walware.ecommons.ltk.ui.sourceediting.SourceEditorViewer;
 
 
 public class ToggleCommentHandler extends AbstractHandler {
+	
+	
+	private static final ConcurrentHashMap<String, Pattern> DEFAULT_PREFIX_MAP= new ConcurrentHashMap<>();
+	
+	protected static Pattern getDefaultPrefixPattern(final String prefix) {
+		Pattern pattern= DEFAULT_PREFIX_MAP.get(prefix);
+		if (pattern == null) {
+			pattern= Pattern.compile("^[ \\t]*(" + Pattern.quote(prefix) + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+			DEFAULT_PREFIX_MAP.putIfAbsent(prefix, pattern);
+		}
+		return pattern;
+	}
+	
+	protected static final Pattern HTML_SPACE_PREFIX_PATTERN= Pattern.compile("^[ \\t]*(" + Pattern.quote("<!--") + " ?)"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	protected static final Pattern HTML_SPACE_POSTFIX_PATTERN= Pattern.compile("( ?" + Pattern.quote("-->") + "[ \\t]*)$"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	
 	
 	private final SourceEditor1 editor;
@@ -97,7 +117,7 @@ public class ToggleCommentHandler extends AbstractHandler {
 		}
 		
 		final ITextSelection selection= getSelection();
-		final IDocument document= this.editor.getViewer().getDocument();
+		final AbstractDocument document= (AbstractDocument) this.editor.getViewer().getDocument();
 		final int operationCode= (isSelectionCommented(document, selection)) ?
 				ITextOperationTarget.STRIP_PREFIX : ITextOperationTarget.PREFIX;
 		
@@ -121,8 +141,12 @@ public class ToggleCommentHandler extends AbstractHandler {
 		return null;
 	}
 	
-	protected void run(final IDocument document, final ITextSelection selection,
+	protected void run(final AbstractDocument document, final ITextSelection selection,
 			final int operationCode) {
+		doRunOperation(operationCode);
+	}
+	
+	protected void doRunOperation(final int operationCode) {
 		this.operationTarget.doOperation(operationCode);
 	}
 	
@@ -157,13 +181,22 @@ public class ToggleCommentHandler extends AbstractHandler {
 		return prefixes;
 	}
 	
+	protected Pattern getPrefixPattern(final String contentType, final String prefix) {
+		return getDefaultPrefixPattern(prefix);
+	}
+	
+	protected Pattern getPostfixPattern(final String contentType, final String prefix) {
+		return null;
+	}
+	
 	/**
 	 * Is the given selection single-line commented?
 	 * 
 	 * @param selection Selection to check
 	 * @return <code>true</code> iff all selected lines are commented
+	 * @throws BadPartitioningException 
 	 */
-	private boolean isSelectionCommented(final IDocument document, final ITextSelection selection) {
+	private boolean isSelectionCommented(final AbstractDocument document, final ITextSelection selection) {
 		if (selection.getStartLine() < 0 || selection.getEndLine() < 0) {
 			return false;
 		}
@@ -171,7 +204,7 @@ public class ToggleCommentHandler extends AbstractHandler {
 		try {
 			final IRegion block= EditorUtil.getTextBlockFromSelection(document,
 					selection.getOffset(), selection.getLength() );
-			final ITypedRegion[] regions= TextUtilities.computePartitioning(document,
+			final ITypedRegion[] regions= document.computePartitioning(
 					this.editor.getDocumentContentInfo().getPartitioning(),
 					block.getOffset(), block.getLength(), false );
 			
@@ -199,7 +232,7 @@ public class ToggleCommentHandler extends AbstractHandler {
 			}
 			return true;
 		}
-		catch (final BadLocationException e) {
+		catch (final BadLocationException | BadPartitioningException e) {
 			log(e);
 		}
 		return false;
@@ -223,8 +256,8 @@ public class ToggleCommentHandler extends AbstractHandler {
 			// check for occurrences of prefixes in the given lines
 			for (int i= startLine; i <= endLine; i++) {
 				
-				final IRegion line= document.getLineInformation(i);
-				final String text= document.get(line.getOffset(), line.getLength());
+				final IRegion lineInfo= document.getLineInformation(i);
+				final String text= document.get(lineInfo.getOffset(), lineInfo.getLength());
 				
 				final int[] found= TextUtilities.indexOf(prefixes, text, 0);
 				
@@ -266,28 +299,111 @@ public class ToggleCommentHandler extends AbstractHandler {
 		return (offset > region.getOffset() + region.getLength() ? -1 : startLine + 1);
 	}
 	
-	protected void addPrefix(final IDocument document, final IRegion region, final String prefix) throws BadLocationException {
+	protected void doPrefix(final AbstractDocument document, final IRegion region,
+			final String prefix)
+			throws BadLocationException, BadPartitioningException {
 		final int startLine= document.getLineOfOffset(region.getOffset());
 		final int stopLine= (region.getLength() > 0) ?
 				document.getLineOfOffset(region.getOffset()+region.getLength()-1) :
 				startLine;
+		
 		final MultiTextEdit multi= new MultiTextEdit(region.getOffset(), region.getLength());
 		for (int line= startLine; line <= stopLine; line++) {
 			multi.addChild(new InsertEdit(document.getLineOffset(line), prefix));
 		}
-		if (document instanceof IDocumentExtension4) {
-			final IDocumentExtension4 document4= (IDocumentExtension4) document;
-			final DocumentRewriteSession rewriteSession= document4.startRewriteSession(
+		
+		{	final DocumentRewriteSession rewriteSession= document.startRewriteSession(
 					DocumentRewriteSessionType.STRICTLY_SEQUENTIAL );
 			try {
 				multi.apply(document, TextEdit.NONE);
 			}
 			finally {
-				document4.stopRewriteSession(rewriteSession);
+				document.stopRewriteSession(rewriteSession);
 			}
 		}
-		else {
-			multi.apply(document, TextEdit.NONE);
+	}
+	
+	protected void doPrefix(final AbstractDocument document, final IRegion region,
+			final String prefix, final String postfix)
+			throws BadLocationException, BadPartitioningException {
+		final int startLine= document.getLineOfOffset(region.getOffset());
+		final int stopLine= (region.getLength() > 0) ?
+				document.getLineOfOffset(region.getOffset()+region.getLength()-1) :
+				startLine;
+		
+		final MultiTextEdit multi= new MultiTextEdit(region.getOffset(), region.getLength());
+		for (int line= startLine; line <= stopLine; line++) {
+			final IRegion lineInfo= document.getLineInformation(line);
+			multi.addChild(new InsertEdit(lineInfo.getOffset(), prefix));
+			multi.addChild(new InsertEdit(lineInfo.getOffset() + lineInfo.getLength(), postfix));
+		}
+		
+		{	final DocumentRewriteSession rewriteSession= document.startRewriteSession(
+					DocumentRewriteSessionType.STRICTLY_SEQUENTIAL );
+			try {
+				multi.apply(document, TextEdit.NONE);
+			}
+			finally {
+				document.stopRewriteSession(rewriteSession);
+			}
+		}
+	}
+	
+	protected void doStripPrefix(final AbstractDocument document, final IRegion region)
+			throws BadLocationException, BadPartitioningException {
+		final int startLine= document.getLineOfOffset(region.getOffset());
+		final int stopLine= (region.getLength() > 0) ?
+				document.getLineOfOffset(region.getOffset()+region.getLength()-1) :
+				startLine;
+		
+		final MultiTextEdit multi= new MultiTextEdit(region.getOffset(), region.getLength());
+		for (int line= startLine; line <= stopLine; line++) {
+			final IRegion lineInfo= document.getLineInformation(line);
+			final String contentType= document.getContentType(
+					this.editor.getDocumentContentInfo().getPartitioning(),
+					lineInfo.getOffset(), false );
+			
+			final String[] prefixes= getPrefixes(contentType);
+			final String text= document.get(lineInfo.getOffset(), lineInfo.getLength());
+			final int[] found= TextUtilities.indexOf(prefixes, text, 0);
+			assert (found[0] >= 0);
+			
+			{	final Pattern pattern= getPrefixPattern(contentType, prefixes[found[1]]);
+				if (pattern != null) {
+					final Matcher matcher= pattern.matcher(text);
+					matcher.reset(text);
+					if (matcher.find()) {
+						multi.addChild(new DeleteEdit(
+								lineInfo.getOffset() + matcher.start(1),
+								matcher.end(1) - matcher.start(1) ));
+					}
+				}
+				else {
+					multi.addChild(new DeleteEdit(
+							lineInfo.getOffset() + found[0],
+							prefixes[found[1]].length() ));
+				}
+			}
+			{	final Pattern pattern= getPostfixPattern(contentType, prefixes[found[1]]);
+				if (pattern != null) {
+					final Matcher matcher= pattern.matcher(text);
+					if (matcher.find()) {
+						multi.addChild(new DeleteEdit(
+								lineInfo.getOffset() + matcher.start(1),
+								matcher.end(1) - matcher.start(1) ));
+					}
+				}
+			}
+		}
+		
+		{	final DocumentRewriteSession rewriteSession= document.startRewriteSession(
+					DocumentRewriteSessionType.STRICTLY_SEQUENTIAL );
+			try {
+				multi.apply(document, TextEdit.NONE);
+			}
+			finally {
+				document.stopRewriteSession(rewriteSession);
+			}
 		}
 	}
 	
