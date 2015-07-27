@@ -42,6 +42,9 @@ public class SourceContent {
 	
 	public SourceContent(final long stamp, final String text, final int offset,
 			final ILineInformation lines) {
+		if (text == null) {
+			throw new NullPointerException("text"); //$NON-NLS-1$
+		}
 		this.stamp= stamp;
 		this.text= text;
 		this.offset= offset;
