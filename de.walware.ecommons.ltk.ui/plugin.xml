@@ -912,6 +912,12 @@
             value="79,79,127">
       </colorDefinition>
       <colorDefinition
+            id="de.walware.workbench.themes.CodeRawBackgroundColor"
+            isEditable="false"
+            label=""
+            value="231,239,239">
+      </colorDefinition>
+      <colorDefinition
             id="de.walware.workbench.themes.CodeUndefinedColor"
             isEditable="false"
             label=""
