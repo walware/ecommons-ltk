@@ -37,9 +37,6 @@ public class LineInformationCreator {
 				}
 				break;
 			case '\n':
-				if (offset < text.length() && text.charAt(offset) == '\r') {
-					offset++;
-				}
 				break;
 			default:
 				continue;
