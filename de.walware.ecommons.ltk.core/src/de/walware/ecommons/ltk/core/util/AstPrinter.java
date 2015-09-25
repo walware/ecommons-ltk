@@ -62,10 +62,10 @@ public class AstPrinter implements ICommonAstVisitor {
 			this.writer.append('[');
 			this.writer.append(Integer.toString(node.getOffset()));
 			this.writer.append(", "); //$NON-NLS-1$
-			this.writer.append(Integer.toString(node.getStopOffset()));
+			this.writer.append(Integer.toString(node.getEndOffset()));
 			this.writer.append(") "); //$NON-NLS-1$
 			printNodeInfo(node);
-			printFragment(node.getOffset(), node.getStopOffset());
+			printFragment(node.getOffset(), node.getEndOffset());
 			this.writer.append('\n');
 			
 			this.level++;

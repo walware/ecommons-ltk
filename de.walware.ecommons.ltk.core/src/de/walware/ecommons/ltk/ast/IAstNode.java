@@ -13,9 +13,8 @@ package de.walware.ecommons.ltk.ast;
 
 import java.lang.reflect.InvocationTargetException;
 
-import org.eclipse.jface.text.IRegion;
-
 import de.walware.ecommons.collections.ImList;
+import de.walware.ecommons.text.core.ITextRegion;
 
 
 /**
@@ -23,14 +22,14 @@ import de.walware.ecommons.collections.ImList;
  * <p>
  * The interface must be implemented by the language specific AST classes.</p>
  */
-public interface IAstNode extends IRegion {
+public interface IAstNode extends ITextRegion {
 	
 	
 	int getStatusCode();
 	
 	@Override
 	int getOffset();
-	int getStopOffset();
+	int getEndOffset();
 	@Override
 	int getLength();
 	
@@ -38,7 +37,6 @@ public interface IAstNode extends IRegion {
 	void acceptInChildren(ICommonAstVisitor visitor) throws InvocationTargetException;
 	
 	IAstNode getParent();
-	IAstNode getRoot();
 	boolean hasChildren();
 	int getChildCount();
 	IAstNode getChild(int index);

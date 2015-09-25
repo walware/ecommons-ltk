@@ -40,7 +40,7 @@ public abstract class StructureSelectHandler extends AbstractHandler {
 		@Override
 		IRegion concreteNewSelectionRange(final AstSelection selection) {
 			final IAstNode covering = selection.getCovering();
-			return createRegion(covering.getOffset(), covering.getStopOffset());
+			return createRegion(covering.getOffset(), covering.getEndOffset());
 		}
 		
 	}
@@ -55,13 +55,13 @@ public abstract class StructureSelectHandler extends AbstractHandler {
 		IRegion concreteNewSelectionRange(final AstSelection selection) {
 			final IAstNode covering = selection.getCovering();
 			IAstNode child = selection.getChildLastTouching();
-			if (child == null || selection.getStopOffset() >= child.getStopOffset()) {
+			if (child == null || selection.getStopOffset() >= child.getEndOffset()) {
 				child = selection.getChildAfter();
 			}
 			if (child != null) {
-				return createRegion(selection.getStartOffset(), child.getStopOffset());
+				return createRegion(selection.getStartOffset(), child.getEndOffset());
 			}
-			return createRegion(covering.getOffset(), covering.getStopOffset());
+			return createRegion(covering.getOffset(), covering.getEndOffset());
 		}
 		
 	}
@@ -82,7 +82,7 @@ public abstract class StructureSelectHandler extends AbstractHandler {
 			if (child != null) {
 				return createRegion(selection.getStopOffset(), child.getOffset());
 			}
-			return createRegion(covering.getStopOffset(), covering.getOffset());
+			return createRegion(covering.getEndOffset(), covering.getOffset());
 		}
 		
 	}

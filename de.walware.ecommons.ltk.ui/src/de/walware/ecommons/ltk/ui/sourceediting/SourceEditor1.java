@@ -627,7 +627,7 @@ public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 			for (int i = 0; i < n; i++) {
 				final IAstNode child = root.getChild(i);
 				if (selection.getOffset() >= child.getOffset()) {
-					if (selection.getOffset()+selection.getLength() <= child.getStopOffset()) {
+					if (selection.getOffset()+selection.getLength() <= child.getEndOffset()) {
 						return child;
 					}
 				}
