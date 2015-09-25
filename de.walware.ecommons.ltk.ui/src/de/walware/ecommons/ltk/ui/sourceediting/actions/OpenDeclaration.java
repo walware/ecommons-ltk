@@ -34,9 +34,12 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import de.walware.ecommons.ui.util.UIAccess;
 
+import de.walware.ecommons.ltk.ast.IAstNode;
+import de.walware.ecommons.ltk.core.model.INameAccess;
 import de.walware.ecommons.ltk.core.model.ISourceElement;
 import de.walware.ecommons.ltk.core.model.ISourceUnit;
 import de.walware.ecommons.ltk.core.model.IWorkspaceSourceUnit;
+import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditor;
 
 
 public class OpenDeclaration {
@@ -55,7 +58,7 @@ public class OpenDeclaration {
 			return list.get(0);
 		}
 		else {
-			final ListDialog dialog = new ListDialog(part != null ? part.getSite().getShell() : UIAccess.getActiveWorkbenchShell(true));
+			final ListDialog dialog= new ListDialog(part != null ? part.getSite().getShell() : UIAccess.getActiveWorkbenchShell(true));
 			dialog.setTitle("Open Declaration");
 			dialog.setMessage("Select the appropriate declaration:");
 			dialog.setHelpAvailable(false);
@@ -73,14 +76,23 @@ public class OpenDeclaration {
 		}
 	}
 	
+	public <TNameAccess extends INameAccess<?, ?>> TNameAccess selectAccess(final List<? extends TNameAccess> accessList) {
+		for (final TNameAccess candidate : accessList) {
+			if (candidate.isWriteAccess()) {
+				return candidate;
+			}
+		}
+		return null;
+	}
+	
 	public ILabelProvider createLabelProvider() {
 		return new LabelProvider();
 	}
 	
 	public void open(final ISourceElement element, final boolean activate) throws PartInitException  {
-		final ISourceUnit su = element.getSourceUnit();
+		final ISourceUnit su= element.getSourceUnit();
 		if (su instanceof IWorkspaceSourceUnit) {
-			final IResource resource = ((IWorkspaceSourceUnit) su).getResource();
+			final IResource resource= ((IWorkspaceSourceUnit) su).getResource();
 			if (resource.getType() == IResource.FILE) {
 				open((IFile) resource, activate, element.getNameSourceRange());
 				return;
@@ -89,12 +101,12 @@ public class OpenDeclaration {
 	}
 	
 	public void open(final IFile file, final boolean activate, final IRegion region) throws PartInitException  {
-		final IWorkbenchPage page = UIAccess.getActiveWorkbenchPage(true);
-		final IEditorDescriptor editorDescriptor = IDE.getEditorDescriptor(file, true);
-		final FileEditorInput input = new FileEditorInput(file);
-		IEditorPart editorPart = page.findEditor(input);
+		final IWorkbenchPage page= UIAccess.getActiveWorkbenchPage(true);
+		final IEditorDescriptor editorDescriptor= IDE.getEditorDescriptor(file, true);
+		final FileEditorInput input= new FileEditorInput(file);
+		IEditorPart editorPart= page.findEditor(input);
 		if (editorPart == null || !(editorPart instanceof ITextEditor)) {
-			editorPart = page.openEditor(input, editorDescriptor.getId(), activate);
+			editorPart= page.openEditor(input, editorDescriptor.getId(), activate);
 		}
 		else if (activate) {
 			page.activate(editorPart);
@@ -102,6 +114,16 @@ public class OpenDeclaration {
 		if (editorPart instanceof ITextEditor) {
 			((ITextEditor) editorPart).selectAndReveal(region.getOffset(), region.getLength());
 		}
+	}
+	
+	public void open(final ISourceEditor editor, final INameAccess<?, ?> access) {
+		IAstNode node= access.getNameNode();
+		if (node != null) {
+			editor.selectAndReveal(node.getOffset(), node.getLength());
+			return;
+		}
+		node= access.getNode();
+		editor.selectAndReveal(node.getOffset(), 0);
 	}
 	
 }
