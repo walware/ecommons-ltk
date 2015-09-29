@@ -538,6 +538,53 @@ public class BasicHeuristicTokenScanner implements ITokenScanner {
 		}
 	}
 	
+	public int computePairBalance(int backwardOffset, final int backwardBound,
+			int forwardOffset, final int forwardBound, final int initial,
+			final char[] pair, final char escapeChar) {
+		int balance= 0;
+		final StopCondition condition= createFindPeerStopCondition(forwardBound, pair, escapeChar);
+		
+		ITER_BACKWARD : while (--backwardOffset >= 0) {
+			backwardOffset= scanBackward(backwardOffset, backwardBound, condition);
+			if (backwardOffset != NOT_FOUND) {
+				if (this.fChar == pair[OPENING_PEER]) {
+					balance++;
+				}
+				else {
+					balance--;
+				}
+			}
+			else {
+				break ITER_BACKWARD;
+			}
+		}
+		if (balance < 0) {
+			balance= 0;
+		}
+		balance+= initial;
+		
+		ITER_FORWARD : while (forwardOffset < forwardBound) {
+			forwardOffset= scanForward(forwardOffset, forwardBound, condition);
+			if (forwardOffset != NOT_FOUND) {
+				if (this.fChar == pair[OPENING_PEER]) {
+					balance++;
+				}
+				else {
+					balance--;
+				}
+				if (balance == 0) {
+					break ITER_FORWARD;
+				}
+				forwardOffset++;
+			}
+			else {
+				break ITER_FORWARD;
+			}
+		}
+		return balance;
+	}
+	
+	
 	/**
 	 * Finds the smallest position in <code>fDocument</code> such that the position is &gt;= <code>position</code>
 	 * and &lt; <code>bound</code> and <code>Character.isWhitespace(fDocument.getChar(pos))</code> evaluates to <code>false</code>.
