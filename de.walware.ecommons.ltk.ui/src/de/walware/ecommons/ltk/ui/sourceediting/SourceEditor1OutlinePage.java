@@ -27,6 +27,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPageLayout;
+import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.editors.text.IEncodingSupport;
 import org.eclipse.ui.part.IPageSite;
 import org.eclipse.ui.part.IShowInSource;
@@ -290,6 +291,9 @@ public abstract class SourceEditor1OutlinePage extends AbstractEditorOutlinePage
 		final IMenuManager menuManager = actionBars.getMenuManager();
 		
 		menuManager.add(fSyncWithEditorAction);
+		
+		final IContextService service= (IContextService) serviceLocator.getService(IContextService.class);
+		service.activateContext("de.walware.ecommons.ltk.contexts.EditSource1MenuSet"); //$NON-NLS-1$
 	}
 	
 	@Override
