@@ -22,4 +22,15 @@ public interface ISmartInsertSettings {
 		CORRECT_INDENT,
 	}
 	
+	enum HardWrapMode {
+		UPTO_CURSOR,
+		MERGE
+	}
+	
+	
+	boolean isSmartInsertEnabledByDefault();
+	
+	TabAction getSmartInsertTabAction();
+	
+	
 }

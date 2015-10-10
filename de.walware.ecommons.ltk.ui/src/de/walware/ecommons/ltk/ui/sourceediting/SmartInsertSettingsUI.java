@@ -25,6 +25,8 @@ public class SmartInsertSettingsUI {
 				switch ((ISmartInsertSettings.TabAction) element) {
 				case INSERT_TAB_CHAR:
 					return "Insert Tab Char";
+				case INSERT_TAB_LEVEL:
+					return "Insert Tab Level";
 				case INSERT_INDENT_LEVEL:
 					return "Insert Indent Level";
 				case CORRECT_INDENT:

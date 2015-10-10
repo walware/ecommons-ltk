@@ -203,8 +203,12 @@
             id="de.walware.ecommons.ltk.commands.CorrectIndent"
             categoryId="de.walware.statet.base.commandCategorys.StatetSource"
             name="%commands_CorrectIndent_name"
-            description="%commands_CorrectIndent_description"
-            />
+            description="%commands_CorrectIndent_description"/>
+      <command
+            id="de.walware.ecommons.ltk.commands.CorrectLineWrap"
+            categoryId="de.walware.statet.base.commandCategorys.StatetSource"
+            name="%commands_CorrectLineWrap_name"
+            description="%commands_CorrectLineWrap_description"/>
       
       <command
             id="de.walware.ecommons.ltk.commands.ToggleLiveReportProblems"
