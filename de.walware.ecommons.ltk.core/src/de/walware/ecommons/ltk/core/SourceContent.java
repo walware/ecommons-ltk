@@ -11,8 +11,8 @@
 
 package de.walware.ecommons.ltk.core;
 
-import de.walware.ecommons.text.ILineInformation;
 import de.walware.ecommons.text.LineInformationCreator;
+import de.walware.ecommons.text.core.ILineInformation;
 
 
 /**

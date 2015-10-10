@@ -13,6 +13,9 @@ package de.walware.ecommons.text;
 
 import java.util.Arrays;
 
+import de.walware.ecommons.text.core.ILineInformation;
+import de.walware.ecommons.text.core.LineInformation;
+
 
 public class LineInformationCreator {
 	
