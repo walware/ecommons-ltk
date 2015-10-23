@@ -598,11 +598,16 @@ public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 		fOverviewRuler = createOverviewRuler(getSharedColors());
 		
 		final ISourceViewer viewer = new SourceEditorViewer(parent,
-				ruler, getOverviewRuler(), isOverviewRulerVisible(), styles);
+				ruler, getOverviewRuler(), isOverviewRulerVisible(), styles,
+				getSourceViewerFlags() );
 		// ensure decoration support has been created and configured.
 		getSourceViewerDecorationSupport(viewer);
 		
 		return viewer;
+	}
+	
+	protected int getSourceViewerFlags() {
+		return 0;
 	}
 	
 	protected IRegion getRangeToReveal(final ISourceUnitModelInfo modelInfo, final ISourceStructElement element) {

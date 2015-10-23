@@ -11,15 +11,15 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.8.0",
  org.eclipse.core.contenttype,
  org.eclipse.core.filesystem,
  org.eclipse.core.resources;visibility:=reexport,
- org.eclipse.jface.text;visibility:=reexport,
+ de.walware.ecommons.text.core;visibility:=reexport,
  org.eclipse.core.filebuffers,
- org.eclipse.ltk.core.refactoring
+ org.eclipse.ltk.core.refactoring,
+ org.eclipse.jface.text;visibility:=reexport
 Import-Package: com.ibm.icu.text;version="4.4.2.2",
  de.walware.ecommons,
  de.walware.ecommons.collections;version="1.1.0",
  de.walware.ecommons.io,
  de.walware.ecommons.string,
- de.walware.ecommons.text.core,
  org.apache.commons.collections.primitives;version="1.0.0"
 Export-Package: de.walware.ecommons.ltk,
  de.walware.ecommons.ltk.ast,
