@@ -6,7 +6,7 @@
 	
 	<groupId>de.walware.ecommons</groupId>
 	<artifactId>ecommons-ltk</artifactId>
-	<version>2.4-SNAPSHOT</version>
+	<version>2.5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>ECommons LTK</name>
 	
@@ -64,7 +64,7 @@
 						<artifact>
 							<groupId>de.walware.ecommons</groupId>
 							<artifactId>de.walware.ecommons.ltk-default</artifactId>
-							<version>2.0.1-SNAPSHOT</version>
+							<version>2.5.0-SNAPSHOT</version>
 						</artifact>
 					</target>
 				</configuration>
