@@ -24,8 +24,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
-import de.walware.ecommons.collections.ImCollections;
-import de.walware.ecommons.collections.ImList;
+import de.walware.jcommons.collections.ImCollections;
+import de.walware.jcommons.collections.ImList;
 
 import de.walware.ecommons.ltk.LTKUtil;
 import de.walware.ecommons.ltk.core.model.IModelElement;

@@ -18,7 +18,7 @@ import org.eclipse.jface.text.templates.Template;
 import org.eclipse.jface.text.templates.persistence.TemplatePersistenceData;
 import org.eclipse.jface.text.templates.persistence.TemplateStore;
 
-import de.walware.ecommons.collections.ImCollections;
+import de.walware.jcommons.collections.ImCollections;
 
 
 public class TemplateStoreContribution implements ITemplateContribution {

@@ -73,9 +73,10 @@ import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 import org.eclipse.ui.texteditor.templates.ITemplatesPage;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
+import de.walware.jcommons.collections.ImCollections;
+import de.walware.jcommons.collections.ImList;
+
 import de.walware.ecommons.FastList;
-import de.walware.ecommons.collections.ImCollections;
-import de.walware.ecommons.collections.ImList;
 import de.walware.ecommons.preferences.Preference;
 import de.walware.ecommons.preferences.PreferencesUtil;
 import de.walware.ecommons.preferences.SettingsChangeNotifier;

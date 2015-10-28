@@ -32,7 +32,7 @@ import org.eclipse.jface.text.templates.TemplateException;
 import org.eclipse.jface.text.templates.persistence.TemplateStore;
 import org.eclipse.swt.graphics.Image;
 
-import de.walware.ecommons.collections.ImCollections;
+import de.walware.jcommons.collections.ImCollections;
 
 import de.walware.ecommons.ltk.internal.ui.LTKUIPlugin;
 import de.walware.ecommons.ltk.ui.LTKUI;

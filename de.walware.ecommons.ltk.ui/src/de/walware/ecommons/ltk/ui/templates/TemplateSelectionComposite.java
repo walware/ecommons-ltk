@@ -31,8 +31,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
-import de.walware.ecommons.collections.ImCollections;
-import de.walware.ecommons.collections.ImList;
+import de.walware.jcommons.collections.ImCollections;
+import de.walware.jcommons.collections.ImList;
+
 import de.walware.ecommons.ui.util.LayoutUtil;
 import de.walware.ecommons.ui.util.ViewerUtil;
 import de.walware.ecommons.ui.util.ViewerUtil.TableComposite;

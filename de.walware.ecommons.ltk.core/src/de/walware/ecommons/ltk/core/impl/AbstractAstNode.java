@@ -13,8 +13,8 @@ package de.walware.ecommons.ltk.core.impl;
 
 import java.lang.reflect.InvocationTargetException;
 
-import de.walware.ecommons.collections.ImCollections;
-import de.walware.ecommons.collections.ImList;
+import de.walware.jcommons.collections.ImCollections;
+import de.walware.jcommons.collections.ImList;
 
 import de.walware.ecommons.ltk.ast.IAstNode;
 import de.walware.ecommons.ltk.ast.ICommonAstVisitor;

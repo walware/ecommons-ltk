@@ -14,7 +14,7 @@ package de.walware.ecommons.ltk.core.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.walware.ecommons.collections.ImCollections;
+import de.walware.jcommons.collections.ImCollections;
 
 import de.walware.ecommons.ltk.IElementName;
 

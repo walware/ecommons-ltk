@@ -15,7 +15,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TextUtilities;
 
-import de.walware.ecommons.collections.ImList;
+import de.walware.jcommons.collections.ImList;
 
 
 public abstract class AbstractDocContentSections implements IDocContentSections {

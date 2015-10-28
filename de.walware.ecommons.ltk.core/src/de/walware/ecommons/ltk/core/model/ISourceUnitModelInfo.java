@@ -11,7 +11,7 @@
 
 package de.walware.ecommons.ltk.core.model;
 
-import de.walware.ecommons.collections.ImList;
+import de.walware.jcommons.collections.ImList;
 
 import de.walware.ecommons.ltk.AstInfo;
 import de.walware.ecommons.ltk.core.ISourceModelStamp;

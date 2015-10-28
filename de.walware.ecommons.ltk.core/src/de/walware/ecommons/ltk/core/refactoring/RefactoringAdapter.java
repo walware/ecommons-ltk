@@ -65,7 +65,8 @@ import org.eclipse.text.edits.DeleteEdit;
 import org.eclipse.text.edits.InsertEdit;
 import org.eclipse.text.edits.MultiTextEdit;
 
-import de.walware.ecommons.collections.ImCollections;
+import de.walware.jcommons.collections.ImCollections;
+
 import de.walware.ecommons.io.FileUtil;
 import de.walware.ecommons.text.BasicHeuristicTokenScanner;
 import de.walware.ecommons.text.TextUtil;

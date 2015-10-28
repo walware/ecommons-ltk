@@ -31,8 +31,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 
-import de.walware.ecommons.collections.ImCollections;
-import de.walware.ecommons.collections.ImList;
+import de.walware.jcommons.collections.ImCollections;
+import de.walware.jcommons.collections.ImList;
+
 import de.walware.ecommons.workbench.ui.WorkbenchUIUtil;
 
 import de.walware.ecommons.ltk.core.ElementSet;

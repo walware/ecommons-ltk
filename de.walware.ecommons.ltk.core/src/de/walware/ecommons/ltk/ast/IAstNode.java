@@ -13,7 +13,8 @@ package de.walware.ecommons.ltk.ast;
 
 import java.lang.reflect.InvocationTargetException;
 
-import de.walware.ecommons.collections.ImList;
+import de.walware.jcommons.collections.ImList;
+
 import de.walware.ecommons.text.core.ITextRegion;
 
 
@@ -29,6 +30,7 @@ public interface IAstNode extends ITextRegion {
 	
 	@Override
 	int getOffset();
+	@Override
 	int getEndOffset();
 	@Override
 	int getLength();

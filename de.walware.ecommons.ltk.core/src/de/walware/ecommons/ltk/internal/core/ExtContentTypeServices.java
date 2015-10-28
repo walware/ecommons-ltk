@@ -24,8 +24,9 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
 
+import de.walware.jcommons.collections.ImCollections;
+
 import de.walware.ecommons.IDisposable;
-import de.walware.ecommons.collections.ImCollections;
 
 import de.walware.ecommons.ltk.IExtContentTypeManager;
 

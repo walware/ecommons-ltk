@@ -21,6 +21,8 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
+import de.walware.jcommons.collections.ImList;
+
 import de.walware.ecommons.preferences.IPreferenceAccess;
 import de.walware.ecommons.preferences.ui.ScopedPreferenceStore;
 
@@ -33,16 +35,14 @@ public class CombinedPreferenceStore {
 	public static IPreferenceStore createStore(
 			final IPreferenceStore[] preferenceStores, final IPreferenceAccess corePrefs, final String[] coreQualifier) {
 		
-		IScopeContext[] contexts = corePrefs.getPreferenceContexts();
+		ImList<IScopeContext> contexts= corePrefs.getPreferenceContexts();
 		// default scope must not be included (will be automatically added)
-		if (contexts.length > 0 && contexts[contexts.length-1] instanceof DefaultScope) {
-			final IScopeContext[] newContexts = new IScopeContext[contexts.length-1];
-			System.arraycopy(contexts, 0, newContexts, 0, contexts.length-1);
-			contexts = newContexts;
+		if (contexts.size() > 0 && contexts.get(contexts.size() - 1) instanceof DefaultScope) {
+			contexts= contexts.subList(0, contexts.size() - 1);
 		}
-		final IScopeContext mainScope = (contexts.length > 0) ? contexts[0] : new InstanceScope();
+		final IScopeContext mainScope = (!contexts.isEmpty()) ? contexts.get(0) : InstanceScope.INSTANCE;
 		
-		if (preferenceStores.length == 0 && contexts.length <= 1 && coreQualifier.length == 1) {
+		if (preferenceStores.length == 0 && contexts.size() <= 1 && coreQualifier.length == 1) {
 			return new ScopedPreferenceStore(mainScope, coreQualifier[0]);
 		}
 		

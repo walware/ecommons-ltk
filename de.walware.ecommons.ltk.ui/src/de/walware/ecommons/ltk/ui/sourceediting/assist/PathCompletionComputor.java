@@ -45,7 +45,8 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.statushandlers.StatusManager;
 
-import de.walware.ecommons.lang.SystemUtils;
+import de.walware.jcommons.lang.SystemUtils;
+
 import de.walware.ecommons.runtime.core.util.PathUtils;
 import de.walware.ecommons.ui.SharedUIResources;
 

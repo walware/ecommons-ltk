@@ -68,8 +68,9 @@ import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
-import de.walware.ecommons.collections.ImCollections;
-import de.walware.ecommons.collections.ImList;
+import de.walware.jcommons.collections.ImCollections;
+import de.walware.jcommons.collections.ImList;
+
 import de.walware.ecommons.preferences.Preference;
 import de.walware.ecommons.preferences.ui.ColorSelectorObservableValue;
 import de.walware.ecommons.preferences.ui.OverlayStoreConfigurationBlock;

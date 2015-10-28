@@ -28,7 +28,7 @@ public class ECommonsRefactoring {
 	}
 	
 	public static void setSaveAllEditors(final boolean save) {
-		PreferencesUtil.setPrefValue(PreferencesUtil.getInstancePrefs().getPreferenceContexts()[0], PREF_SAVE_ALL_EDITORS, save);
+		PreferencesUtil.setPrefValue(PreferencesUtil.getInstancePrefs().getPreferenceContexts().get(0), PREF_SAVE_ALL_EDITORS, save);
 	}
 	
 }

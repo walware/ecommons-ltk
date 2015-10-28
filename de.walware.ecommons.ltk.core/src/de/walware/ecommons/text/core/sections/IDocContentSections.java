@@ -13,7 +13,7 @@ package de.walware.ecommons.text.core.sections;
 
 import org.eclipse.jface.text.IDocument;
 
-import de.walware.ecommons.collections.ImList;
+import de.walware.jcommons.collections.ImList;
 
 
 public interface IDocContentSections {
