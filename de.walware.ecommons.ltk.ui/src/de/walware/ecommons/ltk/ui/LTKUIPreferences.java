@@ -13,7 +13,7 @@ package de.walware.ecommons.ltk.ui;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
-import de.walware.ecommons.preferences.Preference.IntPref;
+import de.walware.ecommons.preferences.core.Preference.IntPref;
 import de.walware.ecommons.preferences.ui.RGBPref;
 import de.walware.ecommons.text.ui.settings.DecorationPreferences;
 

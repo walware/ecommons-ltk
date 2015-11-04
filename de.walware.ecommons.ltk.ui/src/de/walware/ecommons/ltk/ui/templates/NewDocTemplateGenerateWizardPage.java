@@ -23,8 +23,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 
-import de.walware.ecommons.preferences.Preference;
 import de.walware.ecommons.preferences.PreferencesUtil;
+import de.walware.ecommons.preferences.core.Preference;
 import de.walware.ecommons.ui.util.LayoutUtil;
 
 import de.walware.ecommons.ltk.internal.ui.TemplatesMessages;

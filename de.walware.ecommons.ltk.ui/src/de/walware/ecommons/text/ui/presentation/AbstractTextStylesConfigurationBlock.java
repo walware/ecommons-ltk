@@ -71,7 +71,7 @@ import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import de.walware.jcommons.collections.ImCollections;
 import de.walware.jcommons.collections.ImList;
 
-import de.walware.ecommons.preferences.Preference;
+import de.walware.ecommons.preferences.core.Preference;
 import de.walware.ecommons.preferences.ui.ColorSelectorObservableValue;
 import de.walware.ecommons.preferences.ui.OverlayStoreConfigurationBlock;
 import de.walware.ecommons.preferences.ui.OverlayStorePreference;
@@ -244,19 +244,19 @@ public abstract class AbstractTextStylesConfigurationBlock extends OverlayStoreC
 		
 		public class UseStylePref extends Preference<UseStyle> {
 			UseStylePref(final String qualifier, final String key) {
-				super(qualifier, key, Type.STRING);
+				super(qualifier, key);
 			}
 			@Override
 			public Class<UseStyle> getUsageType() {
 				return UseStyle.class;
 			}
 			@Override
-			public UseStyle store2Usage(final Object obj) {
-				return getUseStyle((String) obj);
+			public UseStyle store2Usage(final String storeValue) {
+				return getUseStyle(storeValue);
 			}
 			@Override
-			public Object usage2Store(final UseStyle obj) {
-				return obj.getRefRootKey();
+			public String usage2Store(final UseStyle usageValue) {
+				return usageValue.getRefRootKey();
 			}
 		}
 		

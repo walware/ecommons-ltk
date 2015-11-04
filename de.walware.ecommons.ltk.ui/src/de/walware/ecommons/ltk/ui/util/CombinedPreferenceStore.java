@@ -23,7 +23,7 @@ import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
 import de.walware.jcommons.collections.ImList;
 
-import de.walware.ecommons.preferences.IPreferenceAccess;
+import de.walware.ecommons.preferences.core.IPreferenceAccess;
 import de.walware.ecommons.preferences.ui.ScopedPreferenceStore;
 
 
