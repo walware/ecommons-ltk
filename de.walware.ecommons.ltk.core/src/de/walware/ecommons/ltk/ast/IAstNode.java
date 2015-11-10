@@ -26,12 +26,27 @@ import de.walware.ecommons.text.core.ITextRegion;
 public interface IAstNode extends ITextRegion {
 	
 	
+	int NA_OFFSET= Integer.MIN_VALUE;
+	
+	
 	int getStatusCode();
 	
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * <p>Obligatory offset property: {@link #NA_OFFSET} not supported.</p>
+	 */
 	@Override
 	int getOffset();
+	
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * <p>Obligatory offset property: {@link #NA_OFFSET} not supported.</p>
+	 */
 	@Override
 	int getEndOffset();
+	
 	@Override
 	int getLength();
 	
