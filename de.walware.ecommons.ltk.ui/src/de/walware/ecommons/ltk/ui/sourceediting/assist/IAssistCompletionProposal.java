@@ -17,6 +17,10 @@ import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 
 public interface IAssistCompletionProposal extends ICompletionProposal, ICompletionProposalExtension2 {
 	
+	
+	String QUALIFIER_SEPARATOR= "\u2002–\u2002"; //$NON-NLS-1$
+	
+	
 	/**
 	 * Returns relevance of the proposal
 	 * <p>

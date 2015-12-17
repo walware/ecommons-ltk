@@ -48,7 +48,7 @@ public abstract class CompletionProposalWithOverwrite
 	}
 	
 	
-	public final AssistInvocationContext getInvocationContext() {
+	public AssistInvocationContext getInvocationContext() {
 		return this.context;
 	}
 	

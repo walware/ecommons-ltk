@@ -26,9 +26,8 @@ import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditor;
 public interface IContentAssistComputer {
 	
 	
-	int COMBINED_MODE=                                      0x1;
-	int SPECIFIC_MODE=                                      0x2;
-	int INFORMATION_MODE=                                   0x4;
+	int COMBINED_MODE=                                      1 << 0;
+	int SPECIFIC_MODE=                                      1 << 1;
 	
 	
 	/**
@@ -61,7 +60,9 @@ public interface IContentAssistComputer {
 	 * @param monitor a progress monitor to report progress. The monitor is private to this
 	 *     invocation, i.e. there is no need for the receiver to spawn a sub monitor.
 	 */
-	IStatus computeCompletionProposals(AssistInvocationContext context, int mode, AssistProposalCollector<IAssistCompletionProposal> proposals, IProgressMonitor monitor);
+	IStatus computeCompletionProposals(AssistInvocationContext context, int mode,
+			AssistProposalCollector proposals,
+			IProgressMonitor monitor);
 	
 	/**
 	 * Returns context information objects valid at the given invocation context.
@@ -71,6 +72,8 @@ public interface IContentAssistComputer {
 	 * @param monitor a progress monitor to report progress. The monitor is private to this
 	 *     invocation, i.e. there is no need for the receiver to spawn a sub monitor.
 	 */
-	IStatus computeContextInformation(AssistInvocationContext context, AssistProposalCollector<IAssistInformationProposal> proposals, IProgressMonitor monitor);
+	IStatus computeInformationProposals(AssistInvocationContext context,
+			AssistProposalCollector proposals,
+			IProgressMonitor monitor);
 	
 }

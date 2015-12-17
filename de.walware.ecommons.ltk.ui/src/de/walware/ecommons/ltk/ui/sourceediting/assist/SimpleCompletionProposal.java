@@ -80,7 +80,7 @@ public abstract class SimpleCompletionProposal extends CompletionProposalWithOve
 	 */
 	@Override
 	public int getRelevance() {
-		return 50;
+		return 0;
 	}
 	
 	@Override

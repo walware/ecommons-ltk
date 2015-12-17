@@ -89,24 +89,19 @@ public abstract class TemplatesCompletionComputer implements IContentAssistCompu
 	public void sessionStarted(final ISourceEditor editor, final ContentAssist assist) {
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public void sessionEnded() {
 	}
 	
 	protected boolean handleRequest(final int mode, final String prefix) {
 		return (prefix != null
-				&& (prefix.length() > 0 || mode == IContentAssistComputer.SPECIFIC_MODE) );
+				&& (prefix.length() > 0 || mode == SPECIFIC_MODE) );
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 */
+	
 	@Override
-	public IStatus computeCompletionProposals(final AssistInvocationContext context,
-			final int mode, final AssistProposalCollector<IAssistCompletionProposal> tenders, final IProgressMonitor monitor) {
+	public IStatus computeCompletionProposals(final AssistInvocationContext context, final int mode,
+			final AssistProposalCollector proposals, final IProgressMonitor monitor) {
 		final ISourceViewer viewer= context.getSourceViewer();
 		
 		String prefix= extractPrefix(context);
@@ -128,7 +123,7 @@ public abstract class TemplatesCompletionComputer implements IContentAssistCompu
 		int count= 0;
 		if (context.getLength() > 0) {
 			if (prefix.length() == context.getLength()) {
-				count= doComputeProposals(tenders, templateContext, prefix, 0, region);
+				count= doComputeProposals(templateContext, prefix, 0, region, proposals);
 			}
 			prefix= ""; // wenn erfolglos, dann ohne prefix //$NON-NLS-1$
 			if (count != 0) {
@@ -148,16 +143,23 @@ public abstract class TemplatesCompletionComputer implements IContentAssistCompu
 			}
 			templateContext.setVariable(GlobalTemplateVariables.SELECTION, text);
 			
-			doComputeProposals(tenders, templateContext, prefix, selectionType, region);
+			doComputeProposals(templateContext, prefix, selectionType, region, proposals);
 		}
 		catch (final BadLocationException e) {
 		}
 		return null;
 	}
 	
-	private int doComputeProposals(final AssistProposalCollector<IAssistCompletionProposal> proposals,
-			final DocumentTemplateContext context, final String prefix, final int selectionType,
-			final IRegion replacementRegion) {
+	@Override
+	public IStatus computeInformationProposals(final AssistInvocationContext context,
+			final AssistProposalCollector tenders, final IProgressMonitor monitor) {
+		return null;
+	}
+	
+	
+	private int doComputeProposals(final DocumentTemplateContext context, final String prefix,
+			final int selectionType, final IRegion replacementRegion,
+			final AssistProposalCollector proposals) {
 		// Add Templates
 		final int count= 0;
 		final List<Template> templates= getTemplates(context.getContextType().getId());
@@ -171,8 +173,8 @@ public abstract class TemplatesCompletionComputer implements IContentAssistCompu
 				}
 				
 				proposals.add(createProposal(template, context, prefix, replacementRegion,
-						(template.getName().regionMatches(true, 0, prefix, 0, prefix.length())) ? 90 : 0
-						));
+						(template.getName().regionMatches(true, 0, prefix, 0, prefix.length())) ?
+								20 : -100 ));
 			}
 		}
 		
@@ -192,12 +194,6 @@ public abstract class TemplatesCompletionComputer implements IContentAssistCompu
 		default:
 			return false;
 		}
-	}
-	
-	@Override
-	public IStatus computeContextInformation(final AssistInvocationContext context,
-			final AssistProposalCollector<IAssistInformationProposal> tenders, final IProgressMonitor monitor) {
-		return null;
 	}
 	
 	

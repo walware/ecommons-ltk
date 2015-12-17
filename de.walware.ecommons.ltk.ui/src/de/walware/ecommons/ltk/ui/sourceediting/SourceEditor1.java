@@ -112,6 +112,7 @@ import de.walware.ecommons.ltk.ui.sourceediting.actions.GotoNextWordHandler;
 import de.walware.ecommons.ltk.ui.sourceediting.actions.GotoPreviousWordHandler;
 import de.walware.ecommons.ltk.ui.sourceediting.actions.SelectNextWordHandler;
 import de.walware.ecommons.ltk.ui.sourceediting.actions.SelectPreviousWordHandler;
+import de.walware.ecommons.ltk.ui.sourceediting.actions.SpecificContentAssistHandler;
 import de.walware.ecommons.ltk.ui.sourceediting.actions.ToggleCommentHandler;
 
 
@@ -790,6 +791,10 @@ public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 		if (matcher != null) {
 			handlerService.activateHandler(ISourceEditorCommandIds.GOTO_MATCHING_BRACKET,
 					new GotoMatchingBracketHandler(matcher, this));
+		}
+		{	final IHandler2 handler= new SpecificContentAssistHandler(this,
+					this.fConfigurator.getSourceViewerConfiguration().getContentAssist() );
+			handlerService.activateHandler(ISourceEditorCommandIds.SPECIFIC_CONTENT_ASSIST_COMMAND_ID, handler);
 		}
 		
 		{	final IHandler2 handler = createToggleCommentHandler();

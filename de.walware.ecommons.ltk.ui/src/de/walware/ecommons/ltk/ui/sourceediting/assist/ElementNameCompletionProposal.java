@@ -11,6 +11,8 @@
 
 package de.walware.ecommons.ltk.ui.sourceediting.assist;
 
+import java.util.Objects;
+
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
@@ -200,7 +202,7 @@ public abstract class ElementNameCompletionProposal<E extends IModelElement>
 	
 	@Override
 	public int hashCode() {
-		return getClass().hashCode() * ((this.getReplacementName() != null) ? this.getReplacementName().hashCode() : 564);
+		return getClass().hashCode() * Objects.hashCode(getReplacementName());
 	}
 	
 	@Override
@@ -208,12 +210,12 @@ public abstract class ElementNameCompletionProposal<E extends IModelElement>
 		if (this == obj) {
 			return true;
 		}
-		if (getClass() != obj.getClass()) {
-			return false;
+		if (getClass() == obj.getClass()) {
+			final ElementNameCompletionProposal<?> other= (ElementNameCompletionProposal<?>) obj;
+			return (Objects.equals(getReplacementName(), other.getReplacementName())
+					&& Objects.equals(getElement(), other.getElement()) );
 		}
-		final ElementNameCompletionProposal<?> other= (ElementNameCompletionProposal<?>) obj;
-		return (   ((this.getReplacementName() != null) ? this.getReplacementName().equals(other.getReplacementName()) : null == other.getReplacementName())
-				&& ((this.element != null) ? this.element.equals(other.element) : null == other.element) );
+		return false;
 	}
 	
 }

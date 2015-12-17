@@ -21,8 +21,11 @@ import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.ITextHoverExtension;
 import org.eclipse.jface.text.ITextHoverExtension2;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.TypedRegion;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.statushandlers.StatusManager;
+
+import de.walware.ecommons.text.core.util.TextUtils;
 
 import de.walware.ecommons.ltk.internal.ui.LTKUIPlugin;
 import de.walware.ecommons.ltk.ui.sourceediting.assist.AssistInvocationContext;
@@ -38,38 +41,38 @@ import de.walware.ecommons.ltk.ui.sourceediting.assist.InfoHoverRegistry.Effecti
 public abstract class EditorTextInfoHoverProxy implements ITextHover, ITextHoverExtension, ITextHoverExtension2 {
 	
 	
-	private final InfoHoverDescriptor fDescriptor;
+	private final InfoHoverDescriptor descriptor;
 	
-	private IInfoHover fHover;
+	private IInfoHover hover;
 	
-	private final SourceEditorViewerConfiguration fSourceEditorConfig;
+	private final SourceEditorViewerConfiguration sourceEditorConfig;
 	
 	
-	public EditorTextInfoHoverProxy(final InfoHoverDescriptor descriptor, final 
-			SourceEditorViewerConfiguration config) {
-		fDescriptor = descriptor;
-		fSourceEditorConfig = config;
+	public EditorTextInfoHoverProxy(final InfoHoverDescriptor descriptor,
+			final SourceEditorViewerConfiguration config) {
+		this.descriptor= descriptor;
+		this.sourceEditorConfig= config;
 	}
 	
 	
 	protected ISourceEditor getEditor() {
-		return fSourceEditorConfig.getSourceEditor();
+		return this.sourceEditorConfig.getSourceEditor();
 	}
 	
 	protected boolean ensureHover() {
-		if (fHover == null) {
-			fHover = fDescriptor.createHover();
-			if (fHover instanceof CombinedHover) {
-				final EffectiveHovers effectiveHovers = fSourceEditorConfig.getConfiguredInfoHovers();
+		if (this.hover == null) {
+			this.hover= this.descriptor.createHover();
+			if (this.hover instanceof CombinedHover) {
+				final EffectiveHovers effectiveHovers= this.sourceEditorConfig.getConfiguredInfoHovers();
 				if (effectiveHovers != null) {
-					((CombinedHover) fHover).setHovers(effectiveHovers.getDescriptorsForCombined());
+					((CombinedHover) this.hover).setHovers(effectiveHovers.getDescriptorsForCombined());
 				}
 				else {
-					fHover = null;
+					this.hover= null;
 				}
 			}
 		}
-		return (fHover != null);
+		return (this.hover != null);
 	}
 	
 	@Override
@@ -84,28 +87,37 @@ public abstract class EditorTextInfoHoverProxy implements ITextHover, ITextHover
 	
 	@Override
 	public Object getHoverInfo2(final ITextViewer textViewer, final IRegion hoverRegion) {
-		if (ensureHover()) {
+		final ISourceEditor editor= getEditor();
+		if (editor != null && ensureHover()) {
 			try {
-				final AssistInvocationContext context = createContext(hoverRegion, new NullProgressMonitor());
+				final String contentType= (hoverRegion instanceof TypedRegion) ?
+						((TypedRegion) hoverRegion).getType() :
+						TextUtils.getContentType(editor.getViewer().getDocument(),
+								editor.getDocumentContentInfo(), hoverRegion.getOffset(),
+								hoverRegion.getLength() == 0 );
+				
+				final AssistInvocationContext context= createContext(hoverRegion, contentType,
+						new NullProgressMonitor() );
 				if (context != null) {
-					return fHover.getHoverInfo(context);
+					return this.hover.getHoverInfo(context);
 				}
 			}
 			catch (final Exception e) {
 				StatusManager.getManager().handle(new Status(IStatus.ERROR, LTKUIPlugin.PLUGIN_ID,
 						NLS.bind("An error occurred when preparing the information hover ''{0}'' (mouse).",
-								fDescriptor.getName() ), e ));
+								this.descriptor.getName() ), e ));
 			}
 		}
 		return null;
 	}
 	
-	protected abstract AssistInvocationContext createContext(IRegion region, IProgressMonitor monitor);
+	protected abstract AssistInvocationContext createContext(IRegion region, String contentType,
+			IProgressMonitor monitor );
 	
 	@Override
 	public IInformationControlCreator getHoverControlCreator() {
 		if (ensureHover()) {
-			return fHover.getHoverControlCreator();
+			return this.hover.getHoverControlCreator();
 		}
 		return null;
 	}

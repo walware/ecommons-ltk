@@ -36,7 +36,6 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.ITextViewerExtension2;
-import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.information.IInformationPresenter;
 import org.eclipse.jface.text.information.IInformationProvider;
@@ -156,7 +155,7 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 	
 	private IPresentationReconciler presentationReconciler;
 	private ICharPairMatcher pairMatcher;
-	private ContentAssistant contentAssistant;
+	private ContentAssist contentAssistant;
 	private IQuickAssistAssistant quickAssistant;
 	
 	private DecorationPreferences decorationPreferences;
@@ -379,7 +378,11 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 		return this.contentAssistant;
 	}
 	
-	protected ContentAssistant createContentAssistant(final ISourceViewer sourceViewer) {
+	public ContentAssist getContentAssist() {
+		return this.contentAssistant;
+	}
+	
+	protected ContentAssist createContentAssistant(final ISourceViewer sourceViewer) {
 		if (getSourceEditor() != null) {
 			final ContentAssist assistant = new ContentAssist();
 			assistant.setDocumentPartitioning(getConfiguredDocumentPartitioning(null));
@@ -389,10 +392,6 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 			return assistant;
 		}
 		return null;
-	}
-	
-	ContentAssist getContentAssist() {
-		return (ContentAssist) this.contentAssistant;
 	}
 	
 	protected void initContentAssist(final ContentAssist assistant) {
@@ -603,9 +602,9 @@ public abstract class SourceEditorViewerConfiguration extends TextSourceViewerCo
 		
 	}
 	
-	protected ContentAssistant createTemplateVariableContentAssistant(final ISourceViewer sourceViewer,
+	protected ContentAssist createTemplateVariableContentAssistant(final ISourceViewer sourceViewer,
 			final TemplateVariableProcessor processor) {
-		final ContentAssistant assistant= new ContentAssistant();
+		final ContentAssist assistant= new ContentAssist();
 		assistant.setDocumentPartitioning(getConfiguredDocumentPartitioning(null));
 		
 		for (final String contentType : getConfiguredContentTypes(null)) {

@@ -11,38 +11,36 @@
 
 package de.walware.ecommons.ltk.ui.sourceediting.assist;
 
-import java.lang.reflect.Array;
 import java.util.HashMap;
 import java.util.Map;
 
 
-public class AssistProposalCollector<T> {
+public class AssistProposalCollector {
 	
 	
-	private final Class<T> type;
-	
-	protected final Map<T, T> proposals;
+	private final Map<IAssistCompletionProposal, IAssistCompletionProposal> proposals;
 	
 	
-	public AssistProposalCollector(final Class<T> type) {
-		this.type= type;
+	public AssistProposalCollector() {
 		this.proposals= new HashMap<>();
 	}
 	
 	
-	public void add(final T proposal) {
-		this.proposals.put(proposal, proposal);
+	public void add(final IAssistCompletionProposal proposal) {
+		final IAssistCompletionProposal existing= this.proposals.put(proposal, proposal);
+		if (existing != null && existing.getRelevance() > proposal.getRelevance()) {
+			this.proposals.put(existing, existing);
+		}
 	}
 	
 	public int getCount() {
 		return this.proposals.size();
 	}
 	
-	public T[] toArray() {
-		@SuppressWarnings("unchecked")
-		final T[] array= (T[]) Array.newInstance(this.type, this.proposals.size());
-		this.proposals.values().toArray(array);
-		return array;
+	public IAssistCompletionProposal[] toArray() {
+		return this.proposals.values().toArray(
+				new IAssistCompletionProposal[this.proposals.size()] );
 	}
+	
 	
 }

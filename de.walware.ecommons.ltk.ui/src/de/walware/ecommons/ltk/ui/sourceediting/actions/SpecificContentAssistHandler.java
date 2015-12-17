@@ -17,9 +17,11 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.source.ISourceViewer;
 
+import de.walware.ecommons.ui.util.UIAccess;
+
 import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditor;
 import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditorCommandIds;
-import de.walware.ecommons.ltk.ui.sourceediting.assist.ContentAssistComputerRegistry;
+import de.walware.ecommons.ltk.ui.sourceediting.assist.ContentAssist;
 
 
 /**
@@ -28,8 +30,9 @@ import de.walware.ecommons.ltk.ui.sourceediting.assist.ContentAssistComputerRegi
 public final class SpecificContentAssistHandler extends AbstractHandler {
 	
 	
-	private final ISourceEditor fEditor;
-	private final ContentAssistComputerRegistry fRegistry;
+	private final ISourceEditor editor;
+	
+	private final ContentAssist ContentAssist;
 	
 	
 	/**
@@ -37,9 +40,9 @@ public final class SpecificContentAssistHandler extends AbstractHandler {
 	 *
 	 * @param registry the computer registry to use for the enablement of proposal categories
 	 */
-	public SpecificContentAssistHandler(final ISourceEditor editor, final ContentAssistComputerRegistry registry) {
-		fEditor = editor;
-		fRegistry = registry;
+	public SpecificContentAssistHandler(final ISourceEditor editor, final ContentAssist ContentAssist) {
+		this.editor= editor;
+		this.ContentAssist= ContentAssist;
 	}
 	
 	
@@ -52,21 +55,16 @@ public final class SpecificContentAssistHandler extends AbstractHandler {
 	 */
 	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
-		final String par = event.getParameter(ISourceEditorCommandIds.SPECIFIC_CONTENT_ASSIST_CATEGORY_PARAMETER_ID);
-		if (par == null) {
+		final String par= event.getParameter(ISourceEditorCommandIds.SPECIFIC_CONTENT_ASSIST_CATEGORY_PARAMETER_ID);
+		if (par == null || !UIAccess.isOkToUse(this.editor.getViewer())) {
 			return null;
 		}
-		fRegistry.startSpecificMode(par);
 		
-		final ITextOperationTarget target = (ITextOperationTarget) fEditor.getAdapter(ITextOperationTarget.class);
-		try {
-			if (target != null && target.canDoOperation(ISourceViewer.CONTENTASSIST_PROPOSALS)) {
-				target.doOperation(ISourceViewer.CONTENTASSIST_PROPOSALS);
-			}
+		final ITextOperationTarget target= (ITextOperationTarget) this.editor.getAdapter(ITextOperationTarget.class);
+		if (target != null && target.canDoOperation(ISourceViewer.CONTENTASSIST_PROPOSALS)) {
+			this.ContentAssist.showPossibleCompletions(par);
 		}
-		finally {
-			fRegistry.stopSpecificMode();
-		}
+		
 		return null;
 	}
 	

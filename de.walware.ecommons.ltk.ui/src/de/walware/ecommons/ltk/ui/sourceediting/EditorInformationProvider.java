@@ -18,10 +18,13 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.TypedRegion;
 import org.eclipse.jface.text.information.IInformationProvider;
 import org.eclipse.jface.text.information.IInformationProviderExtension;
 import org.eclipse.jface.text.information.IInformationProviderExtension2;
 import org.eclipse.ui.statushandlers.StatusManager;
+
+import de.walware.ecommons.text.core.util.TextUtils;
 
 import de.walware.ecommons.ltk.internal.ui.LTKUIPlugin;
 import de.walware.ecommons.ltk.ui.sourceediting.assist.AssistInvocationContext;
@@ -29,7 +32,7 @@ import de.walware.ecommons.ltk.ui.sourceediting.assist.IInfoHover;
 
 
 public abstract class EditorInformationProvider
-		implements IInformationProvider, IInformationProviderExtension, IInformationProviderExtension2{
+		implements IInformationProvider, IInformationProviderExtension, IInformationProviderExtension2 {
 	
 	
 	private final ISourceEditor editor;
@@ -59,7 +62,13 @@ public abstract class EditorInformationProvider
 		this.bestHover = null;
 		final SubMonitor progress = SubMonitor.convert(null);
 		try {
-			final AssistInvocationContext context = createContext(region, progress);
+			final String contentType= (region instanceof TypedRegion) ?
+					((TypedRegion) region).getType() :
+					TextUtils.getContentType(this.editor.getViewer().getDocument(),
+							this.editor.getDocumentContentInfo(), region.getOffset(),
+							region.getLength() == 0 );
+			
+			final AssistInvocationContext context = createContext(region, contentType, progress);
 			if (context != null) {
 				for (int i = 0; i < this.hovers.length; i++) {
 					final Object info = this.hovers[i].getHoverInfo(context);
@@ -85,6 +94,7 @@ public abstract class EditorInformationProvider
 		return null;
 	}
 	
-	protected abstract AssistInvocationContext createContext(IRegion region, IProgressMonitor monitor);
+	protected abstract AssistInvocationContext createContext(IRegion region, String contentType,
+			IProgressMonitor monitor );
 	
 }

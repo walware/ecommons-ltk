@@ -17,6 +17,8 @@ import java.util.Iterator;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.BadPartitioningException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
@@ -33,6 +35,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.texteditor.spelling.SpellingAnnotation;
 import org.eclipse.ui.texteditor.spelling.SpellingProblem;
+
+import de.walware.ecommons.text.core.util.TextUtils;
 
 import de.walware.ecommons.ltk.IModelManager;
 import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditor;
@@ -144,11 +148,10 @@ public class QuickAssistProcessor implements IQuickAssistProcessor {
 	private String errorMessage;
 	
 	
-	public QuickAssistProcessor() {
-		this(null);
-	}
-	
 	public QuickAssistProcessor(final ISourceEditor editor) {
+		if (editor == null) {
+			throw new NullPointerException("editor"); //$NON-NLS-1$
+		}
 		this.editor= editor;
 	}
 	
@@ -156,7 +159,7 @@ public class QuickAssistProcessor implements IQuickAssistProcessor {
 	/**
 	 * @return the editor
 	 */
-	public ISourceEditor getEditor() {
+	public final ISourceEditor getEditor() {
 		return this.editor;
 	}
 	
@@ -187,8 +190,10 @@ public class QuickAssistProcessor implements IQuickAssistProcessor {
 	 * @return the context to be passed to the computers
 	 */
 	protected AssistInvocationContext createContext(final IQuickAssistInvocationContext invocationContext,
+			final String contentType,
 			final IProgressMonitor monitor) {
-		return new AssistInvocationContext(getEditor(), invocationContext.getOffset(),
+		return new AssistInvocationContext(getEditor(),
+				invocationContext.getOffset(), contentType,
 				IModelManager.MODEL_FILE, monitor );
 	}
 	
@@ -199,28 +204,38 @@ public class QuickAssistProcessor implements IQuickAssistProcessor {
 		final SubMonitor progress= SubMonitor.convert(null);
 		progress.beginTask("", 10); //$NON-NLS-1$
 		
-		final AssistInvocationContext context= createContext(invocationContext, progress.newChild(3));
-		if (context == null) {
+		try {
+			final String contentType= TextUtils.getContentType(this.editor.getViewer().getDocument(),
+					this.editor.getDocumentContentInfo(), invocationContext.getOffset(),
+					invocationContext.getLength() == 0 );
+			
+			final AssistInvocationContext context= createContext(invocationContext, contentType,
+					progress.newChild(3) );
+			if (context == null) {
+				return null;
+			}
+			final ISourceViewer viewer= context.getSourceViewer();
+			if (viewer == null) {
+				return null;
+			}
+			final AssistProposalCollector proposals= new AssistProposalCollector();
+			
+			final IAnnotationModel model= viewer.getAnnotationModel();
+			if (model != null) {
+				addAnnotationProposals(context, proposals, model);
+			}
+			if (context.getModelInfo() != null) {
+				addModelAssistProposals(context, proposals, progress);
+			}
+			
+			if (proposals.getCount() == 0) {
+				return null;
+			}
+			return filterAndSortCompletionProposals(proposals, context, progress);
+		}
+		catch (final BadPartitioningException | BadLocationException e) {
 			return null;
 		}
-		final ISourceViewer viewer= context.getSourceViewer();
-		if (viewer == null) {
-			return null;
-		}
-		final AssistProposalCollector<IAssistCompletionProposal> proposals= new AssistProposalCollector<>(IAssistCompletionProposal.class);
-		
-		final IAnnotationModel model= viewer.getAnnotationModel();
-		if (model != null) {
-			addAnnotationProposals(context, proposals, model);
-		}
-		if (context.getModelInfo() != null) {
-			addModelAssistProposals(context, proposals, progress);
-		}
-		
-		if (proposals.getCount() == 0) {
-			return null;
-		}
-		return filterAndSortCompletionProposals(proposals, context, progress);
 	}
 	
 	/**
@@ -228,12 +243,12 @@ public class QuickAssistProcessor implements IQuickAssistProcessor {
 	 * and returned, or a new list may be created and returned.
 	 * 
 	 * @param proposals the list of collected proposals
-	 * @param monitor a progress monitor
 	 * @param context 
+	 * @param monitor a progress monitor
 	 * @return the list of filtered and sorted proposals, ready for display
 	 */
 	protected IAssistCompletionProposal[] filterAndSortCompletionProposals(
-			final AssistProposalCollector<IAssistCompletionProposal> proposals,
+			final AssistProposalCollector proposals,
 			final AssistInvocationContext context, final IProgressMonitor monitor) {
 		final IAssistCompletionProposal[] array= proposals.toArray();
 		if (array.length > 1) {
@@ -250,8 +265,7 @@ public class QuickAssistProcessor implements IQuickAssistProcessor {
 	}
 	
 	private void addAnnotationProposals(final IQuickAssistInvocationContext invocationContext,
-			final AssistProposalCollector<IAssistCompletionProposal> proposals,
-			final IAnnotationModel model) {
+			final AssistProposalCollector proposals, final IAnnotationModel model) {
 		final int offset= invocationContext.getOffset();
 		final Iterator<Annotation> iter= model.getAnnotationIterator();
 		while (iter.hasNext()) {
@@ -278,8 +292,7 @@ public class QuickAssistProcessor implements IQuickAssistProcessor {
 	}
 	
 	protected void addModelAssistProposals(final AssistInvocationContext context,
-			final AssistProposalCollector<IAssistCompletionProposal> proposals,
-			final IProgressMonitor monitor) {
+			final AssistProposalCollector proposals, final IProgressMonitor monitor) {
 	}
 	
 	@Override

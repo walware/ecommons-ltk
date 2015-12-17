@@ -108,7 +108,7 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 		
 		@Override
 		public int getRelevance() {
-			return 40;
+			return 20;
 		}
 		
 		@Override
@@ -350,7 +350,7 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 	 */
 	@Override
 	public IStatus computeCompletionProposals(final AssistInvocationContext context, final int mode,
-			final AssistProposalCollector<IAssistCompletionProposal> proposals, final IProgressMonitor monitor) {
+			final AssistProposalCollector proposals, final IProgressMonitor monitor) {
 		try {
 			final int offset= context.getInvocationOffset();
 			final IRegion partition= getContentRange(context, mode);
@@ -411,14 +411,14 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 			
 			if (baseStore == null || !baseStore.fetchInfo().exists()) {
 				if (path != null) {
-					return tryAlternative(context, proposals, path, offset - segmentPrefix.length(), 
-							segmentPrefix, completionPrefix );
+					return tryAlternative(context, path, offset - segmentPrefix.length(), segmentPrefix, 
+							completionPrefix, proposals );
 				}
 				return null;
 			}
 			
-			doAddChildren(context, proposals, baseStore, offset - segmentPrefix.length(), segmentPrefix,
-					completionPrefix );
+			doAddChildren(context, baseStore, offset - segmentPrefix.length(), segmentPrefix, completionPrefix,
+					proposals );
 			if (!segmentPrefix.isEmpty() && !segmentPrefix.equals(".")) { //$NON-NLS-1$
 				baseStore= baseStore.getChild(segmentPrefix);
 				if (baseStore.fetchInfo().exists()) {
@@ -429,8 +429,8 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 					prefixBuilder.append(baseStore.getName());
 					prefixBuilder.append(this.fileSeparator);
 					completionPrefix= prefixBuilder.toString();
-					doAddChildren(context, proposals, baseStore, offset - segmentPrefix.length(),
-							"", completionPrefix ); //$NON-NLS-1$
+					doAddChildren(context, baseStore, offset - segmentPrefix.length(), "", //$NON-NLS-1$
+							completionPrefix, proposals );
 				}
 			}
 			return Status.OK_STATUS;
@@ -446,6 +446,13 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 		restorePathSeparator();
 		return null;
 	}
+	
+	@Override
+	public IStatus computeInformationProposals(final AssistInvocationContext context,
+			final AssistProposalCollector proposals, final IProgressMonitor monitor) {
+		return null;
+	}
+	
 	
 	/**
 	 * @param prefix to check
@@ -489,9 +496,10 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 		}
 	}
 	
-	protected void doAddChildren(final AssistInvocationContext context, final AssistProposalCollector<IAssistCompletionProposal> proposals,
+	protected void doAddChildren(final AssistInvocationContext context,
 			final IFileStore baseStore,
-			final int startOffset, final String segmentPrefix, final String completionPrefix) throws CoreException {
+			final int startOffset, final String segmentPrefix, final String completionPrefix,
+			final AssistProposalCollector proposals) throws CoreException {
 		final IContainer[] workspaceRefs= ResourcesPlugin.getWorkspace().getRoot().findContainersForLocationURI(baseStore.toURI());
 		final IContainer workspaceRef= (workspaceRefs.length > 0) ? workspaceRefs[0] : null;
 		final String[] names= baseStore.childNames(EFS.NONE, new NullProgressMonitor());
@@ -504,15 +512,6 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 						workspaceRef ));
 			}
 		}
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public IStatus computeContextInformation(final AssistInvocationContext context,
-			final AssistProposalCollector<IAssistInformationProposal> proposals, final IProgressMonitor monitor) {
-		return null;
 	}
 	
 	
@@ -544,9 +543,10 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 		return EFS.getStore(URIUtil.toURI(path));
 	}
 	
-	protected IStatus tryAlternative(final AssistInvocationContext context, final AssistProposalCollector<IAssistCompletionProposal> proposals,
-			final IPath path, final int startOffset,
-			final String segmentPrefix, final String completionPrefix) throws CoreException {
+	protected IStatus tryAlternative(final AssistInvocationContext context,
+			final IPath path,
+			final int startOffset, final String segmentPrefix, final String completionPrefix,
+			final AssistProposalCollector proposals) throws CoreException {
 		return null;
 	}
 	

@@ -32,7 +32,7 @@ public interface IQuickAssistComputer {
 	 *     invocation, i.e. there is no need for the receiver to spawn a sub monitor.
 	 */
 	IStatus computeAssistProposals(AssistInvocationContext context,
-			AssistProposalCollector<IAssistCompletionProposal> proposals,
+			AssistProposalCollector proposals,
 			IProgressMonitor monitor);
 	
 }

@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextHover;
-import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.information.IInformationProvider;
 import org.eclipse.jface.text.presentation.IPresentationDamager;
@@ -185,9 +184,9 @@ public class MultiContentSectionSourceViewerConfiguration extends SourceEditorVi
 			if (state == null) {
 				config.initPresentationReconciler(getPresentationReconciler());
 				
-				{	final ContentAssist contentAssist= getContentAssist();
-					if (contentAssist != null) {
-						config.initContentAssist(contentAssist);
+				{	final ContentAssist ContentAssist= getContentAssist();
+					if (ContentAssist != null) {
+						config.initContentAssist(ContentAssist);
 					}
 				}
 				
@@ -285,7 +284,7 @@ public class MultiContentSectionSourceViewerConfiguration extends SourceEditorVi
 	
 	
 	@Override
-	protected ContentAssistant createContentAssistant(final ISourceViewer sourceViewer) {
+	protected ContentAssist createContentAssistant(final ISourceViewer sourceViewer) {
 		if (getSourceEditor() != null) {
 			final ContentAssist assistant= new LazyContentAssist();
 			assistant.setDocumentPartitioning(getConfiguredDocumentPartitioning(null));

@@ -12,7 +12,6 @@
 package de.walware.ecommons.ltk.ui.sourceediting.assist;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -29,6 +28,9 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.osgi.framework.Bundle;
+
+import de.walware.jcommons.collections.ImCollections;
+import de.walware.jcommons.collections.ImList;
 
 import de.walware.ecommons.ICommonStatusConstants;
 import de.walware.ecommons.IDisposable;
@@ -163,8 +165,7 @@ public class ContentAssistComputerRegistry implements ManageListener, IDisposabl
 	private final StringSetPref prefDisabledCategoryIds;
 	private final StringArrayPref prefOrderedCategoryIds;
 	
-	private List<ContentAssistCategory> categories;
-	private String specificModeId;
+	private ImList<ContentAssistCategory> categories;
 	
 	
 	public ContentAssistComputerRegistry(final String contentTypeId, final String prefQualifier) {
@@ -203,8 +204,8 @@ public class ContentAssistComputerRegistry implements ManageListener, IDisposabl
 		if (this.qualifier != null && groupIds.contains(this.qualifier)) {
 			synchronized (this) {
 				if (this.categories != null) {
-					this.categories= Collections.unmodifiableList(applyPreferences(
-							PreferencesUtil.getInstancePrefs(), this.categories));
+					this.categories= ImCollections.toList(
+							applyPreferences(PreferencesUtil.getInstancePrefs(), this.categories) );
 				}
 			}
 		}
@@ -214,7 +215,7 @@ public class ContentAssistComputerRegistry implements ManageListener, IDisposabl
 	public void afterSettingsChangeNotification(final Set<String> groupIds) {
 	}
 	
-	private List<ContentAssistCategory> loadExtensions() {
+	private ImList<ContentAssistCategory> loadExtensions() {
 		final ArrayList<IConfigurationElement> categoryConfigs= new ArrayList<>(); // categories of all content types!
 		final Map<String, List<ComputerDescriptor>> computersByCategoryId= new HashMap<>();
 		
@@ -283,11 +284,12 @@ public class ContentAssistComputerRegistry implements ManageListener, IDisposabl
 						e ));
 			}
 		}
-		return (this.categories= Collections.unmodifiableList(applyPreferences(
-				PreferencesUtil.getInstancePrefs(), categories)));
+		return (this.categories= ImCollections.toList(
+				applyPreferences(PreferencesUtil.getInstancePrefs(), categories) ));
 	}
 	
-	List<ContentAssistCategory> applyPreferences(final IPreferenceAccess prefAccess, final List<ContentAssistCategory> categories) {
+	List<ContentAssistCategory> applyPreferences(final IPreferenceAccess prefAccess,
+			final List<ContentAssistCategory> categories) {
 		final Set<String> disabledIds= prefAccess.getPreferenceValue(getPrefDefaultDisabledCategoryIds());
 		for (final ContentAssistCategory category : categories) {
 			final boolean enabled= disabledIds == null || !disabledIds.contains(category.getId());
@@ -324,7 +326,7 @@ public class ContentAssistComputerRegistry implements ManageListener, IDisposabl
 	}
 	
 	public synchronized List<ContentAssistCategory> getCopyOfCategories() {
-		List<ContentAssistCategory> categories= this.categories;
+		ImList<ContentAssistCategory> categories= this.categories;
 		if (categories == null) {
 			categories= loadExtensions();
 		}
@@ -359,34 +361,27 @@ public class ContentAssistComputerRegistry implements ManageListener, IDisposabl
 	}
 	
 	
-	public synchronized List<ContentAssistCategory> getCategories() {
-		List<ContentAssistCategory> categories= this.categories;
+	public synchronized ImList<ContentAssistCategory> getCategories() {
+		ImList<ContentAssistCategory> categories= this.categories;
 		if (categories == null) {
 			categories= loadExtensions();
-		}
-		if (this.specificModeId != null) {
-			for (final ContentAssistCategory category : categories) {
-				if (category.getId().equals(this.specificModeId)) {
-					final ContentAssistCategory copy= new ContentAssistCategory(category);
-					copy.isIncludedInDefault= true;
-					return Collections.singletonList(copy);
-				}
-			}
-			return Collections.emptyList();
 		}
 		return categories;
 	}
 	
-	public synchronized void startSpecificMode(final String categoryId) {
-		this.specificModeId= categoryId;
-	}
-	
-	public synchronized void stopSpecificMode() {
-		this.specificModeId= null;
-	}
-	
-	public synchronized boolean isInSpecificMode() {
-		return (this.specificModeId != null);
+	public synchronized ImList<ContentAssistCategory> getCategory(final String categoryId) {
+		ImList<ContentAssistCategory> categories= this.categories;
+		if (categories == null) {
+			categories= loadExtensions();
+		}
+		for (final ContentAssistCategory category : categories) {
+			if (category.getId().equals(categoryId)) {
+				final ContentAssistCategory copy= new ContentAssistCategory(category);
+				copy.isIncludedInDefault= true;
+				return ImCollections.newList(copy);
+			}
+		}
+		return ImCollections.emptyList();
 	}
 	
 }

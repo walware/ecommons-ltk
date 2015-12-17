@@ -96,8 +96,6 @@ public class TemplateProposal implements IAssistCompletionProposal,
 	
 	private final Image image;
 	
-	private StyledString displayString;
-	
 	private IRegion region;
 	
 	private IRegion selectionToSet; // initialized by apply()
@@ -115,28 +113,17 @@ public class TemplateProposal implements IAssistCompletionProposal,
 		this.image= image;
 		this.region= region;
 		
-		this.displayString= null;
-		
 		this.relevance= relevance;
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public void selected(final ITextViewer textViewer, final boolean smartToggle) {
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public void unselected(final ITextViewer textViewer) {
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public boolean validate(final IDocument document, final int offset, final DocumentEvent event) {
 		try {
@@ -166,20 +153,12 @@ public class TemplateProposal implements IAssistCompletionProposal,
 		return false;
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public char[] getTriggerCharacters() {
 		// no triggers
 		return new char[0];
 	}
 	
-	/**
-	 * Returns the relevance.
-	 *
-	 * @return the relevance
-	 */
 	@Override
 	public int getRelevance() {
 		return this.relevance;
@@ -195,25 +174,17 @@ public class TemplateProposal implements IAssistCompletionProposal,
 		return this.template.isAutoInsertable();
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public String getDisplayString() {
 		return getStyledDisplayString().getString();
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public StyledString getStyledDisplayString() {
-		if (this.displayString == null) {
-			final StyledString s= new StyledString(this.template.getName());
-			s.append(" – " + this.template.getDescription(), StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
-			this.displayString= s;
-		}
-		return this.displayString;
+		final StyledString s= new StyledString(this.template.getName());
+		s.append(QUALIFIER_SEPARATOR, StyledString.QUALIFIER_STYLER);
+		s.append(this.template.getDescription(), StyledString.QUALIFIER_STYLER);
+		return s;
 	}
 	
 	@Override
@@ -241,7 +212,7 @@ public class TemplateProposal implements IAssistCompletionProposal,
 						null, getDisplayString(), ((IWorkbenchTemplateContext) context).evaluateInfo(getTemplate()), 
 						DefaultBrowserInformationInput.FORMAT_SOURCE_INPUT);
 			}
-				
+			
 			final TemplateBuffer templateBuffer= context.evaluate(getTemplate());
 			if (templateBuffer != null) {
 				return new DefaultBrowserInformationInput(
@@ -264,9 +235,6 @@ public class TemplateProposal implements IAssistCompletionProposal,
 		// not called anymore
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public void apply(final ITextViewer viewer, final char trigger, final int stateMask, final int offset) {
 		final IDocument document= viewer.getDocument();
@@ -453,25 +421,16 @@ public class TemplateProposal implements IAssistCompletionProposal,
 		return end;
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public CharSequence getPrefixCompletionText(final IDocument document, final int completionOffset) {
 		return this.template.getName();
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public int getPrefixCompletionStart(final IDocument document, final int completionOffset) {
 		return getReplaceOffset();
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public Point getSelection(final IDocument document) {
 		if (this.selectionToSet != null) {
@@ -480,17 +439,11 @@ public class TemplateProposal implements IAssistCompletionProposal,
 		return null;
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public int getContextInformationPosition() {
 		return this.region.getOffset();
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public IContextInformation getContextInformation() {
 		return null;
