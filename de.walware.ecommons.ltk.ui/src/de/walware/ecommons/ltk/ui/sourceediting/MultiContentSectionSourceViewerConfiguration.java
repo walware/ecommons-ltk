@@ -288,7 +288,7 @@ public class MultiContentSectionSourceViewerConfiguration extends SourceEditorVi
 		if (getSourceEditor() != null) {
 			final ContentAssist assistant= new LazyContentAssist();
 			assistant.setDocumentPartitioning(getConfiguredDocumentPartitioning(null));
-			assistant.setRestoreCompletionProposalSize(DialogUtil.getDialogSettings(LTKUIPlugin.getDefault(), "ContentAssist.Proposal.size")); //$NON-NLS-1$
+			assistant.setRestoreCompletionProposalSize(DialogUtil.getDialogSettings(LTKUIPlugin.getInstance(), "ContentAssist.Proposal.size")); //$NON-NLS-1$
 			
 			initContentAssist(assistant);
 			return assistant;

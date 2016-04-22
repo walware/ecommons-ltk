@@ -87,7 +87,7 @@ public abstract class QuickOutlineInformationControl extends QuickTreeInformatio
 	
 	@Override
 	protected IDialogSettings getDialogSettings() {
-		return DialogUtil.getSection(LTKUIPlugin.getDefault().getDialogSettings(), "EditorStructurePopup"); //$NON-NLS-1$
+		return DialogUtil.getSection(LTKUIPlugin.getInstance().getDialogSettings(), "EditorStructurePopup"); //$NON-NLS-1$
 	}
 	
 	@Override

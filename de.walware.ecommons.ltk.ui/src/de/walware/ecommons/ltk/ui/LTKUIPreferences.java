@@ -24,7 +24,7 @@ public class LTKUIPreferences {
 	
 	
 	public static IPreferenceStore getPreferenceStore() {
-		return LTKUIPlugin.getDefault().getPreferenceStore();
+		return LTKUIPlugin.getInstance().getPreferenceStore();
 	}
 	
 	

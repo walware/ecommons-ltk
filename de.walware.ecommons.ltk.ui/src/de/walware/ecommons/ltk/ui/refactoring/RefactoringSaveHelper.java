@@ -40,7 +40,7 @@ import org.eclipse.ui.actions.GlobalBuildAction;
 import org.eclipse.ui.dialogs.ListDialog;
 import org.eclipse.ui.statushandlers.StatusManager;
 
-import de.walware.ecommons.io.BuildUtil;
+import de.walware.ecommons.resources.core.BuildUtils;
 import de.walware.ecommons.ui.util.UIAccess;
 
 import de.walware.ecommons.ltk.internal.ui.LTKUIPlugin;
@@ -132,7 +132,7 @@ public class RefactoringSaveHelper {
 		
 		try {
 			// Save isn't cancelable.
-			final boolean autoBuild = BuildUtil.setAutoBuilding(false);
+			final boolean autoBuild = BuildUtils.setAutoBuilding(false);
 			try {
 				if ((fSaveMode & 0xf) == SAVE_ALL
 						|| ECommonsRefactoring.getSaveAllEditors()) {
@@ -171,7 +171,7 @@ public class RefactoringSaveHelper {
 				fFilesSaved = true;
 			}
 			finally {
-				BuildUtil.setAutoBuilding(autoBuild);
+				BuildUtils.setAutoBuilding(autoBuild);
 			}
 			return true;
 		}

@@ -164,7 +164,7 @@ public abstract class PathCompletionComputor implements IContentAssistComputer {
 			if (this.workspaceRef != null) {
 				final IResource member= this.workspaceRef.findMember(this.fileStore.getName(), true);
 				if (member != null) {
-					image= LTKUIPlugin.getDefault().getWorkbenchLabelProvider().getImage(member);
+					image= LTKUIPlugin.getInstance().getWorkbenchLabelProvider().getImage(member);
 				}
 			}
 			if (image == null) {

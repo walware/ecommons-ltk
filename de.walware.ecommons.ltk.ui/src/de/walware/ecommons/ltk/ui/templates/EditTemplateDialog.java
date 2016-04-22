@@ -449,7 +449,7 @@ public class EditTemplateDialog extends ExtStatusDialog {
 	
 	
 	protected IDialogSettings getDialogSettings() {
-		return DialogUtil.getDialogSettings(LTKUIPlugin.getDefault(), "TemplateEditDialog"); //$NON-NLS-1$
+		return DialogUtil.getDialogSettings(LTKUIPlugin.getInstance(), "TemplateEditDialog"); //$NON-NLS-1$
 	}
 	
 	@Override

@@ -110,7 +110,7 @@ public class LTKUI {
 	
 	
 	public static ImageRegistry getImages() {
-		return LTKUIPlugin.getDefault().getImageRegistry();
+		return LTKUIPlugin.getInstance().getImageRegistry();
 	}
 	
 }

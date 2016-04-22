@@ -252,21 +252,21 @@ public class CodeTemplateConfigurationBlock extends ManagedConfigurationBlock
 		
 	}
 	
-	private class ThisDataAdapter extends DataAdapter<TemplateItem> {
+	private class TemplateDataAdapter extends DataAdapter.TreeAdapter<TemplateItem> {
 		
 		
 		private final Map<String, IObservableValue> defaultValues;
 		private final Map<Preference<?>, String> prefs;
 		
 		
-		public ThisDataAdapter(final ITreeContentProvider treeProvider,
+		public TemplateDataAdapter(final ITreeContentProvider treeProvider,
 				final IObservableValue defaultValue) {
 			super(treeProvider, defaultValue);
 			this.prefs= null;
 			this.defaultValues= null;
 		}
 		
-		public ThisDataAdapter(final ITreeContentProvider treeProvider,
+		public TemplateDataAdapter(final ITreeContentProvider treeProvider,
 				final Map<Preference<?>, String> prefs) {
 			super(treeProvider, null);
 			this.prefs= prefs;
@@ -381,7 +381,7 @@ public class CodeTemplateConfigurationBlock extends ManagedConfigurationBlock
 	
 	private ImList<TemplateCategory> templateCategories;
 	
-	private ThisDataAdapter dataAdapter;
+	private TemplateDataAdapter dataAdapter;
 	private ThisContentProvider contentProvider;
 	
 	private TreeViewer treeViewer;
@@ -509,14 +509,14 @@ public class CodeTemplateConfigurationBlock extends ManagedConfigurationBlock
 		this.contentProvider= new ThisContentProvider();
 		switch (this.mode & DEFAULT_MASK) {
 		case DEFAULT_SINGLE:
-			this.dataAdapter= new ThisDataAdapter(this.contentProvider,
+			this.dataAdapter= new TemplateDataAdapter(this.contentProvider,
 					createObservable(this.defaultPref) );
 			break;
 		case DEFAULT_BY_CATEGORY:
-			this.dataAdapter= new ThisDataAdapter(this.contentProvider, prefs);
+			this.dataAdapter= new TemplateDataAdapter(this.contentProvider, prefs);
 			break;
 		default:
-			this.dataAdapter= new ThisDataAdapter(this.contentProvider, (IObservableValue) null);
+			this.dataAdapter= new TemplateDataAdapter(this.contentProvider, (IObservableValue) null);
 			break;
 		}
 		

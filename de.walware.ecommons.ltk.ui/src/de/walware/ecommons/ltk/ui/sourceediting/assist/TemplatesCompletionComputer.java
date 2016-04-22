@@ -226,7 +226,7 @@ public abstract class TemplatesCompletionComputer implements IContentAssistCompu
 	}
 	
 	protected Image getImage(final Template template) {
-		return LTKUIPlugin.getDefault().getImageRegistry().get(LTKUI.OBJ_TEXT_TEMPLATE_IMAGE_ID);
+		return LTKUIPlugin.getInstance().getImageRegistry().get(LTKUI.OBJ_TEXT_TEMPLATE_IMAGE_ID);
 	}
 	
 }

@@ -44,7 +44,7 @@ public class LTKUIPlugin extends AbstractUIPlugin {
 	 * 
 	 * @return the shared instance
 	 */
-	public static LTKUIPlugin getDefault() {
+	public static LTKUIPlugin getInstance() {
 		return gPlugin;
 	}
 	
@@ -123,9 +123,6 @@ public class LTKUIPlugin extends AbstractUIPlugin {
 		}
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	protected void initializeImageRegistry(final ImageRegistry reg) {
 		if (!fStarted) {

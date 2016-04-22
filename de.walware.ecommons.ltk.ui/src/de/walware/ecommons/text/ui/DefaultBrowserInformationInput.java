@@ -42,7 +42,7 @@ public class DefaultBrowserInformationInput extends BrowserInformationControlInp
 		
 		public Formatter() {
 			JFaceResources.getFontRegistry().addListener(this);
-			LTKUIPlugin.getDefault().addStoppingListener(this);
+			LTKUIPlugin.getInstance().addStoppingListener(this);
 			updateStyleSheet();
 		}
 		

@@ -80,13 +80,15 @@ public class AdvancedContentAssistConfigurationBlock extends ManagedConfiguratio
 	
 	
 	private CheckboxTableViewer defaultList;
+	
 	private CheckboxTableViewer circlingList;
+	private ButtonGroup<ContentAssistCategory> circlingOrderButtons;
+	
 	private final Map<Object, Image> images= new HashMap<>();
 	
 	private final ContentAssistComputerRegistry registry;
 	
 	private WritableList orderedCategories;
-	private ButtonGroup<ContentAssistCategory> orderButtons;
 	
 	private Command specificCommand;
 	private IParameter specificParam;
@@ -226,15 +228,15 @@ public class AdvancedContentAssistConfigurationBlock extends ManagedConfiguratio
 			final Composite table= createCirclingTable(group);
 			table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 			
-			this.orderButtons= new ButtonGroup<>(group);
-			this.orderButtons.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
-			this.orderButtons.addUpButton(null);
-			this.orderButtons.addDownButton(null);
+			this.circlingOrderButtons= new ButtonGroup<>(group);
+			this.circlingOrderButtons.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
+			this.circlingOrderButtons.addUpButton(null);
+			this.circlingOrderButtons.addDownButton(null);
 		}
 		
 		this.orderedCategories= new WritableList();
 		this.circlingList.setInput(this.orderedCategories);
-		this.orderButtons.connectTo(this.circlingList, this.orderedCategories, null);
+		this.circlingOrderButtons.connectTo(this.circlingList, this.orderedCategories, null);
 		ViewerUtil.scheduleStandardSelection(this.circlingList);
 		
 		ViewerUtil.scheduleStandardSelection(this.defaultList);
@@ -332,6 +334,7 @@ public class AdvancedContentAssistConfigurationBlock extends ManagedConfiguratio
 		for (final ContentAssistCategory category : orderedCategories) {
 			this.circlingList.setChecked(category, category.isEnabledAsSeparate);
 		}
+		circlingOrderButtons.refresh();
 	}
 	
 	@Override

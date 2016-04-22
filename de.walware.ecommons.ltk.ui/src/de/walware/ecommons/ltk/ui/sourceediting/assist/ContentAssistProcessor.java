@@ -65,7 +65,8 @@ import de.walware.ecommons.ltk.ui.sourceediting.ISourceEditor;
 public class ContentAssistProcessor extends ContentAssist.Processor implements IContentAssistProcessor {
 	
 	
-	private static final boolean DEBUG= "true".equalsIgnoreCase(Platform.getDebugOption("de.walware.ecommons.ui/debug/ResultCollector")); //$NON-NLS-1$ //$NON-NLS-2$
+	private static final boolean DEBUG_LOG= Boolean.parseBoolean(
+			Platform.getDebugOption("de.walware.ecommons.ltk/debug/ContentAssist/log") ); //$NON-NLS-1$
 	
 	private static final Collator NAME_COLLATOR= Collator.getInstance();
 	
@@ -213,7 +214,7 @@ public class ContentAssistProcessor extends ContentAssist.Processor implements I
 		try {
 			final AssistInvocationContext context= getCompletionProposalContext(offset, m.newChild(3));
 			
-			final long setup= DEBUG ? System.nanoTime() : 0L;
+			final long setup= (DEBUG_LOG) ? System.nanoTime() : 0;
 			
 			final long modificationStamp= ((AbstractDocument) context.getSourceViewer().getDocument()).getModificationStamp();
 			final int mode;
@@ -253,14 +254,14 @@ public class ContentAssistProcessor extends ContentAssist.Processor implements I
 			
 			final AssistProposalCollector proposals= createProposalCollector();
 			collectCompletionProposals(context, mode, categories, proposals, m);
-			final long collect= DEBUG ? System.nanoTime() : 0L;
+			final long collect= (DEBUG_LOG) ? System.nanoTime() : 0;
 			
 			m.subTask(EditingMessages.ContentAssistProcessor_ComputingProposals_Sorting_task);
 			final IAssistCompletionProposal[] result= filterAndSortCompletionProposals(proposals,
 					context, m.newChild(1) );
-			final long filter= DEBUG ? System.nanoTime() : 0L;
+			final long filter= (DEBUG_LOG) ? System.nanoTime() : 0;
 			
-			if (DEBUG) {
+			if (DEBUG_LOG) {
 				final StringBuilder sb= new StringBuilder("Code Assist Stats"); //$NON-NLS-1$
 				sb.append(" (").append(result.length).append(" proposals)"); //$NON-NLS-1$ //$NON-NLS-2$
 				sb.append("\n\t" + "setup=   ").append((setup - startTime)); //$NON-NLS-1$ //$NON-NLS-2$
