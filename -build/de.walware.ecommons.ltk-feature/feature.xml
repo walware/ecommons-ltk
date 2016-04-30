@@ -45,6 +45,20 @@
          unpack="false"/>
 
    <plugin
+         id="de.walware.ecommons.ltk.buildpaths.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="de.walware.ecommons.ltk.buildpaths.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
          id="de.walware.ecommons.text.core"
          download-size="0"
          install-size="0"

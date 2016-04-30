@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Vendor: WalWare.de
+Bundle-Name: ECommons LTK - Buildpath - Core
+Bundle-SymbolicName: de.walware.ecommons.ltk.buildpaths.core;singleton:=true
+Bundle-Version: 2.5.0.qualifier
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Require-Bundle: org.eclipse.core.runtime;bundle-version="3.10",
+ org.eclipse.core.resources;visibility:=reexport
+Import-Package: de.walware.jcommons.collections;version="1.0",
+ de.walware.jcommons.lang;version="1.0.0",
+ de.walware.ecommons
+Export-Package: de.walware.ecommons.ltk.buildpaths.core
