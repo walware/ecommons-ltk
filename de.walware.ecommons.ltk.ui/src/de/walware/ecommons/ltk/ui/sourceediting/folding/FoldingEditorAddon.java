@@ -244,7 +244,7 @@ public class FoldingEditorAddon implements ISourceEditorAddon, IModelElementInpu
 			else {
 				final ProjectionAnnotationModel model= input.fAnnotationModel;
 				final List<FoldingAnnotation> del= new ArrayList<>();
-				for (final Iterator<FoldingAnnotation> iter= model.getAnnotationIterator(); iter.hasNext(); ) {
+				for (final Iterator<FoldingAnnotation> iter= (Iterator) model.getAnnotationIterator(); iter.hasNext(); ) {
 					final FoldingAnnotation ann= iter.next();
 					final Position position= model.getPosition(ann);
 					final FoldingAnnotation newAnn= ctx.table.remove(position);
@@ -477,7 +477,7 @@ public class FoldingEditorAddon implements ISourceEditorAddon, IModelElementInpu
 			EncodedValue.writeLong(sb, resource.getModificationStamp());
 			
 			final ProjectionAnnotationModel model= input.fAnnotationModel;
-			for (final Iterator<FoldingAnnotation> iter= model.getAnnotationIterator(); iter.hasNext(); ) {
+			for (final Iterator<FoldingAnnotation> iter= (Iterator) model.getAnnotationIterator(); iter.hasNext(); ) {
 				final FoldingAnnotation ann= iter.next();
 				final int state= ann.getState();
 				if (state != ann.getInitialState()) {

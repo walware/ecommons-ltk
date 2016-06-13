@@ -24,8 +24,8 @@ import de.walware.ecommons.ltk.core.model.ISourceStructElement;
 public class ElementNameComparator extends ViewerComparator implements Comparator<IModelElement> {
 	
 	
-	public ElementNameComparator(final Comparator<IElementName> nameComparator) {
-		super(nameComparator);
+	public ElementNameComparator(final Comparator<? super IElementName> nameComparator) {
+		super((Comparator) nameComparator);
 	}
 	
 	
@@ -51,7 +51,8 @@ public class ElementNameComparator extends ViewerComparator implements Comparato
 		if (c1 != c2) {
 			return c1 - c2;
 		}
-		final int result = getComparator().compare(e1.getElementName(), e2.getElementName());
+		final int result = ((Comparator<? super IElementName>) getComparator())
+				.compare(e1.getElementName(), e2.getElementName());
 		if (result != 0) {
 			return result;
 		}
