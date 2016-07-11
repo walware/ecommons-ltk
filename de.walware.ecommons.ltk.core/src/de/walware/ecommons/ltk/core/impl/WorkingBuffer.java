@@ -48,9 +48,11 @@ import de.walware.ecommons.ltk.internal.core.LTKCorePlugin;
 public class WorkingBuffer implements IWorkingBuffer {
 	
 	/** Mode for IFile (in workspace) */
-	protected static final int IFILE= 1;
+	protected static final byte IFILE= 1;
 	/** Mode for IFileStore (URI) */
-	protected static final int FILESTORE= 2;
+	protected static final byte FILESTORE= 2;
+	
+	protected static final byte DOCUMENT= 1;
 	
 	
 	public static SourceContent createContentFromDocument(final IDocument doc) {
@@ -81,7 +83,7 @@ public class WorkingBuffer implements IWorkingBuffer {
 	 *   <li>> 0 - mode constant {@link #IFILE}, {@link #FILESTORE}</li>
 	 * </ul>
 	 */
-	private int mode;
+	private byte mode;
 	
 	public WorkingBuffer(final ISourceUnit unit) {
 		this.unit= unit;
@@ -93,7 +95,7 @@ public class WorkingBuffer implements IWorkingBuffer {
 	 * 
 	 * @return <code>true</code> if valid mode, otherwise <code>false</code>
 	 */
-	protected final int detectMode() {
+	protected final byte detectResourceMode() {
 		if (this.mode == 0) {
 			final Object resource= this.unit.getResource();
 			if (resource instanceof IFile) {
@@ -110,9 +112,14 @@ public class WorkingBuffer implements IWorkingBuffer {
 		return this.mode;
 	}
 	
-	protected final int getMode() {
+	protected final byte getResourceMode() {
 		return this.mode;
 	}
+	
+	protected byte getContentMode() {
+		return 0;
+	}
+	
 	
 	@Override
 	public long getContentStamp(final IProgressMonitor monitor) {
@@ -126,7 +133,7 @@ public class WorkingBuffer implements IWorkingBuffer {
 				return underlyingUnit.getContentStamp(monitor);
 			}
 		}
-		if (detectMode() == IFILE) {
+		if (detectResourceMode() == IFILE) {
 			final IFile resource= (IFile) this.unit.getResource();
 			if (resource != null) {
 				return resource.getModificationStamp();
@@ -140,27 +147,24 @@ public class WorkingBuffer implements IWorkingBuffer {
 		return this.document;
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public synchronized AbstractDocument getDocument(final IProgressMonitor monitor) {
-		if (this.document == null) {
+		AbstractDocument doc= this.document;
+		if (doc == null) {
 			final SubMonitor progress= SubMonitor.convert(monitor);
-			final AbstractDocument doc= createDocument(progress);
+			doc= createDocument(progress);
 			checkDocument(doc);
-			this.document= doc;
+			if ((getContentMode() & DOCUMENT) != 0) {
+				this.document= doc;
+			}
 		}
-		return this.document;
+		return doc;
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public SourceContent getContent(final IProgressMonitor monitor) {
 		final SubMonitor progress= SubMonitor.convert(monitor);
-		final IDocument doc= this.document;
+		final IDocument doc= ((getContentMode() & DOCUMENT) != 0) ? getDocument(monitor) : getDocument();
 		if (doc != null) {
 			return createContentFromDocument(doc);
 		}
@@ -183,7 +187,7 @@ public class WorkingBuffer implements IWorkingBuffer {
 				return underlyingUnit.checkState(validate, monitor);
 			}
 		}
-		switch (detectMode()) {
+		switch (detectResourceMode()) {
 		case IFILE:
 			{	final IFile resource= (IFile) this.unit.getResource();
 				if (!validate) {
@@ -238,7 +242,7 @@ public class WorkingBuffer implements IWorkingBuffer {
 	}
 	
 	private IDocument createEmptyDocument() {
-		switch (detectMode()) {
+		switch (detectResourceMode()) {
 		case IFILE:
 			return FileBuffers.getTextFileBufferManager().createEmptyDocument(
 					((IFile) this.unit.getResource()).getFullPath(),

@@ -48,8 +48,13 @@ public class FileBufferWorkingBuffer extends WorkingBuffer {
 	
 	
 	@Override
+	protected final byte getContentMode() {
+		return DOCUMENT;
+	}
+	
+	@Override
 	protected AbstractDocument createDocument(final SubMonitor progress) {
-		switch (detectMode()) {
+		switch (detectResourceMode()) {
 		case IFILE:
 			{	final IPath path= ((IFile) this.unit.getResource()).getFullPath();
 				try {
@@ -95,7 +100,7 @@ public class FileBufferWorkingBuffer extends WorkingBuffer {
 				return this.fileBuffer;
 			};
 		}
-		switch (getMode()) {
+		switch (getResourceMode()) {
 		case IFILE:
 			{	final IPath path= ((IFile) this.unit.getResource()).getFullPath();
 				return FileBuffers.getTextFileBufferManager().getTextFileBuffer(path, LocationKind.IFILE);
@@ -111,7 +116,7 @@ public class FileBufferWorkingBuffer extends WorkingBuffer {
 	
 	@Override
 	protected SourceContent createContent(final SubMonitor progress) {
-		if (detectMode() > 0) {
+		if (detectResourceMode() > 0) {
 			final ITextFileBuffer buffer= getBuffer();
 			if (buffer != null) {
 				return createContentFromDocument(buffer.getDocument());
@@ -125,7 +130,7 @@ public class FileBufferWorkingBuffer extends WorkingBuffer {
 		if (this.fileBuffer != null) {
 			try {
 				final SubMonitor progress= SubMonitor.convert(monitor);
-				switch (getMode()) {
+				switch (getResourceMode()) {
 				case IFILE:
 					{	final IPath path= ((IFile) this.unit.getResource()).getFullPath();
 						FileBuffers.getTextFileBufferManager().disconnect(path, LocationKind.IFILE, progress);
@@ -176,7 +181,7 @@ public class FileBufferWorkingBuffer extends WorkingBuffer {
 	
 	@Override
 	public boolean isSynchronized() {
-		if (detectMode() > 0) {
+		if (detectResourceMode() > 0) {
 			final ITextFileBuffer buffer= getBuffer();
 			if (buffer != null) {
 				return !buffer.isDirty();
