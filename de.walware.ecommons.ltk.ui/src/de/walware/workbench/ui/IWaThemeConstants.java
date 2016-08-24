@@ -79,4 +79,7 @@ public interface IWaThemeConstants {
 	String INFORMATION_COLOR = "de.walware.workbench.themes.InformationColor"; //$NON-NLS-1$
 	
 	
+	String TABLE_FONT= "de.walware.workbench.themes.TableFont"; //$NON-NLS-1$
+	
+	
 }

@@ -806,6 +806,15 @@
             Text font used for input and output in tool consoles (e.g. R Console)
          </description>
       </fontDefinition>
+      <fontDefinition
+            id="de.walware.workbench.themes.TableFont"
+            categoryId="de.walware.workbench.themes.ElementCategory"
+            label="%themes_TableFont_label"
+            defaultsTo="org.eclipse.jface.dialogfont">
+         <description>
+            Text font used for text in data table viewer and editors
+         </description>
+      </fontDefinition>
       
       <colorDefinition
             id="de.walware.workbench.themes.CodeDefaultColor"
