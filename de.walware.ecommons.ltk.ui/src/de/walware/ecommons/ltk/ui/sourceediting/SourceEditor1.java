@@ -59,6 +59,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.IShowInSource;
@@ -127,7 +128,8 @@ public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 	public static final String ACTION_ID_TOGGLE_COMMENT = "de.walware.statet.ui.actions.ToggleComment"; //$NON-NLS-1$
 	
 	protected static final ImList<String> ACTION_SET_CONTEXT_IDS= ImCollections.newIdentityList(
-			"de.walware.ecommons.ltk.contexts.EditSource1MenuSet" ); //$NON-NLS-1$
+			"de.walware.ecommons.ltk.contexts.EditSource1MenuSet", //$NON-NLS-1$
+			"org.eclipse.ui.edit.text.actionSet.presentation" ); //$NON-NLS-1$
 	
 	private static final ImList<String> CONTEXT_IDS= ImCollections.addElement(
 			ACTION_SET_CONTEXT_IDS,
@@ -353,12 +355,13 @@ public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 		}
 	}
 	
-	@Override
-	protected void initializeKeyBindingScopes() {
-		setContexts(CONTEXT_IDS);
+	protected Collection<String> getContextIds() {
+		return CONTEXT_IDS;
 	}
 	
-	protected void setContexts(final Collection<String> ids) {
+	@Override
+	protected void initializeKeyBindingScopes() {
+		final Collection<String> ids= getContextIds();
 		setKeyBindingScopes(ids.toArray(new String[ids.size()]));
 	}
 	
@@ -591,6 +594,11 @@ public abstract class SourceEditor1 extends TextEditor implements ISourceEditor,
 			fLazySetup = false;
 			setupConfiguration(getEditorInput(), getSourceViewer());
 			fConfigurator.setTarget(this);
+		}
+		
+		final IContextService contextService= (IContextService) getServiceLocator().getService(IContextService.class);
+		for (String id : getContextIds()) {
+			contextService.activateContext(id);
 		}
 	}
 	
