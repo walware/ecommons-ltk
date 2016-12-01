@@ -184,9 +184,9 @@ public class MultiContentSectionSourceViewerConfiguration extends SourceEditorVi
 			if (state == null) {
 				config.initPresentationReconciler(getPresentationReconciler());
 				
-				{	final ContentAssist ContentAssist= getContentAssist();
-					if (ContentAssist != null) {
-						config.initContentAssist(ContentAssist);
+				{	final ContentAssist contentAssist= getContentAssist();
+					if (contentAssist != null) {
+						config.initContentAssist(contentAssist);
 					}
 				}
 				
